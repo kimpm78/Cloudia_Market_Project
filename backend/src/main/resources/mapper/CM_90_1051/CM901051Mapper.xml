@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1051.mapper.CM901051Mapper">
+    <select id="findByAllOrders" resultType="com.cloudia.backend.CM_90_1051.model.OrderDto">
+        SELECT o.order_id
+              ,o.member_number
+              ,u.login_id
+              ,u.name
+              ,o.order_number
+              ,o.total_amount
+              ,o.payment_value
+              ,o.order_status_value
+              ,o.order_date
+              ,o.tracking_number
+              ,o.shipping_date
+              ,o.delivery_date
+        FROM   orders o
+        LEFT JOIN users u
+        ON     o.member_number = u.member_number
+        ORDER BY 
+               o.order_date
+              ,o.order_status_value
+              ,o.order_number
+              ,o.member_number
+    </select>
+    
+    <select id="getFindOrders" 
+            parameterType="com.cloudia.backend.CM_90_1051.model.SearchRequestDto" 
+            resultType="com.cloudia.backend.CM_90_1051.model.OrderDto">
+        SELECT o.order_id
+              ,o.member_number
+              ,u.login_id
+              ,u.name
+              ,o.order_number
+              ,o.total_amount
+              ,o.payment_value
+              ,o.order_status_value
+              ,o.order_date
+              ,u.email
+        FROM   orders o
+        LEFT JOIN users u
+        ON     o.member_number = u.member_number
+        WHERE 1=1
+        <if test="dateFrom != null and dateFrom != ''">
+            AND o.order_date <![CDATA[>=]]> #{dateFrom}::date
+        </if>
+        <if test="dateTo != null and dateTo != ''">
+            AND o.order_date <![CDATA[<]]> #{dateTo}::date + INTERVAL '1 day'
+        </if>
+        <if test="orderNumber != 0">
+            AND o.order_number = #{orderNumber}
+        </if>
+        <if test="memberNumber != 0">
+            AND o.member_number = #{memberNumber}
+        </if>
+        <if test="paymentMethod != 0">
+            AND o.payment_value = #{paymentMethod}
+        </if>
+        ORDER BY 
+               o.order_date
+              ,o.order_status_value
+              ,o.order_number
+              ,o.member_number
+    </select>
+
+    <select id="getFindOrder" 
+            parameterType="com.cloudia.backend.CM_90_1051.model.SearchRequestDto" 
+            resultType="com.cloudia.backend.CM_90_1051.model.OrderDto">
+        SELECT o.order_id
+              ,o.member_number
+              ,u.login_id
+              ,u.name
+              ,o.order_number
+              ,o.total_amount
+              ,o.payment_value
+              ,o.order_status_value
+              ,o.order_date
+              ,u.email
+              ,o.tracking_number
+              ,o.shipping_date
+              ,o.delivery_date
+        FROM   orders o
+        LEFT JOIN users u
+        ON     o.member_number = u.member_number
+        WHERE 1=1
+        <if test="dateFrom != null and dateFrom != ''">
+            AND o.order_date <![CDATA[>=]]> #{dateFrom}::date
+        </if>
+        <if test="dateTo != null and dateTo != ''">
+            AND o.order_date <![CDATA[<]]> #{dateTo}::date + INTERVAL '1 day'
+        </if>
+        <if test="orderStatusValue != 0">
+            AND o.order_status_value = #{orderStatusValue}
+        </if>
+        <if test="paymentMethod != 0">
+            AND o.payment_value = #{paymentMethod}
+        </if>
+        ORDER BY 
+               o.order_date
+              ,o.order_status_value
+              ,o.order_number
+              ,o.member_number
+    </select>
+
+    <select id="getFindOrderDetail" 
+            parameterType="com.cloudia.backend.CM_90_1051.model.SearchRequestDto" 
+            resultType="com.cloudia.backend.CM_90_1051.model.OrderDetailDto">
+        SELECT od.order_detail_id
+              ,pc.product_name
+              ,od.quantity
+              ,od.total_price
+              ,od.unit_price
+        FROM   order_details od
+        LEFT JOIN product_code  pc
+        ON     od.product_id   = pc.product_code
+        WHERE pc.is_active     = 1
+        AND   od.member_number = #{memberNumber}
+        AND   od.order_number  = #{orderNumber}
+        ORDER BY 
+               od.order_detail_id
+    </select>
+
+    <select id="getAddress" 
+            parameterType="com.cloudia.backend.CM_90_1051.model.SearchRequestDto" 
+            resultType="com.cloudia.backend.CM_90_1051.model.AddressDto">
+        SELECT da.address_nickname
+              ,da.recipient_name
+              ,da.postal_code
+              ,da.address_main
+              ,da.address_detail1
+              ,da.address_detail2
+              ,da.address_detail3
+        FROM   orders o
+        LEFT JOIN delivery_addresses  da
+        ON     o.member_number = da.member_number 
+        AND    o.shipping_address_id = da.address_id
+        WHERE da.is_active     = 1
+        AND   o.member_number = #{memberNumber}
+        AND   o.order_number  = #{orderNumber}
+    </select>
+
+    <update id="uptStatus" parameterType="com.cloudia.backend.CM_90_1051.model.OrderDto">
+        UPDATE orders
+        SET    order_status_value = #{orderStatusValue}
+            <if test="shippingCompany neq null">
+               ,shipping_company = #{shippingCompany}
+            </if>
+            <if test="trackingNumber neq null">
+               ,tracking_number = #{trackingNumber}
+            </if>
+            <if test="shippingDate neq null">
+               ,shipping_date = #{shippingDate}
+            </if>
+              ,updated_by = #{updatedBy}
+              ,updated_at = #{updatedAt}
+        WHERE member_number = #{memberNumber}
+        AND   order_number  = #{orderNumber}
+    </update>
+</mapper>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_01_1001.mapper.CM011001UserMapper">
+
+    <sql id="UserSelectColumns">
+        u.user_id AS userId,
+        u.member_number AS memberNumber,
+        u.role_id AS roleId,
+        u.login_id AS loginId,
+        u.password AS password,
+        u.email AS email,
+        u.name AS name,
+        u.gender_type AS genderType,
+        u.gender_value AS genderValue,
+        TO_CHAR(u.birth_date, 'YYYY-MM-DD') AS birthDate,
+        u.nationality AS nationality,
+        u.phone_number AS phoneNumber,
+        u.postal_code AS postalCode,
+        u.address_main AS addressMain,
+        u.address_detail1 AS addressDetail1,
+        u.address_detail2 AS addressDetail2,
+        u.address_detail3 AS addressDetail3,
+        u.pccc AS pccc,
+        u.terms_agreed AS termsAgreed,
+        u.user_status_type AS userStatusType,
+        u.user_status_value AS userStatusValue,
+        u.note AS note,
+        u.created_by AS createdBy,
+        u.created_at AS createdAt,
+        u.updated_by AS updatedBy,
+        u.updated_at AS updatedAt,
+        p.role_type AS roleType
+    </sql>
+
+    <insert id="insertUser" parameterType="com.cloudia.backend.CM_01_1001.model.User"
+        useGeneratedKeys="true" keyProperty="userId" keyColumn="user_id">
+        INSERT INTO users (
+            member_number,
+            login_id,
+            password,
+            email,
+            name,
+            gender_type,
+            gender_value,
+            birth_date,
+            nationality,
+            phone_number,
+            postal_code,
+            address_main,
+            address_detail1,
+            address_detail2,
+            address_detail3,
+            user_status_type,
+            user_status_value,
+            pccc,
+            terms_agreed,
+            role_id,
+            note,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
+        ) VALUES (
+            #{memberNumber},
+            #{loginId},
+            #{password},
+            #{email},
+            #{name},
+            #{genderType}, 
+            #{genderValue},
+            TO_DATE(#{birthDate}, 'YYYY-MM-DD'),
+            #{nationality},
+            #{phoneNumber},
+            #{postalCode},
+            #{addressMain},
+            #{addressDetail1},
+            #{addressDetail2},
+            #{addressDetail3},
+            #{userStatusType},
+            #{userStatusValue},
+            #{pccc},
+            #{termsAgreed},
+            #{roleId},
+            #{note},
+            #{createdBy},
+            #{createdAt},
+            #{updatedBy},
+            #{updatedAt}
+        )
+    </insert>
+
+    <select id="getNextMemberNumber" resultType="string">
+        SELECT
+            LPAD(nextval('member_number_seq')::text, 8, '0')
+    </select>
+
+    <select id="countByLoginId" parameterType="string" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            users
+        WHERE
+            login_id = #{loginId}
+            AND user_status_value = 1
+    </select>
+
+    <select id="countByEmail" parameterType="string" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            users
+        WHERE
+            email = #{email}
+    </select>
+
+    <select id="findByLoginId" parameterType="string" 
+            resultType="com.cloudia.backend.CM_01_1001.model.User">
+        SELECT
+            <include refid="UserSelectColumns" />
+        FROM
+            users u
+        LEFT JOIN 
+            permissions p ON u.role_id = p.role_id
+        WHERE
+            u.login_id = #{loginId}
+        LIMIT 1
+    </select>
+
+    <select id="findByUserId" parameterType="int" 
+            resultType="com.cloudia.backend.CM_01_1001.model.User">
+        SELECT
+            <include refid="UserSelectColumns" />
+        FROM
+            users u
+        LEFT JOIN 
+            permissions p ON u.role_id = p.role_id
+        WHERE
+            u.user_id = #{userId}
+        LIMIT 1
+    </select>
+
+    <select id="findByMemberNumber" parameterType="string" 
+            resultType="com.cloudia.backend.CM_01_1001.model.User">
+        SELECT
+            <include refid="UserSelectColumns" />
+        FROM
+            users u
+        LEFT JOIN 
+            permissions p ON u.role_id = p.role_id
+        WHERE
+            u.member_number = #{memberNumber}
+        LIMIT 1
+    </select>
+
+    <select id="findAllUsers" 
+            resultType="com.cloudia.backend.CM_01_1001.model.User">
+        SELECT
+            <include refid="UserSelectColumns" />
+        FROM 
+            users u
+        LEFT JOIN 
+            permissions p ON u.role_id = p.role_id
+    </select>
+
+    <select id="countByPccc" parameterType="string" resultType="int">
+    SELECT 
+        COUNT(*)
+    FROM 
+        users
+    WHERE 
+        pccc = #{pccc}
+        AND user_status_value = 1 
+    </select>
+
+    <select id="findEmailsByRoleId" resultType="string">
+        SELECT 
+            email 
+        FROM 
+            public.users 
+        WHERE 
+            role_id = #{roleId} 
+        AND 
+            email IS NOT NULL
+    </select>
+
+</mapper>

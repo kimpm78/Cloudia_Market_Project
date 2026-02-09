@@ -1,0 +1,104 @@
+.terms-page-container {
+  display: flex;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+}
+
+.terms-sub-menu {
+  font-size: 0.9em;
+  color: #888;
+}
+
+.terms-menu-sidebar {
+  flex-shrink: 0;
+  width: 300px;
+  padding-right: 20px;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  margin-right: 20px;
+}
+
+.terms-menu-sidebar button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 0;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 1em;
+  color: #555;
+  transition: all 0.2s ease-in-out;
+}
+
+.terms-menu-sidebar button:hover {
+  color: #333;
+  background-color: #f0f0f0;
+}
+
+.terms-menu-sidebar button.active {
+  font-weight: bold;
+  color: #333;
+  background-color: #e6f0ff;
+  border-left: 3px solid #333;
+  padding-left: 17px;
+}
+
+.terms-content-display {
+  flex-grow: 1;
+  padding-left: 20px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.terms-content-display .terms-section {
+  padding: 20px;
+  line-height: 1.6;
+  color: #333;
+  font-size: 0.95em;
+}
+
+.terms-content-display .terms-title {
+  font-size: 2em;
+  margin-bottom: 30px;
+  color: #000;
+}
+
+.terms-content-display .section-heading {
+  font-size: 1.5em;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  color: #444;
+}
+
+.terms-content-display p {
+  margin-bottom: 10px;
+}
+
+.terms-content-display ol,
+.terms-content-display ul.terms-list-ul {
+  margin-left: 20px;
+}
+
+.terms-content-display ul.terms-sub-list-ul {
+  margin-left: 20px;
+  list-style-type: disc;
+}
+
+.terms-content-display .terms-list-item {
+  margin-bottom: 5px;
+}
+
+.terms-content-display .appendix-date {
+  text-align: right;
+  margin-top: 40px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.terms-content-display strong {
+  font-weight: bold;
+}

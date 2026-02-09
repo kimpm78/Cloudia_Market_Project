@@ -1,0 +1,32 @@
+.notice-title {
+  margin-top: 48px !important;
+  margin-bottom: 48px !important;
+}
+
+.custom-grid .ag-root-wrapper {
+  border: none;
+}
+
+.badge-category {
+  font-weight: 600;
+}
+
+.badge-category.urgent {
+  color: #d32f2f;
+}
+
+.badge-category.payment {
+  color: #007bff;
+}
+
+.badge-category.default {
+  color: #6c757d;
+}
+
+@media screen and (max-width: 767px) {
+  .notice-title {
+    font-size: 30px;
+    margin-top: 24px !important;
+    margin-bottom: 24px !important;
+  }
+}

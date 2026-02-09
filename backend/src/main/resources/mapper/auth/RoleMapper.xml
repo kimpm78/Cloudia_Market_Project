@@ -1,0 +1,44 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.auth.mapper.RoleMapper">
+
+    <select id="findAll" resultType="com.cloudia.backend.auth.model.Role">
+        SELECT
+            role_id AS roleId,
+            role_name AS roleName,
+            role_type AS roleType,
+            description,
+            is_active AS isActive
+        FROM
+            permissions
+        WHERE
+            is_active = 1
+    </select>
+    
+    <select id="findByRoleType" parameterType="String" resultType="com.cloudia.backend.auth.model.Role">
+        SELECT
+            role_id AS roleId,
+            role_name AS roleName,
+            role_type AS roleType,
+            is_active AS isActive
+        FROM
+            permissions 
+        WHERE
+            role_type = #{roleType}
+    </select>
+
+    <select id="findById" parameterType="int" resultType="com.cloudia.backend.auth.model.Role">
+        SELECT
+            role_id AS roleId,
+            role_name AS roleName,
+            role_type AS roleType,
+            is_active AS isActive
+        FROM
+            permissions 
+        WHERE
+            role_id = #{roleId}
+    </select>
+
+</mapper>

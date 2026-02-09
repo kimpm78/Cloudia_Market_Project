@@ -1,0 +1,16 @@
+.mypage-sidebar-column {
+  background-color: #e2e2e2;
+  min-height: 100%;
+}
+
+.mypage-sidebar {
+  min-height: 100%;
+  background-color: #e2e2e2;
+  padding: 16px 12px;
+}
+
+@media (max-width: 768px) {
+  .mypage-sidebar-column {
+    display: none;
+  }
+}

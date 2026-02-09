@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_04_1003.mapper.CM041003Mapper">
+
+    <sql id="BaseSelectColumns">
+        i.inquiry_id AS qnaId,
+        u.user_id AS userId,
+        i.member_number AS memberNumber,
+        u.login_id AS loginId,
+        u.name AS writerName,
+        i.title AS title,
+        i.content AS content,
+        i.inquiry_status_value AS statusValue,
+        CASE WHEN i.inquiry_status_value = 2 THEN 'ANSWERED' ELSE 'PENDING' END AS statusCode,
+        COALESCE(cm.code_value_name, CASE WHEN i.inquiry_status_value = 2 THEN '답변 완료' ELSE '답변 대기' END) AS statusLabel,
+        i.is_private AS isPrivate,
+        i.inquiries_code_type AS inquiriesCodeType,
+        i.inquiries_code_value AS inquiriesCodeValue,
+        i.order_id AS orderId,
+        i.order_number AS orderNumber,
+        i.product_id AS productId,
+        i.name AS productName,
+        to_char(i.created_at, 'YYYY-MM-DD HH24:MI') AS createdAt,
+        to_char(i.updated_at, 'YYYY-MM-DD HH24:MI') AS updatedAt,
+        0 AS viewCount
+    </sql>
+
+    <select id="countQnaList" parameterType="map" resultType="long">
+        SELECT COUNT(1)
+        FROM inquiries i
+        LEFT JOIN users u ON u.member_number = i.member_number
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="searchType eq 2">
+                    WHERE LOWER(i.title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                </when>
+                <when test="searchType eq 3">
+                    WHERE LOWER(i.content) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                </when>
+                <when test="searchType eq 4">
+                    WHERE LOWER(COALESCE(u.login_id, '')) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                       OR LOWER(COALESCE(u.name, '')) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                </when>
+                <otherwise>
+                    WHERE LOWER(i.title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                       OR LOWER(i.content) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
+    <select id="selectQnaList" parameterType="map"
+            resultType="com.cloudia.backend.CM_04_1003.model.QnaSummary">
+        SELECT
+            <include refid="BaseSelectColumns" />
+        FROM inquiries i
+        LEFT JOIN users u ON u.member_number = i.member_number
+        LEFT JOIN code_masters cm
+          ON cm.code_type = i.inquiry_status_type
+         AND cm.code_value = i.inquiry_status_value
+        <if test="keyword != null and keyword != ''">
+            <where>
+                <choose>
+                    <when test="searchType eq 2">
+                        LOWER(i.title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <when test="searchType eq 3">
+                        LOWER(i.content) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <when test="searchType eq 4">
+                        (LOWER(COALESCE(u.login_id, '')) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                         OR LOWER(COALESCE(u.name, '')) LIKE LOWER(CONCAT('%', #{keyword}, '%')))
+                    </when>
+                    <otherwise>
+                        (LOWER(i.title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                         OR LOWER(i.content) LIKE LOWER(CONCAT('%', #{keyword}, '%')))
+                    </otherwise>
+                </choose>
+            </where>
+        </if>
+        ORDER BY i.inquiry_id DESC
+        <if test="size != null">
+            LIMIT #{size}
+        </if>
+        <if test="offset != null">
+            OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="selectQnaDetail" parameterType="long"
+            resultType="com.cloudia.backend.CM_04_1003.model.QnaDetail">
+        SELECT
+            <include refid="BaseSelectColumns" />,
+            latest.answer_content AS answerContent,
+            latest.answerer_id AS answererId,
+            ua.login_id AS answererLoginId,
+            ua.name AS answererName,
+            CASE WHEN latest.created_at IS NOT NULL THEN to_char(latest.created_at, 'YYYY-MM-DD HH24:MI') END AS answerCreatedAt
+        FROM inquiries i
+        LEFT JOIN users u ON u.member_number = i.member_number
+        LEFT JOIN code_masters cm
+          ON cm.code_type = i.inquiry_status_type
+         AND cm.code_value = i.inquiry_status_value
+        LEFT JOIN LATERAL (
+            SELECT id.answer_content,
+                   id.answerer_id,
+                   id.created_at
+            FROM inquiry_details id
+            WHERE id.inquiry_id = i.inquiry_id
+            ORDER BY id.created_at DESC, id.inquiry_answer_id DESC
+            LIMIT 1
+        ) latest ON TRUE
+        LEFT JOIN users ua ON ua.user_id = latest.answerer_id
+        WHERE i.inquiry_id = #{qnaId}
+        LIMIT 1
+    </select>
+
+    <select id="selectPrevQna" parameterType="long"
+            resultType="com.cloudia.backend.CM_04_1003.model.QnaSummary">
+        SELECT
+            <include refid="BaseSelectColumns" />
+        FROM inquiries i
+        LEFT JOIN users u ON u.member_number = i.member_number
+        LEFT JOIN code_masters cm
+          ON cm.code_type = i.inquiry_status_type
+         AND cm.code_value = i.inquiry_status_value
+        WHERE i.inquiry_id &lt; #{qnaId}
+          AND COALESCE(i.is_private, 0) = 0
+        ORDER BY i.inquiry_id DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectNextQna" parameterType="long"
+            resultType="com.cloudia.backend.CM_04_1003.model.QnaSummary">
+        SELECT
+            <include refid="BaseSelectColumns" />
+        FROM inquiries i
+        LEFT JOIN users u ON u.member_number = i.member_number
+        LEFT JOIN code_masters cm
+          ON cm.code_type = i.inquiry_status_type
+         AND cm.code_value = i.inquiry_status_value
+        WHERE i.inquiry_id &gt; #{qnaId}
+          AND COALESCE(i.is_private, 0) = 0
+        ORDER BY i.inquiry_id ASC
+        LIMIT 1
+    </select>
+
+    <insert id="insertQna" parameterType="com.cloudia.backend.CM_04_1003.model.QnaCreateRequest"
+            useGeneratedKeys="true" keyProperty="qnaId" keyColumn="inquiry_id">
+        INSERT INTO inquiries (
+            member_number,
+            title,
+            content,
+            inquiry_status_type,
+            inquiry_status_value,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at,
+            is_private,
+            inquiries_code_type,
+            inquiries_code_value,
+            order_id,
+            order_number,
+            product_id,
+            name
+        ) VALUES (
+            #{memberNumber},
+            #{title},
+            #{content},
+            '006',
+            1,
+            #{createdBy},
+            NOW(),
+            #{updatedBy},
+            NOW(),
+            #{isPrivate},
+            COALESCE(#{inquiriesCodeType}, '012'),
+            #{inquiriesCodeValue},
+            #{orderId},
+            #{orderNumber},
+            #{productId},
+            #{productName}
+        )
+    </insert>
+
+    <select id="findLoginIdByMemberNumber" parameterType="string" resultType="string">
+        SELECT login_id
+        FROM users
+        WHERE member_number = #{memberNumber}
+        LIMIT 1
+    </select>
+
+    <insert id="insertQnaAnswer" parameterType="map">
+        INSERT INTO inquiry_details (
+            inquiry_id,
+            answer_content,
+            answerer_id,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
+        ) VALUES (
+            #{qnaId},
+            #{answerContent},
+            #{answererId},
+            #{answererLoginId},
+            NOW(),
+            #{answererLoginId},
+            NOW()
+        )
+    </insert>
+
+    <update id="updateInquiryStatusToAnswered" parameterType="map">
+        UPDATE inquiries
+        SET inquiry_status_type = '006',
+            inquiry_status_value = 2,
+            updated_by = #{updatedBy},
+            updated_at = NOW()
+        WHERE inquiry_id = #{qnaId}
+    </update>
+
+    <delete id="deleteQnaAnswers" parameterType="long">
+        DELETE FROM inquiry_details
+        WHERE inquiry_id = #{qnaId}
+    </delete>
+
+    <delete id="deleteQna" parameterType="long">
+        DELETE FROM inquiries
+        WHERE inquiry_id = #{qnaId}
+    </delete>
+
+    <select id="selectRecentQna" parameterType="map"
+            resultType="com.cloudia.backend.CM_04_1003.model.QnaSummary">
+        SELECT
+            <include refid="BaseSelectColumns" />,
+            latest.answer_content AS answerContent,
+            CASE WHEN latest.created_at IS NOT NULL THEN to_char(latest.created_at, 'YYYY-MM-DD HH24:MI') END AS answerCreatedAt
+        FROM inquiries i
+        LEFT JOIN users u ON u.member_number = i.member_number
+        LEFT JOIN code_masters cm
+          ON cm.code_type = i.inquiry_status_type
+         AND cm.code_value = i.inquiry_status_value
+        LEFT JOIN LATERAL (
+            SELECT id.answer_content, id.created_at
+            FROM inquiry_details id
+            WHERE id.inquiry_id = i.inquiry_id
+            ORDER BY id.created_at DESC, id.inquiry_answer_id DESC
+            LIMIT 1
+        ) latest ON TRUE
+        <where>
+            <if test="productId != null and productId != ''">
+                i.product_id = #{productId}
+            </if>
+        </where>
+        ORDER BY i.inquiry_id DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

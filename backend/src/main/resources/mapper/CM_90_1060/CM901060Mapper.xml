@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1060.mapper.CM901060Mapper">
+    <select id="findAllProduct" resultType="com.cloudia.backend.CM_90_1060.model.ResponseProducts">
+        SELECT p.product_id
+              ,p.product_code
+              ,p.name
+              ,string_agg(c.category_group_name, ', ') as category_group_name
+              ,p.price
+              ,p.code_value
+              ,s.available_qty
+              ,p.reservation_deadline
+              ,p.created_at
+              ,p.created_by 
+              ,p.updated_at
+              ,p.updated_by 
+          FROM products p
+     LEFT JOIN stocks s
+            ON p.product_code = s.product_code
+  JOIN LATERAL ( SELECT jsonb_object_keys(category_obj) as category_key
+                   FROM jsonb_array_elements(p.category) as category_obj) keys ON true
+          JOIN categories c ON c.category_group_code = keys.category_key
+         WHERE p.is_display = 1
+      GROUP BY p.product_id
+              ,p.name
+              ,p.price
+              ,p.code_value
+              ,s.available_qty
+              ,p.created_at
+              ,p.created_by
+              ,p.updated_at
+              ,p.updated_by
+      ORDER BY p.updated_at DESC
+    </select>
+
+    <select id="findByProduct" resultType="com.cloudia.backend.CM_90_1060.model.ResponseProducts">
+        SELECT p.product_id
+              ,p.product_code
+              ,p.name
+              ,string_agg(c.category_group_name, ', ') as category_group_name
+              ,p.price
+              ,p.code_value
+              ,s.available_qty
+              ,p.created_at
+              ,p.created_by 
+              ,p.updated_at
+              ,p.updated_by 
+          FROM products p
+     LEFT JOIN stocks s
+            ON p.product_code = s.product_code
+  JOIN LATERAL ( SELECT jsonb_object_keys(category_obj) as category_key
+                   FROM jsonb_array_elements(p.category) as category_obj) keys ON true
+          JOIN categories c ON c.category_group_code = keys.category_key
+         WHERE p.is_display = 1
+        <if test="searchType eq 1">
+            AND p.product_code ILIKE CONCAT('%', #{searchTerm}, '%')
+        </if>
+        <if test="searchType eq 2">
+            AND p.name ILIKE CONCAT('%', #{searchTerm}, '%')
+        </if>
+      GROUP BY p.product_id
+              ,p.name
+              ,p.price
+              ,p.code_value
+              ,s.available_qty
+              ,p.created_at
+              ,p.created_by
+              ,p.updated_at
+              ,p.updated_by
+      ORDER BY p.updated_at DESC
+    </select>
+
+    <delete id="delProduct">
+        UPDATE products
+           SET is_display = 0
+         WHERE product_id IN
+        <foreach item="productId" collection="productIds" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </delete>
+
+    <delete id="delAttachMents">
+        UPDATE attachments
+           SET is_display = 0
+         WHERE board_id IN
+        <foreach item="productId" collection="productIds" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </delete>
+
+    <select id="findAllCategoryGroupCode" resultType="com.cloudia.backend.CM_90_1060.model.Categories">
+        SELECT category_group_code
+              ,category_group_name
+              ,display_order
+              ,created_by
+              ,created_at
+              ,updated_by
+              ,updated_at 
+          FROM categories
+      ORDER BY display_order
+    </select>
+
+    <select id="findCategory" resultType="com.cloudia.backend.CM_90_1060.model.CategoryDetails">
+        SELECT category_details.category_group_code
+              ,category_details.category_code
+              ,category_details.category_name
+              ,category_details.display_order
+              ,category_details.created_by
+              ,category_details.created_at
+              ,category_details.updated_by
+              ,category_details.updated_at 
+          FROM category_details
+     LEFT JOIN categories
+            ON category_details.category_group_code = categories.category_group_code
+         WHERE category_details.category_group_code IN
+        <foreach item="code" collection="categoryGroupCodes" open="(" separator="," close=")">
+            #{code}
+        </foreach>
+      ORDER BY category_details.category_code
+    </select>
+
+    <select id="findAllStockCode" resultType="com.cloudia.backend.CM_90_1060.model.Stock">
+        SELECT stocks.stock_id
+              ,stocks.product_code
+              ,stocks.price
+              ,product_code.product_name
+              ,product_code.product_category AS productCategory
+              ,stocks.defective_qty
+              ,stocks.total_qty
+              ,stocks.available_qty
+              ,stocks.created_by
+              ,stocks.created_at
+              ,stocks.updated_by
+              ,stocks.updated_at 
+          FROM stocks
+     LEFT JOIN product_code
+            ON stocks.product_code = product_code.product_code
+         WHERE stocks.product_code NOT IN (
+               SELECT product_code
+                 FROM products
+                WHERE is_display = 1)
+      ORDER BY stocks.product_code
+    </select>
+
+    <select id="getNextProductId" resultType="long">
+        SELECT nextval('products_product_id_seq')
+    </select>
+
+    <insert id="editorInsert" parameterType="com.cloudia.backend.CM_90_1060.model.Attachments">
+        INSERT INTO attachments (
+            board_id, file_name, file_path, content_type,
+            code_value, created_by, created_at,
+            updated_by, updated_at, is_display
+        )
+        VALUES (
+            #{boardId}, #{fileName}, #{filePath}, #{contentType},
+            #{codeValue}, #{createdBy}, #{createdAt},
+            #{updatedBy}, #{updatedAt}, 1
+        )
+    </insert>
+
+    <update id="editorUpdate" parameterType="com.cloudia.backend.CM_90_1060.model.Attachments">
+        UPDATE attachments
+        SET 
+            is_display = 0
+            ,updated_by = #{updatedBy}
+            ,updated_at = #{updatedAt}
+        WHERE 
+            board_id = #{boardId}
+        AND file_name = #{fileName}
+    </update>
+
+    <select id="findByProductByCode" resultType="int">
+        SELECT COUNT(*)
+          FROM products
+         WHERE product_code = #{productCode}
+           AND is_display = 1
+    </select>
+
+    <insert id="productInsert" parameterType="com.cloudia.backend.CM_90_1060.model.Products">
+        INSERT INTO products (
+            product_id, product_code, name, price, delivery_price,
+            is_display, release_date, reservation_deadline, code_value, category,
+            created_by, created_at, updated_by, updated_at, purchaseLimit, weight
+        )
+        VALUES (
+            #{productId}, #{productCode}, #{name}, #{price}, #{deliveryPrice},
+            1, #{releaseDate}, #{reservationDeadline}, #{codeValue}, 
+            <choose>
+                <when test="category != null and category != ''">
+                    #{category}::jsonb
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            #{createdBy}, #{createdAt}, #{updatedBy}, #{updatedAt} , #{purchaseLimit} , #{weight}
+        )
+    </insert>
+
+    <update id="productUpdate" parameterType="com.cloudia.backend.CM_90_1060.model.Products">
+        UPDATE products 
+        SET 
+            price = #{price},
+            delivery_price = #{deliveryPrice},
+            release_date = #{releaseDate},
+            reservation_deadline = #{reservationDeadline},
+            code_value = #{codeValue},
+            category = <choose>
+                <when test="category != null and category != ''">
+                    #{category}::jsonb
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            purchaseLimit = #{purchaseLimit},
+            weight = #{weight},
+            updated_by = #{updatedBy},
+            updated_at = #{updatedAt}
+        WHERE product_id = #{productId}
+          AND is_display = 1
+    </update>
+
+    <insert id="insertProductDetail" parameterType="com.cloudia.backend.CM_90_1060.model.ProductDetails">
+        INSERT INTO product_details (
+            product_id, thumbnail_url, description,
+            created_by, created_at, updated_by, updated_at
+        )
+        VALUES (
+            #{productId}, #{thumbnailUrl}, #{description},
+            #{createdBy}, #{createdAt}, #{updatedBy}, #{updatedAt}
+        )
+    </insert>
+
+    <insert id="updateProductDetail" parameterType="com.cloudia.backend.CM_90_1060.model.ProductDetails">
+        UPDATE product_details 
+        SET 
+            <if test="thumbnailUrl != null and thumbnailUrl != ''">
+                thumbnail_url = #{thumbnailUrl},
+            </if>
+            description = #{description},
+            updated_by = #{updatedBy},
+            updated_at = #{updatedAt}
+        WHERE product_id = #{productId}
+    </insert>
+
+    <select id="findByUpdProductById" resultType="com.cloudia.backend.CM_90_1060.model.ProductUpt">
+        SELECT p.category
+            ,p.product_code
+            ,p.name AS productName
+            ,pc.product_category AS productCategory
+            ,p.delivery_price
+            ,p.price AS productPrice
+            ,s.price AS purchasePrice
+            ,p.reservation_deadline
+            ,p.release_date AS expectedDeliveryDate
+            ,p.purchaseLimit
+            ,p.weight
+            ,pd.description AS productnote
+            ,pd.thumbnail_url AS productFile
+            ,s.available_qty
+        FROM products p
+        LEFT JOIN stocks s
+          ON p.product_code = s.product_code
+        LEFT JOIN product_details pd
+          ON p.product_id = pd.product_id
+        LEFT JOIN product_code pc
+          ON p.product_code = pc.product_code
+       WHERE p.product_id = #{productCode}
+         AND p.is_display = 1
+         AND pc.is_active = 1
+    </select>    
+
+    <select id="editorGet" resultType="com.cloudia.backend.CM_90_1060.model.Attachments">
+        SELECT *
+        FROM attachments
+        WHERE board_id = #{productCode}
+          AND code_value = 3
+          AND is_display = 1
+    </select>
+</mapper>

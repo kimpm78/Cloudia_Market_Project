@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1044.mapper.CM901044Mapper">
+    <select id="findByAllNotice" resultType="com.cloudia.backend.CM_90_1044.model.NoticeInfo">
+        SELECT notice_id
+              ,title
+              ,content
+              ,code_value
+              ,is_display
+              ,pinned
+              ,view_count
+              ,published_at
+              ,user_id
+              ,created_by
+              ,created_at
+              ,updated_by
+              ,updated_at
+          FROM notices
+      ORDER BY pinned
+              ,code_value
+              ,published_at
+    </select>
+    <select id="findByNotice" resultType="com.cloudia.backend.CM_90_1044.model.NoticeInfo">
+        SELECT notice_id
+              ,title
+              ,content
+              ,code_value
+              ,is_display
+              ,pinned
+              ,view_count
+              ,published_at
+              ,user_id
+              ,created_by
+              ,created_at
+              ,updated_by
+              ,updated_at
+          FROM notices
+        <where>
+            <if test="searchType eq 1">
+                AND (title ILIKE CONCAT('%', #{searchKeyword}, '%')
+                  OR content ILIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchType eq 2">
+                AND title ILIKE CONCAT('%', #{searchKeyword}, '%')
+            </if>
+            <if test="searchType eq 3">
+                AND content ILIKE CONCAT('%', #{searchKeyword}, '%')
+            </if>
+        </where>
+      ORDER BY pinned
+              ,code_value
+              ,published_at
+    </select>
+    <select id="findIdNotice" resultType="com.cloudia.backend.CM_90_1044.model.NoticeInfo">
+        SELECT notice_id
+              ,title
+              ,content
+              ,code_value
+              ,is_display
+              ,pinned
+              ,view_count
+              ,published_at
+              ,user_id
+              ,created_by
+              ,created_at
+              ,updated_by
+              ,updated_at
+          FROM notices
+         WHERE notice_id = #{noticeId}
+    </select>    
+    <insert id="noticeUpload" parameterType="com.cloudia.backend.CM_90_1044.model.NoticeInfo">
+        INSERT INTO notices (
+            title, content, code_value, is_display,
+            pinned, published_at, user_id, created_by, 
+            created_at, updated_by, updated_at
+        )
+        VALUES (
+            #{title}, #{content}, #{codeValue}, #{isDisplay},
+            #{pinned}, #{publishedAt}, #{userId}, #{createdBy}, 
+            #{createdAt}, #{updatedBy}, #{updatedAt}
+        )
+    </insert>
+    <update id="noticeUpdate" parameterType="com.cloudia.backend.CM_90_1044.model.NoticeInfo">
+        UPDATE notices
+           SET title = #{title}
+              ,content = #{content}
+              ,code_value = #{codeValue}
+              ,pinned = #{pinned}
+              ,is_display = #{isDisplay}
+              ,updated_by = #{updatedBy}
+              ,updated_at = #{updatedAt}
+         WHERE notice_id = #{noticeId}
+    </update>
+</mapper>

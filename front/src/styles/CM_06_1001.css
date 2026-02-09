@@ -1,0 +1,27 @@
+.cm-06-1001__product-image {
+  width: 100px;
+  height: 100px;
+  display: block;
+  object-fit: cover;
+  border-radius: 4px;
+  color: transparent;
+  font-size: 0;
+}
+
+.cm-06-1001__thumb {
+  flex: 0 0 100px;
+}
+
+.cm-06-1001__summary {
+  padding-top: 55px;
+}
+
+.cm-06-1001__summary-card {
+  min-width: 300px;
+  width: 100%;
+}
+
+.cm-06-1001__summary-warning {
+  font-size: 0.8em;
+  font-weight: bold;
+}

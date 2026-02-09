@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudia.backend.CM_01_1006.mapper.CM011006Mapper">
+    
+    <sql id="BaseResponseColumns">
+        i.inquiry_id AS inquiryId,
+        i.member_number AS memberNumber,
+        u.login_id AS loginId,
+        u.name AS writerName,
+        i.title AS title,
+        i.content AS content,
+        i.is_private AS isPrivate,
+        i.inquiry_status_value AS statusValue,
+        CASE WHEN i.inquiry_status_value = 2 THEN 'ANSWERED' ELSE 'PENDING' END AS statusCode,
+        COALESCE(cm_status.code_value_name, CASE WHEN i.inquiry_status_value = 2 THEN '답변 완료' ELSE '답변 대기' END) AS statusLabel,
+        cm_cat.code_value_name AS categoryName,
+        i.created_at AS createdAt,
+        i.updated_at AS updatedAt
+    </sql>
+
+    <select id="findByMemberNumber" resultType="com.cloudia.backend.CM_01_1006.model.InquiryResponseDTO">
+       SELECT 
+            <include refid="BaseResponseColumns" />,
+            CASE WHEN i.inquiry_status_value = 2 THEN true ELSE false END AS isAnswered
+       FROM inquiries i
+       LEFT JOIN users u ON u.member_number = i.member_number
+       LEFT JOIN code_masters cm_status 
+            ON cm_status.code_type = '006' AND cm_status.code_value = i.inquiry_status_value
+       LEFT JOIN code_masters cm_cat 
+            ON cm_cat.code_type = '012' AND cm_cat.code_value = i.inquiries_code_value
+       WHERE i.member_number = #{memberNumber} 
+       ORDER BY i.created_at DESC
+    </select>
+    
+    <select id="getProductList" resultType="com.cloudia.backend.CM_01_1006.model.InquiryProductDTO">
+        SELECT 
+            MIN(product_code) AS productCode,
+            name AS productName
+        FROM products
+        GROUP BY name
+        ORDER BY name ASC
+    </select>
+
+    <insert id="insertInquiry" parameterType="com.cloudia.backend.CM_01_1006.model.InquiryEntity"
+            useGeneratedKeys="true" keyProperty="inquiryId">
+        INSERT INTO inquiries (
+            member_number,
+            title,
+            content,
+            created_by,
+            created_at,
+            is_private,
+            inquiry_status_type,
+            inquiry_status_value,
+            inquiries_code_type,
+            inquiries_code_value
+        ) VALUES (
+            #{memberNumber},
+            #{title},
+            #{content},
+            #{createdBy},
+            #{createdAt},
+            #{isPrivate},
+            #{inquiryStatusType},
+            #{inquiryStatusValue},
+            #{inquiriesCodeType},
+            #{inquiriesCodeValue}
+        )
+    </insert>
+    
+    <select id="findDetailByInquiryId" parameterType="long"
+            resultType="com.cloudia.backend.CM_01_1006.model.InquiryResponseDTO">
+        SELECT
+            <include refid="BaseResponseColumns" />,
+            latest.answer_content AS answerContent,
+            latest.answerer_id AS answererId,
+            ua.login_id AS answererLoginId,
+            ua.name AS answererName,
+            ua.role_id AS answererRoleId,
+            latest.created_at AS answerCreatedAt,
+            CASE WHEN i.inquiry_status_value = 2 THEN true ELSE false END AS isAnswered
+        FROM inquiries i
+        LEFT JOIN users u ON u.member_number = i.member_number
+        LEFT JOIN code_masters cm_status 
+            ON cm_status.code_type = '006' AND cm_status.code_value = i.inquiry_status_value
+        LEFT JOIN code_masters cm_cat 
+            ON cm_cat.code_type = '012' AND cm_cat.code_value = i.inquiries_code_value
+        
+        LEFT JOIN LATERAL (
+            SELECT id.answer_content, id.answerer_id, id.created_at
+            FROM inquiry_details id
+            WHERE id.inquiry_id = i.inquiry_id
+            ORDER BY id.created_at DESC LIMIT 1
+        ) latest ON TRUE
+        LEFT JOIN users ua ON ua.user_id = latest.answerer_id
+        
+        WHERE i.inquiry_id = #{inquiryId}
+    </select>
+
+    <select id="findPrevInquiry" parameterType="map"
+            resultType="com.cloudia.backend.CM_01_1006.model.InquiryResponseDTO">
+        SELECT i.inquiry_id AS inquiryId, i.title AS title
+        FROM inquiries i
+        WHERE i.inquiry_id &lt; #{inquiryId} AND i.member_number = #{memberNumber}
+        ORDER BY i.inquiry_id DESC LIMIT 1
+    </select>
+
+    <select id="findNextInquiry" parameterType="map"
+            resultType="com.cloudia.backend.CM_01_1006.model.InquiryResponseDTO">
+        SELECT i.inquiry_id AS inquiryId, i.title AS title
+        FROM inquiries i
+        WHERE i.inquiry_id &gt; #{inquiryId} AND i.member_number = #{memberNumber}
+        ORDER BY i.inquiry_id ASC LIMIT 1
+    </select>
+    
+    <insert id="insertInquiryAnswer" parameterType="map">
+        INSERT INTO inquiry_details (
+            inquiry_id, answer_content, answerer_id, created_by, created_at, updated_by, updated_at
+        ) VALUES (
+            #{inquiryId}, #{answerContent}, #{answererId}, #{answererLoginId}, NOW(), #{answererLoginId}, NOW()
+        )
+    </insert>
+    
+    <update id="updateInquiryStatusToAnswered" parameterType="map">
+        UPDATE inquiries
+        SET inquiry_status_value = 2,
+            updated_by = #{updatedBy},
+            updated_at = NOW()
+        WHERE inquiry_id = #{inquiryId}
+    </update>
+
+    <delete id="deleteInquiryById" parameterType="long">
+        DELETE FROM inquiries WHERE inquiry_id = #{inquiryId}
+    </delete>
+
+</mapper>

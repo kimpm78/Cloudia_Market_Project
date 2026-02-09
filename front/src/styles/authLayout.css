@@ -1,0 +1,8 @@
+.auth-container {
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  background-color: #fff;
+}

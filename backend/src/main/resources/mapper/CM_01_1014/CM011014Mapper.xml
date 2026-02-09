@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_01_1014.mapper.CM011014Mapper">
+
+    <select id="findAccountByLoginId" resultType="com.cloudia.backend.CM_01_1014.model.UserAccount">
+        SELECT
+            refund_account_bank AS refundAccountBank,
+            refund_account_number AS refundAccountNumber,
+            refund_account_holder AS refundAccountHolder
+        FROM users
+        WHERE login_id = #{loginId}
+    </select>
+
+    <select id="findUserByLoginId" resultType="com.cloudia.backend.CM_01_1001.model.User">
+        SELECT * FROM users WHERE login_id = #{loginId}
+    </select>
+
+    <update id="updateUserAccount" parameterType="com.cloudia.backend.CM_01_1001.model.User">
+        UPDATE users
+        SET
+            refund_account_bank = #{refundAccountBank},
+            refund_account_number = #{refundAccountNumber},
+            refund_account_holder = #{refundAccountHolder},
+            updated_at = NOW()
+        WHERE
+            user_id = #{userId}
+    </update>
+
+</mapper>

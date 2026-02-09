@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudia.backend.batch.mapper.SchedulerMapper">
+    <select id="updateProductCount" resultType="int">
+        SELECT COUNT(*)
+          FROM products
+         WHERE reservation_deadline <![CDATA[<]]> #{resvDay}
+           AND is_display = 1
+           AND code_value = 3
+    </select>
+
+    <update id="updateProduct">
+        UPDATE products 
+        SET    code_value = 4,
+               updated_at = #{updDay, jdbcType=TIMESTAMP},
+               updated_by = 'SYSTEM'
+        WHERE  reservation_deadline <![CDATA[<]]> #{resvDay}
+          AND  is_display = 1
+          AND  code_value = 3
+    </update>
+
+    <select id="sendPaymentDeadlineNoticeCount" resultType="int">
+        SELECT COUNT(*)
+          FROM orders
+         WHERE (order_date + INTERVAL '1 days')::DATE <![CDATA[<=]]> CAST(#{endDay} AS DATE)
+           AND order_status_value = 1
+           AND payment_value = 1
+    </select>
+
+    <select id="sendPaymentDeadlineNotice" resultType="com.cloudia.backend.batch.model.OrdersDto">
+        SELECT order_number
+              ,member_number
+              ,recipient_name
+              ,total_amount
+              ,order_date
+              ,order_date + INTERVAL '2 days' AS end_date
+          FROM orders
+         WHERE (order_date + INTERVAL '1 days')::DATE <![CDATA[<=]]> CAST(#{endDay} AS DATE)
+           AND order_status_value = 1
+           AND payment_value = 1
+    </select>
+
+    <select id="sendEmails" resultType="com.cloudia.backend.batch.model.SendEmail">
+        SELECT email
+          FROM users
+         WHERE user_status_value = 1
+           AND role_id IN (1,2)
+    </select>
+
+    <insert id="insertHolidayBatch" parameterType="java.util.List">
+        INSERT INTO holidays (
+            holiday_date, 
+            country_code,
+            holiday_name, 
+            holiday_type, 
+            created_by,
+            created_at
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.holidayDate}, 
+                #{item.countryCode},
+                #{item.holidayName}, 
+                #{item.holidayType}, 
+                #{item.createdBy},
+                #{item.createdAt}
+            )
+        </foreach>
+        ON CONFLICT (holiday_date, country_code) DO NOTHING
+    </insert>
+
+    <select id="sendConfirmDeliveryCont" resultType="int">
+        SELECT COUNT(*)
+          FROM orders
+         WHERE (CAST(shipping_date AS DATE) + INTERVAL '10 days')::DATE <![CDATA[<=]]> CAST(#{endDay} AS DATE)
+           AND order_status_value = 4
+    </select>
+
+    <select id="sendConfirmDelivery" resultType="com.cloudia.backend.batch.model.OrdersDto">
+        SELECT order_number
+              ,member_number
+              ,recipient_name
+              ,total_amount
+              ,order_date
+          FROM orders
+         WHERE (CAST(shipping_date AS DATE) + INTERVAL '10 days')::DATE <![CDATA[<=]]> CAST(#{endDay} AS DATE)
+           AND order_status_value = 4
+    </select>
+</mapper>

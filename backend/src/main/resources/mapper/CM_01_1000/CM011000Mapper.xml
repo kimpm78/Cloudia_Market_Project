@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_01_1000.mapper.CM011000Mapper">
+
+    <resultMap id="userWithRoleResultMap" type="com.cloudia.backend.CM_01_1001.model.User">
+        <id property="userId" column="user_id"/>
+        <result property="loginId" column="login_id"/>
+        <result property="password" column="password"/>
+        <result property="memberNumber" column="member_number"/> 
+        <result property="userStatusValue" column="user_status_value"/>
+        <result property="roleId" column="role_id"/>
+        <result property="permissionLevel" column="permission_level"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="phoneNumber" column="phone_number"/>
+
+        <collection property="authorities" javaType="java.util.ArrayList"
+        ofType="org.springframework.security.core.authority.SimpleGrantedAuthority">
+            <constructor>
+                <arg column="role_type" javaType="string"/>
+            </constructor>
+        </collection>
+    </resultMap>
+
+    <select id="findByLoginId" parameterType="string" resultMap="userWithRoleResultMap">
+        SELECT
+            u.user_id AS user_id,
+            u.login_id,
+            u.password,
+            u.member_number,
+            u.name,
+            u.email,
+            u.phone_number,
+            p.role_type,
+            p.role_id,
+            p.permission_level
+        FROM
+            users u
+        LEFT JOIN
+            permissions p ON u.role_id = p.role_id
+        WHERE
+            u.login_id = #{loginId}
+    </select>
+</mapper>

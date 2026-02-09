@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_03_1003.mapper.CM031003Mapper">
+
+  <!-- 장르 상품 리스트 조회 -->
+  <select id="selectGenreProductList" resultType="com.cloudia.backend.CM_03_1003.model.ProductInfo">
+    SELECT 
+      p.product_id,
+      p.product_code,
+      p.name,
+      p.category,
+      p.price,
+      p.delivery_price,
+      p.release_date,
+      p.is_display,
+      p.code_type,
+      p.code_value,
+      p.created_by,
+      p.created_at,
+      p.updated_by,
+      p.updated_at,
+      d.thumbnail_url,
+      stock.available_qty,
+      COALESCE(string_agg(DISTINCT cg.category_group_name, ', '), '') AS category_group_name
+    FROM products p
+    LEFT JOIN product_details d ON p.product_id = d.product_id
+    LEFT JOIN LATERAL (
+      SELECT s.available_qty
+      FROM stocks s
+      WHERE s.product_code = p.product_code
+         OR s.product_code = CAST(p.product_id AS VARCHAR)
+      ORDER BY s.updated_at DESC NULLS LAST
+      LIMIT 1
+    ) stock ON true
+    LEFT JOIN LATERAL (
+      SELECT DISTINCT jsonb_object_keys(e) AS category_key
+      FROM jsonb_array_elements(p.category) AS e
+    ) keys ON true
+    LEFT JOIN categories cg ON cg.category_group_code = keys.category_key
+    WHERE p.is_display = 1
+      AND cg.category_group_name = '장르'
+    GROUP BY
+      p.product_id,
+      p.product_code,
+      p.name,
+      p.category,
+      p.price,
+      p.delivery_price,
+      p.release_date,
+      p.is_display,
+      p.code_type,
+      p.code_value,
+      p.created_by,
+      p.created_at,
+      p.updated_by,
+      p.updated_at,
+      d.thumbnail_url,
+      stock.available_qty
+    ORDER BY p.created_at DESC
+  </select>
+
+  <!-- 상품 리스트 조회 -->
+  <select id="selectNewProductList" resultType="com.cloudia.backend.CM_03_1003.model.ProductInfo">
+    SELECT 
+      p.product_id,
+      p.product_code,
+      p.name,
+      p.category,
+      p.price,
+      p.delivery_price,
+      p.release_date,
+      p.reservation_deadline,
+      p.is_display,
+      p.code_type,
+      p.code_value,
+      p.created_by,
+      p.created_at,
+      p.updated_by,
+      p.updated_at,
+      d.thumbnail_url,
+      stock.available_qty,
+      COALESCE(string_agg(DISTINCT cg.category_group_name, ', '), '') AS category_group_name
+    FROM products p
+    LEFT JOIN product_details d ON p.product_id = d.product_id
+    LEFT JOIN LATERAL (
+      SELECT s.available_qty
+      FROM stocks s
+      WHERE s.product_code = p.product_code
+         OR s.product_code = CAST(p.product_id AS VARCHAR)
+      ORDER BY s.updated_at DESC NULLS LAST
+      LIMIT 1
+    ) stock ON true
+    LEFT JOIN LATERAL (
+      SELECT DISTINCT jsonb_object_keys(e) AS category_key
+      FROM jsonb_array_elements(p.category) AS e
+    ) keys ON true
+    LEFT JOIN categories cg ON cg.category_group_code = keys.category_key
+    WHERE p.is_display = 1
+    GROUP BY
+      p.product_id,
+      p.product_code,
+      p.name,
+      p.category,
+      p.price,
+      p.delivery_price,
+      p.release_date,
+      p.reservation_deadline,
+      p.is_display,
+      p.code_type,
+      p.code_value,
+      p.created_by,
+      p.created_at,
+      p.updated_by,
+      p.updated_at,
+      d.thumbnail_url,
+      stock.available_qty
+    ORDER BY p.created_at DESC
+  </select>
+
+  <!-- 상품 상세 조회 -->
+  <select id="selectProductDetail" parameterType="long" resultType="com.cloudia.backend.CM_03_1003.model.ProductInfo">
+    SELECT 
+      p.product_id,
+      p.product_code,
+      p.name,
+      p.category,
+      p.price,
+      p.delivery_price,
+      p.release_date,
+      p.reservation_deadline,
+      p.is_display,
+      p.code_type,
+      p.code_value,
+      p.created_by,
+      p.created_at,
+      p.updated_by,
+      p.updated_at,
+      d.thumbnail_url,
+      d.description,
+      stock.available_qty,
+      COALESCE(string_agg(DISTINCT cg.category_group_name, ', '), '') AS category_group_name
+    FROM products p
+    LEFT JOIN product_details d ON p.product_id = d.product_id
+    LEFT JOIN LATERAL (
+      SELECT s.available_qty
+      FROM stocks s
+      WHERE s.product_code = p.product_code
+         OR s.product_code = CAST(p.product_id AS VARCHAR)
+      ORDER BY s.updated_at DESC NULLS LAST
+      LIMIT 1
+    ) stock ON true
+    LEFT JOIN LATERAL (
+      SELECT DISTINCT jsonb_object_keys(e) AS category_key
+      FROM jsonb_array_elements(p.category) AS e
+    ) keys ON true
+    LEFT JOIN categories cg ON cg.category_group_code = keys.category_key
+    WHERE p.product_id = #{productId}
+    GROUP BY
+      p.product_id,
+      p.product_code,
+      p.name,
+      p.category,
+      p.price,
+      p.delivery_price,
+      p.release_date,
+      p.reservation_deadline,
+      p.is_display,
+      p.code_type,
+      p.code_value,
+      p.created_by,
+      p.created_at,
+      p.updated_by,
+      p.updated_at,
+      d.thumbnail_url,
+      d.description,
+      stock.available_qty
+  </select>
+
+  <!-- 카테고리 조회-->
+  <resultMap id="CategoryGroupWithDetailsResultMap" type="com.cloudia.backend.CM_03_1003.model.Categories">
+    <id property="categoryGroupCode" column="category_group_code"/>
+    <result property="categoryGroupName" column="category_group_name"/>
+    <result property="displayOrder" column="display_order"/>
+    <result property="createdBy" column="created_by"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedBy" column="updated_by"/>
+    <result property="updatedAt" column="updated_at"/>
+    <collection property="details" ofType="com.cloudia.backend.CM_03_1003.model.CategoryDetails">
+      <result property="categoryGroupCode" column="detail_group_code"/>
+      <result property="categoryCode" column="category_code"/>
+      <result property="categoryName" column="category_name"/>
+      <result property="displayOrder" column="detail_display_order"/>
+      <result property="createdBy" column="detail_created_by"/>
+      <result property="createdAt" column="detail_created_at"/>
+      <result property="updatedBy" column="detail_updated_by"/>
+      <result property="updatedAt" column="detail_updated_at"/>
+    </collection>
+  </resultMap>
+
+  <select id="findCategoryGroupWithDetails" resultMap="CategoryGroupWithDetailsResultMap">
+    SELECT 
+      cg.category_group_code,
+      cg.category_group_name,
+      cg.display_order,
+      cg.created_by,
+      cg.created_at,
+      cg.updated_by,
+      cg.updated_at,
+      cd.category_group_code AS detail_group_code,
+      cd.category_code,
+      cd.category_name,
+      cd.display_order AS detail_display_order,
+      cd.created_by AS detail_created_by,
+      cd.created_at AS detail_created_at,
+      cd.updated_by AS detail_updated_by,
+      cd.updated_at AS detail_updated_at
+    FROM categories cg
+    LEFT JOIN category_details cd ON cg.category_group_code = cd.category_group_code
+    ORDER BY cg.display_order, cd.display_order
+  </select>
+
+  <select id="findCategory" resultType="com.cloudia.backend.CM_03_1003.model.CategoryDetails">
+    SELECT category_details.category_group_code
+          ,category_details.category_code
+          ,category_details.category_name
+          ,category_details.display_order
+          ,category_details.created_by
+          ,category_details.created_at
+          ,category_details.updated_by
+          ,category_details.updated_at 
+      FROM category_details
+     LEFT JOIN categories
+            ON category_details.category_group_code = categories.category_group_code
+         WHERE category_details.category_group_code IN
+        <foreach item="code" collection="categoryGroupCodes" open="(" separator="," close=")">
+            #{code}
+        </foreach>
+    ORDER BY category_details.category_code
+  </select>
+  
+  <!-- 상품 장바구니 상품 조회 -->
+  <select id="findCartItem" parameterType="map" resultType="com.cloudia.backend.CM_03_1003.model.CartItem">
+    SELECT * FROM cart_items 
+    WHERE user_id = #{userId} AND product_id = CAST(#{productId} AS VARCHAR)
+  </select>
+
+  <!-- 장바구니 수량 수정 -->
+  <update id="updateQuantity" parameterType="map">
+    UPDATE cart_items
+    SET quantity = quantity + #{quantity}, cart_updated_at = CURRENT_TIMESTAMP
+    WHERE user_id = #{userId} AND product_id = CAST(#{productId} AS VARCHAR)
+  </update>
+
+  <!-- 장바구니 상품 추가 -->
+  <insert id="insertCartItem" parameterType="map">
+    INSERT INTO cart_items (
+      user_id,
+      product_id,
+      quantity,
+      cart_updated_at,
+      is_active,
+      created_by,
+      created_at,
+      updated_by,
+      updated_at
+    )
+    VALUES (
+      #{userId},
+      #{productId},
+      #{quantity},
+      CURRENT_TIMESTAMP,
+      1,
+      #{userId},
+      CURRENT_TIMESTAMP,
+      #{userId},
+      CURRENT_TIMESTAMP
+    )
+  </insert>
+
+</mapper>

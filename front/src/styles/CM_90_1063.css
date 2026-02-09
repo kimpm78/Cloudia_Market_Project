@@ -1,0 +1,22 @@
+.content-wrapper {
+  flex-grow: 1;
+  background-color: white;
+}
+
+.input-group-custom {
+  max-width: 400px;
+  flex: 1 1 auto;
+  margin-right: 10px;
+}
+
+.select-custom {
+  max-width: 140px;
+}
+
+.btn-min-width {
+  min-width: 90px;
+}
+
+.spacer-30px {
+  width: 30px;
+}

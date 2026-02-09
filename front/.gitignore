@@ -1,0 +1,56 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Distribution / Build output
+dist
+dist-ssr
+.cache
+build
+out
+.temp
+.rollup.cache
+package-lock.json
+
+# node_modules (Exclude this!)
+node_modules
+
+# Local environment files (sensitive information)
+*.local
+.env.local
+.env.*.local
+.env
+.env.dev
+.env.production
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Package manager lock files (Keep these!)
+# yarn.lock
+# package-lock.json
+# pnpm-lock.yaml
+
+# Test coverage reports (optional)
+coverage
+__snapshots__
+
+# Framework specific folders (examples)
+.svelte-kit
+.nuxt
+
+# Local development deploy script (should not be version controlled)
+deploy-frontend-dev.sh

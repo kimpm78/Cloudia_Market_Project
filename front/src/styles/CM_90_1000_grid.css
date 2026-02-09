@@ -1,0 +1,60 @@
+.ag-dom {
+    width: 100%;
+    height: 100%;
+}
+
+.ag-theme-balham {
+    width: 100%;
+    height: 60vh;
+}
+
+.ag-cursor-pointer .ag-row:hover {
+  cursor: pointer;
+}
+
+.ag-theme-balham .ag-header {
+    font-weight: bold;
+}
+
+.ag-theme-balham .ag-cell {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  gap: 8px;
+}
+
+.nav-button,
+.group-button,
+.page-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #fff;
+  color: #000;
+  user-select: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.group-button {
+  background-color: #eee;
+}
+
+.page-button.active {
+  background-color: #007bff;
+  color: #fff;
+  font-weight: 600;
+  border-color: #007bff;
+}
+
+.disabled {
+  cursor: default;
+  opacity: 0.5;
+  pointer-events: none;
+}

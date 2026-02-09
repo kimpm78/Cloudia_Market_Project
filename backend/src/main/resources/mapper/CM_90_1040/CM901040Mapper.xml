@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1040.mapper.CM901040Mapper">
+    <select id="findByAllBanner" resultType="com.cloudia.backend.CM_90_1040.model.BannerInfo">
+        SELECT banner_id
+              ,banner_name
+              ,url_link
+              ,image_link
+              ,is_display
+              ,display_order
+              ,created_by
+              ,created_at
+              ,updated_by
+              ,updated_at
+          FROM banners;
+    </select>
+
+    <select id="findByBanner" resultType="com.cloudia.backend.CM_90_1040.model.BannerInfo">
+        SELECT banner_id
+              ,banner_name
+              ,url_link
+              ,image_link
+              ,is_display
+              ,display_order
+              ,created_by
+              ,created_at
+              ,updated_by
+              ,updated_at
+          FROM banners
+         WHERE banner_name ILIKE CONCAT('%', #{searchTerm}, '%')
+    </select>
+
+    <select id="findByBannerById" resultType="com.cloudia.backend.CM_90_1040.model.BannerInfo">
+        SELECT banner_id
+              ,banner_name
+              ,url_link
+              ,image_link
+              ,is_display
+              ,display_order
+              ,created_by
+              ,created_at
+              ,updated_by
+              ,updated_at
+          FROM banners
+         WHERE banner_id = #{bannerId}
+    </select>
+
+
+    <select id="getFindDisplayOrder" resultType="int">
+       SELECT num
+         FROM generate_series(1, 8) AS num
+        WHERE num NOT IN (
+              SELECT display_order
+                FROM banners
+               WHERE is_display = 1
+        )
+    </select>
+
+    <update id="bannerUpdate" parameterType="com.cloudia.backend.CM_90_1040.model.BannerInfo">
+        UPDATE banners
+        <set>
+            <if test="bannerName neq null and bannerName neq ''">
+                banner_name = #{bannerName},
+            </if>
+            <if test="urlLink neq null">
+                url_link = #{urlLink},
+            </if>
+            <if test="imageLink neq null and imageLink neq ''">
+                image_link = #{imageLink},
+            </if>
+            <if test="isDisplay neq null">
+                is_display = #{isDisplay},
+            </if>
+            <if test="displayOrder neq null">
+                display_order = #{displayOrder},
+            </if>
+            updated_by = #{updatedBy},
+            updated_at = #{updatedAt}
+        </set>
+        WHERE banner_id = #{bannerId}
+    </update>
+
+    <select id="countByDisplayOrder" resultType="int">
+        SELECT COUNT(*)
+          FROM banners
+         WHERE display_order = #{displayOrderId}
+           AND is_display = 1
+    </select>
+
+    <select id="findByUsedAllBanner" resultType="int">
+        SELECT COUNT(*)
+          FROM banners
+         WHERE is_display = 1
+    </select>
+
+    <insert id="bannerUpload" parameterType="com.cloudia.backend.CM_90_1040.model.BannerInfo">
+        INSERT INTO banners (
+            banner_name, url_link, image_link, is_display,
+            display_order, created_by, created_at,
+            updated_by, updated_at
+        )
+        VALUES (
+            #{bannerName}, #{urlLink}, #{imageLink}, #{isDisplay},
+            #{displayOrder}, #{createdBy}, #{createdAt},
+            #{updatedBy}, #{updatedAt}
+        )
+    </insert>
+
+    <delete id="bannerDel">
+        DELETE FROM banners
+         WHERE banner_id = #{bannerId}
+    </delete>
+</mapper>

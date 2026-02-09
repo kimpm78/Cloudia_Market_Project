@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.cloudia.backend.CM_01_1002.mapper.CM011002Mapper">
+
+    <select id="countByEmail" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE email = #{email}
+    </select>
+    
+    <select id="findByEmail" parameterType="String" resultType="com.cloudia.backend.CM_01_1001.model.User">
+        SELECT
+            login_id,
+            password,
+            email
+        FROM
+            users
+        WHERE
+            email = #{email}
+    </select>
+</mapper>

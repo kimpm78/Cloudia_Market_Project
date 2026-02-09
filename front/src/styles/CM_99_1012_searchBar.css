@@ -1,0 +1,18 @@
+/* 모바일: 0 ~ 767px */
+@media (max-width: 767px) {
+  .cm-searchbar {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+
+  .cm-search-select,
+  .cm-search-button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .cm-search-input {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}

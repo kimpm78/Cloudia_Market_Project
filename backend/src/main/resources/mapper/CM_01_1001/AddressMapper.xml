@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_01_1001.mapper.CM011001AddressMapper">
+    <insert id="insertAddress" parameterType="com.cloudia.backend.CM_01_1001.model.Address" useGeneratedKeys="true" keyProperty="addressId"> 
+    INSERT INTO delivery_addresses (
+        member_number,
+        address_nickname,
+        recipient_name,
+        postal_code,
+        address_main,
+        address_detail1,
+        address_detail2,
+        address_detail3,
+        recipient_phone,
+        is_default,
+        is_active,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at
+        ) VALUES (
+            #{memberNumber},
+        #{addressNickname},
+        #{recipientName},
+        #{postalCode},
+        #{addressMain},
+        #{addressDetail1},
+        #{addressDetail2},
+        #{addressDetail3},
+        #{recipientPhone},
+        #{isDefault},
+        #{isActive},
+        #{createdBy},
+        #{createdAt},
+        #{updatedBy},
+        #{updatedAt}
+        )
+    </insert>
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1031.mapper.CM901031Mapper">
+    <select id="findByAllAges" resultType="com.cloudia.backend.CM_90_1031.model.ageDto">
+        WITH age_groups AS (
+            SELECT unnest(ARRAY['0-10','11-20','21-30','31-40','41-50','51-60','60+']) AS age_group
+        ),
+        user_data AS (
+            SELECT 
+                CASE 
+                    WHEN EXTRACT(YEAR FROM AGE(u.birth_date)) BETWEEN 0 AND 10 THEN '0-10'
+                    WHEN EXTRACT(YEAR FROM AGE(u.birth_date)) BETWEEN 11 AND 20 THEN '11-20'
+                    WHEN EXTRACT(YEAR FROM AGE(u.birth_date)) BETWEEN 21 AND 30 THEN '21-30'
+                    WHEN EXTRACT(YEAR FROM AGE(u.birth_date)) BETWEEN 31 AND 40 THEN '31-40'
+                    WHEN EXTRACT(YEAR FROM AGE(u.birth_date)) BETWEEN 41 AND 50 THEN '41-50'
+                    WHEN EXTRACT(YEAR FROM AGE(u.birth_date)) BETWEEN 51 AND 60 THEN '51-60'
+                    ELSE '60+'
+                END AS age_group,
+                u.member_number,
+                COALESCE(o.total_amount, 0) AS total_amount
+            FROM users u
+            LEFT JOIN orders o
+                ON u.member_number = o.member_number
+            AND o.order_status_value >= 2
+            AND EXTRACT(YEAR FROM o.order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+        )
+        SELECT 
+            ag.age_group,
+            COALESCE(COUNT(DISTINCT ud.member_number), 0) AS user_count,
+            CASE 
+                WHEN COUNT(DISTINCT ud.member_number) > 0
+                THEN ROUND(COALESCE(SUM(ud.total_amount), 0) / COUNT(DISTINCT ud.member_number), 0)
+                ELSE 0
+            END AS avg_amount_per_user
+        FROM age_groups ag
+        LEFT JOIN user_data ud ON ag.age_group = ud.age_group
+        GROUP BY ag.age_group
+        ORDER BY ag.age_group
+    </select>
+
+    <select id="findByAllGenders" resultType="com.cloudia.backend.CM_90_1031.model.genderDto">
+        WITH gender_list AS (
+            SELECT unnest(ARRAY['Man','Girl','Other']) AS gender_group
+        ),
+        gender_data AS (
+            SELECT 
+                u.member_number,
+                CASE 
+                    WHEN u.gender_value = 1 THEN 'Man'
+                    WHEN u.gender_value = 2 THEN 'Girl'
+                    WHEN u.gender_value = 3 THEN 'Other'
+                END AS gender_group
+            FROM users u
+            WHERE u.gender_type = '010'
+        )
+        SELECT 
+            gl.gender_group,
+            COALESCE(COUNT(DISTINCT gd.member_number), 0) AS user_count,
+            ROUND(
+                COALESCE(SUM(o.total_amount), 0) 
+                / NULLIF(COUNT(DISTINCT gd.member_number), 0),
+            0) AS avg_amount_per_user
+        FROM gender_list gl
+        LEFT JOIN gender_data gd ON gl.gender_group = gd.gender_group
+        LEFT JOIN orders o
+            ON gd.member_number = o.member_number
+        AND o.order_status_value >= 2
+        AND EXTRACT(QUARTER FROM o.order_date) = EXTRACT(QUARTER FROM CURRENT_DATE)
+        AND EXTRACT(YEAR FROM o.order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+        GROUP BY gl.gender_group
+        ORDER BY CASE gl.gender_group
+            WHEN 'Man' THEN 1
+            WHEN 'Girl' THEN 2
+            WHEN 'Other' THEN 3
+        END
+    </select>
+</mapper>

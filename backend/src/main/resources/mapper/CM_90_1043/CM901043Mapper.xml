@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1043.mapper.CM901043Mapper">
+    <select id="selectCategoryGroups" resultType="com.cloudia.backend.CM_90_1043.model.CategoryGroupDTO">
+        SELECT category_group_code
+             , category_group_name
+             , display_order
+          FROM categories
+         ORDER BY 
+               display_order
+    </select>
+
+    <select id="selectCategoryDetails" resultType="com.cloudia.backend.CM_90_1043.model.CategoryDetailDTO">
+        SELECT category_group_code
+             , category_code
+             , category_name
+             , display_order
+          FROM category_details
+         WHERE is_active = 1
+         ORDER BY 
+               category_group_code
+             , display_order
+    </select>
+
+    <!-- 카테고리 생성 -->
+    <insert id="insertCategory" parameterType="com.cloudia.backend.CM_90_1043.model.CategoryDetailDTO">
+        INSERT INTO category_details (
+            category_group_code
+          , category_code
+          , category_name
+          , display_order
+          , created_by
+          , created_at
+          , updated_by
+          , updated_at
+          , is_active
+        ) VALUES (
+            #{categoryGroupCode}
+          , #{categoryCode}
+          , #{categoryName}
+          , #{displayOrder}
+          , #{createdBy}
+          , #{createdAt}
+          , #{updatedBy}
+          , #{updatedAt}
+          , #{isActive}
+        )
+    </insert>
+
+    <!-- 카테고리 수정 -->
+    <update id="updateCategory" parameterType="com.cloudia.backend.CM_90_1043.model.CategoryDetailDTO">
+        UPDATE category_details
+           SET category_name = #{categoryName}
+             , display_order = #{displayOrder}
+             , updated_by = #{updatedBy}
+             , updated_at = #{updatedAt}
+        WHERE category_code = #{categoryCode}
+          AND category_group_code = #{categoryGroupCode}
+    </update>
+
+    <!-- 카테고리 삭제 -->
+    <delete id="deleteCategory" parameterType="com.cloudia.backend.CM_90_1043.model.CategoryDetailDTO">
+        UPDATE category_details
+        SET    is_active = #{isActive}
+             , updated_by = #{updatedBy}
+             , updated_at = #{updatedAt}
+        WHERE category_code = #{categoryCode}
+          AND category_group_code = #{categoryGroupCode}
+    </delete>
+
+    <select id="selectMaxUpdatedAt" resultType="java.time.LocalDateTime">
+        SELECT MAX(updated_at) 
+         FROM category_details 
+        WHERE is_active = 1
+    </select>
+
+  <select id="selectNextCategoryCode" parameterType="String" resultType="String">
+      SELECT CONCAT('CD_', COALESCE(MAX(CAST(SUBSTRING(category_code, 4) AS INTEGER)), 0) + 1)
+      FROM category_details
+      WHERE category_group_code = #{categoryGroupCode}
+        AND category_code LIKE 'CD_%'
+  </select>
+
+  <select id="selectByGroupAndCode" 
+          parameterType="com.cloudia.backend.CM_90_1043.model.CategoryDetailDTO" 
+          resultType="com.cloudia.backend.CM_90_1043.model.ProductDTO">
+      SELECT *
+      FROM products
+      WHERE EXISTS (
+          SELECT 1
+          FROM jsonb_array_elements(category) AS elem
+          WHERE jsonb_exists(elem, #{categoryGroupCode})
+            AND jsonb_exists(jsonb_extract_path(elem, #{categoryGroupCode}), #{categoryCode})
+      )
+  </select>
+</mapper>

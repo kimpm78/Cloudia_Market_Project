@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_02_1000.mapper.CM021000Mapper">
+<!-- 헤더 메뉴 -->
+    <select id="findHeaderMenus" resultType="com.cloudia.backend.CM_02_1000.model.HeaderMenu">
+        SELECT menu_id
+              ,menu_name
+              ,url
+              ,sort_order
+              ,NULL AS icon
+          FROM menus
+         WHERE menu_code_value = 1
+           AND is_active = 1
+      ORDER BY menu_id, sort_order ASC;
+    </select>
+<!-- 아이콘 메뉴 -->
+    <select id="findIconMenus" resultType="com.cloudia.backend.CM_02_1000.model.HeaderMenu">
+        SELECT menu_id,
+               menu_name,
+               url,
+               sort_order,
+               NULL AS icon
+        FROM menus
+        WHERE menu_code_value = 3
+          AND is_active = 1
+        ORDER BY menu_id, sort_order ASC
+    </select>
+
+    <select id="findActiveCartItemsByUserId" parameterType="long" resultType="com.cloudia.backend.CM_02_1000.model.CartItem">
+        SELECT DISTINCT
+            c.product_id,
+            COALESCE(p.name, pc.product_name, c.product_id) AS product_name,
+            c.quantity,
+            (COALESCE(p.price, 0) * c.quantity) AS price
+        FROM cart_items c
+        LEFT JOIN products p
+          ON (
+            CAST(p.product_id AS VARCHAR) = c.product_id
+            OR p.product_code = c.product_id
+          )
+        LEFT JOIN product_code pc
+          ON pc.product_code = c.product_id
+        WHERE c.user_id = CAST(#{userId} AS BIGINT)
+          AND c.is_active = 1
+    </select>
+    <select id="selectCartTotalAmount" parameterType="long" resultType="int">
+        SELECT COALESCE(SUM(item_price), 0) AS total_amount
+        FROM (
+            SELECT DISTINCT ON (c.cart_item_id)
+                   c.cart_item_id,
+                   (COALESCE(p.price, 0) * c.quantity) AS item_price
+              FROM cart_items c
+              LEFT JOIN products p
+                ON (
+                    CAST(p.product_id AS VARCHAR) = c.product_id
+                    OR p.product_code = c.product_id
+                )
+             WHERE c.user_id = CAST(#{userId} AS BIGINT)
+               AND c.is_active = 1
+             ORDER BY c.cart_item_id, p.price DESC NULLS LAST
+        ) t
+    </select>
+    <!-- 장바구니 아이템 개수 조회 (배지 표시용) -->
+    <select id="selectCartItemCount" parameterType="long" resultType="int">
+      SELECT COALESCE(COUNT(*), 0)
+      FROM cart_items
+      WHERE user_id = CAST(#{userId} AS BIGINT)
+        AND is_active = 1
+    </select>
+<!-- 배너 조회 -->
+    <select id="findByAllBanner" resultType="com.cloudia.backend.CM_02_1000.model.BannerInfo">
+        SELECT banner_id
+              ,banner_name
+              ,url_link
+              ,image_link
+              ,is_display
+              ,display_order
+              ,created_by
+              ,created_at
+              ,updated_by
+              ,updated_at
+          FROM banners;
+    </select>
+</mapper>

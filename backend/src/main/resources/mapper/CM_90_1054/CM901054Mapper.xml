@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1054.mapper.CM901054Mapper">
+    <select id="getChart1" resultType="com.cloudia.backend.CM_90_1054.model.SalesDto">
+        <![CDATA[
+        SELECT
+            to_char(m.month, 'YYYY-MM') AS month,
+            COALESCE(SUM(o.total_amount), 0) AS totalAmount
+        FROM generate_series(
+                to_date(#{startDate}, 'YYYY-MM'),
+                to_date(#{endDate}, 'YYYY-MM'),
+                interval '1 month'
+            ) AS m(month)
+        LEFT JOIN orders o
+            ON o.order_date >= m.month
+         AND o.order_date <  (m.month + interval '1 month')
+         AND o.order_status_value > 2
+        GROUP BY m.month
+        ORDER BY m.month
+        ]]>
+    </select>
+
+    <select id="getChart2" resultType="com.cloudia.backend.CM_90_1054.model.SalesDto">
+        <![CDATA[
+        SELECT
+            to_char(m.month, 'YYYY-MM') AS month,
+            COALESCE(SUM(o.net_profit), 0) AS totalAmount
+        FROM generate_series(
+                to_date(#{startDate}, 'YYYY-MM'),
+                to_date(#{endDate}, 'YYYY-MM'),
+                interval '1 month'
+            ) AS m(month)
+        LEFT JOIN orders o
+            ON o.order_date >= m.month
+         AND o.order_date <  (m.month + interval '1 month')
+         AND o.order_status_value > 2
+        GROUP BY m.month
+        ORDER BY m.month
+        ]]>
+    </select>
+</mapper>

@@ -1,0 +1,311 @@
+/* Basic editor styles */
+.tiptap {
+  :first-child {
+    margin-top: 0;
+  }
+  /* List styles */
+  ul,
+  ol {
+    padding: 0 1rem;
+    margin: 1.25rem 1rem 1.25rem 0.4rem;
+
+    li p {
+      margin-top: 0.25em;
+      margin-bottom: 0.25em;
+    }
+  }
+  /* Task list specific styles */
+  ul[data-type='taskList'] {
+    list-style: none;
+    margin-left: 0;
+    padding: 0;
+
+    li {
+      align-items: flex-start;
+      display: flex;
+
+      > label {
+        flex: 0 0 auto;
+        margin-right: 0.5rem;
+        user-select: none;
+      }
+
+      > div {
+        flex: 1 1 auto;
+      }
+    }
+
+    input[type='checkbox'] {
+      cursor: pointer;
+    }
+
+    ul[data-type='taskList'] {
+      margin: 0;
+    }
+  }
+  /* Heading styles */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.1;
+    text-wrap: pretty;
+    margin: 0 0 1rem;
+  }
+
+  h1,
+  h2 {
+    margin-bottom: 1.2rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    margin-top: 2.5rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+    margin-top: 1.5rem;
+  }
+
+  h4 {
+    font-size: 1.15rem;
+    margin-top: 1.5rem;
+  }
+  h5 {
+    font-size: 1.05rem;
+    margin-top: 1.5rem;
+  }
+  h6 {
+    font-size: 0.95rem;
+    margin-top: 1.5rem;
+  }
+  p {
+    margin: 0 0 1rem;
+  }
+  span {
+    font-size: 16px;
+  }
+
+  /* Code and preformatted text styles */
+  code {
+    background-color: rgba(88, 5, 255, 0.05);
+    border-radius: 0.4rem;
+    color: #2e2b29;
+    font-size: 0.85rem;
+    padding: 0.25em 0.3em;
+  }
+
+  mark {
+    background-color: #faf594;
+    border-radius: 0.4rem;
+    box-decoration-break: clone;
+    padding: 0.1rem 0.3rem;
+  }
+
+  pre {
+    background-color: #f7f9fa;
+    border-radius: 4px;
+    padding: 16px 24px;
+    position: relative;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  pre code {
+    background: none;
+    color: #333;
+    font-size: inherit;
+    padding: 0;
+  }
+
+  blockquote {
+    border-left: 4px solid #999;
+    margin: 1.5rem 0;
+    padding-left: 1rem;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  /* 마우스 오버 시 강조 */
+  blockquote:hover {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    cursor: pointer;
+    margin: 2rem 0;
+  }
+
+  /* Placeholder (at the top) */
+  p.is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+  figure {
+    margin: 0;
+    a {
+      display: block;
+      text-decoration: none;
+    }
+    img {
+      max-width: 1000px;
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+  }
+  .ProseMirror-selectednode img {
+    outline: 3px solid #0d6efd;
+  }
+  /* tiptap table styles */
+  table {
+    border-collapse: collapse;
+    margin: 0;
+    overflow: hidden;
+    table-layout: fixed;
+    width: 100%;
+  }
+  td,
+  th {
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    min-width: 1em;
+    padding: 6px 8px;
+    position: relative;
+    vertical-align: top;
+    > * {
+      margin-bottom: 0;
+    }
+  }
+  th {
+    background-color: #f3f3f3;
+    font-weight: bold;
+    text-align: left;
+  }
+  .selectedCell:after {
+    background: #e0e0e0;
+    mix-blend-mode: multiply;
+    content: '';
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 2;
+  }
+
+  .column-resize-handle {
+    background-color: #7c4dff;
+    bottom: -2px;
+    pointer-events: none;
+    position: absolute;
+    right: -2px;
+    top: 0;
+    width: 4px;
+  }
+  .tableWrapper {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+  &.resize-cursor {
+    cursor: ew-resize;
+    cursor: col-resize;
+  }
+  /* Link styles */
+  a {
+    color: #6a00f5;
+    cursor: pointer;
+
+    &:hover {
+      color: #5800cc;
+    }
+  }
+}
+/* 스크롤 바 */
+.tiptap::-webkit-scrollbar {
+  width: 8px;
+}
+.tiptap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tiptap::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 5px;
+}
+/* 에디트 내용 입력 텍스트 바 */
+.tiptap-wrapper {
+  min-height: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+/* 에디트 메뉴 바 */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.control-group {
+  flex-wrap: wrap;
+  align-content: flex-start;
+  overflow: visible;
+}
+.control-group > * {
+  flex: 0 0 auto;
+}
+/* 메뉴 말풍선 툴팁 */
+.custom-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  margin-bottom: 10px;
+  background-color: #333;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.custom-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+.tooltip-wrapper:hover .custom-tooltip {
+  opacity: 1;
+}
+
+/* 모바일: 0 ~ 767px */
+@media screen and (max-width: 767px) {
+  .tiptap table {
+    display: block;
+    overflow-x: auto;
+  }
+}

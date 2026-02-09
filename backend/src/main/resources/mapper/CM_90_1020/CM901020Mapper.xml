@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1020.mapper.CM901020Mapper">
+    <select id="findByAllUsers" resultType="com.cloudia.backend.CM_90_1020.model.UsersDto">
+        SELECT user_id
+             , name
+             , member_number
+             , login_id
+             , email
+             , role_id
+             , user_status_value
+             , note
+             , created_at
+             , refund_account_holder
+             , refund_account_number
+             , refund_account_bank
+             , pccc
+          FROM users
+         WHERE role_id != 1 
+      ORDER BY role_id
+              ,member_number
+              ,created_at
+    </select>
+
+    <select id="findByUsers" resultType="com.cloudia.backend.CM_90_1020.model.UsersDto">
+        SELECT user_id
+             , name
+             , member_number
+             , login_id
+             , email
+             , role_id
+             , user_status_value
+             , note
+             , created_at
+             , refund_account_holder
+             , refund_account_number
+             , refund_account_bank
+             , pccc
+          FROM users
+        <where>
+            role_id != 1 
+            <if test="searchType == 1">
+                AND member_number ILIKE CONCAT('%', #{searchTerm}, '%')
+            </if>
+            <if test="searchType == 2">
+                AND login_id ILIKE CONCAT('%', #{searchTerm}, '%')
+            </if>
+        </where>
+      ORDER BY role_id
+              ,member_number
+              ,created_at
+    </select>
+
+    <select id="findByUser" resultType="com.cloudia.backend.CM_90_1020.model.UsersDto">
+        SELECT user_id
+             , name
+             , member_number
+             , login_id
+             , email
+             , phone_number
+             , birth_date
+             , nationality
+             , role_id
+             , user_status_value
+             , note
+             , gender_value
+             , postal_code
+             , address_main
+             , address_detail1
+             , address_detail2
+             , address_detail3
+             , refund_account_holder
+             , refund_account_number
+             , refund_account_bank
+             , pccc
+          FROM users
+         WHERE member_number = #{searchTerm}
+    </select>
+
+    <update id="userUpload" parameterType="com.cloudia.backend.CM_90_1020.model.UsersDto">
+        UPDATE users
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="phoneNumber != null">
+                phone_number = #{phoneNumber},
+            </if>
+            <if test="birthDate != null">
+                birth_date = #{birthDate},
+            </if>
+            <if test="nationality != null">
+                nationality = #{nationality},
+            </if>
+            <if test="roleId != null">
+                role_id = #{roleId},
+            </if>
+            <if test="userStatusValue != null">
+                user_status_value = #{userStatusValue},
+            </if>
+            <if test="genderValue != null">
+                gender_value = #{genderValue},
+            </if>
+            <if test="postalCode != null">
+                postal_code = #{postalCode},
+            </if>
+            <if test="addressMain != null">
+                address_main = #{addressMain},
+            </if>
+            <if test="addressDetail1 != null">
+                address_detail1 = #{addressDetail1},
+            </if>
+            <if test="addressDetail2 != null">
+                address_detail2 = #{addressDetail2},
+            </if>
+            <if test="addressDetail3 != null">
+                address_detail3 = #{addressDetail3},
+            </if>
+            <if test="pccc != null">
+                pccc = #{pccc},
+            </if>
+            <if test="refundAccountHolder != null">
+                refund_account_holder = #{refundAccountHolder},
+            </if>
+            <if test="refundAccountNumber != null">
+                refund_account_number = #{refundAccountNumber},
+            </if>
+            <if test="refundAccountBank != null">
+                refund_account_bank = #{refundAccountBank},
+            </if>
+            note = #{note},
+            updated_by = #{updatedBy},
+            updated_at = #{updatedAt}
+        </set>
+        WHERE member_number = #{memberNumber}
+    </update>
+
+
+    <select id="findRecentPasswordHistory" resultType="com.cloudia.backend.CM_90_1020.model.PasswordHistoryDto">
+        SELECT password_history_id
+              ,member_number
+              ,password
+              ,created_at
+        FROM password_history
+        WHERE member_number = #{memberNumber}
+        AND created_at <![CDATA[>=]]> #{sixMonthsAgo} 
+        ORDER BY created_at DESC
+    </select>
+    
+    <insert id="insertPasswordHistory" parameterType="com.cloudia.backend.CM_90_1020.model.UsersDto">
+        INSERT INTO password_history (
+            member_number, password, created_at
+        )
+        VALUES (
+            #{memberNumber}, #{password}, #{createdAt}
+        )
+    </insert>
+</mapper>

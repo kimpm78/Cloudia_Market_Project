@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="com.cloudia.backend.CM_01_1007.mapper.CM011007Mapper">
+
+    <select id="findProfileByLoginId" resultType="com.cloudia.backend.CM_01_1007.model.UserProfile">
+        SELECT
+            login_id AS loginId,  
+            name,
+            nationality,
+            phone_number,
+            postal_code,
+            address_main,
+            address_detail1,
+            address_detail2,
+            address_detail3,
+            pccc
+        FROM users
+        WHERE login_id = #{loginId}
+    </select>
+    
+    <select id="findUserByLoginId" resultType="com.cloudia.backend.CM_01_1001.model.User">
+        SELECT * FROM users WHERE login_id = #{loginId}
+    </select>
+
+    <update id="updateUserProfile" parameterType="com.cloudia.backend.CM_01_1001.model.User">
+        UPDATE users
+        SET
+            nationality = #{nationality},
+            phone_number = #{phoneNumber},
+            postal_code = #{postalCode},
+            address_main = #{addressMain},
+            address_detail1 = #{addressDetail1},
+            address_detail2 = #{addressDetail2},
+            address_detail3 = #{addressDetail3},
+            pccc = #{pccc},
+            updated_at = NOW()
+        WHERE
+            user_id = #{userId}
+    </update>
+
+</mapper>

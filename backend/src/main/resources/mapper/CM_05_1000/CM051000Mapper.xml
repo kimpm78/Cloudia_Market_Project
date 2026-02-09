@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_05_1000.mapper.CM051000Mapper">
+
+    <select id="findByAllNotice" resultType="com.cloudia.backend.CM_05_1000.model.NoticeInfo">
+        SELECT n.notice_id
+              ,n.title
+              ,n.content
+              ,n.code_value
+              ,n.is_display
+              ,n.pinned
+              ,n.view_count
+              ,n.published_at
+              ,n.user_id
+              ,u.role_id AS roleId
+              ,n.created_by
+              ,n.created_at
+              ,n.updated_by
+              ,n.updated_at
+          FROM notices n
+          LEFT JOIN users u
+            ON u.user_id = CAST(n.user_id AS BIGINT)
+      ORDER BY pinned
+              ,code_value
+              ,published_at
+    </select>
+    <select id="findByNotice" resultType="com.cloudia.backend.CM_05_1000.model.NoticeInfo">
+        SELECT n.notice_id
+              ,n.title
+              ,n.content
+              ,n.code_value
+              ,n.is_display
+              ,n.pinned
+              ,n.view_count
+              ,n.published_at
+              ,n.user_id
+              ,u.role_id AS roleId
+              ,n.created_by
+              ,n.created_at
+              ,n.updated_by
+              ,n.updated_at
+          FROM notices n
+          LEFT JOIN users u
+            ON u.user_id = CAST(n.user_id AS BIGINT)
+        <where>
+            <choose>
+                <when test="searchType eq 1">
+                    (n.title LIKE CONCAT('%', #{searchKeyword}, '%')
+                     OR n.content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                </when>
+                <when test="searchType eq 2">
+                    n.title LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <when test="searchType eq 3">
+                    n.content LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <when test="searchType eq 4">
+                    (LOWER(COALESCE(n.user_id, '')) LIKE LOWER(CONCAT('%', #{searchKeyword}, '%'))
+                     OR LOWER(COALESCE(n.created_by, '')) LIKE LOWER(CONCAT('%', #{searchKeyword}, '%')))
+                </when>
+            </choose>
+        </where>
+      ORDER BY pinned
+              ,code_value
+              ,published_at
+    </select>
+    <select id="findIdNotice" resultType="com.cloudia.backend.CM_05_1000.model.NoticeInfo">
+        SELECT n.notice_id
+              ,n.title
+              ,n.content
+              ,n.code_value
+              ,n.is_display
+              ,n.pinned
+              ,n.view_count
+              ,n.published_at
+              ,n.user_id
+              ,u.role_id AS roleId
+              ,n.created_by
+              ,n.created_at
+              ,n.updated_by
+              ,n.updated_at
+          FROM notices n
+          LEFT JOIN users u
+            ON u.user_id = CAST(n.user_id AS BIGINT)
+         WHERE n.notice_id = #{noticeId}
+    </select>    
+    <select id="findIdNoticeOne" resultType="com.cloudia.backend.CM_05_1000.model.NoticeInfo">
+        SELECT n.notice_id
+              ,n.title
+              ,n.content
+              ,n.code_value
+              ,n.is_display
+              ,n.pinned
+              ,n.view_count
+              ,n.published_at
+              ,n.user_id
+              ,u.role_id AS roleId
+              ,n.created_by
+              ,n.created_at
+              ,n.updated_by
+              ,n.updated_at
+          FROM notices n
+          LEFT JOIN users u
+            ON u.user_id = CAST(n.user_id AS BIGINT)
+         WHERE n.notice_id = #{noticeId}
+    </select>
+    <select id="findPrevNotice" resultType="com.cloudia.backend.CM_05_1000.model.NoticeInfo">
+        SELECT n.notice_id
+              ,n.title
+              ,n.content
+              ,n.code_value
+              ,n.is_display
+              ,n.pinned
+              ,n.view_count
+              ,n.published_at
+              ,n.user_id
+              ,u.role_id AS roleId
+              ,n.created_by
+              ,n.created_at
+              ,n.updated_by
+              ,n.updated_at
+          FROM notices n
+          LEFT JOIN users u
+            ON u.user_id = CAST(n.user_id AS BIGINT)
+         WHERE n.notice_id &lt; #{noticeId}
+           AND n.is_display = 1
+      ORDER BY n.notice_id DESC
+         LIMIT 1
+    </select>
+    <select id="findNextNotice" resultType="com.cloudia.backend.CM_05_1000.model.NoticeInfo">
+        SELECT n.notice_id
+              ,n.title
+              ,n.content
+              ,n.code_value
+              ,n.is_display
+              ,n.pinned
+              ,n.view_count
+              ,n.published_at
+              ,n.user_id
+              ,u.role_id AS roleId
+              ,n.created_by
+              ,n.created_at
+              ,n.updated_by
+              ,n.updated_at
+          FROM notices n
+          LEFT JOIN users u
+            ON u.user_id = CAST(n.user_id AS BIGINT)
+         WHERE n.notice_id &gt; #{noticeId}
+           AND n.is_display = 1
+      ORDER BY n.notice_id ASC
+         LIMIT 1
+    </select>
+    <update id="incrementViewCount" parameterType="int">
+        UPDATE notices
+           SET view_count = COALESCE(view_count, 0) + 1
+              ,updated_at = NOW()
+         WHERE notice_id = #{noticeId}
+    </update>
+    <insert id="noticeUpload" parameterType="com.cloudia.backend.CM_05_1000.model.NoticeInfo">
+        INSERT INTO notices (
+            title, content, code_value, is_display,
+            pinned, published_at, user_id, created_by, 
+            created_at, updated_by, updated_at
+        )
+        VALUES (
+            #{title}, #{content}, #{codeValue}, #{isDisplay},
+            #{pinned}, #{publishedAt}, #{userId}, #{createdBy}, 
+            #{createdAt}, #{updatedBy}, #{updatedAt}
+        )
+    </insert>
+    <update id="noticeUpdate" parameterType="com.cloudia.backend.CM_05_1000.model.NoticeInfo">
+        UPDATE notices
+           SET title = #{title}
+              ,content = #{content}
+              ,code_value = #{codeValue}
+              ,pinned = #{pinned}
+              ,is_display = #{isDisplay}
+              ,updated_by = #{updatedBy}
+              ,updated_at = #{updatedAt}
+         WHERE notice_id = #{noticeId}
+    </update>
+    <delete id="deleteNotice" parameterType="long">
+        DELETE FROM notices
+        WHERE notice_id = #{noticeId}
+    </delete>
+</mapper>

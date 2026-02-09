@@ -1,0 +1,64 @@
+.cm-company_dot {
+  width: 18px;
+  height: 18px;
+  background: #2a7de1;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.cm-company_title {
+  font-size: 50px;
+  font-weight: 600;
+  padding-bottom: 30px;
+}
+
+.cm-company_table th,
+.cm-company_table td {
+  padding: 16px 18px;
+  vertical-align: middle;
+  border: 1px solid #d7d7d7;
+}
+
+.cm-company_table th {
+  width: 260px;
+  background: #f7f4f2;
+  font-weight: 600;
+  color: #1b1b1b;
+}
+
+/* 모바일: 0 ~ 767px */
+@media screen and (max-width: 767px) {
+  .cm-company_title {
+    font-size: 30px;
+    padding-bottom: 24px;
+  }
+
+  .cm-company_table {
+    border: none;
+  }
+
+  .cm-company_table,
+  .cm-company_table tbody,
+  .cm-company_table tr,
+  .cm-company_table th,
+  .cm-company_table td {
+    display: block;
+    width: 100%;
+  }
+
+  .cm-company_table tr {
+    border: 1px solid #d7d7d7;
+    margin-bottom: 12px;
+  }
+
+  .cm-company_table th {
+    background: #f7f4f2;
+    border: none;
+    border-bottom: 1px solid #d7d7d7;
+    width: 100%;
+  }
+
+  .cm-company_table td {
+    border: none;
+  }
+}

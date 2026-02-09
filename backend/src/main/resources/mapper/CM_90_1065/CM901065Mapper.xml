@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1065.mapper.CM901065Mapper">
+    <select id="getProductCode" resultType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
+        SELECT product_code     AS productCode
+             , product_name     AS productName
+             , product_category AS productCategory
+             , created_by       AS createdBy
+             , created_at       AS createdAt
+             , updated_by       AS updatedBy
+             , updated_at       AS updatedAt
+          FROM product_code
+         WHERE is_active = 1
+         ORDER BY
+               product_code
+             , product_name
+    </select>
+
+    <select id="findByProductCode" resultType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
+        SELECT product_code     AS productCode
+             , product_name     AS productName
+             , product_category AS productCategory
+             , created_by       AS createdBy
+             , created_at       AS createdAt
+             , updated_by       AS updatedBy
+             , updated_at       AS updatedAt
+          FROM product_code
+        <where>
+               is_active = 1
+         <if test="searchType == 1">
+           AND product_code ILIKE CONCAT('%', #{searchTerm}, '%')
+         </if>
+         <if test="searchType == 2">
+           AND product_name ILIKE CONCAT('%', #{searchTerm}, '%')
+         </if>
+        </where>
+         ORDER BY
+               product_code
+             , product_name
+    </select>
+    
+    <select id="findByOneCode" resultType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
+        SELECT product_code     AS productCode
+             , product_name     AS productName
+             , product_category AS productCategory
+             , created_by       AS createdBy
+             , created_at       AS createdAt
+             , updated_by       AS updatedBy
+             , updated_at       AS updatedAt
+          FROM product_code
+        <where>
+               is_active = 1
+         <if test="searchType == 1">
+           AND product_code = #{searchTerm}
+         </if>
+         <if test="searchType == 2">
+           AND product_name = #{searchTerm}
+           AND product_category = #{category}
+         </if>
+        </where>
+    </select>
+
+    <insert id="insCode" parameterType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
+        INSERT INTO product_code (
+            product_code, product_name, created_by, 
+            created_at, updated_by, updated_at, product_category
+        )
+        VALUES (
+            #{productCode}, #{productName}, #{createdBy}, 
+            #{createdAt}, #{updatedBy}, #{updatedAt}, #{productCategory}
+        )
+    </insert>
+
+    <update id="uptCode" parameterType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
+        UPDATE product_code
+           SET is_active        = 0
+             , updated_by       = #{updatedBy}
+             , updated_at       = #{updatedAt}
+         WHERE product_code     = #{productCode}
+           AND product_category = #{category}
+    </update>
+
+    <select id="findByOneStock" resultType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
+        <![CDATA[
+        SELECT product_code     AS productCode
+             , created_by       AS createdBy
+             , created_at       AS createdAt
+             , updated_by       AS updatedBy
+             , updated_at       AS updatedAt
+          FROM stocks
+         WHERE product_code = #{searchTerm}
+           AND total_qty > 0
+         ]]>
+    </select>
+
+    <select id="findByOneProduct" resultType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
+        <![CDATA[
+        SELECT product_code     AS productCode
+             , created_by       AS createdBy
+             , created_at       AS createdAt
+             , updated_by       AS updatedBy
+             , updated_at       AS updatedAt
+          FROM products
+         WHERE product_code = #{searchTerm}
+           AND is_display = 1
+         ]]>
+    </select>
+</mapper>
+

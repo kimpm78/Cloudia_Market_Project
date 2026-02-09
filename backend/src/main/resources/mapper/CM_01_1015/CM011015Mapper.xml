@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_01_1015.mapper.CM011015Mapper">
+
+    <resultMap id="ReturnDetailMap" type="com.cloudia.backend.CM_01_1015.model.ReturnResponse">
+        <id property="returnId" column="return_id" />
+        <result property="orderNo" column="order_no" />
+        <result property="requestedAt" column="requested_at" />
+        <result property="completedAt" column="completed_at" />
+        <result property="reason" column="reason" />
+        <result property="imageUrls" column="image_urls" />
+        <result property="returnStatusValue" column="return_status_value" />
+        <collection property="products" ofType="com.cloudia.backend.CM_01_1015.model.ReturnResponse$ProductInfo">
+            <result property="productCode" column="product_code" />
+            <result property="productName" column="p_name" />
+            <result property="quantity" column="rd_quantity" />
+        </collection>
+    </resultMap>
+
+    <select id="getReturnableOrders" resultType="map">
+        SELECT 
+            o.order_id AS "orderId",
+            o.order_number AS "orderNo",
+            to_char(o.order_date, 'YYYY-MM-DD') AS "orderDate",
+            o.total_amount AS "totalAmount"
+        FROM 
+            public.orders o
+        WHERE 
+            o.member_number = (SELECT member_number FROM public.users WHERE user_id = #{userId})
+          AND 
+            o.order_status_value = 5
+        ORDER BY 
+            o.order_date DESC
+    </select>
+
+    <insert id="insertReturnRequest">
+        INSERT INTO returns (
+            order_no,
+            customer_id,
+            reason,
+            return_status_type,
+            return_status_value,
+            image_urls,
+            requested_at,
+            created_at
+        ) VALUES (
+            #{req.orderNo},
+            #{userId},
+            #{req.content},
+            '005',
+            CASE WHEN #{req.type} = 1 THEN 1 ELSE 4 END,
+            #{imageUrls},
+            #{createdAt},
+            #{createdAt}
+        )
+    </insert>
+
+    <insert id="insertReturnDetail">
+        INSERT INTO return_details (
+            return_id,
+            product_code,
+            quantity,
+            created_by,
+            created_at
+        ) VALUES (
+            currval('returns_return_id_seq'),
+            #{productCode},
+            #{quantity},
+            #{createdBy},
+            CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <select id="getReturnDetail" resultMap="ReturnDetailMap">
+        SELECT 
+            r.return_id,
+            r.order_no,
+            to_char(r.requested_at, 'YYYY-MM-DD HH24:MI') AS requested_at,
+            r.reason,
+            r.image_urls,
+            r.return_status_value,
+            rd.product_code,
+            p.name AS p_name,
+            rd.quantity AS rd_quantity
+        FROM 
+            returns r
+        JOIN 
+            return_details rd ON r.return_id = rd.return_id
+        LEFT JOIN 
+            products p ON TRIM(rd.product_code) = TRIM(p.product_code)
+        WHERE 
+            r.return_id = #{returnId}
+          AND 
+            r.customer_id = #{userId}
+    </select>
+
+    <select id="getReturnList" resultMap="ReturnDetailMap">
+        SELECT 
+            r.return_id,
+            r.order_no,
+            to_char(r.requested_at, 'YYYY-MM-DD') AS requested_at,
+            r.return_status_value,
+            rd.product_code,
+            p.name AS p_name,
+            rd.quantity AS rd_quantity
+        FROM 
+            returns r
+        JOIN 
+            return_details rd ON r.return_id = rd.return_id
+        LEFT JOIN 
+            products p ON TRIM(rd.product_code) = TRIM(p.product_code)
+        WHERE 
+            r.customer_id = #{userId}
+        ORDER BY 
+            r.return_id DESC
+    </select>
+
+    <update id="updateToExchangeStatus">
+        UPDATE 
+            orders
+        SET 
+            order_status_value = 5,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE 
+            order_number = #{orderNo}
+          AND 
+            member_number = #{memberNumber}
+    </update>
+
+   <select id="getProductsByOrderNo" resultType="com.cloudia.backend.CM_01_1015.model.ReturnResponse$ProductInfo">
+        SELECT 
+            od.product_id AS productCode,
+            p.name AS productName,
+            od.quantity AS quantity
+        FROM 
+            public.order_details od
+        LEFT JOIN 
+            public.products p ON TRIM(od.product_id) = TRIM(p.product_code)
+        WHERE 
+            od.order_number = #{orderNo}
+        AND 
+            od.member_number = (SELECT member_number FROM public.users WHERE user_id = #{userId})
+    </select>
+    
+    <select id="getCurrentReturnId" resultType="int">
+        SELECT currval('returns_return_id_seq')
+    </select>
+
+</mapper>

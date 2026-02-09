@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1050.mapper.CM901050Mapper">
+    <select id="findByAllSales" resultType="com.cloudia.backend.CM_90_1050.model.ResultDto">
+        SELECT od.member_number
+              ,u.login_id
+              ,pc.product_name
+              ,od.unit_price
+              ,o.shipping_cost
+              ,o.discount_amount
+              ,s.price
+              ,o.order_date
+              ,od.quantity
+        FROM  orders o
+        LEFT JOIN order_details od
+        ON    o.member_number = od.member_number
+        AND   o.order_number = od.order_number
+        LEFT JOIN stocks s
+        ON    od.product_id = s.product_code
+        LEFT JOIN product_code pc
+        ON    s.product_code = pc.product_code
+        LEFT JOIN users u
+        ON    o.member_number = u.member_number              
+        ORDER BY 
+               od.member_number
+              ,od.order_number
+              ,order_detail_id DESC
+    </select>
+    <select id="getFindSales" 
+            parameterType="com.cloudia.backend.CM_90_1050.model.SearchRequestDto" 
+            resultType="com.cloudia.backend.CM_90_1050.model.ResultDto">
+        SELECT od.member_number
+              ,u.login_id
+              ,pc.product_name
+              ,od.unit_price
+              ,o.shipping_cost
+              ,o.discount_amount
+              ,s.price
+              ,o.order_date
+              ,od.quantity
+        FROM  orders o
+        LEFT JOIN order_details od
+        ON    o.member_number = od.member_number
+        AND   o.order_number = od.order_number
+        LEFT JOIN stocks s
+        ON    od.product_id = s.product_code
+        LEFT JOIN product_code pc
+        ON    s.product_code = pc.product_code
+        LEFT JOIN users u
+        ON    o.member_number = u.member_number         
+        WHERE 1=1
+        <if test="dateFrom != null and dateFrom != ''">
+            AND o.order_date <![CDATA[>=]]> #{dateFrom}::date
+        </if>
+        <if test="dateTo != null and dateTo != ''">
+            AND o.order_date <![CDATA[<]]> #{dateTo}::date + INTERVAL '1 day'
+        </if>     
+        ORDER BY 
+               od.member_number
+              ,od.order_number
+              ,order_detail_id DESC
+    </select>
+</mapper>

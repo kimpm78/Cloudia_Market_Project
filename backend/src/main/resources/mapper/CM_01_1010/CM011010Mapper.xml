@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_01_1010.mapper.CM011010Mapper">
+
+    <select id="findByUserId" resultType="com.cloudia.backend.CM_01_1001.model.User">
+        SELECT
+            user_id,
+            member_number,
+            login_id,
+            password,
+            email,
+            name,
+            user_status_value
+        FROM
+            users
+        WHERE
+            user_id = #{userId}
+    </select>
+
+    <update id="deactivateUser">
+        UPDATE
+            users
+        SET
+            user_status_value = 3,
+            reason_text = #{reasonText},
+            updated_at = NOW()
+        WHERE
+            user_id = #{userId}
+    </update>
+
+    <select id="countActiveOrders" resultType="int">
+        SELECT COUNT(*)
+        FROM orders
+        WHERE member_number = #{memberNumber}
+        AND order_status_value IN (1, 2, 3, 4) 
+    </select>
+
+</mapper>

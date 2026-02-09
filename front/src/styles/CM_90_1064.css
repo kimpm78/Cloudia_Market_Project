@@ -1,0 +1,13 @@
+.content-wrapper {
+  flex-grow: 1;
+  background-color: white;
+}
+
+.btn-fixed-width {
+  width: 150px;
+}
+
+.custom-modal-overlay {
+  display: block;
+  background-color: rgba(0, 0, 0, 0.5);
+}

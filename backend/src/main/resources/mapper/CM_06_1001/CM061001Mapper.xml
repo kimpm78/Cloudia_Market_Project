@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_06_1001.mapper.CM061001Mapper">
+    <!-- 주문번호 생성 -->
+    <select id="selectNextOrderNumber" resultType="string">
+        SELECT LPAD(nextval('order_number_seq')::text, 7, '0')
+    </select>
+
+    <!-- 회원별 주문번호 생성 (00001부터 시작) -->
+    <select id="selectNextOrderNumberByMember" resultType="string">
+        SELECT LPAD(
+            (
+                COALESCE(
+                    MAX(
+                        CASE
+                            WHEN order_number ~ '^[0-9]+$' THEN CAST(order_number AS INTEGER)
+                            ELSE NULL
+                        END
+                    ),
+                    0
+                ) + 1
+            )::text,
+            5,
+            '0'
+        )
+        FROM orders
+        WHERE member_number = #{memberNumber}
+    </select>
+
+    <!-- 주문 저장 -->
+    <insert id="createOrder"
+            parameterType="com.cloudia.backend.CM_06_1001.model.OrderInfo"
+            useGeneratedKeys="true"
+            keyProperty="orderId"
+            keyColumn="order_id">
+
+        INSERT INTO orders (
+            member_number,
+            order_number,
+            total_amount,
+            payment_type,
+            order_status_type,
+            order_status_value,
+            shipping_address_id,
+            recipient_name,
+            recipient_phone,
+            shipping_cost,
+            discount_amount,
+            payment_value,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
+        )
+        VALUES (
+            #{memberNumber},
+            #{orderNumber},
+            #{totalAmount},
+            COALESCE(#{paymentType}, '011'),
+            #{orderStatusType},
+            #{orderStatusValue},
+            #{shippingAddressId},
+            #{recipientName},
+            #{recipientPhone},
+            #{shippingCost},
+            #{discountAmount},
+            #{paymentValue},
+            COALESCE(#{createdBy}, 'system'),
+            NOW(),
+            COALESCE(#{updatedBy}, 'system'),
+            NOW()
+        )
+    </insert>
+
+    <!-- 주문 상품 조회 -->
+    <select id="findOrderItems"
+            parameterType="long"
+            resultType="com.cloudia.backend.CM_06_1001.model.OrderItemInfo">
+        SELECT
+            od.order_detail_id AS orderItemId,
+            od.member_number   AS memberNumber,
+            od.order_number    AS orderNumber,
+            od.product_id      AS productId,
+            od.quantity        AS quantity,
+            od.unit_price      AS price,
+            od.total_price     AS lineTotal,
+            p.name             AS productName,
+            p.delivery_price   AS shippingFee,
+            pd.thumbnail_url   AS imageLink
+        FROM order_details od
+        JOIN orders o
+            ON o.order_number = od.order_number
+        LEFT JOIN products p
+            ON p.product_code = od.product_id
+        LEFT JOIN product_details pd
+            ON pd.product_id = p.product_id
+        WHERE o.order_id = #{orderId}
+        ORDER BY od.order_detail_id ASC
+    </select>
+
+    <!-- 주문 소유자 조회 -->
+    <select id="findOrderOwner" resultType="string">
+        SELECT member_number
+        FROM orders
+        WHERE order_id = #{orderId}
+    </select>
+
+    <!-- 회원 이메일 조회 -->
+    <select id="findEmailByMemberNumber" resultType="string">
+        SELECT u.email
+        FROM users u
+        WHERE u.member_number = #{memberNumber}
+        LIMIT 1
+    </select>
+
+    <!-- 주문 소유자 user_id 조회 -->
+    <select id="findOrderUserId" resultType="string">
+        SELECT u.user_id::text
+        FROM orders o
+        JOIN users u
+            ON u.member_number = o.member_number
+        WHERE o.order_id = #{orderId}
+    </select>
+
+    <!-- 주문 요약 조회 -->
+    <select id="findOrderSummary"
+            resultType="com.cloudia.backend.CM_06_1001.model.OrderSummary">
+        SELECT
+            o.order_id AS orderId,
+            o.order_number AS orderNumber,
+            o.total_amount AS totalAmount,
+            o.shipping_cost AS shippingFee,
+            o.order_status_value AS orderStatusValue,
+            o.created_at AS createdAt,
+            o.recipient_name AS recipientName,
+            o.recipient_phone AS recipientPhone,
+            o.shipping_address_id AS shippingAddressId,
+            NULL AS address,
+            u.name AS buyerName,
+            u.email AS buyerEmail
+        FROM orders o
+        LEFT JOIN users u 
+            ON u.member_number = o.member_number
+        WHERE o.order_id = #{orderId}
+        LIMIT 1
+    </select>
+
+
+    <!-- 주문 + 회원 검증용 상세 조회 -->
+    <select id="selectOrderByIdAndMember"
+            parameterType="map"
+            resultType="com.cloudia.backend.CM_06_1001.model.OrderInfo">
+
+        SELECT 
+            o.order_id AS orderId,
+            o.order_number AS orderNumber,
+            o.member_number AS memberNumber,
+            o.total_amount AS totalAmount,
+            o.shipping_cost AS shippingCost,
+            o.order_status_value AS orderStatusValue,
+            o.recipient_name AS recipientName,
+            o.recipient_phone AS recipientPhone,
+            NULL AS address,
+            o.created_at AS createdAt,
+            u.name AS buyerName,
+            u.email AS buyerEmail
+        FROM orders o
+        LEFT JOIN users u 
+               ON o.member_number = u.member_number
+        WHERE o.order_id = #{orderId}
+          AND o.member_number = #{memberNumber}
+    </select>
+
+
+    <!-- 주문 완료 처리 -->
+    <update id="updateOrderStatusToCompleted">
+        UPDATE orders
+        SET order_status_type  = '008',
+            order_status_value = 2,
+            refund_deadline    = #{refundDeadline},
+            updated_at         = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
+    <!-- 주문 상품 저장 / 조회 -->
+    <insert id="insertOrderItem"
+            parameterType="com.cloudia.backend.CM_06_1001.model.OrderItemInfo"
+            useGeneratedKeys="true"
+            keyProperty="orderItemId"
+            keyColumn="order_detail_id">
+
+        INSERT INTO order_details (
+            member_number,
+            order_number,
+            product_id,
+            quantity,
+            unit_price,
+            total_price,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
+        )
+        VALUES (
+            #{memberNumber},
+            #{orderNumber},
+            #{productId},
+            #{quantity},
+            #{price},
+            #{lineTotal},
+            COALESCE(#{createdBy}, 'system'),
+            NOW(),
+            COALESCE(#{updatedBy}, 'system'),
+            NOW()
+        )
+    </insert>
+
+
+    <!-- 주문 상세 삭제 (orderId 기준) -->
+    <delete id="deleteOrderDetailsByOrderId">
+        DELETE FROM order_details od
+        USING orders o
+        WHERE o.order_number = od.order_number
+          AND o.order_id = #{orderId}
+    </delete>
+
+    <!-- 결제 저장 / 조회 / 업데이트 -->
+    <insert id="insertPayment"
+            parameterType="com.cloudia.backend.CM_06_1001.model.PaymentInfo">
+
+        INSERT INTO payments (
+            payment_id,
+            order_id,
+            order_number,
+            payment_type,
+            payment_method,
+            payment_status_type,
+            payment_status_code,
+            amount,
+            transaction_id,
+            pg_provider,
+            approved_at,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
+        )
+        VALUES (
+            #{paymentId},
+            #{orderId},
+            #{orderNumber},
+            COALESCE(#{paymentType}, '011'),
+            #{paymentMethod},
+            #{paymentStatusType},
+            #{paymentStatusCode},
+            #{amount},
+            #{transactionId},
+            #{pgProvider},
+            #{approvedAt},
+            COALESCE(#{createdBy}, 'system'),
+            NOW(),
+            COALESCE(#{updatedBy}, 'system'),
+            NOW()
+        )
+    </insert>
+
+    <!-- 결제 정보 업데이트 -->
+    <update id="updatePayment">
+        UPDATE payments
+        SET 
+            payment_status_type = #{paymentStatusType},
+            payment_status_code = #{paymentStatusCode},
+            transaction_id = COALESCE(#{transactionId}, transaction_id),
+            approved_at = COALESCE(#{approvedAt}, approved_at),
+            updated_at = NOW()
+        WHERE payment_id = #{paymentId}
+    </update>
+
+    <update id="updatePaymentTransactionId">
+        UPDATE payments
+        SET
+            transaction_id = COALESCE(#{transactionId}, transaction_id),
+            updated_at = NOW()
+        WHERE payment_id = #{paymentId}
+    </update>
+
+    <!-- 최신 결제 정보 조회 -->
+    <select id="findLatestPayment"
+            resultType="com.cloudia.backend.CM_06_1001.model.PaymentInfo">
+
+        SELECT *
+        FROM payments
+        WHERE order_number = #{orderNumber}
+        ORDER BY updated_at DESC
+        LIMIT 1
+    </select>
+
+    <!-- 최신 결제 정보 조회 (orderId 기준) -->
+    <select id="findLatestPaymentByOrderId"
+            resultType="com.cloudia.backend.CM_06_1001.model.PaymentInfo">
+        SELECT *
+        FROM payments
+        WHERE order_id = #{orderId}
+        ORDER BY updated_at DESC
+        LIMIT 1
+    </select>
+
+    <!-- 최신 결제 정보 조회 (transactionId/TID 기준) -->
+    <select id="findLatestPaymentByTransactionId"
+            resultType="com.cloudia.backend.CM_06_1001.model.PaymentInfo">
+        SELECT *
+        FROM payments
+        WHERE transaction_id = #{transactionId}
+        ORDER BY updated_at DESC
+        LIMIT 1
+    </select>
+
+    <!-- 배송지 주소 소유 검증 -->
+    <select id="existsActiveDeliveryAddress" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM delivery_addresses
+            WHERE address_id = #{addressId}
+                AND member_number = #{memberNumber}
+                AND is_active = 1
+        )
+    </select>
+
+    <!-- 승인 성공/실패 > 결제 정보 업데이트 -->
+    <update id="updatePaymentStatusOnApprove">
+        UPDATE payments
+        SET
+            transaction_id = COALESCE(#{transactionId},
+            transaction_id),
+            payment_status_code = #{statusCode},
+            approved_at = CASE WHEN #{statusCode} = '2' THEN NOW() ELSE approved_at END,
+            updated_by = COALESCE(#{updatedBy}, 'system'),
+            updated_at = NOW()
+        WHERE payment_id = #{paymentId}
+    </update>
+
+    <!-- 승인 성공/실패 > 주문 상태 변경 -->
+    <update id="updateOrderStatusOnApprove">
+        UPDATE orders
+        SET
+            order_status_value = #{statusValue},
+            net_profit = CASE
+                WHEN #{statusValue} = 2 THEN
+                    COALESCE(total_amount, 0)
+                    - COALESCE((
+                        SELECT SUM(od.quantity * COALESCE(s.price, 0))
+                        FROM order_details od
+                        LEFT JOIN LATERAL (
+                            SELECT st.price
+                            FROM stocks st
+                            WHERE st.product_code = od.product_id
+                            ORDER BY st.updated_at DESC NULLS LAST
+                            LIMIT 1
+                        ) s ON TRUE
+                        WHERE od.order_number = (
+                            SELECT o.order_number
+                            FROM orders o
+                            WHERE o.order_id = #{orderId}
+                        )
+                    ), 0)
+                    + COALESCE(shipping_cost, 0)
+                ELSE net_profit
+            END,
+            updated_by = COALESCE(#{updatedBy}, 'system'),
+            updated_at = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
+    <!-- PG 승인 성공 시 순수익 갱신 -->
+    <update id="updateOrderNetProfit">
+        UPDATE orders
+        SET
+            net_profit = COALESCE(total_amount, 0)
+                - COALESCE((
+                    SELECT SUM(od.quantity * COALESCE(s.price, 0))
+                    FROM order_details od
+                    LEFT JOIN LATERAL (
+                        SELECT st.price
+                        FROM stocks st
+                        WHERE st.product_code = od.product_id
+                        ORDER BY st.updated_at DESC NULLS LAST
+                        LIMIT 1
+                    ) s ON TRUE
+                    WHERE od.order_number = (
+                        SELECT o.order_number
+                        FROM orders o
+                        WHERE o.order_id = #{orderId}
+                    )
+                ), 0)
+                + COALESCE(shipping_cost, 0),
+            updated_by = COALESCE(#{updatedBy}, 'system'),
+            updated_at = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
+    <!-- PG 취소 > 결제 상태 변경 -->
+    <update id="updatePaymentStatusOnCancel">
+        UPDATE payments
+        SET
+            payment_status_code = 3,
+            updated_by          = COALESCE(#{updatedBy}, 'system'),
+            updated_at          = NOW()
+        WHERE payment_id = #{paymentId}
+    </update>
+
+    <!-- 실패/닫힘 처리: 결제 상태를 실패로 변경 -->
+    <update id="updatePaymentStatusToFailed">
+        UPDATE payments
+        SET
+            payment_status_code = 3,
+            transaction_id      = COALESCE(#{transactionId}, transaction_id),
+            updated_by          = COALESCE(#{updatedBy}, 'system'),
+            updated_at          = NOW()
+        WHERE payment_id = #{paymentId}
+    </update>
+
+    <!-- PG 취소 > 장바구니 비활성화 -->
+    <update id="deactivateCartItemsByOrderId">
+        UPDATE cart_items
+        SET
+            is_active = 0,
+            updated_by = COALESCE(#{updatedBy}, 'system'),
+            updated_at = NOW()
+        WHERE is_active = 1
+          AND user_id = (
+              SELECT u.user_id
+              FROM users u
+              JOIN orders o
+                ON o.member_number = u.member_number
+              WHERE o.order_id = #{orderId}
+              LIMIT 1
+          )
+          AND product_id IN (
+              SELECT od.product_id
+              FROM order_details od
+              JOIN orders o
+                ON o.order_number = od.order_number
+              WHERE o.order_id = #{orderId}
+          )
+    </update>
+
+    <!-- PG 취소 > 주문 상태 변경 -->
+    <update id="updateOrderStatusOnCancel">
+        UPDATE orders
+        SET
+            order_status_value = #{statusValue},
+            updated_at = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
+    <!-- 장바구니 조회 및 비활성화 -->
+    <select id="selectCartItemsForOrder"
+            resultType="com.cloudia.backend.CM_06_1000.model.CartItemResponse">
+        SELECT 
+            ci.cart_item_id AS cartItemId,
+            ci.product_id AS productId,
+            p.name AS productName,
+            p.price AS productPrice,
+            pd.thumbnail_url AS imageLink,
+            ci.quantity,
+            (p.price * ci.quantity) AS lineTotal,
+            p.delivery_price AS shippingFee
+        FROM cart_items ci
+        LEFT JOIN products p 
+               ON p.product_code = ci.product_id
+        LEFT JOIN product_details pd 
+               ON pd.product_id = p.product_id
+        WHERE ci.user_id = #{userId}
+          AND ci.is_active = 1
+          AND p.is_display = 1
+          AND ci.cart_item_id IN
+              <foreach collection="cartItemIds" item="id" open="(" separator="," close=")">
+                  #{id}
+              </foreach>
+    </select>
+
+    <!-- 장바구니 항목 비활성화 -->
+    <update id="deactivateCartItems">
+        UPDATE cart_items
+        SET 
+            is_active = 0,
+            updated_by = #{updatedBy},
+            updated_at = NOW()
+        WHERE cart_item_id IN
+              <foreach collection="cartItemIds" item="id" open="(" separator="," close=")">
+                  #{id}
+              </foreach>
+    </update>
+
+
+    <!-- 재고 감소 -->
+    <update id="decreaseStock">
+        UPDATE stocks
+        SET 
+            total_qty = total_qty - #{quantity},
+            cart_qty = GREATEST(COALESCE(cart_qty, 0) - #{quantity}, 0),
+            updated_at = NOW()
+        WHERE product_code = #{productId}
+          AND total_qty >= #{quantity}
+    </update>
+
+    <!-- 재고 조회 및 관리 -->
+    <select id="findStockIdByProductCode" resultType="long">
+        SELECT stock_id
+        FROM stocks
+        WHERE product_code = #{productId}
+        LIMIT 1
+    </select>
+
+    <insert id="insertStockDetail">
+        INSERT INTO stock_details (
+            stock_id,
+            qty,
+            reason,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
+        )
+        VALUES (
+            #{stockId},
+            #{qty},
+            #{reason},
+            COALESCE(#{createdBy}, 'system'),
+            NOW(),
+            COALESCE(#{updatedBy}, 'system'),
+            NOW()
+        )
+    </insert>
+
+</mapper>

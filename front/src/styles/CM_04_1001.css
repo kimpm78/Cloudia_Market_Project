@@ -1,0 +1,107 @@
+.review-content {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.review-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  table-layout: fixed;
+}
+
+.review-content th,
+.review-content td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.review-content th {
+  background-color: #f3f3f3;
+  font-weight: bold;
+}
+
+.review-content tbody tr:nth-child(odd) {
+  background-color: #fafafa;
+}
+
+.review-content tbody tr:hover {
+  background-color: #f0f8ff;
+}
+
+.reply-line {
+  border-left: 2px solid #ccc; /* 세로줄 */
+  border-bottom: 2px solid #ccc; /* 가로줄 */
+  width: 20px; /* ㄴ 가로 길이 */
+  height: 20px; /* ㄴ 세로 길이 */
+  margin-top: 10px; /* 댓글과의 높이 맞추기 */
+}
+
+.comment-box {
+  background-color: #eaf4f6; /* 댓글 배경 */
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.comment-reply {
+  background-color: #f8f9fa; /* 대댓글 배경 */
+  padding: 10px;
+  margin: 10px 0 10px 24px; /* 대댓글은 들여쓰기 */
+  border-radius: 4px;
+  position: relative;
+  border: 1px solid #ccc;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.comment-reply::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 10px;
+  width: 12px;
+  height: 12px;
+  border-left: 2px solid #ccc;
+  border-bottom: 2px solid #ccc;
+}
+
+/* 모바일 및 태블릿: 0 ~ 1023px */
+@media screen and (max-width: 1023px) {
+}
+
+/* 모바일: 0 ~ 767px */
+@media screen and (max-width: 767px) {
+  .comment-box {
+    padding: 16px;
+    font-size: 14px;
+  }
+  .comment-reply {
+    padding: 14px;
+    margin-left: 16px;
+  }
+
+  .review-action-wrap {
+    gap: 16px;
+  }
+
+  .review-action-secondary {
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .review-action-secondary .btn {
+    flex: 0 0 auto;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

@@ -1,0 +1,197 @@
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import CMMessage from '../constants/CMMessage';
+import CM_99_1004 from '../components/commonPopup/CM_99_1004.jsx';
+import axiosInstance from '../services/axiosInstance.js';
+import { CATEGORIES, DISPLAY_OPTIONS } from '../constants/constants.js';
+
+const RadioGroup = ({ name, options = [], value, onChange, label }) => (
+  <div className="mb-3">
+    <label className="form-label d-block">{label}</label>
+    {options &&
+      options.length > 0 &&
+      options.map((option) => (
+        <div key={option.value} className="form-check form-check-inline">
+          <input
+            className="form-check-input"
+            type="radio"
+            name={name}
+            id={`${name}_${option.value}`}
+            value={option.value}
+            checked={value === option.value}
+            onChange={(e) => onChange(Number(e.target.value))}
+          />
+          <label className="form-check-label" htmlFor={`${name}_${option.value}`}>
+            {option.label}
+          </label>
+        </div>
+      ))}
+  </div>
+);
+
+const InputField = ({ id, label, value, onChange, error, ...props }) => (
+  <div className="mb-3">
+    <label htmlFor={id} className="form-label">
+      {label}
+    </label>
+    <input
+      id={id}
+      className="form-control"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      {...props}
+    />
+    {error && <div className="text-danger">{error}</div>}
+  </div>
+);
+
+const TextAreaField = ({ id, label, value, onChange, error, ...props }) => (
+  <div className="mb-3">
+    <label htmlFor={id} className="form-label">
+      {label}
+    </label>
+    <textarea
+      id={id}
+      className="form-control"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      {...props}
+    />
+    {error && <div className="text-danger">{error}</div>}
+  </div>
+);
+
+export default function CM_90_1046() {
+  const { noticeId } = useParams();
+  const navigate = useNavigate();
+  const [popupType, setPopupType] = useState('');
+  const [open1004, setOpen1004] = useState(false);
+  const [message, setMessage] = useState('');
+  const [errors, setErrors] = useState({});
+  const [form, setForm] = useState({
+    noticeId: 0,
+    title: '',
+    content: '',
+    codeValue: 1,
+    isDisplay: 1,
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await axiosInstance.get('/admin/menu/notice/findIdNotice', {
+        params: {
+          noticeId: noticeId,
+        },
+      });
+
+      if (result.data.result) {
+        setForm({
+          noticeId: result.data.resultList[0].noticeId,
+          title: result.data.resultList[0].title,
+          content: result.data.resultList[0].content,
+          codeValue: result.data.resultList[0].codeValue,
+          isDisplay: result.data.resultList[0].isDisplay,
+        });
+      }
+    };
+
+    if (noticeId) {
+      fetchData();
+    }
+  }, [noticeId, navigate]);
+
+  const updateForm = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleRegisterClick = async (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      const result = await axiosInstance.post('/admin/menu/notice/update', form);
+      if (result.data.result) {
+        setMessage(CMMessage.MSG_INF_002);
+        setPopupType('success');
+        setOpen1004(true);
+      }
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (form.title.trim().length === 0) newErrors.title = CMMessage.MSG_ERR_002('타이틀 명');
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  return (
+    <div className="d-flex flex-grow-1">
+      <div className="content-wrapper p-3">
+        <h5 className="border-bottom pb-2 mb-3">공지사항 수정</h5>
+        <form onSubmit={handleRegisterClick}>
+          {/* 제목 */}
+          <InputField
+            id="title"
+            label="제목"
+            type="text"
+            value={form.title}
+            onChange={(value) => updateForm('title', value)}
+            error={errors.title}
+          />
+
+          {/* 분류 */}
+          <RadioGroup
+            name="codeValue"
+            label="분류"
+            options={CATEGORIES}
+            value={form.codeValue}
+            onChange={(value) => updateForm('codeValue', value)}
+          />
+
+          {/* 사용 여부 */}
+          <RadioGroup
+            name="isDisplay"
+            label="사용 여부"
+            options={DISPLAY_OPTIONS}
+            value={form.isDisplay}
+            onChange={(value) => updateForm('isDisplay', value)}
+          />
+
+          {/* 내용 */}
+          <TextAreaField
+            id="content"
+            label="내용"
+            rows="15"
+            value={form.content}
+            onChange={(value) => updateForm('content', value)}
+            error={errors.content}
+          />
+
+          {/* 버튼 */}
+          <div className="d-flex justify-content-center gap-2">
+            <button type="submit" className="btn btn-primary btn-fixed-width">
+              업데이트
+            </button>
+            <Link to={`/notice/${noticeId}`} className="btn btn-secondary btn-fixed-width">
+              뒤로가기
+            </Link>
+          </div>
+        </form>
+        {/* 알림 팝업 */}
+        <CM_99_1004
+          isOpen={open1004}
+          onClose={() => {
+            setOpen1004(false);
+            if (popupType === 'success') {
+              navigate(-1);
+            }
+          }}
+          Message={message}
+        />
+      </div>
+    </div>
+  );
+}

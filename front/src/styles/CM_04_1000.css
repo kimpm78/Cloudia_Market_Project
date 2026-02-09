@@ -1,0 +1,16 @@
+/* 모바일: 0 ~ 767px */
+@media screen and (max-width: 767px) {
+  .review-list-container {
+    padding: 0 1rem !important;
+  }
+
+  .review-list-header {
+    gap: 12px;
+    margin-top: 24px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .review-list-header h1 {
+    font-size: 30px;
+  }
+}

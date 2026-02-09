@@ -1,0 +1,150 @@
+.board-wrapper {
+  padding: 30px;
+}
+
+.draggable-item {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  margin-bottom: 2px;
+  padding: 8px 12px;
+  user-select: none;
+}
+
+.category-container {
+  position: relative;
+  height: 600px;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+}
+
+.category-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 12px;
+  padding-bottom: 80px;
+}
+
+.add-category-wrapper {
+  position: sticky;
+  bottom: 0;
+  background: transparent;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+}
+
+.add-category-wrapper .input-inside-btn-left{
+  left: 2rem;
+}
+
+.add-category-wrapper input{
+  background-color: transparent;
+  font-weight: bold;
+  border: 2px dashed #ced4da;
+  padding: 10px 0;
+}
+
+.add-category-wrapper input:focus {
+  border-style: solid;
+  outline: none;
+}
+.input-with-button-wrapper{
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-weight: bold;
+}
+
+.input-with-button-wrapper input{ 
+  border: 1px dashed;
+  background: transparent;
+}
+
+.input-with-button-wrapper input:focus {
+  border-style: solid;
+  outline: none;
+}
+
+.input-inside-btn-left {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 1.1rem;
+  color: #6c757d;
+  z-index: 2;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.input-inside-btn-left:hover {
+  color: #000;
+}
+
+.input-with-button-wrapper input.form-control {
+  padding-left: 2rem;
+}
+
+.input-with-button-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-inside-btn-left {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #495057;
+  font-size: 1.1rem;
+  z-index: 2;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.hover-icons {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.item-content:hover .hover-icons {
+  opacity: 0.5;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.item-content.editing .hover-icons {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.item-content.editing .hover-icons i.bi-pencil-square {
+  color: #007bff !important;
+}
+
+.item-content.editing .hover-icons i.bi-trash {
+  color: #dc3545 !important;
+}
+

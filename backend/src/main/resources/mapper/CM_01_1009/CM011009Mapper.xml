@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudia.backend.CM_01_1009.mapper.CM011009Mapper">
+
+    <select id="findByLoginId" resultType="com.cloudia.backend.CM_01_1001.model.User">
+        SELECT
+            user_id,
+            login_id,
+            password,
+            email,
+            member_number
+        FROM
+            users
+        WHERE
+            login_id = #{loginId}
+    </select>
+
+    <update id="updatePassword">
+        UPDATE
+            users
+        SET
+            password = #{newPassword},
+            updated_at = NOW()
+        WHERE
+            user_id = #{userId}
+    </update>
+
+    <select id="findRecentPasswords" resultType="string">
+        SELECT password
+        FROM password_history
+        WHERE member_number = #{memberNumber}
+          AND created_at >= #{sixMonthsAgo}  
+    </select>
+
+    <insert id="insertPasswordHistory">
+        INSERT INTO password_history (
+            member_number,
+            password,
+            created_at
+        ) VALUES (
+            #{memberNumber},
+            #{password},
+            NOW()
+        )
+    </insert>
+</mapper>

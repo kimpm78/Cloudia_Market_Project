@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_90_1010.mapper.CM901010Mapper">
+    <select id="getStatus" resultType="com.cloudia.backend.CM_90_1010.model.StatusDto">
+        SELECT ono.new_order
+             , opp.payment_pending
+             , opc.purchase_confirmed
+             , 0 AS reserved
+             , rexp.exchange_requested
+             , reip.exchange_in_progress
+             , rec.exchange_completed
+             , rr.refund_requested
+             , rrip.refund_in_progress
+             , rrc.refund_completed
+             , ps.preparing_shipment
+             , it.in_transit
+             , d.delivered
+             , ocr.cancel_requested         
+             , ip.answer_pending
+             , ic.answer_completed
+        FROM   ( SELECT count(*) AS new_order
+                   FROM orders
+                  WHERE order_status_value in (1,2) 
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) ono,
+               ( SELECT count(*) AS payment_pending
+                   FROM orders
+                  WHERE order_status_value = 1 
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) opp,
+               ( SELECT count(*) AS purchase_confirmed
+                   FROM orders
+                  WHERE order_status_value = 2 
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) opc,
+               ( SELECT count(*) AS exchange_requested
+                   FROM returns
+                  WHERE return_status_value = 1 ) rexp,
+               ( SELECT count(*) AS exchange_in_progress
+                   FROM returns
+                  WHERE return_status_value = 2 ) reip,
+               ( SELECT count(*) AS exchange_completed
+                   FROM returns
+                  WHERE return_status_value = 3 
+                    AND completed_at <![CDATA[>=]]> #{startDate}::date
+                    AND completed_at <![CDATA[<=]]> #{EndDate}::date ) rec,
+               ( SELECT count(*) AS refund_requested
+                   FROM returns
+                  WHERE return_status_value = 4 ) rr,
+               ( SELECT count(*) AS refund_in_progress
+                   FROM returns
+                  WHERE return_status_value = 5 ) rrip,
+               ( SELECT count(*) AS refund_completed
+                   FROM returns
+                  WHERE return_status_value = 6 
+                    AND completed_at <![CDATA[>=]]> #{startDate}::date
+                    AND completed_at <![CDATA[<=]]> #{EndDate}::date ) rrc,
+               ( SELECT count(*) AS preparing_shipment
+                   FROM orders
+                  WHERE order_status_value = 3 ) ps,
+               ( SELECT count(*) AS in_transit
+                   FROM orders
+                  WHERE order_status_value = 4
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) it,
+               ( SELECT count(*) AS delivered
+                   FROM orders
+                  WHERE order_status_value = 5
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) d,
+               ( SELECT count(*) AS cancel_requested
+                   FROM orders
+                  WHERE order_status_value in (6,7) 
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) ocr,
+               ( SELECT count(*) AS answer_pending
+                   FROM inquiries
+                  WHERE inquiry_status_value = 1 ) ip,
+               ( SELECT count(*) AS answer_completed
+                   FROM inquiries
+                  WHERE inquiry_status_value = 2
+                    AND updated_at <![CDATA[>=]]> #{startDate}::date
+                    AND updated_at <![CDATA[<=]]> #{EndDate}::date ) ic
+    </select>
+
+    <select id="getWeeklySales" resultType="com.cloudia.backend.CM_90_1010.model.WeeklySalesDto">
+        WITH days AS (
+            SELECT generate_series(0, 6) AS day_num
+        )
+        SELECT d.day_num
+             , CASE d.day_num
+                    WHEN 0 THEN 'Sun'
+                    WHEN 1 THEN 'Mon'
+                    WHEN 2 THEN 'Tue'
+                    WHEN 3 THEN 'Wed'
+                    WHEN 4 THEN 'Thu'
+                    WHEN 5 THEN 'Fri'
+                    WHEN 6 THEN 'Sat'
+               END AS day_of_week
+             , COALESCE(SUM(o.total_amount), 0) AS total_amount
+        FROM   days d
+        LEFT JOIN 
+               orders o 
+        ON     EXTRACT(DOW FROM o.order_date) = d.day_num
+        AND    o.order_status_value in (3,4,5)
+        AND    o.order_date <![CDATA[>=]]> #{startDate}::date
+        AND    o.order_date <![CDATA[<=]]> #{EndDate}::date
+        GROUP BY d.day_num
+            , day_of_week
+        ORDER BY d.day_num
+    </select>
+
+    <select id="getPreviousInfo" resultType="com.cloudia.backend.CM_90_1010.model.PreviousInfoDto">
+        SELECT pns.previous_net_sales
+             , sa.settlement_amount
+             , ra.refund_amount
+             , oc.order_count
+             , rc.refund_count
+             , spc.shipment_processed_count
+             , dc.delivered_count
+        FROM   ( SELECT sum(total_amount) AS previous_net_sales
+                   FROM orders
+                  WHERE order_status_value in (3,4,5) 
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<]]> #{EndDate}::date ) pns,
+                ( SELECT sum(total_amount) AS settlement_amount
+                   FROM orders
+                  WHERE order_status_value in (3,4,5) 
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<]]> #{EndDate}::date ) sa,
+                ( SELECT sum(total_amount) AS refund_amount
+                   FROM returns
+                  WHERE return_status_value = 3
+                    AND completed_at <![CDATA[>=]]> #{startDate}::date
+                    AND completed_at <![CDATA[<]]> #{EndDate}::date ) ra,
+                ( SELECT count(*) AS order_count
+                   FROM orders
+                  WHERE order_status_value in (1,2) 
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<]]> #{EndDate}::date ) oc,
+                ( SELECT count(*) AS refund_count
+                   FROM returns
+                  WHERE return_status_value = 3
+                    AND completed_at <![CDATA[>=]]> #{startDate}::date
+                    AND completed_at <![CDATA[<]]> #{EndDate}::date ) rc,
+               ( SELECT count(*) AS shipment_processed_count
+                   FROM orders
+                  WHERE order_status_value = 4
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<]]> #{EndDate}::date ) spc,
+               ( SELECT count(*) AS delivered_count
+                   FROM orders
+                  WHERE order_status_value = 5
+                    AND order_date <![CDATA[>=]]> #{startDate}::date
+                    AND order_date <![CDATA[<]]> #{EndDate}::date ) dc
+    </select>
+</mapper>

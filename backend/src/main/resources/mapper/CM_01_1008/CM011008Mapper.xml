@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudia.backend.CM_01_1008.mapper.CM011008Mapper">
+
+    <select id="findUserByLoginId" resultType="com.cloudia.backend.CM_01_1001.model.User">
+        SELECT user_id, member_number 
+        FROM users 
+        WHERE login_id = #{loginId}
+    </select>
+    
+    <select id="findAddressesByMemberNumber" resultType="com.cloudia.backend.CM_01_1008.model.DeliveryAddress">
+        SELECT * 
+        FROM delivery_addresses 
+        WHERE member_number = #{memberNumber} AND is_active = 1 ORDER BY is_default DESC, created_at DESC
+    </select>
+    
+    <select id="countAddressesByMemberNumber" resultType="int">
+        SELECT COUNT(*) 
+        FROM delivery_addresses 
+        WHERE member_number = #{memberNumber} AND is_active = 1
+    </select>
+    
+    <insert id="insertAddress" parameterType="com.cloudia.backend.CM_01_1008.model.DeliveryAddress">
+        INSERT INTO delivery_addresses 
+            (
+            member_number, 
+            address_nickname, 
+            recipient_name, 
+            recipient_phone, 
+            postal_code, 
+            address_main, 
+            address_detail1, 
+            address_detail2, 
+            address_detail3, 
+            is_default, 
+            created_by, 
+            updated_by
+            )
+        VALUES 
+            (
+            #{memberNumber}, 
+            #{addressNickname}, 
+            #{recipientName}, 
+            #{recipientPhone}, 
+            #{postalCode}, 
+            #{addressMain}, 
+            #{addressDetail1}, 
+            #{addressDetail2}, 
+            #{addressDetail3}, 
+            #{isDefault}, 
+            #{createdBy}, 
+            #{updatedBy}
+            )
+    </insert>
+    
+    <update id="resetDefaultAddress">
+        UPDATE delivery_addresses
+        SET is_default = FALSE,
+            updated_at = NOW()
+        WHERE member_number = #{memberNumber}
+          AND is_active = 1
+          AND is_default = TRUE
+    </update>
+    
+   <update id="updateAddress" parameterType="com.cloudia.backend.CM_01_1008.model.DeliveryAddress">
+        UPDATE delivery_addresses
+        SET address_nickname = #{addressNickname},
+            recipient_name = #{recipientName},
+            recipient_phone = #{recipientPhone},
+            postal_code = #{postalCode},
+            address_main = #{addressMain},
+            address_detail1 = #{addressDetail1},
+            address_detail2 = #{addressDetail2},
+            address_detail3 = #{addressDetail3},
+            is_default = #{isDefault},
+            updated_at = NOW(),
+            updated_by = #{updatedBy} 
+        WHERE address_id = #{addressId}
+    </update>
+    
+    <select id="findAddressById" resultType="com.cloudia.backend.CM_01_1008.model.DeliveryAddress">
+    SELECT * 
+    FROM delivery_addresses 
+    WHERE address_id = #{addressId} AND is_active = 1
+    </select>
+
+    <update id="deleteAddressSoft">
+        UPDATE delivery_addresses 
+        SET is_active = 0, deleted_at = NOW() 
+        WHERE address_id = #{addressId}
+    </update>
+
+    <update id="updateAddressDefaultStatus">
+    UPDATE delivery_addresses
+    SET is_default = #{isDefault},
+        updated_at = NOW(),
+        updated_by = #{updatedBy}
+    WHERE address_id = #{addressId}
+    </update>
+</mapper>

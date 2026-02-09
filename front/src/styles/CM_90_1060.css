@@ -1,0 +1,22 @@
+.select-unified {
+    width: 9rem;
+}
+.select-unified .select__control {
+  border: 1px solid #ced4da !important;
+  box-shadow: none !important;
+  min-height: 38px !important;
+  height: 38px !important;
+}
+
+.select-unified .select__control:hover {
+  border: 1px solid #ced4da !important;
+}
+
+.select-unified .select__value-container {
+  padding: 0 0.75rem !important;
+  height: 38px !important;
+}
+
+.select-unified .select__indicators {
+  height: 38px !important;
+}

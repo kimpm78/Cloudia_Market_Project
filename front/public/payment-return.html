@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>결제 처리 중...</title>
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background: #fafafa;
+        color: #222;
+        margin: 0;
+        padding: 40px 16px;
+        text-align: center;
+      }
+      .box {
+        max-width: 460px;
+        margin: 0 auto;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+        padding: 22px 18px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+      }
+      .title {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 10px;
+      }
+      .desc {
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0;
+        color: #555;
+      }
+      .spinner {
+        width: 26px;
+        height: 26px;
+        margin: 16px auto 0;
+        border: 3px solid #ddd;
+        border-top-color: #888;
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .error {
+        margin-top: 14px;
+        font-size: 13px;
+        color: #b00020;
+      }
+      pre {
+        text-align: left;
+        margin-top: 10px;
+        padding: 10px;
+        background: #f7f7f7;
+        border-radius: 8px;
+        font-size: 12px;
+        white-space: pre-wrap;
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="box">
+      <h1 class="title">결제 처리 중...</h1>
+      <p class="desc">
+        결제 인증이 완료되었습니다.<br />
+        승인/결과 확정 중이니 잠시만 기다려주세요.
+      </p>
+      <div class="spinner" aria-label="loading"></div>
+
+      <div id="error" class="error" role="alert" aria-live="polite"></div>
+      <pre id="detail"></pre>
+    </div>
+
+    <script>
+      (async function () {
+        const errorEl = document.getElementById('error');
+        const detailEl = document.getElementById('detail');
+
+        const showError = (msg, detail) => {
+          errorEl.textContent = msg;
+          if (detail) {
+            detailEl.style.display = 'block';
+            detailEl.textContent = detail;
+          }
+        };
+
+        // 쿼리스트링/해시 파라미터 파싱 (대소문자 무시)
+        const searchParams = new URLSearchParams(window.location.search);
+        const hashRaw = (window.location.hash || '').replace(/^#\??/, '');
+        const hashParams = hashRaw ? new URLSearchParams(hashRaw) : null;
+
+        const buildLowerParamMap = (params) => {
+          const map = new Map();
+          if (!params) return map;
+
+          for (const [k, v] of params.entries()) {
+            const key = String(k || '').toLowerCase();
+            if (!key) continue;
+            if (!map.has(key)) map.set(key, v);
+          }
+          return map;
+        };
+
+        const searchMap = buildLowerParamMap(searchParams);
+        const hashMap = buildLowerParamMap(hashParams);
+
+        const formMap = new Map();
+        document.querySelectorAll('input, select, textarea').forEach((el) => {
+          if (!el.name) return;
+          if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) return;
+          const key = String(el.name || '').toLowerCase();
+          if (!key || formMap.has(key)) return;
+          formMap.set(key, el.value ?? '');
+        });
+
+        const getParam = (key) => {
+          const k = String(key || '').toLowerCase();
+          if (!k) return null;
+          return formMap.get(k) ?? searchMap.get(k) ?? hashMap.get(k) ?? null;
+        };
+
+        const ORDER_CONTEXT_KEY = 'PG_ORDER_CONTEXT';
+        const RESULT_CHANNEL_KEY = 'PG_PAYMENT_RESULT';
+        const TID_CACHE_KEY = 'PG_LAST_TID';
+
+        const safeTrim = (value) => String(value || '').trim();
+
+        const readOrderContext = () => {
+          try {
+            const raw = localStorage.getItem(ORDER_CONTEXT_KEY);
+            if (!raw) return null;
+            return JSON.parse(raw);
+          } catch (err) {
+            return null;
+          }
+        };
+
+        const ctx = readOrderContext();
+
+        // 파라미터 우선, 없으면 로컬 컨텍스트로 보완
+        let orderId = safeTrim(getParam('orderid'));
+        const orderNoParam = safeTrim(getParam('orderno') || getParam('order_no'));
+        let orderNumber = safeTrim(getParam('ordernumber') || getParam('order_number'));
+        let paymentMethod = safeTrim(getParam('paymentmethod')) || null;
+
+        // PG 결과 코드/메시지 (케이스/표기 차이 대응)
+        let resultCode =
+          safeTrim(getParam('rtn_cd') || getParam('resultcode') || getParam('result_code')) || '';
+        let resultMsg =
+          safeTrim(getParam('rtn_msg') || getParam('resultmsg') || getParam('result_msg')) || '';
+
+        const statusParam = (safeTrim(getParam('status')) || '').toLowerCase();
+        const cancelReasonParam =
+          safeTrim(getParam('cancelreason') || getParam('cancel_reason') || getParam('reason')) ||
+          '';
+
+        const encData = safeTrim(getParam('encdata') || getParam('enc_data'));
+        let tid = safeTrim(getParam('tid') || getParam('transactionid') || getParam('transaction_id'));
+
+        const cacheTid = (tidValue) => {
+          if (!tidValue) return;
+          try {
+            const payload = {
+              tid: tidValue,
+              orderId: orderId || null,
+              orderNumber: orderNumber || null,
+              ts: Date.now(),
+            };
+            localStorage.setItem(TID_CACHE_KEY, JSON.stringify(payload));
+          } catch (err) {
+            // ignore
+          }
+        };
+
+        if ((!orderId || !orderNumber) && ctx) {
+          if (!orderId && ctx.orderId != null) orderId = safeTrim(ctx.orderId);
+          if (!orderNumber && ctx.orderNumber != null) orderNumber = safeTrim(ctx.orderNumber);
+          if (!paymentMethod && ctx.paymentMethod != null)
+            paymentMethod = safeTrim(ctx.paymentMethod);
+        }
+        const fallbackAmount = ctx && ctx.amount != null ? Number(ctx.amount) : null;
+        if (!orderNoParam && ctx && ctx.pgOrderNo) {
+          orderNumber = safeTrim(ctx.pgOrderNo);
+        }
+        if (orderNoParam) {
+          orderNumber = orderNoParam;
+        }
+
+        cacheTid(tid);
+
+        const getApiBase = () => {
+          const paramBase = safeTrim(getParam('apibase'));
+          const ctxBase = ctx && ctx.apiBase ? safeTrim(ctx.apiBase) : '';
+          const candidate = paramBase || ctxBase || '';
+          if (!candidate) return null;
+
+          try {
+            const url = new URL(candidate, window.location.origin);
+            if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+            return url.toString().replace(/\/+$/, '');
+          } catch (err) {
+            return null;
+          }
+        };
+
+        const publishResult = (payload) => {
+          // 1) 같은 오리진의 opener가 있으면 postMessage
+          try {
+            if (window.opener && !window.opener.closed) {
+              window.opener.postMessage(
+                { type: RESULT_CHANNEL_KEY, payload },
+                window.location.origin
+              );
+            }
+          } catch (err) {
+            // ignore
+          }
+
+          // 2) BroadcastChannel 지원 시 브로드캐스트
+          try {
+            if (window.BroadcastChannel) {
+              const channel = new BroadcastChannel(RESULT_CHANNEL_KEY);
+              channel.postMessage(payload);
+              channel.close();
+            }
+          } catch (err) {
+            // ignore
+          }
+        };
+
+        const redirectToResultPage = (paymentStatus, cancelReason) => {
+          const query = new URLSearchParams({
+            orderId: orderId || '',
+            orderNumber: orderNumber || '',
+            status: paymentStatus,
+            cancelReason: cancelReason || '',
+            paymentMethod: paymentMethod || '',
+            from: 'returnPage',
+          }).toString();
+          window.location.replace('/order-payment/result?' + query);
+        };
+
+        let finalized = false;
+
+        const sendFailBeacon = (reason) => {
+          const apiBase = getApiBase();
+          if (!apiBase) return;
+          if (!orderId && !orderNumber && !tid) return;
+          const payload = JSON.stringify({
+            orderId: orderId ? Number(orderId) : null,
+            orderNumber: orderNumber || null,
+            tid: tid || null,
+            pgType: 'COOKIEPAY',
+            reason,
+          });
+          try {
+            if (navigator.sendBeacon) {
+              const blob = new Blob([payload], { type: 'application/json' });
+              navigator.sendBeacon(`${apiBase}/pay/fail`, blob);
+              return;
+            }
+          } catch (err) {
+            // ignore
+          }
+          try {
+            fetch(`${apiBase}/pay/fail`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: payload,
+              keepalive: true,
+            });
+          } catch (err) {
+            // ignore
+          }
+        };
+
+        window.addEventListener('pagehide', () => {
+          if (finalized) return;
+          cacheTid(tid);
+          sendFailBeacon('USER_CLOSED_PAGE');
+        });
+
+        const finalize = (paymentStatus, cancelReason = null) => {
+          finalized = true;
+          const payload = {
+            paymentStatus,
+            orderId: orderId || null,
+            orderNumber: orderNumber || null,
+            paymentMethod,
+            pgType: 'COOKIEPAY',
+            tid: tid || null,
+            cancelReason: cancelReason || null,
+            from: 'payment-return',
+            ts: Date.now(),
+          };
+
+          try {
+            localStorage.removeItem(ORDER_CONTEXT_KEY);
+          } catch (err) {
+            // ignore
+          }
+
+          // 1️⃣ 부모 창으로 결과 전송
+          publishResult(payload);
+
+          // 2️⃣ 약간의 딜레이 후 팝업 닫기
+          setTimeout(() => {
+            try {
+              // opener가 있으면 팝업 닫기
+              if (window.opener && !window.opener.closed) {
+                window.close();
+              } else {
+                // opener가 없으면 결과 페이지로 이동
+                redirectToResultPage(paymentStatus, cancelReason);
+              }
+            } catch (err) {
+              // 닫기 실패하면 결과 페이지로 이동
+              redirectToResultPage(paymentStatus, cancelReason);
+            }
+          }, 300);
+        };
+
+        const callFailApi = async (reason) => {
+          const apiBase = getApiBase();
+          if (!apiBase) return;
+          if (!orderId && !orderNumber && !tid) return;
+
+          try {
+            await fetch(`${apiBase}/pay/fail`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                orderId: orderId ? Number(orderId) : null,
+                orderNumber: orderNumber || null,
+                tid: tid || null,
+                pgType: 'COOKIEPAY',
+                reason,
+              }),
+            });
+          } catch (err) {
+            // ignore
+          }
+        };
+
+        const callCallbackDecrypt = async (encDataValue) => {
+          const apiBase = getApiBase();
+          if (!apiBase || !encDataValue) return null;
+          const pgTypeParam = safeTrim(getParam('pgtype')) || 'COOKIEPAY';
+
+          try {
+            const url = `${apiBase}/pay/decrypt?encData=${encodeURIComponent(
+              encDataValue
+            )}&pgType=${encodeURIComponent(pgTypeParam)}`;
+            const response = await fetch(url, { method: 'GET' });
+            const json = await response.json().catch(() => null);
+            if (!response.ok || !json?.result) return null;
+            return json?.resultList?.pgResult || null;
+          } catch (err) {
+            return null;
+          }
+        };
+
+        // 명시적 status 처리 (cancel/fail/error)
+        if (statusParam === 'cancel' || statusParam === 'fail' || statusParam === 'error') {
+          const reason = cancelReasonParam || `PG_${statusParam.toUpperCase()}`;
+          await callFailApi(reason);
+          finalize(statusParam === 'cancel' ? 'cancel' : 'fail', reason);
+          return;
+        }
+
+        // resultCode가 0000이 아니면 실패 처리
+        if (resultCode && resultCode !== '0000') {
+          const reason = resultMsg || resultCode;
+          await callFailApi(reason);
+          finalize('fail', reason);
+          return;
+        }
+
+        // tid 없으면 승인 요청 불가
+        if (!tid && encData) {
+          const decrypted = await callCallbackDecrypt(encData);
+          if (decrypted) {
+            tid = safeTrim(decrypted.tid || decrypted.TID || tid);
+            cacheTid(tid);
+            if (!resultCode)
+              resultCode = safeTrim(decrypted.resultCode || decrypted.RESULTCODE || '');
+            if (!resultMsg) resultMsg = safeTrim(decrypted.resultMsg || decrypted.RESULTMSG || '');
+          }
+
+          if (resultCode && resultCode !== '0000') {
+            const reason = resultMsg || resultCode;
+            await callFailApi(reason);
+            finalize('fail', reason);
+            return;
+          }
+        }
+
+        if (!tid) {
+          await callFailApi('MISSING_TID');
+          finalize('fail', 'MISSING_TID');
+          return;
+        }
+
+        // 4) 승인 요청
+        const apiBase = getApiBase();
+        if (!apiBase) {
+          finalize('fail', 'MISSING_API_BASE');
+          return;
+        }
+        try {
+          const response = await fetch(`${apiBase}/pay/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: orderId ? Number(orderId) : null,
+              orderNumber: orderNumber || null,
+              pgType: 'COOKIEPAY',
+              tid,
+              amount: Number.isFinite(fallbackAmount) ? fallbackAmount : null,
+            }),
+          });
+
+          const json = await response.json().catch(() => null);
+          if (response.ok && json?.result) {
+            finalize('success');
+            return;
+          }
+
+          const reason = (json && json.message) || 'APPROVE_FAILED';
+          await callFailApi(reason);
+          finalize('fail', reason);
+        } catch (err) {
+          await callFailApi('APPROVE_REQUEST_FAILED');
+          finalize('fail', 'APPROVE_REQUEST_FAILED');
+        }
+      })();
+    </script>
+  </body>
+</html>

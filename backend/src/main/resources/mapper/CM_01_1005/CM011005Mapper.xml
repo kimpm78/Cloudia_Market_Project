@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudia.backend.CM_01_1005.mapper.CM011005Mapper">
+
+    <resultMap id="OrderEntityMap" type="com.cloudia.backend.CM_01_1005.model.OrderEntity">
+        <id property="orderId" column="order_id" />
+        <result property="orderNo" column="order_number" />
+        <result property="memberNumber" column="member_number" />
+        <result property="orderDate" column="order_date" />
+        <result property="deliveryDate" column="delivery_date" />
+        <result property="totalAmount" column="total_amount" />
+        <result property="shippingCost" column="shipping_cost" />
+        <result property="paymentValue" column="payment_value" />
+        <result property="orderStatusValue" column="order_status_value" />
+        <result property="paymentAt" column="payment_at" />
+        <result property="productImageUrl" column="product_image_url" />
+        <result property="productName" column="product_name" />
+        <result property="orderItemCount" column="order_item_count" />
+        <result property="paymentType" column="payment_type" />
+        <result property="orderStatusType" column="order_status_type" />
+        <result property="recipientName" column="recipient_name" />
+        <result property="recipientPhone" column="recipient_phone" />
+        <result property="shippingCompany" column="shipping_company" />
+        <result property="trackingNumber" column="tracking_number" />
+        <result property="shippingAddress" column="shipping_address" />
+    </resultMap>
+
+    <select id="findOrderHistoryByFilters" resultMap="OrderEntityMap">
+        SELECT
+            o.order_id,
+            o.order_number,
+            o.member_number,
+            o.order_date,
+            o.delivery_date,
+            o.total_amount,
+            o.shipping_cost,
+            o.payment_value,
+            o.order_status_value,
+            CASE 
+                WHEN o.payment_value = 2 THEN p.approved_at 
+                WHEN o.payment_value = 1 THEN o.remittance_date 
+            END AS payment_at,
+            (
+                SELECT pd.thumbnail_url 
+                FROM order_details od_sub 
+                JOIN products p_sub ON od_sub.product_id = p_sub.product_code 
+                JOIN product_details pd ON p_sub.product_id = pd.product_id 
+                WHERE od_sub.order_number = o.order_number 
+                ORDER BY od_sub.order_detail_id ASC 
+                LIMIT 1
+            ) AS product_image_url,
+            (
+                SELECT p.name 
+                FROM order_details od4 
+                JOIN products p ON od4.product_id = p.product_code 
+                WHERE od4.order_number = o.order_number 
+                  AND od4.member_number = o.member_number 
+                ORDER BY od4.order_detail_id ASC 
+                LIMIT 1
+            ) AS product_name,
+            (
+                SELECT COUNT(od_cnt.order_detail_id) 
+                FROM order_details od_cnt 
+                WHERE od_cnt.order_number = o.order_number 
+                  AND od_cnt.member_number = o.member_number
+            ) AS order_item_count
+        FROM
+            orders o
+        LEFT JOIN 
+            payments p ON o.order_number = p.order_number
+        WHERE
+            o.member_number = #{memberNumber}
+        AND EXISTS (
+            SELECT 1 FROM order_details od_chk
+            JOIN products p_chk ON od_chk.product_id = p_chk.product_code
+            WHERE od_chk.order_number::TEXT = o.order_number::TEXT
+            AND p_chk.is_display = 1
+            AND (
+                p_chk.code_value::TEXT = '1' 
+                OR (
+                    p_chk.code_value::TEXT = '3' 
+                    AND CURRENT_DATE &lt;= p_chk.reservation_deadline::DATE
+                )
+            )
+        )
+        <if test="keyword != null and keyword != ''">
+            AND EXISTS (
+                SELECT 1 FROM order_details od_search 
+                JOIN products p_search ON od_search.product_id = p_search.product_code 
+                WHERE od_search.order_number = o.order_number 
+                  AND od_search.member_number = o.member_number 
+                  AND LOWER(p_search.name) LIKE '%' || LOWER(#{keyword}) || '%'
+            )
+        </if>
+        <if test="orderStatusValue != null"> 
+            AND o.order_status_value = #{orderStatusValue} 
+        </if>
+        <if test="year != null and year != ''"> 
+            AND TO_CHAR(o.order_date, 'YYYY') = #{year} 
+        </if>
+        <if test="month != null and month != ''"> 
+            AND TO_CHAR(o.order_date, 'MM') = LPAD(#{month}, 2, '0') 
+        </if>
+        <if test="paymentMethod != null"> 
+            AND o.payment_value = #{paymentMethod} 
+        </if>
+        ORDER BY 
+            o.order_date DESC
+    </select>
+
+    <select id="findOrderByOrderNoAndMemberNumber" resultMap="OrderEntityMap">
+        SELECT
+            o.order_id,
+            o.order_number,
+            o.member_number,
+            o.order_date,
+            o.delivery_date,
+            o.total_amount,
+            o.payment_type,
+            o.payment_value,
+            o.order_status_type,
+            o.order_status_value,
+            o.recipient_name,
+            o.recipient_phone,
+            o.shipping_company,
+            o.tracking_number,
+            o.shipping_cost,
+            CASE 
+                WHEN o.payment_value = 2 THEN p.approved_at 
+                WHEN o.payment_value = 1 THEN o.remittance_date 
+            END AS payment_at,
+            da.address_main || ' ' || da.address_detail1 || ' ' || COALESCE(da.address_detail2, '') AS shipping_address,
+            (
+                SELECT p_sub.name 
+                FROM order_details od4 
+                JOIN products p_sub ON od4.product_id = p_sub.product_code 
+                WHERE od4.order_number = o.order_number 
+                  AND od4.member_number = o.member_number 
+                ORDER BY od4.order_detail_id ASC 
+                LIMIT 1
+            ) AS product_name,
+            (
+                SELECT COUNT(od_cnt.order_detail_id) 
+                FROM order_details od_cnt 
+                WHERE od_cnt.order_number = o.order_number 
+                  AND od_cnt.member_number = o.member_number
+            ) AS order_item_count
+        FROM
+            orders o
+        LEFT JOIN 
+            delivery_addresses da ON o.shipping_address_id = da.address_id
+        LEFT JOIN 
+            payments p ON o.order_id = p.order_id 
+        WHERE 
+            o.order_number = #{orderNo} 
+          AND o.member_number = #{memberNumber}
+    </select>
+
+    <select id="findPaymentDetailsByOrderNo" resultType="com.cloudia.backend.CM_01_1005.model.OrderDetailResponse$Payment">
+        SELECT
+            DISTINCT ON (od.order_detail_id)
+            COALESCE(p.name, od.product_id) AS product,
+            od.product_id AS productCode,
+            od.quantity,
+            (COALESCE(od.quantity, 0) * COALESCE(od.unit_price, 0)) AS total,
+            pd.thumbnail_url AS imageUrl
+        FROM
+            order_details od
+        LEFT JOIN 
+            products p ON od.product_id = p.product_code
+        LEFT JOIN 
+            product_details pd ON p.product_id = pd.product_id
+        WHERE 
+            od.order_number = #{orderNo} 
+            AND od.member_number = #{memberNumber}
+            AND p.is_display = 1
+            AND (
+                p.code_value = '1' 
+                OR 
+                (
+                    p.code_value = '3'
+                    AND CURRENT_DATE &lt;= p.reservation_deadline::DATE
+                )
+            )
+        ORDER BY 
+            od.order_detail_id ASC
+    </select>
+
+    <insert id="insertRefundRequest">
+        INSERT INTO refund_requests (
+            order_number,
+            member_number,
+            payment_method_code,
+            bank_name,
+            account_number,
+            account_holder,
+            refund_reason,
+            created_at
+        ) VALUES (
+            #{orderNo},
+            #{memberNumber},
+            #{paymentMethodCode},
+            #{bankName},
+            #{accountNumber},
+            #{accountHolder},
+            #{reason},
+            #{createdAt}
+        )
+    </insert>
+
+    <update id="cancelOrderWithReason">
+    UPDATE orders
+    SET 
+        order_status_value = 7, 
+        updated_at = #{updatedAt}
+    WHERE 
+        order_number = #{orderNo} 
+      AND member_number = #{memberNumber}
+</update>
+
+    <select id="findAddressesByMemberNumber" resultType="map">
+        SELECT 
+            address_id AS "addressId",
+            address_nickname AS "addressNickname",
+            recipient_name AS "recipientName",
+            recipient_phone AS "recipientPhone",
+            postal_code AS "postalCode",
+            address_main AS "addressMain",
+            address_detail1 AS "addressDetail1",
+            address_detail2 AS "addressDetail2",
+            is_default AS "isDefault"
+        FROM 
+            delivery_addresses 
+        WHERE 
+            member_number = #{memberNumber} 
+          AND is_active = 1
+        ORDER BY 
+            is_default DESC, 
+            address_id ASC
+    </select>
+
+    <update id="updateOrderStatus">
+        UPDATE orders
+        SET 
+            order_status_value = #{orderStatusValue},
+            updated_at = #{updatedAt}
+        WHERE 
+            order_number = #{orderNo} 
+          AND member_number = #{memberNumber}
+    </update>
+
+    <update id="updateOrderShippingInfo">
+        UPDATE orders
+        SET 
+            recipient_name = #{recipientName},
+            recipient_phone = #{recipientPhone},
+            shipping_address_id = #{shippingAddressId},
+            updated_at = #{updatedAt}
+        WHERE 
+            order_number = #{orderNo} 
+          AND member_number = #{memberNumber} 
+          AND order_status_value &lt;= 3
+    </update>
+
+    <select id="findUserRefundInfoByMemberNumber" resultType="com.cloudia.backend.CM_01_1005.model.OrderDetailResponse$UserRefundInfo">
+        SELECT 
+            refund_account_bank AS bankName,
+            refund_account_number AS accountNumber,
+            refund_account_holder AS accountHolder
+        FROM 
+            users 
+        WHERE 
+            member_number = #{memberNumber}
+    </select>
+
+    <select id="findStockByProductCode" resultType="map">
+        SELECT 
+            stock_id AS "stockId",
+            product_code AS "productCode",
+            available_qty AS "availableQuantity",
+            total_qty AS "totalQty"
+        FROM 
+            stocks 
+        WHERE 
+            product_code = #{productCode}
+    </select>
+
+    <update id="updateStockQty">
+        UPDATE stocks
+        SET 
+            total_qty = total_qty + #{quantity},
+            available_qty = available_qty + #{quantity},
+            updated_at = #{updatedAt}
+        WHERE 
+            product_code = #{productCode}
+    </update>
+
+    <insert id="insertStockDetail">
+        INSERT INTO stock_details (
+            stock_id,
+            qty,
+            reason,
+            created_by,
+            created_at
+        ) VALUES (
+            #{stockId},
+            #{quantity},
+            #{reason},
+            #{memberNumber},
+            #{createdAt}
+        )
+    </insert>
+
+   <select id="findPaymentInfoByOrderId" resultType="com.cloudia.backend.CM_06_1001.model.PaymentInfo">
+        SELECT 
+            payment_id AS paymentId,
+            order_number AS orderNumber,
+            pg_provider AS pgProvider,
+            transaction_id AS transactionId,
+            amount,
+            payment_method AS paymentMethod,
+            payment_status_code AS paymentStatusCode
+        FROM 
+            payments
+        WHERE 
+            order_id = #{orderId}
+        ORDER BY created_at DESC 
+        LIMIT 1
+    </select>
+
+    <select id="findOrderItemsForStockRestore" resultType="map">
+        SELECT 
+            od.product_id AS "productCode",
+            od.quantity AS "quantity",
+            s.stock_id AS "stockId",
+            s.available_qty AS "currentStock"
+        FROM 
+            order_details od
+        LEFT JOIN 
+            stocks s ON od.product_id = s.product_code
+        WHERE 
+            od.order_number = #{orderNo}
+    </select>
+
+</mapper>

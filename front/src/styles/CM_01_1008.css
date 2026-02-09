@@ -1,0 +1,71 @@
+.address-grid-cards .ag-root-wrapper {
+  border: none;
+}
+.address-grid-cards .ag-body-viewport {
+  background-color: transparent;
+}
+.address-grid-cards .ag-row {
+  border-radius: 0.25rem;
+}
+.address-grid-cards .ag-cell {
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  line-height: 1.5;
+}
+.address-grid-cards .ag-cell:last-child {
+  border-right: none;
+}
+
+.address-grid-cards .ag-header {
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+  border-bottom: none;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.address-grid-cards {
+  color: #495057;
+}
+
+.cell-content {
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+.cell-content.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.cell-content.actions .btn {
+  width: 100%;
+}
+
+.address-form-container {
+  max-width: 430px;
+  margin: 0;
+}
+
+.phone-country-code {
+  width: 80px;
+}
+.phone-part {
+  width: 100px;
+}
+
+.add-address-btn-container {
+  margin-top: 2rem;
+  margin-bottom: 5rem;
+}
+
+.address-grid-cards .address-row-card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}

@@ -1,0 +1,133 @@
+.cart-notice-banner {
+  padding: 6px 16px;
+  background-color: #d9d9d9;
+  font-size: 14px;
+  font-weight: 600;
+}
+.cart-notice-text {
+  cursor: pointer;
+}
+.cart-notice-text:hover {
+  text-decoration: underline;
+}
+
+.nav-link.active {
+  color: #0d6efd !important;
+  font-weight: 600;
+}
+.badge-cart {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background-color: #dc3545;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 50%;
+  padding: 4px 6px;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
+}
+
+.toast-fade.toast-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeIn 0.3s forwards;
+}
+
+.toast-fade.toast-exit {
+  opacity: 1;
+  transform: translateY(0);
+  animation: fadeOut 0.35s forwards;
+}
+
+.cm-toast {
+  top: 120px;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* 모바일 및 태블릿: 0 ~ 1023px */
+@media screen and (max-width: 1023px) {
+  .cart-notice-banner {
+    font-size: 12px;
+  }
+
+  .navbar-nav.gap-responsive {
+    gap: 15px !important;
+  }
+
+  .navbar-collapse {
+    position: fixed;
+    top: 80px;
+    right: 0;
+    width: 100%;
+    height: calc(100vh - 80px);
+    background: white;
+    z-index: 1050;
+    overflow-y: auto;
+    padding: 20px;
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+  }
+
+  .navbar-collapse.slide-active {
+    transform: translateX(0%);
+    opacity: 1;
+    visibility: visible;
+    transition:
+      transform 0.3s ease-in-out,
+      opacity 0.3s ease,
+      visibility 0.3s ease;
+  }
+
+  .navbar-collapse.slide-exit {
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      transform 0.3s ease-in-out,
+      opacity 0.3s ease,
+      visibility 0.3s ease;
+  }
+
+  .navbar-collapse.collapsing {
+    transition: none !important;
+  }
+
+  .mobile-footer-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #f0f0f0;
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+    z-index: 9999; /* Bootstrap navbar 위로 */
+  }
+
+  .cm-toast {
+    top: 100px;
+  }
+}
