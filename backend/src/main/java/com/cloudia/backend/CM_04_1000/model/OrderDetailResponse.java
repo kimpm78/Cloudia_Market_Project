@@ -12,9 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 리뷰 작성 시 주문 + 상품 정보 DTO
- * - 주문 정보(orderId, memberNumber, orderNumber, orderDate)
- * - 상품 목록(products)
+ * レビュー作成時の注文＋商品情報DTO
  */
 @Data
 @Builder
@@ -23,15 +21,14 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderDetailResponse {
 
-    // 주문 헤더
     private Long orderId;
-    private String memberNumber; // 주문자 식별
-    private String orderNumber;  // 주문번호 (예: '00001')
+    private String memberNumber;                    // 注文者識別
+    private String orderNumber;                     // 注文番号（例: '00001'）
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderDate;
 
-    private String productCode; // 주문상세 코드
-    private Long productId; // products PK
+    private String productCode;                     // 注文詳細コード
+    private Long productId;                         // products のPK
     private String productName;
 
     @Builder.Default

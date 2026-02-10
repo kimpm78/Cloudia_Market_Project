@@ -6,19 +6,16 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
-/**
- * 댓글 요청
- */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ReviewCommentRequest {
-    private Long reviewId;         // 부모 리뷰 ID
-    private Long parentCommentId;  // 부모 댓글 ID (대댓글인 경우 사용, 없으면 null)
-    private Long commentId;        // 댓글 ID (수정/삭제 시 사용)
-    private Long userId;           // 댓글 작성자 ID
-    private String content;        // 댓글 본문
-    private String createdBy;      // 등록자
+    private Long reviewId;         // 親レビューID
+    private Long parentCommentId;  // 親コメントID（返信コメントの場合に使用、なければnull）
+    private Long commentId;        // コメントID（更新／削除時に使用）
+    private Long userId;           // コメント作成者ID
+    private String content;        // コメント本文
+    private String createdBy;      // 登録者
 }

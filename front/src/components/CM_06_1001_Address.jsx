@@ -37,6 +37,16 @@ function CM_06_1001_Address({
 
   const handleDefaultCheckboxChange = (e) => {
     const checked = e.target.checked;
+    const hasDeliveryInfo =
+      String(currentReceiverName || '').trim().length > 0 &&
+      String(receiverAddress || '').trim().length > 0 &&
+      String(currentReceiverPhone || '').trim().length > 0;
+
+    if (checked && !hasDeliveryInfo) {
+      window.CM_showToast('配送先情報を先に追加してください。');
+      return;
+    }
+
     if (typeof handleToggleDefaultCheckbox === 'function') {
       handleToggleDefaultCheckbox(e, { suppressToast: !checked });
     }
@@ -44,35 +54,35 @@ function CM_06_1001_Address({
 
   return (
     <>
-      {/* 상단 배송지 정보 헤더 + 편집 버튼 */}
+      {/* 上部：配送先情報ヘッダー + 編集ボタン */}
       <div className="d-flex align-items-center justify-content-between mt-4">
-        <h5 className="mb-0">배송지 정보</h5>
+        <h5 className="mb-0 fw-semibold">配送先情報</h5>
         <button className="btn btn-primary btn-sm cm-address-edit-btn" onClick={openAddressModal}>
-          편집
+          編集
         </button>
       </div>
 
-      {/* 현재 선택된 배송지 표시 카드 */}
+      {/* 現在選択中の配送先表示カード */}
       <div className="p-3 border mt-2">
         {currentAddressNickname && (
           <div className="mb-2">
-            <span className="badge bg-primary-subtle text-primary me-2">선택 배송지</span>
+            <span className="badge bg-primary-subtle text-primary me-2">選択中の配送先</span>
             <span className="text-muted">{currentAddressNickname}</span>
           </div>
         )}
         <div className="d-flex justify-content-between py-1">
-          <strong>이름</strong>
+          <strong>氏名</strong>
           <span>{currentReceiverName}</span>
         </div>
         <div className="d-flex justify-content-between py-1">
-          <strong>주소</strong>
+          <strong>住所</strong>
           <span>{receiverAddress}</span>
         </div>
         <div className="d-flex justify-content-between py-1">
-          <strong>전화번호</strong>
+          <strong>電話番号</strong>
           <span>{currentReceiverPhone}</span>
         </div>
-        <div className="cm-address-note">※배송전화는 최대 7자까지 입력됩니다.</div>
+        <div className="cm-address-note">※配送用電話番号は最大7文字まで入力できます。</div>
         <div className="form-check mt-3">
           <input
             className="form-check-input"
@@ -83,17 +93,17 @@ function CM_06_1001_Address({
             disabled={isSavingDefault}
           />
           <label className="form-check-label" htmlFor="saveDefaultAddress">
-            다음에도 사용할게요
+            次回も使用する
           </label>
         </div>
         <div className="text-end mt-2">
           <button className="btn btn-link p-0" onClick={handleNavigateToAddressBook}>
-            주소록 관리 바로가기
+            住所録管理へ
           </button>
         </div>
       </div>
 
-      {/* 배송지 변경 모달 (원본 디자인 그대로) */}
+      {/* 配送先変更モーダル（元デザインのまま） */}
       {showAddressModal && (
         <>
           <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center cm-address-modal-backdrop">
@@ -101,12 +111,12 @@ function CM_06_1001_Address({
               <div className="modal-content border-0">
                 <div className="d-flex justify-content-between align-items-start mb-4">
                   <div>
-                    <h5 className="modal-title fw-semibold">배송지 변경</h5>
+                    <h5 className="modal-title fw-semibold">配送先の変更</h5>
                     <small className="text-muted">
-                      등록된 배송지 정보를 선택해 주세요.
+                      登録済みの配送先情報を選択してください。
                       <br />
                       <span className="text-primary">
-                        ※ 배송지 등록과 자택 정보는 마이페이지에서 변경하실 수 있습니다.
+                        ※ 配送先登録および自宅情報はマイページで変更できます。
                       </span>
                     </small>
                   </div>
@@ -125,12 +135,12 @@ function CM_06_1001_Address({
                     </div>
                   ) : deliveryAddresses.length === 0 ? (
                     <div className="py-4 text-center text-muted">
-                      등록된 배송지가 없습니다.{` `}
+                      登録された配送先がありません。{` `}
                       <button
                         className="btn btn-link p-0 align-baseline"
                         onClick={handleNavigateToAddressBook}
                       >
-                        마이페이지에서 추가하기
+                        マイページで追加する
                       </button>
                     </div>
                   ) : (
@@ -151,15 +161,17 @@ function CM_06_1001_Address({
                               />
                               <div className="d-flex justify-content-between align-items-center mb-2">
                                 <span className="fw-semibold">
-                                  {addr.addressNickname || `배송지 ${addr.addressId}`}
+                                  {addr.addressNickname || `配送先 ${addr.addressId}`}
                                 </span>
                                 {addr.isDefault && (
-                                  <span className="badge bg-primary-subtle text-primary">기본</span>
+                                  <span className="badge bg-primary-subtle text-primary">
+                                    デフォルト
+                                  </span>
                                 )}
                               </div>
-                              <div className="small text-muted mb-1">이름</div>
+                              <div className="small text-muted mb-1">氏名</div>
                               <div className="fw-semibold">{addr.recipientName || '-'}</div>
-                              <div className="small text-muted mt-3 mb-1">주소</div>
+                              <div className="small text-muted mt-3 mb-1">住所</div>
                               <div className="text-break">
                                 {[addr.postalCode ? `(${addr.postalCode})` : null, addr.addressMain]
                                   .filter(Boolean)
@@ -172,7 +184,7 @@ function CM_06_1001_Address({
                                     {detail}
                                   </div>
                                 ))}
-                              <div className="small text-muted mt-3 mb-1">전화번호</div>
+                              <div className="small text-muted mt-3 mb-1">電話番号</div>
                               <div>{addr.recipientPhone || '-'}</div>
                             </label>
                           </div>
@@ -183,14 +195,14 @@ function CM_06_1001_Address({
                 </div>
                 <div className="d-flex justify-content-end gap-2">
                   <button className="btn btn-outline-secondary" onClick={closeAddressModal}>
-                    취소
+                    キャンセル
                   </button>
                   <button
                     className="btn btn-primary"
                     onClick={applySelectedAddress}
                     disabled={!selectedAddressId || deliveryAddresses.length === 0}
                   >
-                    적용
+                    適用
                   </button>
                 </div>
               </div>

@@ -36,8 +36,8 @@
 
     <insert id="insertReturnRequest">
         INSERT INTO returns (
-            order_no,
-            customer_id,
+            order_number,
+            member_number,
             reason,
             return_status_type,
             return_status_value,
@@ -46,7 +46,7 @@
             created_at
         ) VALUES (
             #{req.orderNo},
-            #{userId},
+            (SELECT member_number FROM users WHERE user_id = #{userId} LIMIT 1),
             #{req.content},
             '005',
             CASE WHEN #{req.type} = 1 THEN 1 ELSE 4 END,
@@ -58,15 +58,19 @@
 
     <insert id="insertReturnDetail">
         INSERT INTO return_details (
-            return_id,
+            member_number,
             product_code,
             quantity,
             created_by,
-            created_at
+            created_at,
+            updated_by,
+            updated_at
         ) VALUES (
-            currval('returns_return_id_seq'),
+            (SELECT member_number FROM users WHERE login_id = #{createdBy} LIMIT 1),
             #{productCode},
             #{quantity},
+            #{createdBy},
+            CURRENT_TIMESTAMP,
             #{createdBy},
             CURRENT_TIMESTAMP
         )
@@ -75,43 +79,47 @@
     <select id="getReturnDetail" resultMap="ReturnDetailMap">
         SELECT 
             r.return_id,
-            r.order_no,
+            r.order_number AS order_no,
             to_char(r.requested_at, 'YYYY-MM-DD HH24:MI') AS requested_at,
             r.reason,
             r.image_urls,
             r.return_status_value,
             rd.product_code,
-            p.name AS p_name,
+            p.title AS p_name,
             rd.quantity AS rd_quantity
         FROM 
             returns r
         JOIN 
-            return_details rd ON r.return_id = rd.return_id
+            return_details rd ON r.member_number = rd.member_number
         LEFT JOIN 
             products p ON TRIM(rd.product_code) = TRIM(p.product_code)
         WHERE 
             r.return_id = #{returnId}
           AND 
-            r.customer_id = #{userId}
+            r.member_number = (SELECT member_number FROM users WHERE user_id = #{userId})
+          AND
+            rd.is_display = '1'
     </select>
 
     <select id="getReturnList" resultMap="ReturnDetailMap">
         SELECT 
             r.return_id,
-            r.order_no,
+            r.order_number AS order_no,
             to_char(r.requested_at, 'YYYY-MM-DD') AS requested_at,
             r.return_status_value,
             rd.product_code,
-            p.name AS p_name,
+            p.title AS p_name,
             rd.quantity AS rd_quantity
         FROM 
             returns r
         JOIN 
-            return_details rd ON r.return_id = rd.return_id
+            return_details rd ON r.member_number = rd.member_number
         LEFT JOIN 
             products p ON TRIM(rd.product_code) = TRIM(p.product_code)
         WHERE 
-            r.customer_id = #{userId}
+            r.member_number = (SELECT member_number FROM users WHERE user_id = #{userId})
+          AND
+            rd.is_display = '1'
         ORDER BY 
             r.return_id DESC
     </select>
@@ -130,13 +138,13 @@
 
    <select id="getProductsByOrderNo" resultType="com.cloudia.backend.CM_01_1015.model.ReturnResponse$ProductInfo">
         SELECT 
-            od.product_id AS productCode,
-            p.name AS productName,
+            od.product_code AS productCode,
+            p.title AS productName,
             od.quantity AS quantity
         FROM 
             public.order_details od
         LEFT JOIN 
-            public.products p ON TRIM(od.product_id) = TRIM(p.product_code)
+            public.products p ON TRIM(od.product_code) = TRIM(p.product_code)
         WHERE 
             od.order_number = #{orderNo}
         AND 

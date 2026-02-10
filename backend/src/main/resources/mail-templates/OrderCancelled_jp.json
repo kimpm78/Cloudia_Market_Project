@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "OrderCancelled_jp",
+    "SubjectPart": "【クラウディア マーケット】ご注文キャンセルのお知らせ（自動送信）",
+    "TextPart": "＜本メールは返信できません。ご了承ください。＞\n\n{{name}} 様\n下記ご注文はキャンセルされました。\n\n────────────────────\n■ キャンセル情報\n────────────────────\n注文番号：{{orderNumber}}\n商品情報：{{orderItems}}\n\nご不明な点がございましたらサポートまでお問い合わせください。",
+    "HtmlPart": "<html><body style=\"font-family: Arial, sans-serif; color:#000; font-size:14px; line-height:1.7;\"><p>＜本メールは返信できません。ご了承ください。＞</p><p><strong>{{name}}</strong> 様<br>下記ご注文はキャンセルされました。</p><hr><h4>■ キャンセル情報</h4><p>注文番号：<strong style=\"color:#d93025;\">{{orderNumber}}</strong><br>商品情報：{{orderItems}}</p><p>ご不明な点がございましたらサポートまでお問い合わせください。</p></body></html>"
+  }
+}

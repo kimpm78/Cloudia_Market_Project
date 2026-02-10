@@ -26,7 +26,7 @@ ChartJS.register(
   Legend
 );
 
-// 모달 및 메시지
+// モーダルおよびメッセージ
 const useModal = () => {
   const [modals, setModals] = useState({
     loading: false,
@@ -79,31 +79,31 @@ export default function CM_90_1000() {
     },
     weeklyOrders: [
       {
-        day: '일',
+        day: '日',
         value: 123123,
       },
       {
-        day: '월',
+        day: '月',
         value: 123123,
       },
       {
-        day: '화',
+        day: '火',
         value: 123123,
       },
       {
-        day: '수',
+        day: '水',
         value: 123123,
       },
       {
-        day: '목',
+        day: '木',
         value: 123123,
       },
       {
-        day: '금',
+        day: '金',
         value: 123123,
       },
       {
-        day: '토',
+        day: '土',
         value: 123123,
       },
     ],
@@ -119,31 +119,31 @@ export default function CM_90_1000() {
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  // 데이터 가져오기
+  // データ取得
   useEffect(() => {
     const fetchAnalyticsData = async () => {
       try {
         open('loading');
 
-        // 상태
+        // ステータス
         const statusResponse = await axiosInstance.get('/admin/main/status');
-        // 전날 정보
+        // 前日情報
         const previousResponse = await axiosInstance.get('/admin/main/previous');
-        // 일주일 매출
+        // 週間売上
         const weeklySalesResponse = await axiosInstance.get('/admin/main/weekly');
-        // 일별 방문자
+        // 日別訪問者
         const weeklyResponse = await axiosInstance.get('/admin/main/weekly-visitors');
-        // 월별 방문자
+        // 月別訪問者
         const monthlyResponse = await axiosInstance.get('/admin/main/monthly-visitors');
 
         const dayMapping = {
-          Sun: '일',
-          Mon: '월',
-          Tue: '화',
-          Wed: '수',
-          Thu: '목',
-          Fri: '금',
-          Sat: '토',
+          Sun: '日',
+          Mon: '月',
+          Tue: '火',
+          Wed: '水',
+          Thu: '木',
+          Fri: '金',
+          Sat: '土',
         };
 
         const weeklyOrdersData = weeklySalesResponse.data.resultList.map((item) => ({
@@ -196,20 +196,20 @@ export default function CM_90_1000() {
       } catch (error) {
         setIsDataLoaded(true);
         close('loading');
-        open('error', '데이터 로드 실패');
+        open('error', 'データの読み込みに失敗しました');
       }
     };
 
     fetchAnalyticsData();
   }, []);
 
-  // 주간 주문 차트 설정 (세로 막대 그래프)
+  // 週間売上チャート設定（縦棒グラフ）
   const weeklyOrdersChartData = useMemo(() => {
     return {
       labels: dashboardData.weeklyOrders.map((item) => item.day),
       datasets: [
         {
-          label: '일주일 매출 현황',
+          label: '週間売上状況',
           data: dashboardData.weeklyOrders.map((item) => item.value),
           backgroundColor: 'rgba(99, 102, 241, 0.7)',
           borderColor: 'rgba(99, 102, 241, 1)',
@@ -220,22 +220,22 @@ export default function CM_90_1000() {
     };
   }, [dashboardData.weeklyOrders]);
 
-  // 일별 방문자 차트 설정
+  // 日別訪問者チャート設定
   const weeklyVisitorsChartData = useMemo(() => {
-    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
 
     return {
       labels: days,
       datasets: [
         {
-          label: 'PV (페이지뷰)',
+          label: 'PV（ページビュー）',
           data: dashboardData.weeklyVisitors.pv,
           borderColor: 'rgba(99, 102, 241, 1)',
           backgroundColor: 'rgba(99, 102, 241, 0.1)',
           tension: 0.4,
         },
         {
-          label: 'UV (순방문자)',
+          label: 'UV（ユニーク訪問者）',
           data: dashboardData.weeklyVisitors.uv,
           borderColor: 'rgba(16, 185, 129, 1)',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -245,35 +245,35 @@ export default function CM_90_1000() {
     };
   }, [dashboardData.weeklyVisitors]);
 
-  // 월별 방문자 차트 설정
+  // 月別訪問者チャート設定
   const monthlyVisitorsChartData = useMemo(() => {
     const months = [
-      '1월',
-      '2월',
-      '3월',
-      '4월',
-      '5월',
-      '6월',
-      '7월',
-      '8월',
-      '9월',
-      '10월',
-      '11월',
-      '12월',
+      '1月',
+      '2月',
+      '3月',
+      '4月',
+      '5月',
+      '6月',
+      '7月',
+      '8月',
+      '9月',
+      '10月',
+      '11月',
+      '12月',
     ];
 
     return {
       labels: months,
       datasets: [
         {
-          label: 'PV (페이지뷰)',
+          label: 'PV（ページビュー）',
           data: dashboardData.monthlyVisitors.pv,
           borderColor: 'rgba(99, 102, 241, 1)',
           backgroundColor: 'rgba(99, 102, 241, 0.1)',
           tension: 0.4,
         },
         {
-          label: 'UV (순방문자)',
+          label: 'UV（ユニーク訪問者）',
           data: dashboardData.monthlyVisitors.uv,
           borderColor: 'rgba(16, 185, 129, 1)',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -313,7 +313,7 @@ export default function CM_90_1000() {
       tooltip: {
         callbacks: {
           label: function (context) {
-            return `매출: ${context.parsed.y.toLocaleString()}원`;
+            return `売上: ${context.parsed.y.toLocaleString()}円`;
           },
         },
       },
@@ -323,7 +323,7 @@ export default function CM_90_1000() {
         beginAtZero: true,
         ticks: {
           callback: function (value) {
-            return value.toLocaleString() + '원';
+            return value.toLocaleString() + '円';
           },
         },
       },
@@ -333,16 +333,16 @@ export default function CM_90_1000() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-4">관리 페이지</h5>
+        <h2 className="border-bottom pb-2 mb-4">管理ページ</h2>
 
-        {/* 상태관리 */}
+        {/* ステータス管理 */}
         <div className="card mb-4">
           <div className="card-body">
-            <h6 className="card-title mb-3">상태관리</h6>
+            <h6 className="card-title mb-3">ステータス管理</h6>
             <div className="row g-3">
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">신규 주문</span>
+                  <span className="me-2">新規注文</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.newOrder}
                   </span>
@@ -350,7 +350,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">입금 대기</span>
+                  <span className="me-2">入金待ち</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.paymentPending}
                   </span>
@@ -358,7 +358,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">구매 확정</span>
+                  <span className="me-2">購入確定</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.purchaseConfirmed}
                   </span>
@@ -366,7 +366,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">예약 확정</span>
+                  <span className="me-2">予約確定</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.reserved}
                   </span>
@@ -374,7 +374,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">교환 요청</span>
+                  <span className="me-2">交換申請</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.exchangeRequested}
                   </span>
@@ -382,7 +382,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">교환 처리중</span>
+                  <span className="me-2">交換対応中</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.exchangeInProgress}
                   </span>
@@ -390,7 +390,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">교환 완료</span>
+                  <span className="me-2">交換完了</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.exchangeCompleted}
                   </span>
@@ -398,7 +398,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">환불 요청</span>
+                  <span className="me-2">返金申請</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.refundRequested}
                   </span>
@@ -406,7 +406,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">환불 처리중</span>
+                  <span className="me-2">返金対応中</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.refundInProgress}
                   </span>
@@ -414,7 +414,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">환불 완료</span>
+                  <span className="me-2">返金完了</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.refundCompleted}
                   </span>
@@ -422,7 +422,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">배송 준비중</span>
+                  <span className="me-2">発送準備中</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.preparingShipment}
                   </span>
@@ -430,7 +430,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">배송중</span>
+                  <span className="me-2">配送中</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.inTransit}
                   </span>
@@ -438,7 +438,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">배송 완료</span>
+                  <span className="me-2">配送完了</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.delivered}
                   </span>
@@ -446,7 +446,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">취소 확정</span>
+                  <span className="me-2">キャンセル確定</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.cancelRequested}
                   </span>
@@ -454,7 +454,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">답변 대기</span>
+                  <span className="me-2">回答待ち</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.answerPending}
                   </span>
@@ -462,7 +462,7 @@ export default function CM_90_1000() {
               </div>
               <div className="col-md-3 col-6">
                 <div className="d-flex align-items-center">
-                  <span className="me-2">답변 완료</span>
+                  <span className="me-2">回答完了</span>
                   <span className="badge bg-dark rounded-pill">
                     {dashboardData.statusManagement.answerCompleted}
                   </span>
@@ -472,43 +472,43 @@ export default function CM_90_1000() {
           </div>
         </div>
 
-        {/* 매출 정보 및 주간 차트 */}
+        {/* 売上情報および週間チャート */}
         <div className="row mb-4">
-          {/* 매출 정보 */}
+          {/* 売上情報 */}
           <div className="col-lg-5">
             <div className="card h-100">
               <div className="card-body">
-                <h6 className="card-title mb-3">매출 정보</h6>
+                <h6 className="card-title mb-3">売上情報</h6>
                 <div className="mb-4">
                   <div className="d-flex justify-content-between align-items-center mb-2">
-                    <span className="text-muted">어제의 순매출 현황</span>
+                    <span className="text-muted">昨日の純売上状況</span>
                   </div>
                   <h3 className="text-primary mb-0">
-                    {dashboardData.salesInfo.previousNetSales} 원
+                    {dashboardData.salesInfo.previousNetSales} 円
                   </h3>
                 </div>
 
                 <table className="table table-sm table-borderless">
                   <tbody>
                     <tr>
-                      <td className="text-muted">매출 금액</td>
-                      <td className="text-end">{dashboardData.salesInfo.settlementAmount} 원</td>
-                      <td className="text-muted">환불 금액</td>
-                      <td className="text-end">{dashboardData.salesInfo.refundAmount} 원</td>
+                      <td className="text-muted">売上金額</td>
+                      <td className="text-end">{dashboardData.salesInfo.settlementAmount} 円</td>
+                      <td className="text-muted">返金金額</td>
+                      <td className="text-end">{dashboardData.salesInfo.refundAmount} 円</td>
                     </tr>
                     <tr>
-                      <td className="text-muted">주문 건수</td>
-                      <td className="text-end">{dashboardData.salesInfo.orderCount} 건</td>
-                      <td className="text-muted">환불/반품 건수</td>
-                      <td className="text-end">{dashboardData.salesInfo.refundCount} 건</td>
+                      <td className="text-muted">注文件数</td>
+                      <td className="text-end">{dashboardData.salesInfo.orderCount} 件</td>
+                      <td className="text-muted">返金/返品件数</td>
+                      <td className="text-end">{dashboardData.salesInfo.refundCount} 件</td>
                     </tr>
                     <tr>
-                      <td className="text-muted">배송 처리 건수</td>
+                      <td className="text-muted">発送処理件数</td>
                       <td className="text-end">
-                        {dashboardData.salesInfo.shipmentProcessedCount} 건
+                        {dashboardData.salesInfo.shipmentProcessedCount} 件
                       </td>
-                      <td className="text-muted">배송 완료 건수</td>
-                      <td className="text-end">{dashboardData.salesInfo.deliveredCount} 건</td>
+                      <td className="text-muted">配送完了件数</td>
+                      <td className="text-end">{dashboardData.salesInfo.deliveredCount} 件</td>
                     </tr>
                   </tbody>
                 </table>
@@ -516,11 +516,11 @@ export default function CM_90_1000() {
             </div>
           </div>
 
-          {/* 일주일 매출 현황 */}
+          {/* 週間売上状況 */}
           <div className="col-lg-7">
             <div className="card h-100">
               <div className="card-body">
-                <h6 className="card-title mb-3">일주일 매출 현황</h6>
+                <h6 className="card-title mb-3">週間売上状況</h6>
                 <div style={{ height: '250px' }}>
                   <Bar data={weeklyOrdersChartData} options={barChartOptions} />
                 </div>
@@ -529,20 +529,20 @@ export default function CM_90_1000() {
           </div>
         </div>
 
-        {/* 방문자 수 */}
+        {/* 訪問者数 */}
         <div className="card mb-4">
           <div className="card-body">
-            <h6 className="card-title mb-3">방문자 수</h6>
+            <h6 className="card-title mb-3">訪問者数</h6>
             {isDataLoaded ? (
               <div className="row">
                 <div className="col-md-6 mb-3 mb-md-0">
-                  <h6 className="text-center mb-3">일 방문자 수</h6>
+                  <h6 className="text-center mb-3">日別訪問者数</h6>
                   <div style={{ height: '300px' }}>
                     <Line data={weeklyVisitorsChartData} options={lineChartOptions} />
                   </div>
                 </div>
                 <div className="col-md-6">
-                  <h6 className="text-center mb-3">총 방문자 수</h6>
+                  <h6 className="text-center mb-3">累計訪問者数</h6>
                   <div style={{ height: '300px' }}>
                     <Line data={monthlyVisitorsChartData} options={lineChartOptions} />
                   </div>
@@ -558,7 +558,7 @@ export default function CM_90_1000() {
           </div>
         </div>
 
-        {/* 모달 컴포넌트 */}
+        {/* モーダルコンポーネント */}
         <CM_99_1002 isOpen={modals.loading} onClose={() => close('loading')} />
         <CM_99_1003 isOpen={modals.error} onClose={() => close('error')} message={message} />
       </div>

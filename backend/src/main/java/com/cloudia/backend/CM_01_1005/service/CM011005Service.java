@@ -11,27 +11,27 @@ import java.util.Map;
 public interface CM011005Service {
 
     /**
-     * 로그인 ID와 검색 조건에 맞는 주문 이력을 조회
+     * ログインIDと検索条件に一致する注文履歴を取得
      */
     ResponseEntity<List<OrderListResponse>> searchOrderHistory(String loginId, Map<String, Object> filters);
 
     /**
-     * 특정 주문의 상세 내역을 조회
+     * 特定注文の詳細情報を取得
      */
     ResponseEntity<OrderDetailResponse> getOrderDetail(String loginId, String orderNo);
 
     /**
-     * 주문 취소 요청 (신용카드 취소 또는 계좌 환불 요청)
+     * 注文キャンセル申請（クレジットカード取消または口座返金申請）
      */
     ResponseEntity<String> cancelOrder(String loginId, OrderCancelRequest request);
 
     /**
-     * 사용자의 배송지 목록 조회 (배송지 변경 모달용)
+     * ユーザーの配送先一覧を取得（配送先変更モーダル用）
      */
     ResponseEntity<List<Map<String, Object>>> getDeliveryAddresses(String loginId);
 
     /**
-     * 주문 배송지 정보 수정 (구매 확정 전까지만 가능)
+     * 注文の配送先情報を更新（購入確定前のみ可能）
      */
     ResponseEntity<String> updateShippingInfo(String loginId, Map<String, Object> params);
 }

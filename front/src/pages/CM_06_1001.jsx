@@ -60,11 +60,12 @@ export default function CM_06_1001() {
   const popupCloseWatcherRef = useRef(null);
   const paymentResultReceivedRef = useRef(false);
   const paymentContextRef = useRef(null);
+  const autoCardSubmitHandledRef = useRef(false);
   const [isNoAddressPopupOpen, setIsNoAddressPopupOpen] = useState(false);
 
   const [paymentMethod, setPaymentMethod] = useState({
     code: 'CARD',
-    label: '카드 결제',
+    label: 'カード決済',
   });
 
   const locationState =
@@ -72,7 +73,7 @@ export default function CM_06_1001() {
 
   const initialOrder = locationState?.order || null;
 
-  // 주문 데이터 로딩 훅
+  // 注文データ読み込みフック
   const {
     orderData,
     items,
@@ -112,7 +113,7 @@ export default function CM_06_1001() {
     });
   }, [memberNumberReady, navigate, location.pathname, location.state]);
 
-  // 주문자 정보: 기본은 로그인 사용자 정보, 백엔드 요약 정보는 보조로 사용
+  // 注文者情報：基本はログインユーザー情報、バックエンドの要約情報は補助として使用
   const defaultOrdererName =
     user?.name ||
     orderData?.ordererName ||
@@ -124,24 +125,24 @@ export default function CM_06_1001() {
 
   const ordererEmail = user?.email || orderData?.ordererEmail || orderData?.buyerEmail || '-';
 
+  const defaultReceiverName =
+    orderData?.recipientName || orderData?.receiverName || orderData?.shippingName || '';
+
   const defaultReceiverPhone =
     orderData?.recipientPhone ||
     orderData?.receiverPhone ||
     orderData?.shippingPhone ||
-    orderData?.contactNumber ||
     orderData?.deliveryPhone ||
-    user?.phone ||
     '';
 
   const shippingDefaults = useMemo(
     () => ({
-      recipientName: ordererName,
+      recipientName: defaultReceiverName,
       recipientPhone: defaultReceiverPhone,
-      postalCode:
-        orderData?.shipping?.postalCode ?? orderData?.zipCode ?? orderData?.postalCode ?? '',
-      addressMain: orderData?.shipping?.addressMain ?? orderData?.address ?? '',
+      postalCode: orderData?.shipping?.postalCode ?? '',
+      addressMain: orderData?.shipping?.addressMain ?? '',
     }),
-    [ordererName, defaultReceiverPhone, orderData]
+    [defaultReceiverName, defaultReceiverPhone, orderData]
   );
 
   const initialShippingOverride = null;
@@ -181,16 +182,14 @@ export default function CM_06_1001() {
     const handlePaymentMessage = (event) => {
       if (!event || !event.data) return;
       if (event.origin !== window.location.origin) return;
-
-      // 🔧 type과 payload 구조 처리
       const data = event.data;
 
-      // payment-return.html에서 보내는 구조: { type: "PG_PAYMENT_RESULT", payload: {...} }
+      // payment-return.html から送られる形式: { type: "PG_PAYMENT_RESULT", payload: {...} }
       let paymentData;
       if (data.type === 'PG_PAYMENT_RESULT' && data.payload) {
         paymentData = data.payload;
       } else if (data.paymentStatus) {
-        // 직접 paymentStatus가 있는 경우 (하위 호환)
+        // paymentStatus が直接ある場合（下位互換）
         paymentData = data;
       } else {
         return;
@@ -234,12 +233,15 @@ export default function CM_06_1001() {
   const receiverAddress = shippingInfo.displayAddress || '';
   const isPaymentDisabled =
     isOrderLoading || isPaymentLoading || items.length === 0 || Boolean(orderError);
+  const isLocalCardMockEnabled =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
   const navigateToAddressBook = () => {
     navigate('/mypage/address-book');
   };
 
-  const handlePayment = async () => {
+  const handlePayment = async (localCardInfo = null) => {
     if (isPaymentDisabled) {
       return;
     }
@@ -267,13 +269,20 @@ export default function CM_06_1001() {
       return;
     }
 
+    if (isLocalCardMockEnabled && paymentMethod.code === 'CARD' && !localCardInfo) {
+      navigate('/order-payment/card-input', {
+        state: locationState || {},
+      });
+      return;
+    }
+
     setIsPaymentLoading(true);
 
     try {
-      // 백엔드에서 사용하는 결제방법 코드 매핑 ("1": 계좌이체, "2": 카드)
+      // バックエンドで使用する決済方法コードのマッピング（"1": 銀行振込, "2": カード）
       const paymentMethodValue = paymentMethod.code === 'BANK' ? '1' : '2';
 
-      // 최소한의 배송 정보 payload 구성 (addressId 포함)
+      // 最小限の配送情報 payload 構成（addressId 含む）
       const shippingPayload = {
         recipientName: currentReceiverName,
         recipientPhone: currentReceiverPhone,
@@ -297,7 +306,7 @@ export default function CM_06_1001() {
         shippingPayload.addressDetail3 = shippingInfo.addressDetail3;
       }
 
-      // 주문 생성 요청 payload
+      // 注文作成リクエスト payload
       const orderCreatePayload = {
         memberNumber,
         cartItemIds: cartItemIdsFromState,
@@ -327,7 +336,7 @@ export default function CM_06_1001() {
         ts: Date.now(),
       };
 
-      // 계좌이체: PG 없이 완료/안내 페이지로 이동 (결제 상태는 서버에서 "준비"로 관리)
+      // 銀行振込：PG なしで完了／案内ページへ遷移（決済状態はサーバ側で「準備」として管理）
       if (paymentMethod.code === 'BANK') {
         navigate('/order-payment/result', {
           replace: true,
@@ -341,7 +350,24 @@ export default function CM_06_1001() {
         return;
       }
 
-      // 카드 결제: PG 연동
+      // ローカル開発環境：カード決済はモック完了として処理
+      if (isLocalCardMockEnabled && paymentMethod.code === 'CARD') {
+        navigate('/order-payment/result', {
+          replace: true,
+          state: {
+            paymentStatus: 'success',
+            paymentMethod: 'CARD',
+            pgType: 'LOCAL_MOCK',
+            orderNumber: createdOrderNumber,
+            orderId: createdOrderId,
+            tid: `LOCAL-${Date.now()}`,
+            cardLast4: localCardInfo?.cardNumber?.slice(-4) || '',
+          },
+        });
+        return;
+      }
+
+      // カード決済：PG 連携
       paymentResultReceivedRef.current = false;
       clearPopupWatcher();
 
@@ -352,7 +378,7 @@ export default function CM_06_1001() {
       }
       paymentPopupRef.current = popup;
 
-      // 팝업 닫힘 감시 (사용자 취소 감지)
+      // ポップアップのクローズ監視（ユーザーキャンセル検知）
       popupCloseWatcherRef.current = window.setInterval(() => {
         const p = paymentPopupRef.current;
         if (!p) {
@@ -412,7 +438,7 @@ export default function CM_06_1001() {
         orderNumber: createdOrderNumber,
         pgType: 'COOKIEPAY',
         amount: total,
-        productName: items[0]?.name || '상품',
+        productName: items[0]?.name || '商品',
         buyerName: ordererName,
         buyerEmail: ordererEmail,
         homeUrl: window.location.origin,
@@ -447,7 +473,7 @@ export default function CM_06_1001() {
       const html = payReady.data?.resultList?.html;
       if (!html) {
         closePopup();
-        alert(CMMessage.MSG_ERR_005('결제창 정보'));
+        alert(CMMessage.MSG_ERR_005('決済画面情報'));
         return;
       }
 
@@ -470,150 +496,161 @@ export default function CM_06_1001() {
     }
   };
 
+  useEffect(() => {
+    if (!isLocalCardMockEnabled) return;
+    if (paymentMethod.code !== 'CARD') return;
+    if (!locationState?.autoSubmitCard || !locationState?.localCardInfo) return;
+    if (autoCardSubmitHandledRef.current) return;
+
+    autoCardSubmitHandledRef.current = true;
+    const { autoSubmitCard, localCardInfo, ...cleanedState } = locationState;
+    navigate('/order-payment', { replace: true, state: cleanedState });
+    handlePayment(localCardInfo);
+  }, [isLocalCardMockEnabled, paymentMethod.code, locationState, navigate]);
+
   return (
     <>
       <div className="container my-5">
         <div className="row">
-        <div className="col-12 col-lg-8">
-          <div className="d-flex flex-column flex-sm-row mb-3">
-            <h1 className="fw-bold m-0 me-sm-4 mb-2 mb-sm-0">장바구니</h1>
-            <div className="d-flex flex-wrap flex-sm-nowrap align-items-sm-end">
-              <CM_06_1000_stepIndicator currentStep={1} />
+          <div className="col-12 col-lg-8">
+            <div className="d-flex flex-column flex-sm-row mb-3">
+              <h1 className="fw-bold m-0 me-sm-4 mb-2 mb-sm-0">カート</h1>
+              <div className="d-flex flex-wrap flex-sm-nowrap align-items-sm-end">
+                <CM_06_1000_stepIndicator currentStep={1} />
+              </div>
             </div>
-          </div>
-          <hr />
-          {isOrderLoading && (
-            <div className="alert alert-info py-2" role="alert">
-            </div>
-          )}
-          {orderError && (
-            <div className="alert alert-danger py-2" role="alert">
-              {orderError}
-            </div>
-          )}
+            <hr />
+            {isOrderLoading && <div className="alert alert-info py-2" role="alert"></div>}
+            {orderError && (
+              <div className="alert alert-danger py-2" role="alert">
+                {orderError}
+              </div>
+            )}
 
-          <h5 className="pb-2">상품 정보</h5>
-          {!isOrderLoading && items.length === 0 ? (
-            <div className="py-3 text-muted">{CMMessage.MSG_EMPTY_014}</div>
-          ) : (
-            items.map((item) => (
-              <div key={item.key} className="d-flex border-bottom py-3 align-items-center">
-                <div className="CM-06-1001__thumb">
-                  <img
-                    src={item.image || noImage}
-                    alt={item.name}
-                    className="img-fluid CM-06-1001__product-image"
-                    onError={(event) => {
-                      if (event.currentTarget.src !== noImage) {
-                        event.currentTarget.src = noImage;
-                      }
-                    }}
-                  />
-                </div>
-                <div className="ms-3 flex-grow-1">
-                  <div>{item.name}</div>
-                  {item.option && <div className="text-muted small mt-1">{item.option}</div>}
-                  <div className="fw-bold text-primary mt-2">
-                    {item.unitPrice.toLocaleString()} 원
+            <h5 className="pb-2">商品情報</h5>
+            {!isOrderLoading && items.length === 0 ? (
+              <div className="py-3 text-muted">{CMMessage.MSG_EMPTY_014}</div>
+            ) : (
+              items.map((item) => (
+                <div key={item.key} className="d-flex border-bottom py-3 align-items-center">
+                  <div
+                    className="cm-06-1001_thumb"
+                  >
+                    <img
+                      src={item.image || noImage}
+                      alt={item.name}
+                      className="img-fluid cm-06-1001_product-image"
+                      onError={(event) => {
+                        if (event.currentTarget.src !== noImage) {
+                          event.currentTarget.src = noImage;
+                        }
+                      }}
+                    />
                   </div>
-                  <div className="mt-2 d-flex justify-content-between align-items-center w-100">
-                    <div className="text-muted">수량 {item.quantity}</div>
-                    <div className="fw-semibold">{item.lineTotal.toLocaleString()} 원</div>
+                  <div className="ms-3 flex-grow-1">
+                    <div>{item.name}</div>
+                    {item.option && <div className="text-muted small mt-1">{item.option}</div>}
+                    <div className="fw-bold text-primary mt-2">
+                      {item.unitPrice.toLocaleString()}円
+                    </div>
+                    <div className="mt-2 d-flex justify-content-between align-items-center w-100">
+                      <div className="text-muted">数量 {item.quantity}</div>
+                      <div className="fw-semibold">{item.lineTotal.toLocaleString()}円</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
 
-          <CM_06_1001_Payment
-            paymentMethod={paymentMethod}
-            paymentOptions={paymentOptions}
-            onSelectPaymentMethod={setPaymentMethod}
-            onRequestPayment={handlePayment}
-          />
-          <h5 className="border-bottom pb-2 mt-4">주문자 정보</h5>
-          <div className="py-2">
-            <span className="fw-semibold pe-4">이름</span>
-            {ordererName}
+            <CM_06_1001_Payment
+              paymentMethod={paymentMethod}
+              paymentOptions={paymentOptions}
+              onSelectPaymentMethod={setPaymentMethod}
+              onRequestPayment={handlePayment}
+            />
+            <h5 className="border-bottom pb-2 mt-4 fw-semibold">注文者情報</h5>
+            <div className="py-2">
+              <span className="fw-semibold pe-4">氏名</span>
+              {ordererName}
+            </div>
+            <div className="border-bottom py-2">
+              <span className="fw-semibold pe-3">メール</span>
+              {ordererEmail}
+            </div>
+            {/* 配送先情報 */}
+            <CM_06_1001_Address
+              currentAddressNickname={currentAddressNickname}
+              currentReceiverName={currentReceiverName}
+              currentReceiverPhone={currentReceiverPhone}
+              receiverAddress={receiverAddress}
+              deliveryAddresses={deliveryAddresses}
+              isAddressLoading={isAddressLoading}
+              addressError={addressError}
+              showAddressModal={showAddressModal}
+              openAddressModal={openAddressModal}
+              closeAddressModal={closeAddressModal}
+              selectedAddressId={selectedAddressId}
+              handleAddressRadioChange={handleAddressRadioChange}
+              applySelectedAddress={applySelectedAddress}
+              navigateToAddressBook={navigateToAddressBook}
+              shippingOverride={shippingOverride}
+              currentAddressRecord={currentAddressRecord}
+              isSavingDefault={isSavingDefault}
+              handleToggleDefaultCheckbox={handleToggleDefaultCheckbox}
+            />
           </div>
-          <div className="border-bottom py-2">
-            <span className="fw-semibold pe-3">이메일</span>
-            {ordererEmail}
+
+          <div className="col-12 col-lg-4 d-flex flex-column align-items-end mt-4 mt-lg-0 cm-06-1001_summary">
+            <div className="cm-06-1001_summary-card">
+              <hr className="mb-3" />
+              <div className="d-flex justify-content-between pb-2 border-bottom mb-2">
+                <span>商品合計</span>
+                <strong>{subtotal.toLocaleString()}円</strong>
+              </div>
+              <div className="d-flex justify-content-between pb-2 border-bottom mb-2">
+                <span>送料</span>
+                <strong>{shippingFee.toLocaleString()}円</strong>
+              </div>
+              <div className="d-flex justify-content-between mt-3 mb-2">
+                <span className="fw-bold">お支払い合計</span>
+                <span className="fw-bold fs-5">{total.toLocaleString()}円</span>
+              </div>
+              <button
+                className="btn btn-primary w-100 mb-2 mt-3"
+                onClick={handlePayment}
+                disabled={isPaymentDisabled}
+              >
+                {isPaymentLoading ? '決済準備中...' : '決済する'}
+              </button>
+              <button className="btn btn-secondary w-100" onClick={() => navigate('/cart')}>
+                カートへ戻る
+              </button>
+
+              <div className="text-danger mt-3 cm-06-1001_summary-warning">
+                <div>
+                  <i className="bi bi-exclamation-circle me-1"></i>
+                  商品不良の場合を除き、返品はできません。
+                </div>
+                <div className="mt-2 ms-3">キャンセルは決済手段により異なります。</div>
+                <div className="mt-2 ms-3">
+                  詳細はこちら <i className="bi bi-caret-right-fill mx-1"></i>
+                  <a
+                    href="/terms?type=e-commerce"
+                    className="text-danger text-decoration-none"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    [ガイド - 返品・交換・キャンセル]
+                  </a>
+                </div>
+                <div className="mt-2">
+                  <i className="bi bi-exclamation-circle me-1"></i>
+                  未成年の方は、保護者など法定代理人の同意を得たうえでご利用ください。
+                </div>
+              </div>
+            </div>
           </div>
-          {/* 배송지 정보 */}
-          <CM_06_1001_Address
-            currentAddressNickname={currentAddressNickname}
-            currentReceiverName={currentReceiverName}
-            currentReceiverPhone={currentReceiverPhone}
-            receiverAddress={receiverAddress}
-            deliveryAddresses={deliveryAddresses}
-            isAddressLoading={isAddressLoading}
-            addressError={addressError}
-            showAddressModal={showAddressModal}
-            openAddressModal={openAddressModal}
-            closeAddressModal={closeAddressModal}
-            selectedAddressId={selectedAddressId}
-            handleAddressRadioChange={handleAddressRadioChange}
-            applySelectedAddress={applySelectedAddress}
-            navigateToAddressBook={navigateToAddressBook}
-            shippingOverride={shippingOverride}
-            currentAddressRecord={currentAddressRecord}
-            isSavingDefault={isSavingDefault}
-            handleToggleDefaultCheckbox={handleToggleDefaultCheckbox}
-          />
         </div>
-
-        <div className="col-12 col-lg-4 d-flex flex-column align-items-end mt-4 mt-lg-0 CM-06-1001__summary">
-          <div className="CM-06-1001__summary-card">
-            <hr className="mb-3" />
-            <div className="d-flex justify-content-between pb-2 border-bottom mb-2">
-              <span>총 상품 금액</span>
-              <strong>{subtotal.toLocaleString()}원</strong>
-            </div>
-            <div className="d-flex justify-content-between pb-2 border-bottom mb-2">
-              <span>배송비</span>
-              <strong>{shippingFee.toLocaleString()}원</strong>
-            </div>
-            <div className="d-flex justify-content-between mt-3 mb-2">
-              <span className="fw-bold">총 결제 금액</span>
-              <span className="fw-bold fs-5">{total.toLocaleString()}원</span>
-            </div>
-            <button
-              className="btn btn-primary w-100 mb-2 mt-3"
-              onClick={handlePayment}
-              disabled={isPaymentDisabled}
-            >
-              {isPaymentLoading ? '결제 준비 중...' : '결제하기'}
-            </button>
-            <button className="btn btn-secondary w-100" onClick={() => navigate('/cart')}>
-              장바구니로 이동
-            </button>
-
-            <div className="text-danger mt-3 CM-06-1001__summary-warning">
-              <div>
-                <i className="bi bi-exclamation-circle me-1"></i>
-                상품 불량의 경우를 제외하고는, 반품은 불가능합니다.
-              </div>
-              <div className="mt-2 ms-3">취소는 결제 수단에 따라 다릅니다.</div>
-              <div className="mt-2 ms-3">
-                자세한 내용 <i className="bi bi-caret-right-fill mx-1"></i>
-                <a
-                  href="/terms?type=e-commerce"
-                  className="text-danger text-decoration-none"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  [가이드 - 반품・교환・취소]
-                </a>
-              </div>
-              <div className="mt-2">
-                <i className="bi bi-exclamation-circle me-1"></i>
-                미성년자의 경우, 부모 등 법정대리인의 동의를 받은 후 이용해 주시기 바랍니다.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
       </div>
       <CM_99_1001
         isOpen={isNoAddressPopupOpen}

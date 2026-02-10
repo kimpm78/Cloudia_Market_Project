@@ -7,13 +7,13 @@
     <select id="getProductCode" resultType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
         SELECT product_code     AS productCode
              , product_name     AS productName
-             , product_category AS productCategory
+             , CAST(product_category_code AS VARCHAR) AS productCategory
              , created_by       AS createdBy
              , created_at       AS createdAt
              , updated_by       AS updatedBy
              , updated_at       AS updatedAt
           FROM product_code
-         WHERE is_active = 1
+         WHERE is_display = '1'
          ORDER BY
                product_code
              , product_name
@@ -22,14 +22,14 @@
     <select id="findByProductCode" resultType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
         SELECT product_code     AS productCode
              , product_name     AS productName
-             , product_category AS productCategory
+             , CAST(product_category_code AS VARCHAR) AS productCategory
              , created_by       AS createdBy
              , created_at       AS createdAt
              , updated_by       AS updatedBy
              , updated_at       AS updatedAt
           FROM product_code
         <where>
-               is_active = 1
+               is_display = '1'
          <if test="searchType == 1">
            AND product_code ILIKE CONCAT('%', #{searchTerm}, '%')
          </if>
@@ -45,20 +45,20 @@
     <select id="findByOneCode" resultType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
         SELECT product_code     AS productCode
              , product_name     AS productName
-             , product_category AS productCategory
+             , CAST(product_category_code AS VARCHAR) AS productCategory
              , created_by       AS createdBy
              , created_at       AS createdAt
              , updated_by       AS updatedBy
              , updated_at       AS updatedAt
           FROM product_code
         <where>
-               is_active = 1
+               is_display = '1'
          <if test="searchType == 1">
            AND product_code = #{searchTerm}
          </if>
          <if test="searchType == 2">
            AND product_name = #{searchTerm}
-           AND product_category = #{category}
+           AND product_category_code = CAST(#{category} AS BIGINT)
          </if>
         </where>
     </select>
@@ -66,21 +66,21 @@
     <insert id="insCode" parameterType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
         INSERT INTO product_code (
             product_code, product_name, created_by, 
-            created_at, updated_by, updated_at, product_category
+            created_at, updated_by, updated_at, product_category_code, is_display
         )
         VALUES (
             #{productCode}, #{productName}, #{createdBy}, 
-            #{createdAt}, #{updatedBy}, #{updatedAt}, #{productCategory}
+            #{createdAt}, #{updatedBy}, #{updatedAt}, CAST(#{productCategory} AS BIGINT), '1'
         )
     </insert>
 
     <update id="uptCode" parameterType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
         UPDATE product_code
-           SET is_active        = 0
+           SET is_display       = '0'
              , updated_by       = #{updatedBy}
              , updated_at       = #{updatedAt}
          WHERE product_code     = #{productCode}
-           AND product_category = #{category}
+           AND product_category_code = CAST(#{productCategory} AS BIGINT)
     </update>
 
     <select id="findByOneStock" resultType="com.cloudia.backend.CM_90_1065.model.ProductCodeDto">
@@ -105,8 +105,7 @@
              , updated_at       AS updatedAt
           FROM products
          WHERE product_code = #{searchTerm}
-           AND is_display = 1
+           AND is_display = '1'
          ]]>
     </select>
 </mapper>
-

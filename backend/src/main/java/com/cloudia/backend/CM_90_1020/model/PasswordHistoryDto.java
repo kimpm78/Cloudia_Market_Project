@@ -15,8 +15,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PasswordHistoryDto {
-    private Integer userId; // 기본키
-    private String memberNumber; // 사원 번호
-    private String password; // 비밀번호
-    private OffsetDateTime createdAt; // 생성일
+    private Integer userId;             // 主キー
+    private String memberNumber;        // 社員番号
+    private String password;            // パスワード
+    private OffsetDateTime createdAt;   // 作成日
 }

@@ -29,7 +29,7 @@ import com.cloudia.backend.CM_04_1000.constants.CM041000MessageConstant;
 import com.cloudia.backend.CM_04_1000.mapper.CM041000Mapper;
 import com.cloudia.backend.CM_04_1000.model.Attachments;
 import com.cloudia.backend.CM_04_1000.model.OrderDetailResponse;
-import com.cloudia.backend.CM_04_1000.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_04_1000.model.ReviewInfo;
 import com.cloudia.backend.CM_04_1000.model.ReviewRequest;
 import com.cloudia.backend.CM_04_1000.service.CM041000Service;
@@ -50,7 +50,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class CM041000ServiceImpl implements CM041000Service {
-    // Mapper 정의
     private final CM041000Mapper cm041000Mapper;
     private final CM041001Mapper cm041001Mapper;
     private static final long VIEW_CACHE_TTL_MS = TimeUnit.DAYS.toMillis(1);
@@ -72,10 +71,10 @@ public class CM041000ServiceImpl implements CM041000Service {
     private String baseUrl;
 
     /**
-     * 리뷰 삭제
+     * レビュー削除
      *
-     * @param reviewId 삭제할 리뷰 ID
-     * @return 삭제 결과
+     * @param reviewId 削除するレビューID
+     * @return 削除結果
      */
     @Override
     @Transactional
@@ -95,11 +94,11 @@ public class CM041000ServiceImpl implements CM041000Service {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String loginId = (authentication != null) ? authentication.getName() : null;
 
-            // 관련 댓글/대댓글 하드 삭제
+            // 関連コメント／返信コメントの論理削除
             try {
                 cm041001Mapper.deleteCommentsByReviewId(reviewId);
             } catch (Exception e) {
-                log.warn("리뷰 삭제 시 댓글 삭제 실패 reviewId={}, error={}", reviewId, e.getMessage(), e);
+                log.warn("レビュー削除時のコメント削除に失敗しました reviewId={}, error={}", reviewId, e.getMessage(), e);
             }
 
             int affected = cm041000Mapper.deleteReview(reviewId, userId);
@@ -125,7 +124,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 특정 상품의 리뷰 목록 조회 (옵션 페이지네이션)
+     * 特定商品のレビュー一覧取得（任意ページネーション）
      */
     @Override
     @Transactional(readOnly = true)
@@ -146,7 +145,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 단건 조회
+     * レビュー単体取得
      */
     @Override
     @Transactional(readOnly = false)
@@ -162,7 +161,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 전체 목록 조회 (productId 없이 전체)
+     * レビュー全件取得（productId 指定なし）
      */
     @Override
     @Transactional(readOnly = true)
@@ -173,10 +172,10 @@ public class CM041000ServiceImpl implements CM041000Service {
 
 
     /**
-     * 리뷰 조회수 1일 1회 증가 처리
+     * レビュー閲覧数を「1日1回」だけ増加させる処理
      *
-     * @param reviewId 리뷰 ID
-     * @param userId   사용자 ID
+     * @param reviewId レビューID
+     * @param userId   ユーザーID
      */
     @Override
     @Transactional
@@ -214,10 +213,10 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 주문 + 상품 목록 조회
+     * 注文＋商品一覧取得
      *
-     * @param memberNumber 회원 번호
-     * @return 주문 상세 내역 리스트
+     * @param memberNumber 会員番号
+     * @return 注文詳細リスト
      */
     @Override
     @Transactional(readOnly = true)
@@ -226,12 +225,12 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 주문 내역에 해당 상품이 존재하는지 검증
+     * 注文内に該当商品が存在するか検証
      *
-     * @param memberNumber 회원 번호
-     * @param orderNumber  주문 번호
-     * @param productCode  상품 코드
-     * @return true 존재함, false 존재하지 않음
+     * @param memberNumber 会員番号
+     * @param orderNumber  注文番号
+     * @param productCode  商品コード
+     * @return true: 存在する / false: 存在しない
      */
     @Override
     @Transactional(readOnly = true)
@@ -258,11 +257,11 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 메인 이미지 업로드
+     * レビューのメイン画像アップロード
      *
-     * @param reviewId 리뷰 ID
-     * @param file 업로드할 이미지
-     * @return 업로드된 이미지 URL
+     * @param reviewId レビューID
+     * @param file アップロード画像
+     * @return アップロード済み画像URL
      */
     @Override
     @Transactional
@@ -288,11 +287,11 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 본문 에디터 이미지 임시 업로드 (리뷰 생성/수정 시 이동)
+     * レビュー本文エディタ画像の一時アップロード（作成/更新時に移動）
      *
-     * @param reviewId 리뷰 ID (null 또는 0이면 임시 업로드)
-     * @param file 업로드할 이미지
-     * @return 업로드된 이미지 URL
+     * @param reviewId レビューID（null または 0 の場合は一時アップロード）
+     * @param file アップロード画像
+     * @return アップロード済み画像URL
      */
     @Override
     @Transactional
@@ -309,7 +308,7 @@ public class CM041000ServiceImpl implements CM041000Service {
             try {
                 cleanupOldTmpImages();
             } catch (Exception cleanupEx) {
-                log.debug("임시 이미지 정리 중 경고 reviewId={}, error={}", reviewId, cleanupEx.getMessage());
+                log.debug("一時画像の整理中に警告 reviewId={}, error={}", reviewId, cleanupEx.getMessage());
             }
             log.info("{} reviewId={}, path={}", CM041000MessageConstant.REVIEW_IMAGE_UPLOAD_SUCCESS, reviewId, filePath);
             log.info("End uploadReviewEditorImage: reviewId={}", reviewId);
@@ -326,7 +325,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 생성 + 메인/에디터 이미지 처리
+     * レビュー作成＋メイン/エディタ画像処理
      */
     @Transactional
     public ResponseEntity<ResponseModel<Long>> createReviewWithImage(ReviewRequest review, MultipartFile file) {
@@ -337,14 +336,14 @@ public class CM041000ServiceImpl implements CM041000Service {
                 review.setCreatedBy(loginId);
                 review.setUpdatedBy(loginId);
             }
-            // Validation 및 상품/주문 체크
+            // バリデーションおよび商品／注文チェック
             Integer reviewType = review != null ? review.getReviewType() : null;
-            boolean isReviewType = Objects.equals(reviewType, 0); // 0=리뷰, 1=후기
-            boolean requireProduct = !isReviewType; // 후기일 때만 상품 필수
+            boolean isReviewType = Objects.equals(reviewType, 0); // 0=レビュー、1=口コミ（購入後の感想）
+            boolean requireProduct = !isReviewType; // 口コミの場合のみ商品が必須
             boolean hasProductCode = StringUtils.hasText(review.getProductCode());
 
             if (requireProduct && !hasProductCode) {
-                log.warn("{} 상품 코드가 없습니다. memberNumber={}, orderNumber={}, productCode={}",
+                log.warn("{} 商品コードがありません。memberNumber={}, orderNumber={}, productCode={}",
                         CM041000MessageConstant.REVIEW_VALIDATION_FAIL,
                         review.getMemberNumber(), review.getOrderNumber(), review.getProductCode());
                 return ResponseEntity.badRequest()
@@ -371,13 +370,12 @@ public class CM041000ServiceImpl implements CM041000Service {
                             .body(createResponseModel(null, false, CM041000MessageConstant.REVIEW_ORDER_FETCH_FAIL));
                 }
             } else if (!hasProductCode) {
-                // 리뷰 타입(0)이고 상품/주문을 선택하지 않은 경우 DB NOT NULL 회피용 기본값
                 review.setProductCode("");
                 if (!StringUtils.hasText(review.getOrderNumber())) {
                     review.setOrderNumber("");
                 }
             } else {
-                log.info("주문번호 미포함 옵션 리뷰 경로 - 주문 검증 건너뜀 memberNumber={}, orderNumber={}",
+                log.info("注文番号なしのオプションレビュー経路 - 注文検証をスキップ memberNumber={}, orderNumber={}",
                         review.getMemberNumber(), review.getOrderNumber());
             }
             Long productId = null;
@@ -395,7 +393,6 @@ public class CM041000ServiceImpl implements CM041000Service {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                 .body(createResponseModel(null, false, CM041000MessageConstant.REVIEW_VALIDATION_FAIL));
                     } else {
-                        // 리뷰 타입이고 상품코드를 못 찾으면 0으로 채움
                         productId = 0L;
                     }
                 }
@@ -416,7 +413,7 @@ public class CM041000ServiceImpl implements CM041000Service {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(createResponseModel(null, false, CM041000MessageConstant.REVIEW_UNEXPECTED_ERROR));
             }
-            // 메인 이미지 저장 및 경로 업데이트
+            // メイン画像保存およびパス更新
             if (file != null && !file.isEmpty()) {
                 ResponseEntity<ResponseModel<String>> mainImgResp = saveMainImage(reviewId, file);
                 if (mainImgResp.getBody() == null || !mainImgResp.getBody().isResult()) {
@@ -424,7 +421,7 @@ public class CM041000ServiceImpl implements CM041000Service {
                             .body(createResponseModel(null, false, CM041000MessageConstant.REVIEW_IMAGE_UPLOAD_FAIL));
                 }
             }
-            // 에디터 이미지 처리 및 DB 등록
+            // エディタ画像処理およびDB登録
             ResponseEntity<ResponseModel<Integer>> editorResp = processAndRegisterEditorImages(reviewId, review, loginId);
             if (editorResp != null && (editorResp.getBody() == null || !editorResp.getBody().isResult())) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -449,7 +446,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 수정 + 메인/에디터 이미지 처리
+     * レビュー更新＋メイン/エディタ画像処理
      */
     @Transactional
     public ResponseEntity<ResponseModel<Boolean>> updateReviewWithImage(ReviewRequest req, MultipartFile file) {
@@ -470,7 +467,7 @@ public class CM041000ServiceImpl implements CM041000Service {
                 return ResponseEntity.badRequest()
                         .body(createResponseModel(false, false, CM041000MessageConstant.REVIEW_VALIDATION_FAIL));
             }
-            // 메인 이미지 저장 및 경로 업데이트
+            // メイン画像保存およびパス更新
             if (file != null && !file.isEmpty()) {
                 ResponseEntity<ResponseModel<String>> mainImgResp = saveMainImage(reviewId, file);
                 if (mainImgResp.getBody() == null || !mainImgResp.getBody().isResult()) {
@@ -478,10 +475,10 @@ public class CM041000ServiceImpl implements CM041000Service {
                             .body(createResponseModel(false, false, CM041000MessageConstant.REVIEW_IMAGE_UPLOAD_FAIL));
                 }
             }
-            // 에디터 이미지 처리 및 DB 등록
+            // エディタ画像処理およびDB登録
             ResponseEntity<ResponseModel<Integer>> editorResp = processAndRegisterEditorImages(reviewId, req, loginId);
             if (editorResp != null && (editorResp.getBody() == null || !editorResp.getBody().isResult())) {
-                log.warn("에디터 이미지 처리 실패 reviewId={}", reviewId);
+                log.warn("エディタ画像処理に失敗しました reviewId={}", reviewId);
             }
             int affected = cm041000Mapper.updateReview(reviewId, req);
             if (affected > 0) {
@@ -509,7 +506,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 에디터 이미지 DB 등록 (리스트)
+     * レビューエディタ画像のDB登録（リスト）
      */
     @Transactional
     public ResponseEntity<ResponseModel<Integer>> insertEditorImages(Long reviewId, List<String> movedImagePaths, String loginId) {
@@ -534,7 +531,7 @@ public class CM041000ServiceImpl implements CM041000Service {
                 cm041000Mapper.insertReviewAttachment(attachment);
                 count++;
             }
-            log.info("리뷰 에디터 이미지 DB 등록 완료 reviewId={}, count={}", reviewId, count);
+            log.info("レビューエディタ画像のDB登録完了 reviewId={}, count={}", reviewId, count);
             log.info("End insertEditorImages: reviewId={}", reviewId);
             return ResponseEntity
                     .ok(createResponseModel(count, true, CM041000MessageConstant.REVIEW_IMAGE_UPLOAD_SUCCESS));
@@ -554,10 +551,10 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
     
     /**
-     * 파일 경로에서 확장자 추출
-     * 
-     * @param filePath 파일 경로
-     * @return 확장자 (점 제외), 없으면 빈 문자열
+     * ファイルパスから拡張子を抽出
+     *
+     * @param filePath ファイルパス
+     * @return 拡張子（ドット除外）、なければ空文字
      */
     private String getFileExtension(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
@@ -575,7 +572,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 입력값 검증 (reviewId, file)
+     * レビュー入力値検証（reviewId, file）
      */
     private ResponseEntity<ResponseModel<String>> validateReviewInput(Long reviewId, MultipartFile file) {
         if (reviewId == null || reviewId <= 0) {
@@ -592,14 +589,14 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 메인 이미지 저장 및 DB 업데이트
+     * レビューのメイン画像保存およびDB更新
      */
     private ResponseEntity<ResponseModel<String>> saveMainImage(Long reviewId, MultipartFile file) {
         try {
             String reviewFolder = "review/" + reviewId + "/main";
             String savedName = saveFile(file, reviewFolder);
-            String filePath = reviewFolder + "/" + savedName; // 파일 시스템 기준 상대 경로
-            String imageUrl = "/images/" + filePath; // 정적 리소스 매핑 기준 URL
+            String filePath = reviewFolder + "/" + savedName; // ファイルシステム基準の相対パス
+            String imageUrl = "/images/" + filePath; // 静的リソースマッピング基準のURL
             cm041000Mapper.updateReviewImage(reviewId, imageUrl);
             log.info("{} reviewId={}, path={}, url={}", CM041000MessageConstant.REVIEW_IMAGE_UPLOAD_SUCCESS, reviewId, filePath, imageUrl);
             return ResponseEntity.ok(createResponseModel(imageUrl, true, CM041000MessageConstant.REVIEW_IMAGE_UPLOAD_SUCCESS));
@@ -611,7 +608,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 에디터 이미지 처리 및 DB 등록, ReviewRequest의 content 변경
+     * エディタ画像処理およびDB登録、ReviewRequest の content を更新
      */
     private ResponseEntity<ResponseModel<Integer>> processAndRegisterEditorImages(Long reviewId, ReviewRequest review, String loginId) {
         if (review == null || review.getContent() == null) {
@@ -625,9 +622,9 @@ public class CM041000ServiceImpl implements CM041000Service {
         if (!Objects.equals(processedContent, originalContent)) {
             try {
                 cm041000Mapper.updateReviewContent(reviewId, processedContent, loginId);
-                log.info("리뷰 에디터 콘텐츠 업데이트 완료 reviewId={}, movedImages={}", reviewId, movedEditorImages.size());
+                log.info("レビューエディタ本文の更新完了 reviewId={}, movedImages={}", reviewId, movedEditorImages.size());
             } catch (Exception contentUpdateException) {
-                log.error("리뷰 에디터 콘텐츠 업데이트 실패 reviewId={}, error={}",
+                log.error("レビューエディタ本文の更新に失敗しました reviewId={}, error={}",
                         reviewId, contentUpdateException.getMessage(), contentUpdateException);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(createResponseModel(0, false, CM041000MessageConstant.REVIEW_WRITE_FAIL));
@@ -643,7 +640,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 통합 에러 핸들링
+     * 共通エラーハンドリング
      */
     private <T> ResponseEntity<ResponseModel<T>> handleError(String logMessage, Exception e, String responseMessage) {
         log.error(logMessage, e);
@@ -652,7 +649,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 에디터 이미지 삭제 (imageId 기반)
+     * レビューエディタ画像削除（imageId ベース）
      */
     @Override
     @Transactional
@@ -661,11 +658,11 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 리뷰 이미지 삭제 (imageId 기반)
+     * レビュー画像削除（imageId ベース）
      *
-     * @param reviewId 리뷰 ID
-     * @param imageId 리뷰 이미지 PK
-     * @return 삭제 성공 여부
+     * @param reviewId レビューID
+     * @param imageId レビュー画像PK
+     * @return 削除成功可否
      */
     @Override
     @Transactional
@@ -674,22 +671,22 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 공통 이미지 삭제 로직 (에디터/메인)
+     * 共通画像削除ロジック（エディタ/メイン）
      *
-     * @param type "editor" 또는 "main"
-     * @param reviewId 리뷰 ID
-     * @param imageId 이미지 PK (main의 경우 무시)
-     * @return 삭제 성공 여부
+     * @param type "editor" または "main"
+     * @param reviewId レビューID
+     * @param imageId 画像PK（main の場合は無視）
+     * @return 削除成功可否
      */
     private boolean deleteImageCommon(String type, Long reviewId, Long imageId) {
         try {
             if ("editor".equals(type)) {
                 int affected = cm041000Mapper.deleteReviewAttachment(imageId, reviewId);
                 if (affected > 0) {
-                    log.info("리뷰 에디터 이미지 삭제 성공 reviewId={}, imageId={}", reviewId, imageId);
+                    log.info("レビューエディタ画像の削除に成功 reviewId={}, imageId={}", reviewId, imageId);
                     return true;
                 } else {
-                    log.warn("리뷰 에디터 이미지 삭제 실패 reviewId={}, imageId={}", reviewId, imageId);
+                    log.warn("レビューエディタ画像の削除に失敗 reviewId={}, imageId={}", reviewId, imageId);
                     return false;
                 }
             } else if ("main".equals(type)) {
@@ -697,7 +694,7 @@ public class CM041000ServiceImpl implements CM041000Service {
                 log.info("{} reviewId={}", CM041000MessageConstant.REVIEW_IMAGE_DELETE_SUCCESS, reviewId);
                 return true;
             } else {
-                log.warn("알 수 없는 이미지 삭제 타입: {} reviewId={}, imageId={}", type, reviewId, imageId);
+                log.warn("不明な画像削除タイプ: {} reviewId={}, imageId={}", type, reviewId, imageId);
                 return false;
             }
         } catch (Exception e) {
@@ -706,19 +703,19 @@ public class CM041000ServiceImpl implements CM041000Service {
             } else if ("main".equals(type)) {
                 log.error("{} reviewId={}, imageId={}", CM041000MessageConstant.REVIEW_IMAGE_DELETE_FAIL, reviewId, imageId, e);
             } else {
-                log.error("알 수 없는 이미지 삭제 타입 오류: {} reviewId={}, imageId={}", type, reviewId, imageId, e);
+                log.error("不明な画像削除タイプのエラー: {} reviewId={}, imageId={}", type, reviewId, imageId, e);
             }
             throw e;
         }
     }
 
     /**
-     * 파일 저장
-     * 
-     * @param file 파일 정보
-     * @return 저장된 파일명
-     * @throws IOException       파일 저장 중 오류 발생 시
-     * @throws SecurityException 보안 검증 실패 시
+     * ファイル保存
+     *
+     * @param file ファイル情報
+     * @return 保存されたファイル名
+     * @throws IOException       ファイル保存中にエラーが発生した場合
+     * @throws SecurityException セキュリティ検証に失敗した場合
      */
     private String saveFile(MultipartFile file, String path) throws IOException, SecurityException {
         if (!isValidImageFile(file)) {
@@ -729,11 +726,11 @@ public class CM041000ServiceImpl implements CM041000Service {
             try {
                 String tmpUrl = "images/".concat(path);
                 String fileUrl = s3Service.uploadFile(file, tmpUrl);
-                log.debug("S3 업로드 완료: {}", fileUrl);
+                log.debug("S3アップロード完了: {}", fileUrl);
                 String fileName = Paths.get(fileUrl).getFileName().toString();
                 return fileName;
             } catch (IOException e) {
-                log.error("S3 업로드 실패", e);
+                log.error("S3 アップロード失敗", e);
                 throw new IOException(CMMessageConstant.ERROR_FILE_SAVE_FAILED, e);
             }
         }
@@ -763,15 +760,15 @@ public class CM041000ServiceImpl implements CM041000Service {
             } catch (IOException deleteException) {
                 // ignore cleanup error
             }
-            throw new IOException("File save failed", e);
+            throw new IOException("ファイル保存に失敗しました", e);
         }
     }
 
     /**
-     * 보안을 위한 랜덤 문자열 생성
-     * 
-     * @param length 생성할 문자열 길이
-     * @return 랜덤 문자열
+     * セキュリティ向けランダム文字列生成
+     *
+     * @param length 生成する文字列長
+     * @return ランダム文字列
      */
     private String generateSecureRandomString(int length) {
         SecureRandom random = new SecureRandom();
@@ -784,10 +781,10 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 이미지 파일 형식 검증
-     * 
-     * @param file 파일
-     * @return 유효한 이미지 파일 여부
+     * 画像ファイル形式検証
+     *
+     * @param file ファイル
+     * @return 有効な画像ファイルかどうか
      */
     private boolean isValidImageFile(MultipartFile file) {
         String originalFileName = file.getOriginalFilename();
@@ -803,12 +800,12 @@ public class CM041000ServiceImpl implements CM041000Service {
 
 
     /**
-     * 에디터 본문 내 임시 이미지 경로를 리뷰용 경로로 변환
+     * エディタ本文内の一時画像パスをレビュー用パスへ変換
      *
-     * @param htmlContent 원본 HTML
-     * @param reviewId    리뷰 ID
-     * @param movedImagePaths 이동 성공한 이미지 경로 목록
-     * @return 변환된 HTML
+     * @param htmlContent 元のHTML
+     * @param reviewId    レビューID
+     * @param movedImagePaths 移動成功した画像パス一覧
+     * @return 変換後HTML
      */
     private String processEditorImages(String htmlContent, Long reviewId, List<String> movedImagePaths) {
         if (htmlContent == null || htmlContent.isBlank() || reviewId == null || reviewId <= 0) {
@@ -851,11 +848,11 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 임시 폴더의 이미지를 리뷰 폴더로 이동
+     * 一時フォルダの画像をレビュー用フォルダへ移動
      *
-     * @param fileName     파일명
-     * @param reviewFolder 리뷰 폴더 (예: review/{id}/editor)
-     * @return 이동된 이미지의 상대 경로, 실패 시 null
+     * @param fileName     ファイル名
+     * @param reviewFolder レビューフォルダ（例: review/{id}/editor）
+     * @return 移動後画像の相対パス（失敗時は null）
      */
     private String moveTmpImageToReview(String fileName, String reviewFolder) {
         if (fileName == null || fileName.isBlank()) {
@@ -868,7 +865,7 @@ public class CM041000ServiceImpl implements CM041000Service {
 
         try {
             if (!Files.exists(sourcePath)) {
-                log.warn("임시 이미지가 존재하지 않아 이동을 건너뜁니다. fileName={}", fileName);
+                log.warn("一時画像が存在しないため移動をスキップします。fileName={}", fileName);
                 return null;
             }
 
@@ -879,17 +876,17 @@ public class CM041000ServiceImpl implements CM041000Service {
             Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
             return reviewFolder + "/" + fileName;
         } catch (IOException e) {
-            log.error("리뷰 임시 이미지 이동 실패 fileName={}, target={}", fileName, targetDir, e);
+            log.error("レビュー一時画像の移動に失敗しました fileName={}, target={}", fileName, targetDir, e);
             return null;
         }
     }
 
     /**
-     * 에디터 이미지 최종 URL 생성
+     * エディタ画像の最終URL生成
      *
-     * @param originalUrl 업로드 직후 임시 URL
-     * @param newImagePath 리뷰 폴더 내 이동된 이미지 경로 (예: review/{id}/editor/file.jpg)
-     * @return 정적 리소스 매핑이 가능한 최종 URL
+     * @param originalUrl アップロード直後の一時URL
+     * @param newImagePath レビューフォルダ内へ移動した画像パス（例: review/{id}/editor/file.jpg）
+     * @return 静的リソースとして参照可能な最終URL
      */
     private String buildEditorImageUrl(String originalUrl, String newImagePath) {
         String normalizedPath = newImagePath.startsWith("/") ? newImagePath.substring(1) : newImagePath;
@@ -921,11 +918,11 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * URL prefix와 경로를 안전하게 결합
+     * URL の prefix とパスを安全に結合
      *
-     * @param prefix 기존 URL prefix
-     * @param path   덧붙일 경로
-     * @return 결합된 URL
+     * @param prefix 既存URLのprefix
+     * @param path   追加するパス
+     * @return 結合後URL
      */
     private String joinUrl(String prefix, String path) {
         if (prefix == null || prefix.isBlank()) {
@@ -945,7 +942,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 오래된 임시 이미지 삭제 (1시간 이상 경과 파일)
+     * 古い一時画像を削除（1時間以上経過したファイル）
      */
     private void cleanupOldTmpImages() {
         Path tmpDir = Paths.get(uploadDir, "tmp");
@@ -969,19 +966,19 @@ public class CM041000ServiceImpl implements CM041000Service {
                     try {
                         Files.deleteIfExists(path);
                     } catch (IOException e) {
-                        log.debug("임시 이미지 삭제 실패 path={}", path, e);
+                        log.debug("一時画像の削除に失敗 path={}", path, e);
                     }
                 });
         } catch (IOException e) {
-            log.debug("임시 이미지 정리 중 오류 발생", e);
+            log.debug("一時画像の整理中にエラーが発生しました", e);
         }
     }
 
     /**
-     * 이미지 URL에서 파일명 추출
+     * 画像URLからファイル名を抽出
      *
-     * @param imageUrl 이미지 URL
-     * @return 파일명 또는 null
+     * @param imageUrl 画像URL
+     * @return ファイル名、または null
      */
     private String extractFileNameFromUrl(String imageUrl) {
         if (imageUrl == null || imageUrl.isBlank()) {
@@ -1002,11 +999,11 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * ResponseModel 생성
-     * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    메시지
+     * ResponseModel 生成
+     *
+     * @param resultList 結果データ
+     * @param result     処理結果
+     * @param message    メッセージ
      * @return ResponseModel
      */
     private <T> ResponseModel<T> createResponseModel(T resultList, boolean result, String message) {
@@ -1018,7 +1015,7 @@ public class CM041000ServiceImpl implements CM041000Service {
     }
 
     /**
-     * 세션에 담긴 로그인 ID를 우선 사용하고, 없으면 전달된 값이나 기본값으로 대체
+     * セッション内のログインIDを優先し、なければ引数またはデフォルト値にフォールバック
      */
     private String resolveLoginId(String fallbackLoginId) {
         try {
@@ -1030,7 +1027,7 @@ public class CM041000ServiceImpl implements CM041000Service {
                 }
             }
         } catch (Exception ex) {
-            log.debug("로그인 정보 조회 실패: {}", ex.getMessage());
+            log.debug("ログイン情報の取得に失敗: {}", ex.getMessage());
         }
         if (fallbackLoginId != null && !fallbackLoginId.isBlank()) {
             return fallbackLoginId;

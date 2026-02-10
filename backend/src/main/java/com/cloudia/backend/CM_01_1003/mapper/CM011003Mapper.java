@@ -7,27 +7,24 @@ import com.cloudia.backend.CM_01_1001.model.User;
 public interface CM011003Mapper {
 
     /**
-     * 주어진 이메일을 가진 사용자의 수를 조회
+     * 指定されたメールアドレスを持つユーザー数を取得
      * 
-     * @param email 확인할 이메일 주소
-     * @return 해당 이메일을 가진 사용자의 수 (0 또는 1)
+     * @return 該当メールアドレスを持つユーザー数（0 または 1）
      */
     int countByEmail(String email);
 
     /**
-     * 주어진 이메일로 사용자 정보를 조회
+     * 指定されたメールアドレスでユーザー情報を取得
      * 
-     * @param email 조회할 사용자의 이메일 주소
-     * @return User 객체
+     * @return User オブジェクト
      */
     User findByEmail(String email);
 
     /**
-     * 사용자의 비밀번호를 업데이트
+     * ユーザーのパスワードを更新
      * 
-     * @param email       비밀번호를 변경할 사용자의 이메일
-     * @param newPassword 암호화된 새 비밀번호
-     * @return 업데이트된 행의 수
+     * @param newPassword 暗号化された新しいパスワード
+     * @return 更新された行数
      */
     int updatePassword(User user);
 }

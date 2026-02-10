@@ -172,9 +172,9 @@ export default function CM_01_1006() {
   };
 
   return (
-    <div className="inquiry-container mt-2">
+    <div className="container mt-2">
       <div className="d-flex justify-content-between align-items-end pb-4 mb-4 border-bottom">
-        <h3 className="fw-bolder m-0">お問い合わせ履歴</h3>
+        <h2 className="fw-bolder mt-3">お問い合わせ履歴</h2>
         <button className="btn btn-primary " onClick={() => navigate('/mypage/inquiries/write')}>
           <i className="bi bi-pencil-square me-1"></i>
           お問い合わせ

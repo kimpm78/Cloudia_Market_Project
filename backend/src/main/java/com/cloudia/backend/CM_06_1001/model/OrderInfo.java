@@ -14,51 +14,28 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderInfo {
 
-   /**
-    * 기본 주문 정보
-    */
-   private Long orderId; // PK
-   private String orderNumber; // 주문번호
-   private String memberNumber; // 회원번호
-   private LocalDateTime orderDate; // 주문 시각
+   private Long orderId;               // 注文ID（PK）
+   private String orderNumber;         // 注文番号
+   private String memberNumber;        // 会員番号
+   private LocalDateTime orderDate;    // 注文日時
    private LocalDateTime createdAt;
    private LocalDateTime updatedAt;
-
-   /**
-    * 금액 정보
-    */
-   private Integer subtotal;         // 상품가격 총합
-   private Integer shippingCost;     // 배송비
-   private Integer totalAmount;      // 결제금액 (subtotal + shippingCost)
-   private Long discountAmount;      // 할인액(옵션)
-
-   /**
-    * 주문 상태 (정산 코드: 008)
-    */
-   private String orderStatusType;   // 항상 "008"
-   private Integer orderStatusValue; // 1~7 상태 값
-   private Integer paymentValue; // 1=계좌이체, 2=신용카드
-   private List<OrderItemInfo> items; // 주문 상품 목록
-
-   /**
-    * 결제 정보
-    */
-   private String paymentMethod; // 카드/계좌 등
-   private String pgTid; // PG 거래번호 (TID)
+   private Integer subtotal;           // 商品価格合計
+   private Integer shippingCost;       // 配送料
+   private Integer totalAmount;        // 決済金額（subtotal + shippingCost）
+   private Long discountAmount;        // 割引額（オプション）
+   private String orderStatusType;     // 常に "008"
+   private Integer orderStatusValue;   // 1～7 のステータス値
+   private Integer paymentValue;       // 1=銀行振込、2=クレジットカード
+   private List<OrderItemInfo> items;  // 注文商品一覧
+   private String paymentMethod;       // カード／銀行振込など
+   private String pgTid;               // PG取引番号（TID）
    private String paymentType;
-
-   /**
-    * 배송 정보
-    */
    private String recipientName;
    private String recipientPhone;
    private String zipCode;
-    private String address;           // 전체 주소
-    private Long shippingAddressId;   // (옵션 테이블 구조 시 사용)
-
-   /**
-    * 감사 정보
-    */
+   private String address;             // 住所（全文）
+   private Long shippingAddressId;     // （オプション：テーブル構造使用時）
    private String createdBy;
    private String updatedBy;
 }

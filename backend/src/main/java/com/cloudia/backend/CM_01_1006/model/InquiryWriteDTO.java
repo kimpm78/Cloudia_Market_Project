@@ -20,7 +20,7 @@ public class InquiryWriteDTO {
     @NotBlank(message = "内容を入力してください。")
     private String content;      // すべてのメタ情報を含む本文
 
-    @NotNull(message = "公開／非公開を選択してください。")
+    @NotNull(message = "公開/非公開を選択してください。")
     private Integer isPrivate;    // 公開区分（0: 公開, 1: 非公開）
 
     @NotBlank(message = "問い合わせ種別を選択してください。")

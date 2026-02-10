@@ -7,9 +7,9 @@ import axiosInstance from '../services/axiosInstance';
 import CMMessage from '../constants/CMMessage';
 
 const CATEGORIES = [
-  { value: 1, label: '활성화' },
-  { value: 2, label: '비활성화' },
-  { value: 3, label: '탈퇴' },
+  { value: 1, label: '有効' },
+  { value: 2, label: '無効' },
+  { value: 3, label: '退会' },
 ];
 
 const AUTHORITY_OPTIONS = [
@@ -19,11 +19,11 @@ const AUTHORITY_OPTIONS = [
 ];
 
 const SEARCH_TYPE = [
-  { value: 1, label: '회원 번호' },
+  { value: 1, label: '会員番号' },
   { value: 2, label: 'ID' },
 ];
 
-// 유틸리티
+// ユーティリティ
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -32,7 +32,7 @@ const formatDate = (dateString) => {
   return date.toISOString().slice(0, 10);
 };
 
-// 모달 및 메시지
+// モーダルおよびメッセージ
 const useModal = () => {
   const [modals, setModals] = useState({
     loading: false,
@@ -52,7 +52,7 @@ const useModal = () => {
   return { modals, message, open, close };
 };
 
-// API 호출
+// API呼び出し
 const useApiHandler = (navigate, openModal, closeModal) => {
   return useCallback(
     async (apiCall, showLoading = true) => {
@@ -81,17 +81,17 @@ export default function CM_90_1020() {
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 컬럼 정의
+  // カラム定義
   const columnDefs = useMemo(
     () => [
       {
-        headerName: '회원 번호',
+        headerName: '会員番号',
         field: 'memberNumber',
         minWidth: 150,
         flex: 1,
       },
       {
-        headerName: '이름',
+        headerName: '氏名',
         field: 'name',
         minWidth: 200,
         flex: 1,
@@ -103,13 +103,13 @@ export default function CM_90_1020() {
         flex: 1,
       },
       {
-        headerName: '이메일',
+        headerName: 'メールアドレス',
         field: 'email',
         minWidth: 300,
         flex: 2,
       },
       {
-        headerName: '회원 등급',
+        headerName: '会員権限',
         field: 'roleId',
         minWidth: 130,
         flex: 1,
@@ -120,14 +120,14 @@ export default function CM_90_1020() {
         },
       },
       {
-        headerName: '가입일',
+        headerName: '登録日',
         field: 'createdAt',
         minWidth: 130,
         flex: 1,
         valueFormatter: (params) => formatDate(params.value),
       },
       {
-        headerName: '상태',
+        headerName: 'ステータス',
         field: 'userStatusValue',
         minWidth: 130,
         flex: 1,
@@ -138,13 +138,13 @@ export default function CM_90_1020() {
         },
       },
       {
-        headerName: '비고',
+        headerName: '備考',
         field: 'note',
         minWidth: 300,
         flex: 1,
       },
       {
-        headerName: '설정',
+        headerName: '設定',
         field: 'icon',
         minWidth: 180,
         flex: 1,
@@ -162,7 +162,7 @@ export default function CM_90_1020() {
     []
   );
 
-  // 모든 유저 조회
+  // 全ユーザー取得
   const fetchAllUsers = useCallback(async () => {
     setLoading(true);
     const result = await apiHandler(() => axiosInstance.get('/admin/users/findAll'));
@@ -172,7 +172,7 @@ export default function CM_90_1020() {
     setLoading(false);
   }, [apiHandler, navigate]);
 
-  // 유저 검색
+  // ユーザー検索
   const handleSearch = useCallback(async () => {
     const trimmedSearchTerm = searchTerm.trim();
 
@@ -202,7 +202,7 @@ export default function CM_90_1020() {
     [handleSearch, loading]
   );
 
-  // 초기 데이터 로드
+  // 初期データロード
   useEffect(() => {
     fetchAllUsers();
   }, [fetchAllUsers]);
@@ -210,8 +210,8 @@ export default function CM_90_1020() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">유저 목록</h5>
-        {/* 검색 및 액션 버튼 */}
+        <h2 className="border-bottom pb-2 mb-3">ユーザー一覧</h2>
+        {/* 検索およびアクションボタン */}
         <div className="row mb-3">
           <div className="col-12">
             <div className="d-flex align-items-center w-100">
@@ -232,7 +232,7 @@ export default function CM_90_1020() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="회원번호 / ID을 입력하세요"
+                    placeholder="会員番号／IDを入力してください"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -244,14 +244,14 @@ export default function CM_90_1020() {
                   onClick={handleSearch}
                   disabled={loading}
                 >
-                  검색
+                  検索
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 데이터 그리드 */}
+        {/* データグリッド */}
         <CM_90_1011_grid
           itemsPerPage={10}
           pagesPerGroup={5}
@@ -259,7 +259,7 @@ export default function CM_90_1020() {
           columnDefs={columnDefs}
         />
 
-        {/* 모달 컴포넌트 */}
+        {/* モーダルコンポーネント */}
         <CM_99_1002 isOpen={modals.loading} onClose={() => close('loading')} />
         <CM_99_1003 isOpen={modals.error} onClose={() => close('error')} message={message} />
       </div>

@@ -75,7 +75,7 @@ export default function CM_04_1004() {
         return true;
       } catch (err) {
         if (err.name === 'CanceledError' || err.name === 'AbortError') return false;
-        console.error('Q&A 상세 로드 실패:', err?.message || err);
+        console.error('Q&A詳細の読み込みに失敗しました:', err?.message || err);
         if (!options.silent) {
           setErrorMessage(err?.message || CMMessage.MSG_ERR_005('Q&A'));
           setOpenError(true);
@@ -110,7 +110,7 @@ export default function CM_04_1004() {
 
   const writerDisplay = useMemo(() => {
     if (!qna) return '';
-    return qna.loginId || qna.writerName || (qna.userId ? `user-${qna.userId}` : '익명');
+    return qna.loginId || qna.writerName || (qna.userId ? `user-${qna.userId}` : '匿名');
   }, [qna]);
 
   const canDelete = useMemo(() => {
@@ -122,8 +122,8 @@ export default function CM_04_1004() {
   if (loading) {
     return (
       <div className="container-fluid px-5 py-5">
-        <h1 className="m-0">Q & A</h1>
-        <div className="text-center py-5">불러오는 중입니다...</div>
+        <h1>Q & A</h1>
+        <div className="text-center py-5">読み込み中です...</div>
       </div>
     );
   }
@@ -131,7 +131,7 @@ export default function CM_04_1004() {
   if (!qna || qna.notFound) {
     return (
       <div className="container-fluid px-5 py-5">
-        <h1 className="m-0">Q & A</h1>
+        <h1>Q & A</h1>
         <div className="text-center py-5 text-danger">{CMMessage.MSG_EMPTY_010}</div>
         <CM_99_1003
           isOpen={openError}
@@ -181,7 +181,7 @@ export default function CM_04_1004() {
       }
     } catch (err) {
       const message =
-        err?.response?.data?.message || err?.message || CMMessage.MSG_ERR_007('답변 저장');
+        err?.response?.data?.message || err?.message || CMMessage.MSG_ERR_007('回答保存');
       setAnswerError(message);
     } finally {
       setSubmittingAnswer(false);
@@ -191,8 +191,8 @@ export default function CM_04_1004() {
   const renderAnswerContent = () => (
     <>
       <div className="text-muted small mb-2">
-        {qna.answererLoginId || qna.answererName || '관리자'} /{' '}
-        {qna.answerCreatedAt?.replace(/-/g, '.')}에 작성됨
+        {qna.answererLoginId || qna.answererName || '管理者'} /{' '}
+        {qna.answerCreatedAt?.replace(/-/g, '.')}に作成
       </div>
       <div className="text-primary mb-0 fs-6" style={{ whiteSpace: 'pre-line' }}>
         {qna.answerContent}
@@ -204,7 +204,7 @@ export default function CM_04_1004() {
     if (canManageAnswer) {
       return (
         <div className="border rounded p-3 bg-light">
-          <div className="fw-semibold mb-2">답변</div>
+          <div className="fw-semibold mb-2">回答</div>
           {answerError && <div className="text-danger small mb-2">{answerError}</div>}
           {editingAnswer ? (
             <>
@@ -222,7 +222,7 @@ export default function CM_04_1004() {
                   onClick={handleAnswerSubmit}
                   disabled={submittingAnswer}
                 >
-                  {submittingAnswer ? '저장 중...' : '저장'}
+                  {submittingAnswer ? '保存中...' : '保存'}
                 </button>
                 <button
                   type="button"
@@ -230,7 +230,7 @@ export default function CM_04_1004() {
                   onClick={handleAnswerCancel}
                   disabled={submittingAnswer}
                 >
-                  취소
+                  キャンセル
                 </button>
               </div>
             </>
@@ -243,19 +243,19 @@ export default function CM_04_1004() {
                   className="btn btn-outline-primary btn-sm"
                   onClick={handleAnswerEditStart}
                 >
-                  답변 수정
+                  回答を編集
                 </button>
               </div>
             </>
           ) : (
             <div className="d-flex justify-content-between align-items-center">
-              <span className="text-muted small">등록된 답변이 없습니다.</span>
+              <span className="text-muted small">登録された回答がありません。</span>
               <button
                 type="button"
                 className="btn btn-outline-primary btn-sm"
                 onClick={handleAnswerEditStart}
               >
-                답변 작성
+                回答を作成
               </button>
             </div>
           )}
@@ -266,7 +266,7 @@ export default function CM_04_1004() {
     if (hasAnswer) {
       return (
         <div className="border rounded p-3 bg-light">
-          <div className="fw-semibold mb-2">답변</div>
+          <div className="fw-semibold mb-2">回答</div>
           {renderAnswerContent()}
         </div>
       );
@@ -286,11 +286,11 @@ export default function CM_04_1004() {
     try {
       await deleteQna(qna.qnaId);
       if (typeof window !== 'undefined' && typeof window.CM_showToast === 'function') {
-        window.CM_showToast('Q&A가 삭제되었습니다.');
+        window.CM_showToast('Q&Aが削除されました。');
       }
       setOpen1004(true);
     } catch (err) {
-      const message = err?.response?.data?.message || err?.message || '삭제에 실패했습니다.';
+      const message = err?.response?.data?.message || err?.message || '削除に失敗しました。';
       setDeleteError(message);
       setOpenError(true);
       setErrorMessage(message);
@@ -329,7 +329,7 @@ export default function CM_04_1004() {
         <div className="border-top fs-5 mt-4">
           <div className="d-flex text-muted small border-bottom py-2">
             <span className="d-flex align-items-center gap-1">
-              이전글<i className="bi bi-caret-up-fill"></i>
+              前の記事<i className="bi bi-caret-up-fill"></i>
             </span>
             {prev ? (
               <span
@@ -340,12 +340,12 @@ export default function CM_04_1004() {
                 {prev.title}
               </span>
             ) : (
-              <span className="fs-6 ms-3 text-muted">이전글 내용이 없습니다.</span>
+              <span className="fs-6 ms-3 text-muted">前の記事はありません。</span>
             )}
           </div>
           <div className="d-flex small py-2">
             <span className="d-flex align-items-center gap-1">
-              다음글<i className="bi bi-caret-down-fill"></i>
+              次の記事<i className="bi bi-caret-down-fill"></i>
             </span>
             {next ? (
               <span
@@ -356,7 +356,7 @@ export default function CM_04_1004() {
                 {next.title}
               </span>
             ) : (
-              <span className="fs-6 ms-3 text-muted">다음글 내용이 없습니다.</span>
+              <span className="fs-6 ms-3 text-muted">次の記事はありません。</span>
             )}
           </div>
         </div>
@@ -364,7 +364,7 @@ export default function CM_04_1004() {
         <div className="d-flex flex-column justify-content-center align-items-center mt-4 gap-2">
           <div className="d-flex justify-content-center">
             <button className="btn btn-secondary px-5" onClick={() => navigate('/qna')}>
-              목록
+              一覧
             </button>
             {canDelete && (
               <div className="ms-3 d-flex align-items-center">
@@ -374,7 +374,7 @@ export default function CM_04_1004() {
                   onClick={() => setOpenConfirmDelete(true)}
                   disabled={deleting}
                 >
-                  {deleting ? '삭제 중...' : '삭제'}
+                  {deleting ? '削除中...' : '削除'}
                 </button>
               </div>
             )}

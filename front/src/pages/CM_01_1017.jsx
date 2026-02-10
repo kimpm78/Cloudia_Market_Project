@@ -28,29 +28,29 @@ export default function CM_01_1017() {
     if (!returnId) return;
 
     setLoading(true);
-    console.log('상세 조회 요청 ID:', returnId);
+    console.log('詳細取得リクエストID:', returnId);
 
     getRequest(`/user/returns/${returnId}`)
       .then((res) => {
-        console.log('상세 조회 결과:', res);
+        console.log('詳細取得結果:', res);
         if (res) {
           setData(res);
         } else {
-          alert(res.message || '데이터를 불러올 수 없습니다.');
+          alert(res.message || 'データを取得できません。');
           navigate('/mypage/returns');
         }
       })
       .catch((err) => {
-        console.error('상세 조회 에러:', err);
-        alert('정보를 가져오는 중 오류가 발생했습니다.');
+        console.error('詳細取得エラー:', err);
+        alert('情報の取得中にエラーが発生しました。');
       })
       .finally(() => {
         setLoading(false);
       });
   }, [returnId, navigate]);
 
-  if (loading) return <div className="p-5 text-center fw-bold">로딩 중...</div>;
-  if (!data) return <div className="p-5 text-center">데이터가 없습니다.</div>;
+  if (loading) return <div className="p-5 text-center fw-bold">読み込み中...</div>;
+  if (!data) return <div className="p-5 text-center">データがありません。</div>;
 
   const imageList = data.imageUrls
     ? data.imageUrls
@@ -59,52 +59,52 @@ export default function CM_01_1017() {
         .filter((img) => img !== '')
     : [];
 
-  // 상태 배지 색상
-  const badgeClass = data.returnStatusName?.includes('완료') ? 'bg-success' : 'bg-danger';
+  // ステータスバッジの色
+  const badgeClass = data.returnStatusName?.includes('完了') ? 'bg-success' : 'bg-danger';
 
   return (
     <div className="container py-4">
-      <h3 className="fw-bold mb-4 pb-2 border-bottom">교환/반품 상세 정보</h3>
+      <h3 className="fw-bold mb-4 pb-2 border-bottom">交換／返品 詳細情報</h3>
 
-      {/* 1. 상단 정보 카드 */}
+      {/* 1. 上部情報カード */}
       <div className="card mb-4 shadow-sm">
         <div className="card-header d-flex justify-content-between align-items-center bg-light">
-          <span className="fw-bold">신청번호 #{data.returnId}</span>
+          <span className="fw-bold">申請番号 #{data.returnId}</span>
           <span className={`badge ${badgeClass}`}>{data.returnStatusName}</span>
         </div>
         <div className="card-body">
           <div className="row mb-2">
-            <div className="col-3 text-muted">신청 상품 목록</div>
+            <div className="col-3 text-muted">申請商品一覧</div>
             <div className="col-9">
               <div className="vstack gap-2">
                 {data.products &&
                   data.products.map((p, idx) => (
                     <div key={idx}>
                       <span className="fw-bold">{p.productName}</span>
-                      <span className="text-primary ms-2">({p.quantity}개)</span>
+                      <span className="text-primary ms-2">({p.quantity}個)</span>
                     </div>
                   ))}
               </div>
             </div>
           </div>
           <div className="row mb-2">
-            <div className="col-3 text-muted">주문번호</div>
+            <div className="col-3 text-muted">注文番号</div>
             <div className="col-9 fw-bold text-primary">{data.orderNo}</div>
           </div>
           <div className="row mb-2">
-            <div className="col-3 text-muted">신청일시</div>
+            <div className="col-3 text-muted">申請日時</div>
             <div className="col-9">{data.requestedAt}</div>
           </div>
           <div className="row mb-2">
-            <div className="col-3 text-muted">상품정보</div>
+            <div className="col-3 text-muted">商品情報</div>
             <div className="col-9">{data.productName}</div>
           </div>
         </div>
       </div>
 
-      {/* 2. 상세 사유 (HTML) */}
+      {/* 2. 詳細理由（HTML） */}
       <div className="mb-4">
-        <label className="form-label fw-bold">상세 사유</label>
+        <label className="form-label fw-bold">詳細理由</label>
         <div
           className="border rounded p-4 bg-white"
           style={{ minHeight: '150px' }}
@@ -114,7 +114,7 @@ export default function CM_01_1017() {
 
       {imageList.length > 0 && (
         <div className="mb-4">
-          <label className="form-label fw-bold">증빙 사진 ({imageList.length}장)</label>
+          <label className="form-label fw-bold">証憑写真 ({imageList.length}枚)</label>
           <div className="d-flex gap-2 overflow-auto p-2 border rounded bg-light">
             {imageList.map((filename, idx) => {
               const fullUrl = buildImageUrl(filename);
@@ -123,7 +123,7 @@ export default function CM_01_1017() {
                 <a key={idx} href={fullUrl} target="_blank" rel="noreferrer">
                   <img
                     src={fullUrl}
-                    alt={`증빙-${idx}`}
+                    alt={`証憑-${idx}`}
                     className="rounded border bg-white"
                     style={{
                       width: '120px',
@@ -144,7 +144,7 @@ export default function CM_01_1017() {
 
       <div className="text-center mt-5">
         <button className="btn btn-secondary px-5" onClick={() => navigate('/mypage/returns')}>
-          목록으로 돌아가기
+          一覧に戻る
         </button>
       </div>
     </div>

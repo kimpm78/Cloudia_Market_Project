@@ -9,15 +9,25 @@ import CM_99_1003 from '../components/commonPopup/CM_99_1003';
 import CM_99_1004 from '../components/commonPopup/CM_99_1004';
 
 const BANK_OPTIONS = [
-  { code: 'KB', name: 'KB국민은행' },
-  { code: 'SHINHAN', name: '신한은행' },
-  { code: 'WOORI', name: '우리은행' },
-  { code: 'HANA', name: '하나은행' },
-  { code: 'NH', name: 'NH농협은행' },
-  { code: 'IBK', name: 'IBK기업은행' },
-  { code: 'KAKAO', name: '카카오뱅크' },
-  { code: 'TOSS', name: '토스뱅크' },
-  { code: 'SC', name: 'SC제일은행' },
+  // 日本の主な銀行リスト
+  { code: 'JP_POST', name: 'ゆうちょ銀行' },
+  { code: 'MUFG', name: '三菱UFJ銀行' },
+  { code: 'SMBC', name: '三井住友銀行' },
+  { code: 'MIZUHO', name: 'みずほ銀行' },
+  { code: 'RESONA', name: 'りそな銀行' },
+  { code: 'SBI', name: '住信SBIネット銀行' },
+  { code: 'RAKUTEN', name: '楽天銀行' },
+  { code: 'AEON', name: 'イオン銀行' },
+  // 韓国の主な銀行リスト
+  { code: 'KB', name: 'KB国民銀行' },
+  { code: 'SHINHAN', name: '新韓銀行' },
+  { code: 'WOORI', name: 'ウリィ銀行' },
+  { code: 'HANA', name: 'ハナ銀行' },
+  { code: 'NH', name: 'NH農協銀行' },
+  { code: 'IBK', name: 'IBK企業銀行' },
+  { code: 'KAKAO', name: 'カカオバンク' },
+  { code: 'TOSS', name: 'トスバンク' },
+  { code: 'SC', name: 'SC第一銀行' },
 ];
 
 const useModal = () => {
@@ -51,7 +61,7 @@ export default function CM_01_1014() {
 
   const [initialLoading, setInitialLoading] = useState(true);
 
-  // 계좌 정보 불러오기
+  // 口座情報の取得
   useEffect(() => {
     const fetchAccount = async () => {
       try {
@@ -67,7 +77,7 @@ export default function CM_01_1014() {
           });
         }
       } catch (err) {
-        console.error('계좌 조회 중 오류 발생:', err);
+        console.error('口座情報の取得中にエラーが発生しました:', err);
       } finally {
         setInitialLoading(false);
       }
@@ -80,7 +90,7 @@ export default function CM_01_1014() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // 계좌번호는 숫자만 입력받도록 처리
+    // 口座番号は数字のみ入力可
     if (name === 'refundAccountNumber') {
       const numberOnly = value.replace(/[^0-9]/g, '');
       setAccount((prev) => ({ ...prev, [name]: numberOnly }));
@@ -96,7 +106,7 @@ export default function CM_01_1014() {
       !account.refundAccountNumber ||
       !account.refundAccountHolder
     ) {
-      open('error', '모든 항목을 입력해주세요.');
+      open('error', 'すべての項目を入力してください。');
       return;
     }
     open('confirm');
@@ -107,9 +117,9 @@ export default function CM_01_1014() {
     open('loading');
     try {
       await axiosInstance.put('/user/account', account);
-      open('success', '계좌 정보가 성공적으로 저장되었습니다.');
+      open('success', '口座情報を保存しました。');
     } catch (err) {
-      open('error', err.response?.data?.message || '저장에 실패했습니다.');
+      open('error', err.response?.data?.message || '保存に失敗しました。');
     } finally {
       close('loading');
     }
@@ -120,22 +130,23 @@ export default function CM_01_1014() {
   };
 
   if (initialLoading) {
-    return <div className="p-5 text-center">로딩 중...</div>;
+    return <div className="p-5 text-center">読み込み中...</div>;
   }
 
   return (
     <>
-      <div className="mt-2">
-        <h4 className="border-bottom fw-bolder pb-3 mb-4">환불 계좌번호 등록</h4>
+      <div className="container mt-2">
+        <h2 className="border-bottom fw-bolder pb-3 mb-4 mt-4">
+          返金口座の登録</h2>
         <div className="alert alert-light border mb-4" role="alert">
           <i className="bi bi-info-circle me-2"></i>
-          주문 취소 및 환불 발생 시 입금 받으실 계좌 정보를 입력해주세요.
+          注文キャンセルまたは返金が発生した場合に振込先となる口座情報を入力してください。
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="refundAccountBank" className="form-label fw-bold">
-              <i className="bi bi-asterisk required-asterisk"></i>은행명
+              <i className="bi bi-asterisk required-asterisk"></i>銀行名
             </label>
             <select
               className="form-select"
@@ -145,7 +156,7 @@ export default function CM_01_1014() {
               value={account.refundAccountBank}
               onChange={handleChange}
             >
-              <option value="">은행을 선택해주세요</option>
+              <option value="">銀行を選択してください</option>
               {BANK_OPTIONS.map((bank) => (
                 <option key={bank.code} value={bank.name}>
                   {bank.name}
@@ -154,10 +165,10 @@ export default function CM_01_1014() {
             </select>
           </div>
 
-          {/* 계좌 번호 */}
+          {/* 口座番号 */}
           <div className="mb-3">
             <label htmlFor="refundAccountNumber" className="form-label fw-bold">
-              <i className="bi bi-asterisk required-asterisk"></i>계좌번호
+              <i className="bi bi-asterisk required-asterisk"></i>口座番号
             </label>
             <input
               type="text"
@@ -170,10 +181,10 @@ export default function CM_01_1014() {
             />
           </div>
 
-          {/* 예금주 */}
+          {/* 口座名義 */}
           <div className="mb-3">
             <label htmlFor="refundAccountHolder" className="form-label fw-bold">
-              <i className="bi bi-asterisk required-asterisk"></i>예금주
+              <i className="bi bi-asterisk required-asterisk"></i>口座名義
             </label>
             <input
               type="text"
@@ -188,14 +199,14 @@ export default function CM_01_1014() {
 
           <div className="d-flex justify-content-center gap-2 mt-5 mb-3">
             <button type="submit" className="btn btn-primary px-5" disabled={modals.loading}>
-              {modals.loading ? '저장 중...' : '저장 하기'}
+              {modals.loading ? '保存中...' : '保存する'}
             </button>
             <button
               type="button"
               className="btn btn-secondary px-5"
               onClick={() => navigate('/mypage')}
             >
-              뒤로 가기
+              戻る
             </button>
           </div>
         </form>
@@ -205,7 +216,7 @@ export default function CM_01_1014() {
         isOpen={modals.confirm}
         onClose={() => close('confirm')}
         onConfirm={handleConfirmUpdate}
-        Message="계좌 정보를 저장하시겠습니까?"
+        Message="口座情報を保存しますか？"
       />
       <CM_99_1002 isOpen={modals.loading} />
       <CM_99_1003 isOpen={modals.error} onClose={() => close('error')} message={message} />

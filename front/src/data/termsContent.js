@@ -2,8 +2,8 @@ export const termsOfService = `
   <div class="terms-section">
     <h1 class="terms-title">利用規約</h1>
     <p>
-      麦わらマーケット（以下「当社」といいます）は、本ウェブサイト（以下「本サイト」といいます）を、
-      麦わらマーケットの紹介、各種商品の販売促進、情報収集および商品の販売を目的として、
+      クラウディア マーケット（以下「当社」といいます）は、本ウェブサイト（以下「本サイト」といいます）を、
+      クラウディア マーケットの紹介、各種商品の販売促進、情報収集および商品の販売を目的として、
       本サイトを利用する方（以下「利用者」といいます）の私的利用のために提供します。
     </p>
     <p>
@@ -99,7 +99,7 @@ export const termsOfService = `
     <p>公序良俗に反する内容のメールは、当社判断により予告なく削除する場合があります。</p>
 
     <h2 class="section-heading">14. 商標</h2>
-    <p>本サイトに表示される商標、ロゴ、サービスマークは、麦わらマーケットおよび第三者の登録商標または未登録商標です。</p>
+    <p>本サイトに表示される商標、ロゴ、サービスマークは、クラウディア マーケットおよび第三者の登録商標または未登録商標です。</p>
 
     <h2 class="section-heading">15. リンク先ページの責任</h2>
     <p>当社は、本サイトからリンクされた外部サイトの内容について責任を負いません。</p>
@@ -122,7 +122,7 @@ export const termsOfService = `
     <h2 class="section-heading">20. その他</h2>
     <p>機器故障、通信障害等によりデータ消失が発生した場合、当社は責任を負いません。</p>
 
-    <p class="terms-list-item"><strong>運営会社：麦わらマーケット</strong></p>
+    <p class="terms-list-item"><strong>運営会社：クラウディア マーケット</strong></p>
     <p class="terms-list-item"><strong>所在地：東京都豊洲</strong></p>
   </div>
 `;
@@ -131,7 +131,7 @@ export const privacyPolicy = `
   <div class="terms-section">
     <h1 class="terms-title">プライバシーポリシー</h1>
     <p>
-      麦わらマーケット（以下「当社」）は、「麦わらマーケット」オンラインストア（以下「本サービス」）の運営にあたり、
+      クラウディア マーケット（以下「当社」）は、「クラウディア マーケット」オンラインストア（以下「本サービス」）の運営にあたり、
       個人情報保護の重要性を認識し、個人情報の保護に関する法令（以下「個人情報保護法」）を遵守し、
       以下のプライバシーポリシーに基づき個人情報を適切に取り扱い、保護に努めます。
     </p>
@@ -237,9 +237,9 @@ export const eCommerceInfo = `
 
     <h2 class="section-heading">販売事業者</h2>
     <ul class="terms-list-ul">
-      <li class="terms-list-item"><strong>名称：</strong>麦わらマーケット</li>
-      <li class="terms-list-item"><strong>代表者：</strong>【代表者名を記載】</li>
-      <li class="terms-list-item"><strong>販売責任者：</strong>【販売責任者名を記載】</li>
+      <li class="terms-list-item"><strong>名称：</strong>クラウディア マーケット</li>
+      <li class="terms-list-item"><strong>代表者：</strong>山田 太郎</li>
+      <li class="terms-list-item"><strong>販売責任者：</strong>佐藤 花子</li>
     </ul>
 
     <h2 class="section-heading">所在地</h2>

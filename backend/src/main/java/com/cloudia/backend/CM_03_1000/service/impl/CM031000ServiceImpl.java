@@ -53,10 +53,10 @@ public class CM031000ServiceImpl implements CM031000Service {
     private String uploadDir;
 
     /**
-     * 신상품 목록 조회
-     * 
-     * @param categories 카테고리 리스트
-     * @return 신상품 목록
+     * 新商品一覧取得
+     *
+     * @param categories カテゴリ一覧
+     * @return 新商品一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -74,10 +74,10 @@ public class CM031000ServiceImpl implements CM031000Service {
     }
 
     /**
-     * 상품 상세 조회
-     * 
-     * @param productId 상품 ID
-     * @return 상품 상세 정보
+     * 商品詳細取得
+     *
+     * @param productId 商品ID
+     * @return 商品詳細情報
      */
     @Override
     @Transactional(readOnly = true)
@@ -101,10 +101,10 @@ public class CM031000ServiceImpl implements CM031000Service {
     }
 
     /**
-     * 장바구니 추가
-     * 
-     * @param cartRequest 장바구니 요청 정보
-     * @return 추가 여부
+     * カート追加
+     *
+     * @param cartRequest カート追加リクエスト情報
+     * @return 追加可否
      */
     @Override
     @Transactional
@@ -112,7 +112,7 @@ public class CM031000ServiceImpl implements CM031000Service {
         try {
             String auditUser = resolveAuditUser(cartRequest.getUserId());
 
-            // 상품 정보 조회
+            // 商品情報を取得
             ProductInfo product = cm031000Mapper
                     .selectProductDetail(Long.valueOf(cartRequest.getProductId()));
 
@@ -123,14 +123,14 @@ public class CM031000ServiceImpl implements CM031000Service {
 
             int status = product.getCodeValue();
 
-            // 상품 상태 검증 (003 기준)
-            // 2: 품절, 4: 예약 마감 → 장바구니 불가
+            // 商品ステータス検証（003基準）
+            // 2: 品切れ、4: 予約締切 → カート追加不可
             if (status == 2 || status == 4) {
                 return ResponseEntity.badRequest()
                     .body(setResponseDto(null, false, CM031000MessageConstant.FAIL_CART_ADD));
             }
 
-            // 장바구니 처리
+            // カート処理
             if (cm031000Mapper.findCartItem(
                     cartRequest.getUserId(), cartRequest.getProductId()) != null) {
 
@@ -160,10 +160,10 @@ public class CM031000ServiceImpl implements CM031000Service {
 
     
     /**
-     * 감사 사용자명 해석
-     * 
-     * @param userId
-     * @return
+     * 監査ユーザー名を解決
+     *
+     * @param userId ユーザーID
+     * @return 監査ユーザー名
      */
     private String resolveAuditUser(Long userId) {
         final int MAX_LENGTH = 10;
@@ -185,9 +185,9 @@ public class CM031000ServiceImpl implements CM031000Service {
     }
 
     /**
-     * 전체 카테고리 그룹 코드 조회
-     * 
-     * @return 카테고리 그룹 코드 리스트
+     * カテゴリーグループコード全件取得
+     *
+     * @return カテゴリーグループコード一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -213,10 +213,10 @@ public class CM031000ServiceImpl implements CM031000Service {
     }
 
     /**
-     * 카테고리 상세 조회
-     * 
-     * @param categoryGroupCode 카테고리 그룹 코드 리스트
-     * @return 카테고리 상세 리스트
+     * カテゴリー詳細取得
+     *
+     * @param categoryGroupCode カテゴリーグループコード一覧
+     * @return カテゴリー詳細一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -242,9 +242,9 @@ public class CM031000ServiceImpl implements CM031000Service {
     }
 
     /**
-     * 카테고리 그룹 체크박스용 조회
-     * 
-     * @return 카테고리 그룹 체크박스용 리스트
+     * チェックボックス用のカテゴリーグループ取得
+     *
+     * @return チェックボックス用カテゴリーグループ一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -292,9 +292,9 @@ public class CM031000ServiceImpl implements CM031000Service {
     }
 
     /**
-     * 상품 상태 적용
-     * 
-     * @param products 상품 리스트
+     * 商品ステータス適用
+     *
+     * @param products 商品一覧
      * @return void
      */
     private void applyProductStatus(List<ProductInfo> products) {
@@ -309,7 +309,7 @@ public class CM031000ServiceImpl implements CM031000Service {
 
             int status = product.getCodeValue();
 
-            // 상시판매 상품 1=판매중만 배송 예정일 계산
+            // 通常販売商品は 1=販売中 の場合のみ配送予定日を算出
             if (status == 1) {
                 product.setEstimatedDeliveryDate(
                     dateCalculator.convertToYYMMDD(
@@ -322,13 +322,13 @@ public class CM031000ServiceImpl implements CM031000Service {
     }
 
     /**
-     * 이미지 등록
-     * 
-     * @param file 등록 할 이미지 정보
-     * @return 등록 여부
+     * 画像登録
+     *
+     * @param file 登録する画像ファイル
+     * @return 登録可否
      */
     public ResponseEntity<ResponseModel<String>> imageUpload(MultipartFile file) {
-        // 임시 파일 저장
+        // 一時ファイルとして保存
         String savedFileName = "/tmp/";
         try {
             if (!file.isEmpty()) {

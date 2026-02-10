@@ -26,7 +26,7 @@ export default function CM_06_1000() {
         ? String(userId)
         : null;
 
-  // 장바구니 상태
+  // カート状態
   const [items, setItems] = useState([]); // CartItemResponse[]
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -101,7 +101,7 @@ export default function CM_06_1000() {
         );
       }
     } catch (err) {
-      console.error('헤더 장바구니 수량 동기화 실패:', err?.response?.data || err.message);
+      console.error('ヘッダーのカート件数の同期に失敗しました:', err?.response?.data || err.message);
     }
   }
 
@@ -110,7 +110,7 @@ export default function CM_06_1000() {
     setError('');
     try {
       const { data } = await axiosInstance.get('/guest/cart', { params: { userId } });
-      if (!data?.result) throw new Error(data?.message || '장바구니 조회 실패');
+      if (!data?.result) throw new Error(data?.message || 'カートの取得に失敗しました');
       const list = Array.isArray(data?.resultList)
         ? data.resultList
         : Array.isArray(data?.data)
@@ -127,7 +127,7 @@ export default function CM_06_1000() {
       }
       await syncCartCount();
     } catch (err) {
-      console.error('장바구니 조회 실패:', err);
+      console.error('カートの取得に失敗しました:', err);
       setError(err?.response?.data?.message || err.message);
     } finally {
       setLoading(false);
@@ -183,10 +183,10 @@ export default function CM_06_1000() {
       const { data } = await axiosInstance.post('/guest/cart/delete-selected', {
         cartItemIds,
       });
-      if (!data?.result) throw new Error(data?.message || '삭제 실패');
+      if (!data?.result) throw new Error(data?.message || '削除に失敗しました');
       await fetchCart();
     } catch (err) {
-      console.error('선택 상품 삭제 실패:', err);
+      console.error('選択商品の削除に失敗しました:', err);
       openInfoModal(err?.response?.data?.message || err.message);
     }
   }
@@ -237,7 +237,7 @@ export default function CM_06_1000() {
 
       // 백엔드 ResponseModel 형식: { result: boolean, message: string, ... } 가정
       if (!data?.result) {
-        throw new Error(data?.message || '수량 변경 실패');
+        throw new Error(data?.message || '数量の変更に失敗しました');
       }
 
       // 프론트 상태 반영
@@ -255,9 +255,9 @@ export default function CM_06_1000() {
 
       await syncCartCount();
     } catch (err) {
-      console.error('수량 변경 실패:', err);
+      console.error('数量の変更に失敗しました:', err);
       const message = err?.response?.data?.message || err.message;
-      openInfoModal(message || CMMessage.MSG_ERR_007('수량 변경'));
+      openInfoModal(message || CMMessage.MSG_ERR_007('数量変更'));
 
       // 서버 에러 시에도 원래 수량 복원
       restoreQuantity(target);
@@ -281,10 +281,10 @@ export default function CM_06_1000() {
   async function removeItem(cartItemId) {
     try {
       const { data } = await axiosInstance.delete(`/guest/cart/${cartItemId}`);
-      if (!data?.result) throw new Error(data?.message || '삭제 실패');
+      if (!data?.result) throw new Error(data?.message || '削除に失敗しました');
       await fetchCart();
     } catch (err) {
-      console.error('장바구니 삭제 실패:', err);
+      console.error('カートの削除に失敗しました:', err);
       openInfoModal(err?.response?.data?.message || err.message);
     }
   }
@@ -346,7 +346,7 @@ export default function CM_06_1000() {
       });
 
       if (!data?.result) {
-        throw new Error(data?.message || CMMessage.MSG_ERR_007('주문 준비'));
+        throw new Error(data?.message || CMMessage.MSG_ERR_007('注文準備'));
       }
 
       const payload = data.data || data.resultList || {};
@@ -382,9 +382,9 @@ export default function CM_06_1000() {
         },
       });
     } catch (err) {
-      console.error('주문 준비 실패:', err);
+      console.error('注文準備に失敗しました:', err);
       openInfoModal(
-        err?.response?.data?.message || err.message || CMMessage.MSG_ERR_007('주문 준비')
+        err?.response?.data?.message || err.message || CMMessage.MSG_ERR_007('注文準備')
       );
     }
   }
@@ -430,7 +430,7 @@ export default function CM_06_1000() {
         <img
           src={getImageUrl(it.imageLink)}
           onError={(e) => (e.currentTarget.src = 'https://placehold.jp/100x100.png')}
-          alt={it.productName || '상품 이미지'}
+          alt={it.productName || '商品画像'}
           className="img-fluid"
           style={{ width: '100px', height: '100px', objectFit: 'cover' }}
         />
@@ -443,11 +443,11 @@ export default function CM_06_1000() {
           )}
         </div>
         <div className="fw-bold text-primary mt-2">
-          {(it.productPrice || 0).toLocaleString()} 원
+          {(it.productPrice || 0).toLocaleString()} 円
         </div>
         <div className="mt-2 d-flex justify-content-between align-items-center w-100">
           <div className="d-flex align-items-center gap-2">
-            <label className="m-0">수량</label>
+            <label className="m-0">数量</label>
             <select
               className="form-select"
               style={{ width: '100px' }}
@@ -467,7 +467,7 @@ export default function CM_06_1000() {
               className="btn btn-link text-danger ms-3 p-0"
               onClick={() => openDeleteModal(it.cartItemId)}
             >
-              삭제
+              削除
             </button>
           </div>
         </div>
@@ -481,7 +481,7 @@ export default function CM_06_1000() {
         <div className="row">
           <div className="d-flex flex-column flex-sm-row mb-3">
             <h1 className="fw-bold m-0 me-sm-4 mb-2 mb-sm-0" ref={topRef}>
-              장바구니
+              カート
             </h1>
             <div className="d-flex flex-wrap flex-sm-nowrap align-items-sm-end">
               <CM_06_1000_stepIndicator currentStep={0} />
@@ -490,7 +490,7 @@ export default function CM_06_1000() {
           <hr />
           <div className="col-12 col-lg-8">
             <div className="d-flex justify-content-between align-items-center pb-2">
-              <h5 className="m-0">상품 정보</h5>
+              <h5 className="m-0 fw-semibold">商品情報</h5>
               {!loading && items.length > 0 && (
                 <div className="d-flex align-items-center gap-2">
                   <div className="form-check m-0">
@@ -502,7 +502,7 @@ export default function CM_06_1000() {
                       onChange={handleToggleSelectAll}
                     />
                     <label className="form-check-label ms-1" htmlFor="cart-select-all">
-                      전체 선택
+                      全選択
                     </label>
                   </div>
                   <button
@@ -511,13 +511,13 @@ export default function CM_06_1000() {
                     onClick={openBulkDeleteModal}
                     disabled={!hasSelected}
                   >
-                    선택 삭제
+                    選択削除
                   </button>
                 </div>
               )}
             </div>
 
-            {loading && <div className="py-3">불러오는 중...</div>}
+            {loading && <div className="py-3">読み込み中...</div>}
             {error && <div className="text-danger py-2">{error}</div>}
 
             {!loading && items.length === 0 && (
@@ -528,7 +528,7 @@ export default function CM_06_1000() {
 
             {!loading && reservationItems.length > 0 && (
               <div className="mt-4">
-                <h5 className="fw-bold mb-2">예약 상품 정보</h5>
+                <h5 className="fw-bold mb-2">予約商品情報</h5>
                 {reservationItems.map((it) => renderCartItem(it))}
               </div>
             )}
@@ -536,35 +536,35 @@ export default function CM_06_1000() {
 
           <div className="col-12 col-lg-4 mt-4 mt-5 d-flex flex-column">
             <div className="d-flex justify-content-between pb-2 border-bottom mb-2">
-              <span>총 상품 금액</span>
-              <strong>{subtotal.toLocaleString()}원</strong>
+              <span>商品合計</span>
+              <strong>{subtotal.toLocaleString()}円</strong>
             </div>
             <div className="d-flex justify-content-between pb-2 border-bottom mb-2">
-              <span>배송비</span>
-              <strong>{shippingFee.toLocaleString()}원</strong>
+              <span>送料</span>
+              <strong>{shippingFee.toLocaleString()}円</strong>
             </div>
             <div className="d-flex justify-content-between mt-3 mb-3 flex-column pb-3">
-              <span className="fw-bold">총 결제 금액</span>
-              <span className="fw-bold fs-5">{total.toLocaleString()}원</span>
+              <span className="fw-bold">お支払い合計</span>
+              <span className="fw-bold fs-5">{total.toLocaleString()}円</span>
             </div>
             <button className="btn btn-primary w-100" onClick={handleCheckout}>
-              구매하기
+              購入する
             </button>
             <div className="text-danger mt-3" style={{ fontSize: '0.8em', fontWeight: 'bold' }}>
               <div>
                 <i className="bi bi-exclamation-circle me-1"></i>
-                상품 불량의 경우를 제외하고는, 반품은 불가능합니다.
+                商品不良の場合を除き、返品はできません。
               </div>
-              <div className="mt-2 ms-3">취소는 결제 수단에 따라 다릅니다.</div>
+              <div className="mt-2 ms-3">キャンセルはお支払い方法によって異なります。</div>
               <div className="mt-2 ms-3">
-                자세한 내용 <i className="bi bi-caret-right-fill mx-1"></i>
+                詳細 <i className="bi bi-caret-right-fill mx-1"></i>
                 <a
                   href="/terms?type=e-commerce"
                   className="text-danger text-decoration-none"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  [가이드 - 반품・교환・취소]
+                  [ガイド - 返品・交換・キャンセル]
                 </a>
               </div>
             </div>
@@ -576,11 +576,7 @@ export default function CM_06_1000() {
         isOpen={deleteModalOpen}
         onClose={closeDeleteModal}
         onConfirm={handleRemoveConfirm}
-        Message={
-          bulkDeleteMode
-            ? CMMessage.MSG_CON_004
-            : CMMessage.MSG_CON_005
-        }
+        Message={bulkDeleteMode ? CMMessage.MSG_CON_004 : CMMessage.MSG_CON_005}
       />
     </>
   );

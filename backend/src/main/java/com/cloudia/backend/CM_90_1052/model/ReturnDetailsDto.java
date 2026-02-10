@@ -17,12 +17,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReturnDetailsDto {
-    private int returnId;
-    private int quantity;
-    private int unitPrice;
-    private String productCode;
-    private String createdBy; // 생성자
-    private LocalDateTime createdAt; // 생성일시
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일시
+    private int returnId;               // 返品ID
+    private int quantity;               // 数量
+    private int unitPrice;              // 単価   
+    private String productCode;         // 商品コード
+    private String createdBy;           // 作成者
+    private LocalDateTime createdAt;    // 作成日時
+    private String updatedBy;           // 更新者
+    private LocalDateTime updatedAt;    // 更新日時
 }

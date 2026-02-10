@@ -17,17 +17,17 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReturnsDto {
-    private int returnId; // 리턴 ID
-    private String orderNo; // 요청 번호
-    private String customerId; // 사원 번호
-    private LocalDateTime completedAt; // 교환/환불 완료일
-    private String reason; // 메모
-    private int totalAmount; // 총 환불 금액
-    private int shippingFeeCustomerAmount; // 배달비(고객부담)
-    private int shippingFeeSellerAmount; // 배달비(매장부담)
-    private int refundAmount; // 환불 금액
-    private int returnStatusValue; // 상태
-    private String requestedAt; // 환불/교환 요청일
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일
+    private int returnId;                   // 返品ID
+    private String orderNo;                 // 要求番号
+    private String customerId;              // 社員番号
+    private LocalDateTime completedAt;      // 交換/返金完了日
+    private String reason;                  // メモ
+    private int totalAmount;                // 合計返金額
+    private int shippingFeeCustomerAmount;  // 配送料(顧客負担)
+    private int shippingFeeSellerAmount;    // 配送料(店舗負担)
+    private int refundAmount;               // 返金額
+    private int returnStatusValue;          // 状態
+    private String requestedAt;             // 返金/交換依頼日
+    private String updatedBy;               // 更新者
+    private LocalDateTime updatedAt;        // 更新日
 }

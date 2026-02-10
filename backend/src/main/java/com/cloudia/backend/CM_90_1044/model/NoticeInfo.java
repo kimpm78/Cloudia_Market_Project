@@ -18,18 +18,18 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NoticeInfo {
-    private int noticeId; // 공지사항 아이디
-    @NotBlank(message = "타이틀 명은 필수 입력값입니다.")
-    private String title; // 타이틀 명
-    private String content; // 내용
-    private int codeValue; // 분류
-    private int isDisplay; // 표시 여부
-    private int pinned; // 상단 고정 여부
-    private int viewCount; // 조회수
-    private Date publishedAt; // 게시일
-    private String userId; // 게시자
-    private String createdBy; // 등록자
-    private LocalDateTime createdAt; // 등록일
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일
+    private int noticeId;            // お知らせID
+    @NotBlank(message = "タイトル名は必須入力項目です。")
+    private String title;            // タイトル名
+    private String content;          // 内容
+    private int codeValue;           // 分類
+    private int isDisplay;           // 表示有無
+    private int pinned;              // 上部固定有無
+    private int viewCount;           // 閲覧数
+    private Date publishedAt;        // 公開日
+    private String userId;           // 登録者ID
+    private String createdBy;        // 登録者
+    private LocalDateTime createdAt; // 登録日
+    private String updatedBy;        // 変更者
+    private LocalDateTime updatedAt; // 変更日
 }

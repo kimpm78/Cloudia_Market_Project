@@ -12,7 +12,7 @@ public class Unsubscribe {
 
     private Integer userId;
 
-    @NotBlank(message = "비밀번호는 필수입니다.")
+    @NotBlank(message = "パスワードは必須項目です。")
     private String password;
 
     private List<String> reasons;

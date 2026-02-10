@@ -20,9 +20,9 @@ import com.cloudia.backend.CM_90_1043.model.CategoryDetailDTO;
 import com.cloudia.backend.CM_90_1043.model.CategoryGroupDTO;
 import com.cloudia.backend.CM_90_1043.model.CategorySaveRequest;
 import com.cloudia.backend.CM_90_1043.model.ProductDTO;
-import com.cloudia.backend.CM_90_1043.model.ResponseModel;
 import com.cloudia.backend.CM_90_1043.service.CM901043Service;
 import com.cloudia.backend.CM_90_1051.constants.CM901051MessageConstant;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.common.exception.AuthenticationException;
 import com.cloudia.backend.common.exception.ErrorCode;
 import com.cloudia.backend.common.log.LogHelper;
@@ -41,9 +41,9 @@ public class CM901043ServiceImpl implements CM901043Service {
     private final DateCalculator dateCalculator;
 
     /**
-     * 카테고리 전체 리스트 조회
-     * 
-     * @return 카테고리 전체 리스트
+     * カテゴリー全件一覧取得
+     *
+     * @return カテゴリー全件一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -51,14 +51,14 @@ public class CM901043ServiceImpl implements CM901043Service {
         log.info(CM901051MessageConstant.ORDER_FIND_ALL_START);
 
         try {
-            // 카테고리 그룹 및 상세 정보 조회
+            // カテゴリーグループおよび詳細情報を取得
             List<CategoryGroupDTO> groups = cm901043Mapper.selectCategoryGroups();
             List<CategoryDetailDTO> details = cm901043Mapper.selectCategoryDetails();
 
-            // 최신 수정 시간 조회
+            // 最終更新日時を取得
             LocalDateTime maxUpdatedAt = cm901043Mapper.selectMaxUpdatedAt();
 
-            // 트리 구조 생성
+            // ツリー構造を生成
             Map<String, Object> tree = getCategoryTree(groups, details);
             tree.put("maxUpdatedAt", maxUpdatedAt);
 
@@ -67,7 +67,7 @@ public class CM901043ServiceImpl implements CM901043Service {
             ResponseModel<Map<String, Object>> response = createResponseModel(
                     tree,
                     true,
-                    "카테고리 목록 조회 성공");
+                    "カテゴリー一覧の取得に成功しました");
 
             return ResponseEntity.ok(response);
 
@@ -87,46 +87,46 @@ public class CM901043ServiceImpl implements CM901043Service {
     }
 
     /**
-     * 카테고리 변경사항 저장 (추가/수정/삭제)
+     * カテゴリー変更内容を保存（追加/更新/削除）
      */
     @Override
     @Transactional
     public ResponseEntity<ResponseModel<String>> saveChanges(CategorySaveRequest request, String userId) {
         if (null == userId || userId.isBlank()) {
-            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "카테고리 조회" });
+            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "カテゴリー取得" });
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
         try {
-            log.info("카테고리 저장 요청 - created: {}, updated: {}, deleted: {}",
+            log.info("カテゴリー保存リクエスト - created: {}, updated: {}, deleted: {}",
                     request.getCreated().size(),
                     request.getUpdated().size(),
                     request.getDeleted().size());
 
-            // 배타 체크
+            // 排他チェック
             LocalDateTime currentMaxUpdatedAt = cm901043Mapper.selectMaxUpdatedAt();
 
-            // 클라이언트가 보낸 maxUpdatedAt과 비교
+            // クライアントが送信した maxUpdatedAt と比較
             if (request.getMaxUpdatedAt() != null &&
                     !request.getMaxUpdatedAt().equals(currentMaxUpdatedAt)) {
 
-                log.warn("배타 체크 실패 - 클라이언트: {}, DB: {}",
+                log.warn("排他チェック失敗 - クライアント: {}, DB: {}",
                         request.getMaxUpdatedAt(), currentMaxUpdatedAt);
 
                 ResponseModel<String> response = createResponseModel(
                         null,
                         false,
-                        "데이터가 수정된 이력이 있습니다. 초기화 버튼을 클릭해서 최신 데이터로 다시 해주세요.");
+                        "データが更新されています。初期化ボタンをクリックして最新データでやり直してください。");
 
                 return ResponseEntity.ok(response);
             }
 
-            // 1. 삭제 처리
+            // 1. 削除処理
             if (request.getDeleted() != null && !request.getDeleted().isEmpty()) {
                 int deletedCount = 0;
                 for (CategorySaveRequest.DeleteItem item : request.getDeleted()) {
 
                     if ("category".equals(item.getType())) {
-                        log.info("카테고리 삭제: {}", item.getId());
+                        log.info("カテゴリー削除: {}", item.getId());
                         CategoryDetailDTO category = new CategoryDetailDTO();
                         category.setCategoryCode(item.getId());
                         category.setCategoryGroupCode(item.getParentId());
@@ -139,9 +139,9 @@ public class CM901043ServiceImpl implements CM901043Service {
                                     .map(ProductDTO::getName)
                                     .collect(Collectors.joining(", "));
 
-                            String message = "다음 상품이 이 카테고리에 등록되어 있습니다" +
+                            String message = "次の商品がこのカテゴリに登録されています: " +
                                     productNames +
-                                    "의 상품 삭제 후 다시 시도해주세요.";
+                                    "。商品を削除してから再度お試しください。";
                             ResponseModel<String> response = createResponseModel(
                                     null,
                                     false,
@@ -153,14 +153,14 @@ public class CM901043ServiceImpl implements CM901043Service {
                         deletedCount += cm901043Mapper.deleteCategory(category);
                     }
                 }
-                log.info("카테고리 삭제 완료: {}개 행 영향", deletedCount);
+                log.info("カテゴリー削除完了: {}件の行に影響", deletedCount);
             }
 
-            // 2. 수정 처리
+            // 2. 更新処理
             if (request.getUpdated() != null && !request.getUpdated().isEmpty()) {
                 for (CategorySaveRequest.CategoryItem item : request.getUpdated()) {
                     if ("category".equals(item.getType())) {
-                        log.info("카테고리 수정: {} - {}, order: {}, parentId: {}",
+                        log.info("カテゴリー更新: {} - {}, order: {}, parentId: {}",
                                 item.getId(), item.getTitle(), item.getOrder(), item.getParentId());
                         CategoryDetailDTO category = new CategoryDetailDTO();
                         category.setCategoryCode(item.getId());
@@ -171,28 +171,28 @@ public class CM901043ServiceImpl implements CM901043Service {
                         category.setUpdatedBy(userId);
                         category.setUpdatedAt(dateCalculator.tokyoTime());
                         int updatedCount = cm901043Mapper.updateCategory(category);
-                        log.info("카테고리 수정 완료: {} ({}개 행 영향)", item.getId(), updatedCount);
+                        log.info("カテゴリー更新完了: {} ({}件の行に影響)", item.getId(), updatedCount);
 
                         if (updatedCount == 0) {
-                            log.warn("카테고리 수정 실패 - 존재하지 않는 ID: {}", item.getId());
+                            log.warn("カテゴリー更新失敗 - 存在しないID: {}", item.getId());
                         }
                     }
                 }
             }
 
-            // 3. 생성 처리
+            // 3. 生成処理
             if (request.getCreated() != null && !request.getCreated().isEmpty()) {
                 for (CategorySaveRequest.CategoryItem item : request.getCreated()) {
                     if ("category".equals(item.getType())) {
-                        log.info("카테고리 생성: {}, order: {}, parentId: {}",
+                        log.info("カテゴリー生成: {}, order: {}, parentId: {}",
                                 item.getTitle(), item.getOrder(), item.getParentId());
 
-                        // 검증
+                        // 検証
                         if (item.getParentId() == null || item.getParentId().isEmpty()) {
-                            log.error("카테고리 생성 실패 - parentId 누락: {}", item.getTitle());
-                            throw new IllegalArgumentException("카테고리는 반드시 그룹에 속해야 합니다: " + item.getTitle());
+                            log.error("カテゴリー生成失敗 - parentId 未設定: {}", item.getTitle());
+                            throw new IllegalArgumentException("カテゴリは必ずグループに属している必要があります: " + item.getTitle());
                         }
-                        // 백엔드에서 다음 카테고리 코드 생성
+                        // バックエンド側で次のカテゴリコードを生成
                         String nextCategoryCode = cm901043Mapper.selectNextCategoryCode(item.getParentId());
 
                         CategoryDetailDTO category = new CategoryDetailDTO();
@@ -206,44 +206,44 @@ public class CM901043ServiceImpl implements CM901043Service {
                         category.setUpdatedBy(userId);
                         category.setUpdatedAt(dateCalculator.tokyoTime());
                         int insertedCount = cm901043Mapper.insertCategory(category);
-                        log.info("카테고리 생성 완료: {} ({}개 행 추가)", item.getTitle(), insertedCount);
+                        log.info("カテゴリー生成完了: {} ({}件の行を追加)", item.getTitle(), insertedCount);
                     }
                 }
             }
 
-            log.info("카테고리 저장 완료");
+            log.info("カテゴリー保存完了");
 
             ResponseModel<String> response = createResponseModel(
-                    "저장되었습니다.",
+                    "保存しました。",
                     true,
-                    "카테고리 저장 성공");
+                    "カテゴリーの保存に成功しました");
 
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
-            log.error("카테고리 저장 실패 (유효성 검증)", e);
+            log.error("カテゴリー保存失敗（バリデーション）", e);
             ResponseModel<String> response = createResponseModel(
                     null,
                     false,
                     e.getMessage());
             return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            log.error("카테고리 저장 실패", e);
+            log.error("カテゴリー保存失敗", e);
             ResponseModel<String> response = createResponseModel(
                     null,
                     false,
-                    "저장 중 오류가 발생했습니다: " + e.getMessage());
+                    "保存中にエラーが発生しました: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }
 
     /**
-     * 그룹 + 상세 데이터를 트리 구조로 변환
+     * グループ + 詳細データをツリー構造へ変換
      */
     public Map<String, Object> getCategoryTree(List<CategoryGroupDTO> groups, List<CategoryDetailDTO> details) {
         List<Map<String, Object>> children = groups.stream().map(g -> {
 
-            // 각 그룹에 해당하는 상세 목록 필터링
+            // 各グループに紐づく詳細リストを抽出
             List<Map<String, Object>> childList = details.stream()
                     .filter(d -> d.getCategoryGroupCode().equals(g.getCategoryGroupCode()))
                     .sorted(Comparator.comparing(CategoryDetailDTO::getDisplayOrder))
@@ -258,7 +258,7 @@ public class CM901043ServiceImpl implements CM901043Service {
                     })
                     .collect(Collectors.toList());
 
-            // 그룹 구조 생성
+            // グループ構造を生成
             Map<String, Object> groupMap = new HashMap<>();
             groupMap.put("id", g.getCategoryGroupCode());
             groupMap.put("title", g.getCategoryGroupName());
@@ -270,9 +270,9 @@ public class CM901043ServiceImpl implements CM901043Service {
 
         }).collect(Collectors.toList());
 
-        // 루트 노드 구성
+        // ルートノード構成
         Map<String, Object> root = new HashMap<>();
-        root.put("title", "전체 카테고리");
+        root.put("title", "全カテゴリ");
         root.put("isOpen", true);
         root.put("children", children);
 
@@ -280,11 +280,11 @@ public class CM901043ServiceImpl implements CM901043Service {
     }
 
     /**
-     * ResponseModel 생성
-     * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    메시지
+     * ResponseModel 生成
+     *
+     * @param resultList 結果データ
+     * @param result     処理結果
+     * @param message    メッセージ
      * @return ResponseModel
      */
     private <T> ResponseModel<T> createResponseModel(T resultList, boolean result, String message) {

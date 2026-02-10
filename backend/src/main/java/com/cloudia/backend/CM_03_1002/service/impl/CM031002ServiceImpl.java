@@ -18,7 +18,7 @@ import com.cloudia.backend.CM_03_1002.model.CategoryDetails;
 import com.cloudia.backend.CM_03_1002.model.CategoryGroupForCheckbox;
 import com.cloudia.backend.CM_03_1002.model.CategoryItem;
 import com.cloudia.backend.CM_03_1002.model.ProductInfo;
-import com.cloudia.backend.CM_03_1002.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_03_1002.service.CM031002Service;
 import com.cloudia.backend.constants.CMMessageConstant;
 

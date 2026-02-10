@@ -35,20 +35,20 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
   const purchaseColumnDefs = useMemo(
     () => [
       {
-        headerName: '상품명',
+        headerName: '商品名',
         field: 'productName',
         flex: 2,
         minWidth: 150,
       },
       {
-        headerName: '수량',
+        headerName: '数量',
         field: 'quantity',
         flex: 1,
         minWidth: 80,
         cellStyle: { textAlign: 'center' },
       },
       {
-        headerName: '가격',
+        headerName: '価格',
         field: 'totalPrice',
         flex: 1,
         minWidth: 100,
@@ -58,7 +58,7 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
         },
       },
       {
-        headerName: '개당가격',
+        headerName: '単価',
         field: 'unitPrice',
         flex: 1,
         minWidth: 100,
@@ -82,7 +82,7 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
   const statusOption = ORDER_STATUS.find((s) => s.value === orderData.orderStatusValue);
   const paymentOption = PAYMENT_METHODS.find((p) => p.value === orderData.paymentValue);
 
-  // addressData 기본값 설정
+  // addressData のデフォルト値設定
   const address = addressData || {};
 
   return (
@@ -102,7 +102,7 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
         <div className="modal-dialog modal-xl" role="document">
           <div className="modal-content border-0 shadow-lg">
             <div className="modal-header bg-primary text-white">
-              <h5 className="modal-title fw-bold">주문 상세 정보</h5>
+              <h5 className="modal-title fw-bold">注文詳細情報</h5>
               <button
                 type="button"
                 className="btn-close btn-close-white"
@@ -112,32 +112,32 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
             </div>
 
             <div className="modal-body p-4" style={{ backgroundColor: '#f8f9fa' }}>
-              {/* 기본 정보 및 결제 정보 */}
+              {/* 基本情報・決済情報 */}
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
                   <div className="card border-0 shadow-sm h-100">
                     <div className="card-header bg-white border-bottom">
-                      <h6 className="mb-0 fw-bold text-secondary">기본 정보</h6>
+                      <h6 className="mb-0 fw-bold text-secondary">基本情報</h6>
                     </div>
                     <div className="card-body">
                       <table className="table table-borderless mb-0">
                         <tbody>
                           <tr>
                             <td className="text-muted fw-semibold" style={{ width: '40%' }}>
-                              구매 번호:
+                              注文番号:
                             </td>
                             <td className="fw-medium">{orderData.orderNumber || '-'}</td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">구매자 ID:</td>
+                            <td className="text-muted fw-semibold">購入者ID:</td>
                             <td className="fw-medium">{orderData.loginId || '-'}</td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">사원 번호:</td>
+                            <td className="text-muted fw-semibold">会員番号:</td>
                             <td className="fw-medium">{orderData.memberNumber || '-'}</td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">구매일:</td>
+                            <td className="text-muted fw-semibold">注文日:</td>
                             <td className="fw-medium">{formatDate(orderData.orderDate)}</td>
                           </tr>
                         </tbody>
@@ -149,21 +149,21 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
                 <div className="col-md-6">
                   <div className="card border-0 shadow-sm h-100">
                     <div className="card-header bg-white border-bottom">
-                      <h6 className="mb-0 fw-bold text-secondary">결제 정보</h6>
+                      <h6 className="mb-0 fw-bold text-secondary">決済情報</h6>
                     </div>
                     <div className="card-body">
                       <table className="table table-borderless mb-0">
                         <tbody>
                           <tr>
                             <td className="text-muted fw-semibold" style={{ width: '40%' }}>
-                              결제 금액:
+                              決済金額:
                             </td>
                             <td className="text-primary fw-bold fs-5">
                               ₩{orderData.totalAmount?.toLocaleString() || '0'}
                             </td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">결제 방식:</td>
+                            <td className="text-muted fw-semibold">決済方法:</td>
                             <td>
                               <span className="badge bg-secondary fs-6 px-3 py-2">
                                 {paymentOption?.label || orderData.paymentValue || '-'}
@@ -171,7 +171,7 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
                             </td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">현재 상태:</td>
+                            <td className="text-muted fw-semibold">現在のステータス:</td>
                             <td>
                               <span
                                 className={`badge ${getStatusBadgeClass(orderData.orderStatusValue)} fs-6 px-3 py-2`}
@@ -187,10 +187,10 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
                 </div>
               </div>
 
-              {/* 배송지 정보 */}
+              {/* 配送先情報 */}
               <div className="card border-0 shadow-sm mb-3">
                 <div className="card-header bg-white border-bottom">
-                  <h6 className="mb-0 fw-bold text-secondary">배송지 정보</h6>
+                  <h6 className="mb-0 fw-bold text-secondary">配送先情報</h6>
                 </div>
                 <div className="card-body">
                   <div className="row g-3">
@@ -199,20 +199,20 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
                         <tbody>
                           <tr>
                             <td className="text-muted fw-semibold" style={{ width: '40%' }}>
-                              배송지 명칭:
+                              配送先名称:
                             </td>
                             <td className="fw-medium">{address.addressNickname || '-'}</td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">받는 사람:</td>
+                            <td className="text-muted fw-semibold">受取人:</td>
                             <td className="fw-medium">{address.recipientName || '-'}</td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">우편번호:</td>
+                            <td className="text-muted fw-semibold">郵便番号:</td>
                             <td className="fw-medium">{address.postalCode || '-'}</td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">국가:</td>
+                            <td className="text-muted fw-semibold">国:</td>
                             <td className="fw-medium">{address.country || '-'}</td>
                           </tr>
                         </tbody>
@@ -223,24 +223,24 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
                         <tbody>
                           <tr>
                             <td className="text-muted fw-semibold" style={{ width: '40%' }}>
-                              주소:
+                              住所:
                             </td>
                             <td className="fw-medium">{address.addressMain || '-'}</td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">상세 주소 1:</td>
+                            <td className="text-muted fw-semibold">住所詳細 1:</td>
                             <td className="fw-medium">{address.addressDetail1 || '-'}</td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">상세 주소 2:</td>
+                            <td className="text-muted fw-semibold">住所詳細 2:</td>
                             <td className="fw-medium">{address.addressDetail2 || '-'}</td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">상세 주소 3:</td>
+                            <td className="text-muted fw-semibold">住所詳細 3:</td>
                             <td className="fw-medium">{address.addressDetail3 || '-'}</td>
                           </tr>
                           <tr>
-                            <td className="text-muted fw-semibold">휴대전화 번호:</td>
+                            <td className="text-muted fw-semibold">携帯電話番号:</td>
                             <td className="fw-medium">{address.recipientPhone || '-'}</td>
                           </tr>
                         </tbody>
@@ -250,10 +250,10 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
                 </div>
               </div>
 
-              {/* 구매 리스트 */}
+              {/* 購入リスト */}
               <div className="card border-0 shadow-sm">
                 <div className="card-header bg-white border-bottom">
-                  <h6 className="mb-0 fw-bold text-secondary">구매 리스트</h6>
+                  <h6 className="mb-0 fw-bold text-secondary">購入リスト</h6>
                 </div>
                 <div className="card-body p-0">
                   <div style={{ height: '280px' }}>
@@ -280,7 +280,7 @@ const CM_90_1051_orderDetailModal = ({ show, onHide, orderData, rowData, address
 
             <div className="modal-footer bg-white border-top">
               <button type="button" className="btn btn-secondary px-4" onClick={onHide}>
-                닫기
+                閉じる
               </button>
             </div>
           </div>

@@ -31,7 +31,7 @@ export default [
       ...reactHooks.configs.recommended.rules,
       'react/jsx-no-target-blank': 'off',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      'no-console': 'warn', // 개발 중 console.log 경고
+      'no-console': 'warn', // コンロ流出し禁止
     },
   },
 ];

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axiosInstance from '../services/axiosInstance';
+import axiosInstance from '../services/axiosInstance.js';
 import { fetchReviews as fetchReviewsService } from '../services/ReviewService.js';
 import { buildImageUrl } from '../services/ReviewService.js';
 import { CATEGORIES } from '../constants/constants.js';
@@ -18,7 +18,6 @@ export default function CM_02_1000_board() {
     axiosInstance
       .get(`${import.meta.env.VITE_API_BASE_URL}/guest/notice`)
       .then((res) => {
-        // console.log('공지사항 응답 데이터:', res.data);
         const list = Array.isArray(res.data) ? res.data : res.data?.resultList || [];
         if (Array.isArray(list)) {
           setNotices(list.filter((notice) => notice.isDisplay === 1));
@@ -27,7 +26,7 @@ export default function CM_02_1000_board() {
         }
       })
       .catch((err) => {
-        console.error('공지사항 로드 실패:', err?.response?.data?.message || err.message);
+        console.error('お知らせ ロード失敗:', err?.response?.data?.message || err.message);
       });
   }, []);
 
@@ -107,12 +106,12 @@ export default function CM_02_1000_board() {
 
   return (
     <div className="main-board">
-      <div className="notice-review-board d-flex flex-column flex-lg-row border rounded overflow-hidden">
-        {/* 공지 영역 */}
-        <div className="notice-section w-100 w-lg-50 border-end d-block d-lg-inline-block">
+      <div className="notice-review-board d-flex flex-column flex-md-row border rounded overflow-hidden">
+        {/* お知らせ */}
+        <div className="notice-section w-100 w-md-50 border-end d-block">
           <div className="header bg-light d-flex justify-content-between align-items-center px-3 py-2">
             <Link to="/notice" className="text-dark text-decoration-none fw-bold">
-              공지사항
+              お知らせ
             </Link>
             <div>
               <span>
@@ -141,7 +140,7 @@ export default function CM_02_1000_board() {
           </div>
           <ul className="list-unstyled text-center m-0 p-3 lh-lg">
             {noticePages[noticePage - 1]?.length === 0 && (
-              <li className="text-muted">공지사항 내용이 없습니다.</li>
+              <li className="text-muted">お知らせの内容がありません。</li>
             )}
             {(noticePages[noticePage - 1] ?? []).map((notice) => {
               const codeValue = Number(notice.codeValue);
@@ -151,11 +150,11 @@ export default function CM_02_1000_board() {
               const badgeClass = getCategoryClass(codeValue);
 
               return (
-                <li key={notice.noticeId} className="mb-2 d-flex align-items-center gap-3">
+                <li key={notice.noticeId} className="mb-2 d-flex align-items-center gap-3 notice-item">
                   <strong className={`badge-category ${badgeClass}`}>{categoryLabel}</strong>
                   <Link
                     to={`/notice/${notice.noticeId}`}
-                    className="fw-semibold text-decoration-none text-dark"
+                    className="fw-semibold text-decoration-none text-dark notice-title-ellipsis"
                   >
                     {notice.title}
                   </Link>
@@ -164,11 +163,11 @@ export default function CM_02_1000_board() {
             })}
           </ul>
         </div>
-        {/* 리뷰 영역 */}
-        <div className="review-section w-100 w-lg-50 d-block d-lg-inline-block">
+        {/*レビュー/口コミ*/}
+        <div className="review-section w-100 w-md-50 d-block">
           <div className="header bg-light d-flex justify-content-between align-items-center px-3 py-2">
             <Link to="/review" className="text-dark text-decoration-none fw-bold">
-              리뷰/후기
+              レビュー/口コミ
             </Link>
             <div>
               <span>
@@ -193,9 +192,9 @@ export default function CM_02_1000_board() {
             </div>
           </div>
           <div className="p-3 row row-cols-1 row-cols-md-2 g-3">
-            {loading && <div className="text-center w-100">로딩 중...</div>}
+            {loading && <div className="text-center w-100">ロード中...</div>}
             {!loading && currentReviewPage.length === 0 && (
-              <div className="text-muted text-center w-100">등록된 리뷰가 없습니다.</div>
+              <div className="text-muted text-center w-100">登録されたレビューがありません。</div>
             )}
             {!loading &&
               currentReviewPage.map((review, idx) => (
@@ -208,7 +207,7 @@ export default function CM_02_1000_board() {
                     <img
                       className="review-img"
                       src={buildImageUrl(review.imageUrl)}
-                      alt={`리뷰${idx}`}
+                      alt={`レビュー${idx}`}
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = noImage;

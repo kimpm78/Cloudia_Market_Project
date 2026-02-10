@@ -47,10 +47,11 @@ public class CM061000Controller {
     private final CM061000Service cm061000Service;
 
     /**
-    * 장바구니 조회
-    * @param userId 사용자 ID
-    * @return 장바구니 아이템 리스트
-    */
+     * カート取得
+     *
+     * @param userId ユーザーID
+     * @return カートアイテム一覧
+     */
     @GetMapping("/cart")
     public ResponseEntity<ResponseModel<List<CartItemResponse>>> getCart(@RequestParam Long userId) {
         log.debug("userId: {}", userId);
@@ -62,9 +63,10 @@ public class CM061000Controller {
     }
 
     /**
-     * 장바구니 마지막 갱신 시각 조회
-     * @param userId 사용자 ID
-     * @return 마지막 cart_updated_at
+     * カート最終更新日時の取得
+     *
+     * @param userId ユーザーID
+     * @return 最終 cart_updated_at
      */
     @GetMapping("/cart/last-updated")
     public ResponseEntity<ResponseModel<Map<String, Object>>> getCartLastUpdatedAt(
@@ -80,9 +82,10 @@ public class CM061000Controller {
     }
 
     /**
-     * 장바구니 최초 생성 시각 조회 (TTL 기준)
-     * @param userId 사용자 ID
-     * @return 최초 created_at
+     * カート初回作成日時の取得（TTL基準）
+     *
+     * @param userId ユーザーID
+     * @return 初回 created_at
      */
     @GetMapping("/cart/created-at")
     public ResponseEntity<ResponseModel<Map<String, Object>>> getCartCreatedAt(
@@ -98,8 +101,9 @@ public class CM061000Controller {
     }
 
     /**
-     * 장바구니 비우기
-     * @return 삭제 결과
+     * カートを空にする
+     *
+     * @return 削除結果
      */
     @DeleteMapping("/cart")
     public ResponseEntity<ResponseModel<Void>> clearCart() {
@@ -116,11 +120,11 @@ public class CM061000Controller {
     }
 
     /**
-     * 장바구니 담기
+     * カートに追加
      *
-     * @param req 요청 바디
-     * @param bindingResult 검증 결과
-     * @return 장바구니 담기 결과
+     * @param req           リクエストボディ
+     * @param bindingResult バリデーション結果
+     * @return 追加結果
      */
     @PostMapping("/cart/add")
     public ResponseEntity<ResponseModel<Map<String, Object>>> addToCart(
@@ -154,10 +158,10 @@ public class CM061000Controller {
     }
 
     /**
-     * 수량 변경
-     * 
-     * @param cartItemId 장바구니 아이템 ID
-     * @param req 수량 변경 요청
+     * 数量変更
+     *
+     * @param cartItemId カートアイテムID
+     * @param req        数量変更リクエスト
      */
     @PatchMapping("/cart/{cartItemId}")
     public ResponseEntity<ResponseModel<Void>> updateQuantity(
@@ -191,10 +195,10 @@ public class CM061000Controller {
     }
 
     /**
-     * 장바구니 아이템 삭제
+     * カートアイテム削除
      *
-     * @param cartItemId 장바구니 아이템 ID
-     * @return 삭제 결과
+     * @param cartItemId カートアイテムID
+     * @return 削除結果
      */
     @DeleteMapping("/cart/{cartItemId}")
     public ResponseEntity<ResponseModel<Void>> delete(
@@ -218,10 +222,11 @@ public class CM061000Controller {
     }
 
     /**
-     * 선택된 장바구니 아이템 삭제
-     * @param req 선택 삭제 요청(cartItemIds)
-     * @param bindingResult 검증 결과
-     * @return 삭제 결과
+     * 選択したカートアイテムを削除
+     *
+     * @param req           選択削除リクエスト（cartItemIds）
+     * @param bindingResult バリデーション結果
+     * @return 削除結果
      */
     @PostMapping("/cart/delete-selected")
     public ResponseEntity<ResponseModel<Void>> deleteSelected(
@@ -259,11 +264,11 @@ public class CM061000Controller {
     }
 
     /**
-     * 주문 준비
-     * 
-     * @param req 주문 준비 요청(선택된 cartItemIds)
-     * @param bindingResult 검증 결과
-     * @return 선택된 아이템 목록과 합계 정보
+     * 注文準備
+     *
+     * @param req           注文準備リクエスト（選択した cartItemIds）
+     * @param bindingResult バリデーション結果
+     * @return 選択アイテム一覧と合計情報
      */
     @PostMapping("/cart/prepare-order")
     public ResponseEntity<ResponseModel<Map<String, Object>>> prepareOrder(
@@ -316,23 +321,24 @@ public class CM061000Controller {
     }
 
     /**
-     * 현재 인증된 사용자 ID 조회
-     * @return 사용자 ID
+     * 現在認証されているユーザーIDを取得
+     *
+     * @return ユーザーID
      */
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AccessDeniedException("인증 정보가 없습니다.");
+            throw new AccessDeniedException("認証情報がありません。");
         }
         Object principal = authentication.getPrincipal();
         if (principal instanceof User user) {
             Integer id = user.getUserId();
             if (id == null) {
-                throw new AccessDeniedException("유효한 사용자 정보가 없습니다.");
+                throw new AccessDeniedException("有効なユーザー情報がありません。");
             }
             return id.longValue();
         }
-        throw new AccessDeniedException("유효한 사용자 정보가 없습니다.");
+        throw new AccessDeniedException("有効なユーザー情報がありません。");
     }
 
     private String extractErrorMessage(BindingResult bindingResult) {
@@ -342,57 +348,57 @@ public class CM061000Controller {
     }
 
     /**
-     * 장바구니 담기 요청 바디
+     * カート追加リクエストボディ
      */
     @Data
     public static class AddCartRequest {
 
-        @NotBlank(message = "productId는 필수입니다.")
+        @NotBlank(message = "productId は必須です。")
         private String productId;
 
-        @NotNull(message = "quantity는 필수입니다.")
-        @Min(value = 1, message = "quantity는 1 이상이어야 합니다.")
+        @NotNull(message = "quantity は必須です。")
+        @Min(value = 1, message = "quantity は 1 以上である必要があります。")
         private Integer quantity;
     }
 
     /**
-     * 수량 변경 요청 바디
+     * 数量変更リクエストボディ
      */
     @Data
     public static class UpdateQtyRequest {
 
-        @NotNull(message = "quantity는 필수입니다.")
-        @Min(value = 1, message = "quantity는 1 이상이어야 합니다.")
+        @NotNull(message = "quantity は必須です。")
+        @Min(value = 1, message = "quantity は 1 以上である必要があります。")
         private Integer quantity;
     }
 
     /**
-     * 주문 준비 요청 바디
+     * 注文準備リクエストボディ
      */
     @Data
     public static class PrepareOrderRequest {
 
-        @NotEmpty(message = "cartItemIds는 1개 이상이어야 합니다.")
+        @NotEmpty(message = "cartItemIds は 1 件以上である必要があります。")
         private List<Long> cartItemIds;
     }
 
     /**
-     * 선택 삭제 요청 바디
+     * 選択削除リクエストボディ
      */
     @Data
     public static class DeleteSelectedCartRequest {
 
-        @NotEmpty(message = "cartItemIds는 1개 이상이어야 합니다.")
+        @NotEmpty(message = "cartItemIds は 1 件以上である必要があります。")
         private List<Long> cartItemIds;
     }
     
     /**
-     * 공통 응답 모델 생성
-     * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    응답 메시지
-     * @return ResponseModel 객체
+     * 共通レスポンスモデル生成
+     *
+     * @param resultList 結果データ
+     * @param ret        処理結果
+     * @param msg        レスポンスメッセージ
+     * @return ResponseModel オブジェクト
      */
     private <T> ResponseModel<T> setResponseDto(T resultList, boolean ret, String msg) {
         return ResponseModel.<T>builder()

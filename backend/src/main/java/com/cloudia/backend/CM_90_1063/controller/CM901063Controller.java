@@ -31,70 +31,68 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequestMapping("/api/admin")
 public class CM901063Controller {
-    // Service 정의
     private final CM901063Service cm901063Service;
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 상품 코드 전체 리스트 조회
-     * 
-     * @return 상품 코드 전체 리스트
+     * 商品コード全件一覧取得
+     *
+     * @return 商品コード全件一覧
      */
     @GetMapping("/productCode/all")
     public ResponseEntity<ResponseModel<List<ProductCode>>> findAllProductCode() {
         List<ProductCode> response = cm901063Service.findAllProductCode();
-        return ResponseEntity.ok(ResponseHelper.success(response, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(response, "取得成功"));
     }
 
     /**
-     * 특정 상품 코드 가격 조회
-     * 
-     * @param searchCode 검색 상품 코드
-     * @return 상품 코드 리스트
+     * 指定した商品コードの価格取得
+     *
+     * @param searchCode 検索商品コード
+     * @return 商品コード情報
      */
     @GetMapping("/productCode/{searchCode}")
     public ResponseEntity<ResponseModel<Optional<Stock>>> getStock(@PathVariable String searchCode) {
         Optional<Stock> product = cm901063Service.getStockByCode(searchCode);
-        return ResponseEntity.ok(ResponseHelper.success(product, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(product, "取得成功"));
     }
 
     /**
-     * 입/출고 일람 전체 조회
-     * 
-     * @return 입/출고 일람 전체 리스트
+     * 入出庫一覧の全件取得
+     *
+     * @return 入出庫一覧（全件）
      */
     @GetMapping("/stocks/all")
     public ResponseEntity<ResponseModel<List<StockInfo>>> findAllStocks() {
         List<StockInfo> stocks = cm901063Service.findAllStocks();
-        return ResponseEntity.ok(ResponseHelper.success(stocks, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(stocks, "取得成功"));
     }
 
     /**
-     * 선택 된 상품 코드 / 상품명의 상품 가격 정보 조회
-     * 
-     * @param searchType 검색 타입 (1: 상품 코드 2: 상품 명)
-     * @param searchTerm 검색어
-     * @return 상품 정보
+     * 選択した商品コード／商品名で在庫・価格情報を検索
+     *
+     * @param searchType 検索種別（1: 商品コード / 2: 商品名）
+     * @param searchTerm 検索キーワード
+     * @return 商品情報
      */
     @GetMapping("/stocks/findStocks")
     public ResponseEntity<ResponseModel<List<StockInfo>>> findByStocks(@RequestParam String searchType,
             @RequestParam String searchTerm) {
         List<StockInfo> stock = cm901063Service.findByStocks(searchType, searchTerm);
-        return ResponseEntity.ok(ResponseHelper.success(stock, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(stock, "取得成功"));
     }
 
     /**
-     * 재고 입/출고 등록
+     * 在庫の入出庫登録
      *
-     * @param entity 등록 할 재고 정보 엔티티
-     * 
-     * @return 등록 성공 여부
-     **/
+     * @param entity 登録する在庫情報エンティティ
+     * @return 登録結果
+     */
     @PutMapping("/stocks")
     public ResponseEntity<ResponseModel<Integer>> stockUpsert(@Valid @RequestBody ProductCode entity,
             BindingResult bindingResult, HttpServletRequest request) {
         String memberNumber = jwtTokenProvider.getMemberNoFromToken(jwtTokenProvider.resolveToken(request));
         Integer productOpt = cm901063Service.stockUpsert(entity, memberNumber);
-        return ResponseEntity.ok(ResponseHelper.success(productOpt, "등록 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(productOpt, "登録成功"));
     }
 }

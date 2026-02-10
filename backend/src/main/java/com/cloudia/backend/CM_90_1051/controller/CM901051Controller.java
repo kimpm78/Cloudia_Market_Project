@@ -32,45 +32,45 @@ public class CM901051Controller {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 주문 전체 리스트 조회
-     * 
-     * @return 주문 전체 리스트
+     * 注文一覧を取得
+     *
+     * @return 注文一覧
      */
     @GetMapping("/findAll")
     public ResponseEntity<ResponseModel<List<OrderDto>>> getFindAllUser() {
         List<OrderDto> result = cm901051Service.findByAllOrders();
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得に成功しました"));
     }
 
     /**
-     * 주문 전체 리스트 조회
-     * 
-     * @param 검색 데이터
-     * @return 주문 전체 리스트
+     * 注文一覧を検索して取得
+     *
+     * @param searchRequest 検索条件
+     * @return 注文一覧
      */
     @GetMapping("/findOrder")
     public ResponseEntity<ResponseModel<List<OrderDto>>> getFindOrders(SearchRequestDto searchRequest) {
         List<OrderDto> result = cm901051Service.getFindOrders(searchRequest);
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得に成功しました"));
     }
 
     /**
-     * 주문 상세 리스트 조회
-     * 
-     * @param 검색 데이터
-     * @return 주문 상세 리스트
+     * 注文詳細一覧を取得
+     *
+     * @param searchRequest 検索条件
+     * @return 注文詳細一覧
      */
     @GetMapping("/findDetails")
     public ResponseEntity<ResponseModel<List<OrderDetailDto>>> getFindOrderDetail(SearchRequestDto searchRequest) {
         List<OrderDetailDto> result = cm901051Service.getFindOrderDetail(searchRequest);
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得に成功しました"));
     }
 
     /**
-     * 정산 상태 업데이트
-     * 
-     * @param 검색 데이터
-     * @return 성공 여부
+     * 精算ステータスを更新
+     *
+     * @param searchRequest 検索条件
+     * @return 更新結果
      */
     @PostMapping("/uptStatus")
     public ResponseEntity<ResponseModel<Integer>> uptStatus(@RequestBody SearchRequestDto searchRequest,
@@ -79,17 +79,17 @@ public class CM901051Controller {
                 .getUserIdFromToken(jwtTokenProvider.resolveToken(request))
                 .toString();
         Integer result = cm901051Service.uptStatus(searchRequest, userId);
-        return ResponseEntity.ok(ResponseHelper.success(result, "업데이트 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "更新に成功しました"));
     }
 
     /**
-     * 배송지 정보
-     * 
-     * @return 배송지 정보
+     * 配送先情報を取得
+     *
+     * @return 配送先情報
      */
     @GetMapping("/address")
     public ResponseEntity<ResponseModel<AddressDto>> getAddress(SearchRequestDto searchRequest) {
         AddressDto result = cm901051Service.getAddress(searchRequest);
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得に成功しました"));
     }
 }

@@ -9,6 +9,19 @@
   padding: 16px 12px;
 }
 
+.mypage-sidebar-link {
+  color: #212529;
+  transition: color 0.15s ease;
+}
+
+.mypage-sidebar-link:hover {
+  color: #0d6efd;
+}
+
+.mypage-sidebar-link.active {
+  color: #0d6efd;
+}
+
 @media (max-width: 768px) {
   .mypage-sidebar-column {
     display: none;

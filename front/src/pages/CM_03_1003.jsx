@@ -10,6 +10,7 @@ import { filterItemsForPage } from '../utils/productPageFilters';
 import ProductCardBasic from '../components/CM_03_1000_ProductCardBasic';
 import { normalizeCartAwareStock, isSoldOutBasic } from '../utils/productInventory';
 import CMMessage from '../constants/CMMessage';
+import { normalizeImageUrl } from '../utils/htmlContent';
 
 import '../styles/CM_03_1000.css';
 
@@ -62,9 +63,9 @@ export default function CM_03_1003({ showFilter = true }) {
   }, []);
 
   const allItems = useMemo(() => normalizeCartAwareStock(rawItems, cartMeta), [rawItems, cartMeta]);
-  const categoryGroupLabels = getCategoryGroupsForPage('장르');
+  const categoryGroupLabels = getCategoryGroupsForPage('ジャンル');
 
-  const sourceItems = filterItemsForPage(allItems, '장르');
+  const sourceItems = filterItemsForPage(allItems, 'ジャンル');
   const {
     currentPage,
     selectedFilters,
@@ -95,13 +96,13 @@ export default function CM_03_1003({ showFilter = true }) {
 
   return (
     <>
-      <h1 ref={topRef}>장르</h1>
+      <h1 className='m-5' ref={topRef}>ジャンル</h1>
       <div className="container-fluid my-4">
         <div className="row justify-content-center">
           {showFilter && (
             <div className="col-12 col-md-3 mb-3 mb-md-0">
               <CM_99_1011_filterSidebar
-                pageName="장르"
+                pageName="ジャンル"
                 selectedFilters={selectedFilters}
                 onFilterChange={handleFilterChange}
                 onReset={handleReset}
@@ -114,16 +115,12 @@ export default function CM_03_1003({ showFilter = true }) {
             {sourceItems.length === 0 ? (
               <div className="text-center mt-5">
                 <h5 style={{ color: 'red' }}>{CMMessage.MSG_EMPTY_003}</h5>
-                <p className="text-muted">
-                  {CMMessage.MSG_EMPTY_004}
-                </p>
+                <p className="text-muted">{CMMessage.MSG_EMPTY_004}</p>
               </div>
             ) : filteredItems.length === 0 ? (
               <div className="text-center mt-5">
                 <h5 style={{ color: 'red' }}>{CMMessage.MSG_EMPTY_001}</h5>
-                <p className="text-muted">
-                  {CMMessage.MSG_EMPTY_002}
-                </p>
+                <p className="text-muted">{CMMessage.MSG_EMPTY_002}</p>
               </div>
             ) : (
               <div className="row row-cols-2 row-cols-md-5 g-4">

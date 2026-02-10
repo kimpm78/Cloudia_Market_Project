@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axiosInstance from '../services/axiosInstance';
-import { countries } from '../data/countries';
+import useCountries from '../hooks/useCountries';
 import '../styles/CM_01_1007.css';
 
 import CM_99_1001 from '../components/commonPopup/CM_99_1001';
@@ -32,6 +32,7 @@ export default function CM_01_1007() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { modals, message, open, close } = useModal();
+  const { countries } = useCountries();
 
   const [profile, setProfile] = useState({
     loginId: '',
@@ -62,10 +63,6 @@ export default function CM_01_1007() {
         const response = await axiosInstance.get('/user/profile');
         setProfile(response.data);
         parsePhoneNumber(response.data.phoneNumber);
-        const country = countries.find((c) => c.isoCode === response.data.nationality);
-        if (country) {
-          setPhoneParts((prev) => ({ ...prev, code: country.phoneCode }));
-        }
       } catch (err) {
         open('error', 'プロフィール情報の取得に失敗しました。');
       } finally {
@@ -77,9 +74,22 @@ export default function CM_01_1007() {
     }
   }, [user, parsePhoneNumber, open]);
 
+  useEffect(() => {
+    if (!countries.length || !profile.nationality) return;
+    const country = countries.find((c) => c.isoCode === profile.nationality);
+    if (country) {
+      setPhoneParts((prev) => ({ ...prev, code: country.phoneCode }));
+    }
+  }, [countries, profile.nationality]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile((prev) => ({ ...prev, [name]: value }));
+    setProfile((prev) => {
+      if (name === 'nationality') {
+        return { ...prev, [name]: value, pccc: value === 'KR' ? prev.pccc : '' };
+      }
+      return { ...prev, [name]: value };
+    });
     if (name === 'nationality') {
       const selectedCountry = countries.find((c) => c.isoCode === value);
       if (selectedCountry) {
@@ -116,7 +126,7 @@ export default function CM_01_1007() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const pcccError = validatePccc(profile.pccc);
+    const pcccError = profile.nationality === 'KR' ? validatePccc(profile.pccc) : null;
 
     if (pcccError) {
       open('error', pcccError);
@@ -150,8 +160,8 @@ export default function CM_01_1007() {
   }
 
   return (
-    <>
-      <h4 className="border-bottom fw-bolder pb-3 mb-4 mt-2">プロフィール</h4>
+    <div className="container mt-2">
+      <h2 className="border-bottom fw-bolder pb-3 mb-4 mt-4">プロフィール</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="loginId" className="form-label fw-bold">
@@ -181,7 +191,7 @@ export default function CM_01_1007() {
 
         <div className="mb-3">
           <label htmlFor="nationality" className="form-label fw-bold">
-            <i className="bi bi-asterisk required-asterisk"></i>国籍／居住国
+            <i className="bi bi-asterisk required-asterisk"></i>国籍/居住国
           </label>
           <select
             className="form-select profile-input-medium"
@@ -192,7 +202,7 @@ export default function CM_01_1007() {
           >
             {countries.map((c) => (
               <option key={c.isoCode} value={c.isoCode}>
-                {c.name.kr}
+                {c.name.jp}
               </option>
             ))}
           </select>
@@ -308,22 +318,24 @@ export default function CM_01_1007() {
           />
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="pccc" className="form-label fw-bold">
-            個人通関固有番号（PCCC）
-          </label>
-          <input
-            type="text"
-            className="form-control profile-input-medium"
-            id="pccc"
-            name="pccc"
-            value={profile.pccc || ''}
-            onChange={handleChange}
-            maxLength={13}
-            placeholder="Pから始まる13桁"
-          />
-          <div className="form-text">Pから始まる13桁です。</div>
-        </div>
+        {profile.nationality === 'KR' && (
+          <div className="mb-3">
+            <label htmlFor="pccc" className="form-label fw-bold">
+              個人通関固有番号（PCCC）
+            </label>
+            <input
+              type="text"
+              className="form-control profile-input-medium"
+              id="pccc"
+              name="pccc"
+              value={profile.pccc || ''}
+              onChange={handleChange}
+              maxLength={13}
+              placeholder="Pから始まる13桁"
+            />
+            <div className="form-text">Pから始まる13桁です。</div>
+          </div>
+        )}
 
         <div className="d-flex justify-content-center gap-2 mt-5 mb-3">
           <button type="submit" className="btn btn-primary px-5" disabled={modals.loading}>
@@ -348,6 +360,6 @@ export default function CM_01_1007() {
       <CM_99_1002 isOpen={modals.loading} />
       <CM_99_1003 isOpen={modals.error} onClose={() => close('error')} message={message} />
       <CM_99_1004 isOpen={modals.success} onClose={handleSuccessAndRedirect} Message={message} />
-    </>
+    </div>
   );
 }

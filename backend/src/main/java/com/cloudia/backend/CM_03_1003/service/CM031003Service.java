@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.cloudia.backend.CM_03_1003.model.CartRequest;
 import com.cloudia.backend.CM_03_1003.model.ProductInfo;
-import com.cloudia.backend.CM_03_1003.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_03_1003.model.Categories;
 import com.cloudia.backend.CM_03_1003.model.CategoryDetails;
 import com.cloudia.backend.CM_03_1003.model.CategoryGroupForCheckbox;

@@ -17,12 +17,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Categories {
-    private String categoryGroupCode; // 카테고리 그룹 코드
-    private String categoryGroupName; // 카테고리 그룹 명
-    private int displayOrder; // 표시 순서
-    private String createdBy; // 등록자
-    private LocalDateTime createdAt; // 등록일
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일
-    private List<CategoryDetails> details; // 하위 카테고리 리스트
+    private String categoryGroupCode;       // カテゴリグループコード
+    private String categoryGroupName;       // カテゴリグループ名
+    private int displayOrder;               // 表示順序
+    private String createdBy;               // 登録者
+    private LocalDateTime createdAt;        // 登録日
+    private String updatedBy;               // 更新者
+    private LocalDateTime updatedAt;        // 更新日
+    private List<CategoryDetails> details;  // 下位カテゴリリスト
 }

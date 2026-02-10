@@ -9,7 +9,7 @@ import CM_99_1004 from '../components/commonPopup/CM_99_1004';
 
 const INITIAL_FORM_STATE = {
   title: '',
-  selectedTag: '0', // 0: 반품, 1: 교환
+  selectedTag: '0', // 0: 返品, 1: 交換
   orderNo: '',
   detailImages: [],
   content: '',
@@ -33,7 +33,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
 
   const validateAndProcessFiles = (files) => {
     if (images.length + files.length > MAX_IMAGES) {
-      onError(`이미지는 최대 ${MAX_IMAGES}개까지만 업로드할 수 있습니다.`);
+      onError(`画像は最大${MAX_IMAGES}枚までアップロードできます。`);
       return;
     }
 
@@ -42,7 +42,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
     const imagePromises = files.map((file, index) => {
       return new Promise((resolve, reject) => {
         if (!file.type.startsWith('image/')) {
-          reject('이미지 파일만 업로드 가능합니다.');
+          reject('画像ファイルのみアップロードできます。');
           return;
         }
 
@@ -55,8 +55,8 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
               image.height < IMAGE_CONSTRAINTS.DETAIL_MIN_HEIGHT
             ) {
               reject(
-                `상세 이미지는 최소 ${IMAGE_CONSTRAINTS.DETAIL_MIN_WIDTH}x${IMAGE_CONSTRAINTS.DETAIL_MIN_HEIGHT} 픽셀 이상이어야 합니다. ` +
-                  `(현재 이미지: ${image.width}x${image.height})`
+                `詳細画像は最低${IMAGE_CONSTRAINTS.DETAIL_MIN_WIDTH}x${IMAGE_CONSTRAINTS.DETAIL_MIN_HEIGHT}ピクセル以上である必要があります。` +
+                  `(現在の画像: ${image.width}x${image.height})`
               );
               return;
             }
@@ -71,10 +71,10 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
 
             resolve(newImage);
           };
-          image.onerror = () => reject('이미지 로드 실패');
+          image.onerror = () => reject('画像の読み込みに失敗しました。');
           image.src = e.target.result;
         };
-        reader.onerror = () => reject('파일 읽기 실패');
+        reader.onerror = () => reject('ファイルの読み込みに失敗しました。');
         reader.readAsDataURL(file);
       });
     });
@@ -126,7 +126,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
     <div className="mb-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <label className="form-label mb-0 fw-bold">
-          사진 첨부{' '}
+          画像添付{' '}
           <span className="text-muted">
             ({images.length}/{MAX_IMAGES})
           </span>
@@ -136,7 +136,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
           className="btn btn-outline-primary btn-sm"
           onClick={() => fileInputRef.current?.click()}
         >
-          <i className="bi bi-upload me-1"></i>Upload
+          <i className="bi bi-upload me-1"></i>アップロード
         </button>
       </div>
       <input
@@ -159,7 +159,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
       >
         {images.length === 0 ? (
           <div className="text-center py-4 text-muted small">
-            이미지를 드래그하거나 Upload 버튼을 클릭하세요.
+            画像をドラッグするか、「アップロード」ボタンをクリックしてください。
           </div>
         ) : (
           images.map((image) => (
@@ -200,7 +200,7 @@ export default function CM_01_1016() {
   const [open1004, setOpen1004] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
 
-  const typeLabel = form.selectedTag === '0' ? '반품' : '교환';
+  const typeLabel = form.selectedTag === '0' ? '返品' : '交換';
 
   const updateForm = useCallback(
     (field, value) => {
@@ -213,20 +213,20 @@ export default function CM_01_1016() {
   const applyTemplate = useCallback(() => {
     const selectedOrder = orderList.find((o) => o.orderNumber === form.orderNo);
     const displayDate =
-      selectedOrder?.orderDate || selectedOrder?.displayOrderDate || '(주문번호를 선택해주세요)';
+      selectedOrder?.orderDate || selectedOrder?.displayOrderDate || '(注文番号を選択してください)';
 
     const displayProduct =
       form.selectedProducts.length > 0
-        ? form.selectedProducts.map((p) => `${p.productName} (${p.returnQty}개)`).join(', ')
-        : '(상품을 선택해주세요)';
+        ? form.selectedProducts.map((p) => `${p.productName} (${p.returnQty}個)`).join(', ')
+        : '(商品を選択してください)';
 
     const formatHtml = `
-      <p><strong>[ ${typeLabel} 신청서 ]</strong></p>
-      <p><strong>교환/반품:</strong> ${typeLabel}</p> 
-      <p><strong>주문번호:</strong> ${form.orderNo || '(주문번호를 선택해주세요)'}</p>
-      <p><strong>주문날짜:</strong> ${displayDate}</p>
-      <p><strong>신청상품:</strong> ${displayProduct}</p>
-      <p><strong>상세내용:</strong> </p>
+      <p><strong>[ ${typeLabel} 申請書 ]</strong></p>
+      <p><strong>交換/返品:</strong> ${typeLabel}</p> 
+      <p><strong>注文番号:</strong> ${form.orderNo || '(注文番号を選択してください)'}</p>
+      <p><strong>注文日:</strong> ${displayDate}</p>
+      <p><strong>申請商品:</strong> ${displayProduct}</p>
+      <p><strong>詳細内容:</strong> </p>
       <p>&nbsp;</p>
     `;
     updateForm('content', formatHtml);
@@ -241,7 +241,7 @@ export default function CM_01_1016() {
           }
         })
         .catch((err) => {
-          console.error('API 호출 에러:', err);
+          console.error('API呼び出しエラー:', err);
         });
     }
   }, [user?.loginId]);
@@ -261,7 +261,7 @@ export default function CM_01_1016() {
         const response = await getRequest(`/user/returns/order-products?orderNo=${orderNo}`);
         setAvailableProducts(response || []);
       } catch (err) {
-        console.error('상품 정보 로드 실패:', err);
+        console.error('商品情報の読み込みに失敗しました:', err);
         setAvailableProducts([]);
       }
     } else {
@@ -291,7 +291,7 @@ export default function CM_01_1016() {
     if (item) {
       let num = parseInt(val) || 0;
 
-      // 주문 수량을 초과하는지 검사
+      // 注文数量を超過していないか確認
       if (num > item.orderQty) {
         num = item.orderQty;
       }
@@ -304,10 +304,10 @@ export default function CM_01_1016() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!form.title.trim()) newErrors.title = '제목을 입력해주세요.';
-    if (!form.orderNo) newErrors.orderNo = '주문번호를 선택해주세요.';
-    if (form.selectedProducts.length === 0) newErrors.product = '상품을 하나 이상 선택해주세요.';
-    if (form.content.length < 20) newErrors.content = '이유를 상세히 입력해주세요.';
+    if (!form.title.trim()) newErrors.title = 'タイトルを入力してください。';
+    if (!form.orderNo) newErrors.orderNo = '注文番号をを選択してください。';
+    if (form.selectedProducts.length === 0) newErrors.product = '商品を一つ以上選択してください。';
+    if (form.content.length < 20) newErrors.content = '理由を詳細に入力してください。';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -343,7 +343,7 @@ export default function CM_01_1016() {
       }
     } catch (err) {
       setOpen1002(false);
-      alert(err.message || '오류가 발생했습니다.');
+      alert(err.message || 'エラーが発生しました。');
     } finally {
       setIsLoading(false);
     }
@@ -351,7 +351,7 @@ export default function CM_01_1016() {
 
   return (
     <div className="return-request-container p-4">
-      <h3 className="fw-bold mb-4 border-bottom pb-3">교환/반품 신청</h3>
+      <h3 className="fw-bold mb-4 border-bottom pb-3">交換/返品申請</h3>
       <CM_99_1002 isOpen={open1002} onClose={() => setOpen1002(false)} />
       <CM_99_1004
         isOpen={open1004}
@@ -363,32 +363,32 @@ export default function CM_01_1016() {
         <div className="row g-4">
           <div className="col-md-7">
             <div className="mb-3">
-              <label className="form-label fw-bold">제목</label>
+              <label className="form-label fw-bold">タイトル</label>
               <input
                 className="form-control"
                 value={form.title}
                 onChange={(e) => updateForm('title', e.target.value)}
-                placeholder="교환 또는 반품 신청 제목을 입력해주세요"
+                placeholder="交換または返品申請のタイトルを入力してください"
               />
               {errors.title && <small className="text-danger">{errors.title}</small>}
             </div>
 
             <div className="row mb-3">
               <div className="col-6">
-                <label className="form-label fw-bold">구분</label>
+                <label className="form-label fw-bold">区分</label>
                 <select
                   className="form-select"
                   value={form.selectedTag}
                   onChange={(e) => updateForm('selectedTag', e.target.value)}
                 >
-                  <option value="0">반품</option>
-                  <option value="1">교환</option>
+                  <option value="0">返品</option>
+                  <option value="1">交換</option>
                 </select>
               </div>
               <div className="col-6">
-                <label className="form-label fw-bold">주문번호</label>
+                <label className="form-label fw-bold">注文番号</label>
                 <select className="form-select" value={form.orderNo} onChange={handleOrderChange}>
-                  <option value="">주문 선택</option>
+                  <option value="">注文を選択</option>
                   {orderList.map((o, index) => {
                     return (
                       <option key={o.orderNo} value={o.orderNo}>
@@ -402,7 +402,7 @@ export default function CM_01_1016() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label fw-bold">대상 상품 (수량 선택)</label>
+              <label className="form-label fw-bold">対象商品（数量選択）</label>
               <div
                 className="border rounded p-3 bg-light"
                 style={{ maxHeight: '200px', overflowY: 'auto' }}
@@ -427,7 +427,7 @@ export default function CM_01_1016() {
                             {p.productName}
                           </label>
                           <div className="text-muted" style={{ fontSize: '0.8rem' }}>
-                            주문: {p.quantity}개
+                            注文: {p.quantity}個
                           </div>
                         </div>
                         {sel && (
@@ -442,7 +442,7 @@ export default function CM_01_1016() {
                               max={sel.orderQty}
                               onChange={(e) => handleQtyChange(p.productCode, e.target.value)}
                             />
-                            <span className="small">개</span>
+                            <span className="small">個</span>
                           </div>
                         )}
                       </div>
@@ -450,7 +450,7 @@ export default function CM_01_1016() {
                   })
                 ) : (
                   <div className="text-center text-muted py-3 small">
-                    주문번호를 먼저 선택해주세요.
+                    先に注文番号を選択してください。
                   </div>
                 )}
               </div>
@@ -467,7 +467,7 @@ export default function CM_01_1016() {
         </div>
 
         <div className="mt-4">
-          <label className="form-label fw-bold">상세 내용</label>
+          <label className="form-label fw-bold">詳細内容</label>
           <TiptapEditor
             content={form.content}
             onContentChange={(val) => updateForm('content', val)}
@@ -481,10 +481,10 @@ export default function CM_01_1016() {
             className="btn btn-primary flex-grow-1 fw-bold"
             disabled={isLoading}
           >
-            {isLoading ? '처리 중...' : '신청하기'}
+            {isLoading ? '処理中...' : '申請する'}
           </button>
           <button type="button" className="btn btn-light" onClick={() => navigate(-1)}>
-            취소
+            キャンセル
           </button>
         </div>
       </form>

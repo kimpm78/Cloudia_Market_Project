@@ -9,37 +9,37 @@ import com.cloudia.backend.CM_90_1051.model.SearchRequestDto;
 
 public interface CM901051Service {
     /**
-     * 주문 전체 리스트 조회
+     * 注文全件一覧取得
      * 
-     * @return 주문 전체 리스트
+     * @return 注文全件一覧
      */
     List<OrderDto> findByAllOrders();
 
     /**
-     * 특정 주문 리스트 조회
+     * 条件指定注文一覧取得
      * 
-     * @return 특정 주문 리스트
+     * @return 注文一覧
      */
     List<OrderDto> getFindOrders(SearchRequestDto searchRequest);
 
     /**
-     * 특정 주문 상세 리스트 조회
+     * 注文詳細一覧取得
      * 
-     * @return 특정 주문 상세 리스트
+     * @return 注文詳細一覧
      */
     List<OrderDetailDto> getFindOrderDetail(SearchRequestDto searchRequest);
 
     /**
-     * 정산 상태 업데이트
+     * 精算ステータス更新
      * 
-     * @return 성공 여부
+     * @return 更新結果
      */
     Integer uptStatus(SearchRequestDto searchRequest, String userId);
 
     /**
-     * 배송지 정보
+     * 配送先情報取得
      * 
-     * @return 배송지 정보
+     * @return 配送先情報
      */
     AddressDto getAddress(SearchRequestDto searchRequest);
 }

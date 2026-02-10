@@ -38,7 +38,7 @@ export default function CM_90_1054() {
   const [chartData1, setChartData1] = useState([]);
   const [chartData2, setChartData2] = useState([]);
 
-  // 초기 월 설정
+  // 初期月設定
   useEffect(() => {
     const now = new Date();
 
@@ -54,10 +54,10 @@ export default function CM_90_1054() {
     setEndMonth(end);
   }, []);
 
-  // 데이터 가져오기 함수
+  // データ取得関数
   const fetchData = useCallback(async () => {
     if (!startMonth || !endMonth) {
-      open('error', '시작 월과 종료 월을 모두 선택해주세요.');
+      open('error', '開始月と終了月を両方選択してください。');
       return;
     }
 
@@ -91,18 +91,18 @@ export default function CM_90_1054() {
       close('loading');
     } catch (error) {
       close('loading');
-      open('error', '데이터를 불러오는데 실패했습니다.');
+      open('error', 'データの読み込みに失敗しました。');
     }
   }, [startMonth, endMonth, open, close]);
 
-  // 초기 로딩 시 한번만 데이터 가져오기
+  // 初期ロード時に一度だけデータ取得
   useEffect(() => {
     if (startMonth && endMonth) {
       fetchData();
     }
   }, []);
 
-  // 첫 번째 차트 데이터
+  // 1つ目のチャートデータ
   const chart1Data = useMemo(
     () => ({
       labels: chartData1.map((item) => item.label),
@@ -119,7 +119,7 @@ export default function CM_90_1054() {
     [chartData1]
   );
 
-  // 두 번째 차트 데이터
+  // 2つ目のチャートデータ
   const chart2Data = useMemo(
     () => ({
       labels: chartData2.map((item) => item.label),
@@ -154,14 +154,14 @@ export default function CM_90_1054() {
         beginAtZero: true,
         title: {
           display: true,
-          text: '금액(원)',
+          text: '金額（円）',
         },
         grid: { display: true, color: 'rgba(0, 0, 0, 0.05)' },
       },
       x: {
         title: {
           display: true,
-          text: '월',
+          text: '月',
         },
         grid: { display: false },
       },
@@ -171,14 +171,14 @@ export default function CM_90_1054() {
   return (
     <div className="d-flex flex-grow-1 bg-light">
       <div className="content-wrapper p-4 w-100">
-        <h5 className="border-bottom pb-2 mb-4">매출 정보(차트)</h5>
+        <h2 className="border-bottom pb-2 mb-4">売上情報（チャート）</h2>
 
-        {/* 월 범위 선택 */}
+        {/* 月範囲選択 */}
         <div className="row mb-4 align-items-center">
           <div className="col-md-6">
             <div className="d-flex align-items-end gap-2">
               <div style={{ width: '180px' }}>
-                <label className="form-label small mb-1">시작월</label>
+                <label className="form-label small mb-1">開始月</label>
                 <input
                   type="month"
                   className="form-control"
@@ -190,7 +190,7 @@ export default function CM_90_1054() {
                 <span>~</span>
               </div>
               <div style={{ width: '180px' }}>
-                <label className="form-label small mb-1">종료월</label>
+                <label className="form-label small mb-1">終了月</label>
                 <input
                   type="month"
                   className="form-control"
@@ -205,27 +205,27 @@ export default function CM_90_1054() {
                   onClick={fetchData}
                   disabled={!startMonth || !endMonth}
                 >
-                  검색
+                  検索
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 첫 번째 막대 그래프 */}
+        {/* 1つ目の棒グラフ */}
         <div className="card shadow-sm mb-4">
           <div className="card-body">
-            <h6 className="card-title mb-3">매출</h6>
+            <h6 className="card-title mb-3">売上</h6>
             <div style={{ height: '400px' }}>
               <Bar data={chart1Data} options={barChartOptions} />
             </div>
           </div>
         </div>
 
-        {/* 두 번째 막대 그래프 */}
+        {/* 2つ目の棒グラフ */}
         <div className="card shadow-sm mb-4">
           <div className="card-body">
-            <h6 className="card-title mb-3">순이익</h6>
+            <h6 className="card-title mb-3">純利益</h6>
             <div style={{ height: '400px' }}>
               <Bar data={chart2Data} options={barChartOptions} />
             </div>

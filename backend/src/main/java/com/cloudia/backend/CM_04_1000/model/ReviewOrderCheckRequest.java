@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 주문 세부 정보를 확인하기 위한 데이터 전송 객체
- * 회원 번호, 주문 번호 및 제품 ID 정보가 포함
+ * 注文詳細情報を確認するためのデータ転送
  */
 @Getter
 @Setter
@@ -16,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class ReviewOrderCheckRequest {
-    private String memberNumber; // 회원 번호
-    private String orderNumber;  // 주문번호 (varchar)
-    private Long productId;    // 상품 ID (varchar)
+    private String memberNumber;    // 会員番号
+    private String orderNumber;     // 注文番号
+    private Long productId;         // 商品ID
 }

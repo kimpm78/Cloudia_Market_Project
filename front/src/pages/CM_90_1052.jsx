@@ -10,12 +10,12 @@ import CM_90_1052_ReturnRequestModal from '../components/CM_90_1052_ReturnReques
 import CM_90_1052_DeliveryTrackingModal from '../components/CM_90_1052_DeliveryTrackingModal';
 
 const EXCHANGE_STATUS = [
-  { value: 2, label: '교환 처리중' },
-  { value: 3, label: '교환 완료' },
+  { value: 2, label: '交換対応中' },
+  { value: 3, label: '交換完了' },
 ];
 const REFUND_STATUS = [
-  { value: 4, label: '환불 처리중' },
-  { value: 5, label: '환불 완료' },
+  { value: 4, label: '返金対応中' },
+  { value: 5, label: '返金完了' },
 ];
 
 const formatDate = (dateString) => {
@@ -136,7 +136,7 @@ export default function CM_90_1052() {
       //   axiosInstance.post('/admin/settlement/refund/updateStatus', updateRequestDto)
       // );
 
-      // 성공 시 목록 새로고침
+      // 成功時に一覧を再読み込み
       await fetchAllProducts();
     },
     [apiHandler]
@@ -146,7 +146,7 @@ export default function CM_90_1052() {
     async (deliveryInfo) => {
       try {
         await handleStatusUpdate(selectedOrder, deliveryInfo);
-        open('info', '상태가 업데이트되었습니다.');
+        open('info', 'ステータスを更新しました。');
         setShowDeliveryTrackingModal(false);
         setSelectedOrder(null);
         setPreviousStatusValue(null);
@@ -169,7 +169,7 @@ export default function CM_90_1052() {
       const newValue = parseInt(e.target.value);
       const oldValue = params.value;
 
-      // 교환 완료(3) 또는 환불 완료(5)인 경우 배송조회 모달 표시
+      // 交換完了(3) または返金完了(5)の場合は配送追跡モーダルを表示
       if (newValue === 3 || newValue === 5) {
         setPreviousStatusValue(oldValue);
         params.node.setDataValue(params.colDef.field, newValue);
@@ -178,30 +178,30 @@ export default function CM_90_1052() {
         setShowDeliveryTrackingModal(true);
         return;
       } else {
-        // 그 외의 경우 바로 업데이트
+        // それ以外は即時更新
         params.node.setDataValue(params.colDef.field, newValue);
         const updatedOrderData = { ...params.data, returnStatusValue: newValue };
         try {
           await handleStatusUpdate(updatedOrderData);
-          open('info', '상태가 업데이트되었습니다.');
+          open('info', 'ステータスを更新しました。');
         } catch (error) {
-          // 에러 시 원래 값으로 복구
+          // エラー時は元の値に復元
           params.node.setDataValue(params.colDef.field, oldValue);
         }
       }
     };
 
-    // returnStatusValue에 따라 표시할 옵션 결정
+    // returnStatusValue に応じて表示するオプションを決定
     const getStatusOptions = (statusValue) => {
-      // 교환 상태
+      // 交換ステータス
       if ([2, 3].includes(statusValue)) {
         return EXCHANGE_STATUS;
       }
-      // 환불 상태
+      // 返金ステータス
       if ([4, 5].includes(statusValue)) {
         return REFUND_STATUS;
       }
-      // 기본값 (환불)
+      // デフォルト（返金）
       return REFUND_STATUS;
     };
 
@@ -241,28 +241,28 @@ export default function CM_90_1052() {
   const columnDefs = useMemo(
     () => [
       {
-        headerName: '요청 번호',
+        headerName: '申請番号',
         field: 'orderNo',
         minWidth: 100,
         maxWidth: 120,
         flex: 1,
       },
       {
-        headerName: '요청일',
+        headerName: '申請日',
         field: 'requestedAt',
         minWidth: 100,
         flex: 1,
         valueFormatter: (params) => formatDate(params.value),
       },
       {
-        headerName: '구매자 ID',
+        headerName: '購入者ID',
         field: 'customerId',
         minWidth: 100,
         maxWidth: 150,
         flex: 1,
       },
       {
-        headerName: '구매 번호',
+        headerName: '購入番号',
         field: 'orderNumber',
         minWidth: 100,
         maxWidth: 120,
@@ -278,7 +278,7 @@ export default function CM_90_1052() {
         ),
       },
       {
-        headerName: '환불 금액',
+        headerName: '返金金額',
         field: 'refundAmount',
         minWidth: 100,
         flex: 1,
@@ -287,7 +287,7 @@ export default function CM_90_1052() {
         },
       },
       {
-        headerName: '배송 금액(고객 부담)',
+        headerName: '送料（顧客負担）',
         field: 'shippingFeeCustomerAmount',
         minWidth: 100,
         flex: 1,
@@ -296,7 +296,7 @@ export default function CM_90_1052() {
         },
       },
       {
-        headerName: '배송 금액(매장 부담)',
+        headerName: '送料（店舗負担）',
         field: 'shippingFeeSellerAmount',
         minWidth: 100,
         flex: 1,
@@ -305,7 +305,7 @@ export default function CM_90_1052() {
         },
       },
       {
-        headerName: '환불 총 금액',
+        headerName: '返金合計金額',
         field: 'totalAmount',
         minWidth: 100,
         flex: 1,
@@ -314,14 +314,14 @@ export default function CM_90_1052() {
         },
       },
       {
-        headerName: '환불일',
+        headerName: '返金日',
         field: 'completedAt',
         minWidth: 100,
         flex: 1,
         valueFormatter: (params) => formatDate(params.value),
       },
       {
-        headerName: '상태',
+        headerName: 'ステータス',
         field: 'returnStatusValue',
         minWidth: 120,
         maxWidth: 180,
@@ -347,7 +347,7 @@ export default function CM_90_1052() {
         setRowData(resultList.data.resultList);
       }
     } catch (error) {
-      console.error('데이터 조회 실패:', error);
+      console.error('データ取得に失敗しました:', error);
     } finally {
       setLoading(false);
     }
@@ -377,17 +377,17 @@ export default function CM_90_1052() {
     const hasDateTo = dateTo && dateTo.trim() !== '';
 
     if (!hasDateFrom && !hasDateTo) {
-      open('error', CMMessage.MSG_ERR_002('날짜'));
+      open('error', CMMessage.MSG_ERR_002('日付'));
       setLoading(false);
       return;
     }
 
     if (hasDateFrom && !hasDateTo) {
-      open('error', CMMessage.MSG_ERR_002('시작 날짜'));
+      open('error', CMMessage.MSG_ERR_002('開始日'));
       setLoading(false);
       return;
     } else if (!hasDateFrom && hasDateTo) {
-      open('error', CMMessage.MSG_ERR_002('종료 날짜'));
+      open('error', CMMessage.MSG_ERR_002('終了日'));
       setLoading(false);
       return;
     } else if (hasDateFrom && hasDateTo) {
@@ -437,12 +437,12 @@ export default function CM_90_1052() {
         open('loading');
         await axiosInstance.post('/admin/settlement/refund/process', refundData);
         close('loading');
-        open('info', '환불 처리가 완료되었습니다.');
+        open('info', '返金処理が完了しました。');
         setShowRefundModal(false);
         fetchAllProducts();
       } catch (error) {
         close('loading');
-        open('error', '환불 처리 중 오류가 발생했습니다.');
+        open('error', '返金処理中にエラーが発生しました。');
       }
     },
     [open, close, fetchAllProducts]
@@ -508,7 +508,7 @@ export default function CM_90_1052() {
   return (
     <div className="d-flex">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">환불/교환 관리</h5>
+        <h2 className="border-bottom pb-2 mb-3">返金状態確認</h2>
 
         <div className="row mb-3">
           <div className="col-12">
@@ -516,31 +516,31 @@ export default function CM_90_1052() {
               <div className="card-body">
                 <div className="row g-3 align-items-end">
                   <div className="col-12 col-md-4">
-                    <label className="form-label fw-semibold">조회기간</label>
-                    <div className="d-flex flex-wrap align-items-center">
+                    <label className="form-label fw-semibold">対象期間</label>
+                    <div className="d-flex flex-nowrap align-items-center gap-2">
                       <select
-                        className="form-select me-2 mb-2 mb-md-0"
-                        style={{ width: '120px' }}
+                        className="form-select"
+                        style={{ width: '140px' }}
                         onChange={(e) => handlePeriodSelect(e.target.value)}
                       >
-                        <option value="">기간 선택</option>
-                        <option value="week">최근 1주</option>
-                        <option value="month">최근 1개월</option>
-                        <option value="3months">최근 3개월</option>
+                        <option value="">期間を選択</option>
+                        <option value="week">直近1週間</option>
+                        <option value="month">直近1か月</option>
+                        <option value="3months">直近3か月</option>
                       </select>
                       <input
                         type="date"
-                        className="form-control me-2 mb-2 mb-md-0"
-                        style={{ width: '150px' }}
+                        className="form-control"
+                        style={{ width: '130px' }}
                         value={dateFrom}
                         onChange={(e) => setDateFrom(e.target.value)}
                         onKeyDown={handleKeyDown}
                       />
-                      <span className="me-2">~</span>
+                      <span>~</span>
                       <input
                         type="date"
                         className="form-control"
-                        style={{ width: '150px' }}
+                        style={{ width: '130px' }}
                         value={dateTo}
                         onChange={(e) => setDateTo(e.target.value)}
                         onKeyDown={handleKeyDown}
@@ -555,14 +555,14 @@ export default function CM_90_1052() {
                         onClick={handleSearch}
                         disabled={loading}
                       >
-                        검색
+                        検索
                       </button>
                       <button
                         className="btn btn-primary flex-fill"
                         onClick={handleRefundClick}
                         disabled={loading}
                       >
-                        환불 하기
+                        返金実行
                       </button>
                     </div>
                   </div>

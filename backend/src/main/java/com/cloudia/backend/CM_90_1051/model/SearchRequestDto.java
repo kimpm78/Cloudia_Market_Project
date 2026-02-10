@@ -14,12 +14,12 @@ import lombok.ToString;
 @Builder
 @ToString
 public class SearchRequestDto {
-    private String dateFrom; // 시작일
-    private String dateTo; // 종료일
-    private int paymentMethod;// 결제수단
-    private String memberNumber;// 사원ID
-    private String orderNumber;// 주문ID
-    private int orderStatusValue;// 상태
-    private String carrier; // 배송 회사
-    private String trackingNumber; // 배송 조회 번호
+    private String dateFrom;        // 開始日
+    private String dateTo;          // 終了日
+    private int paymentMethod;      // 支払方法
+    private String memberNumber;    // 会員ID
+    private String orderNumber;     // 注文ID
+    private int orderStatusValue;   // ステータス
+    private String carrier;         // 配送会社
+    private String trackingNumber;  // 追跡番号
 }

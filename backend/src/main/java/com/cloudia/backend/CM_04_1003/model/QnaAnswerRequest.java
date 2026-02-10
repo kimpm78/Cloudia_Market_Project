@@ -13,7 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QnaAnswerRequest {
-
-    @NotBlank(message = "답변 내용을 입력해주세요.")
+    @NotBlank(message = "回答内容を入力してください。")
     private String answerContent;
 }

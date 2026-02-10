@@ -21,10 +21,10 @@ export const isReservationProduct = (item) => {
 };
 
 const PAGE_FILTERS = {
-  신상품: () => true,
-  '예약 상품': isReservationProduct,
-  캐릭터: (item) => hasCategoryGroup(item, '캐릭터'),
-  장르: (item) => hasCategoryGroup(item, '장르'),
+  新商品: () => true,
+  '予約商品': isReservationProduct,
+  キャラクター: (item) => hasCategoryGroup(item, 'キャラクター'),
+  ジャンル: (item) => hasCategoryGroup(item, 'ジャンル'),
 };
 
 export const filterItemsForPage = (items, pageName) => {

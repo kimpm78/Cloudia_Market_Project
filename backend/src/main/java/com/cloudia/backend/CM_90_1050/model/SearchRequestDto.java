@@ -14,6 +14,6 @@ import lombok.ToString;
 @Builder
 @ToString
 public class SearchRequestDto {
-    private String dateFrom; // 시작일
-    private String dateTo; // 종료일
+    private String dateFrom; // 開始日
+    private String dateTo;   // 終了日
 }

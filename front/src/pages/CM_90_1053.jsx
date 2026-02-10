@@ -8,31 +8,31 @@ export default function CM_90_1053() {
   const [rowData, setRowData] = useState([]);
   const columnDefs = [
     {
-      headerName: '상품 코드',
+      headerName: '商品コード',
       field: 'productCode',
       minWidth: 100,
       maxWidth: 120,
       flex: 1,
     },
     {
-      headerName: '상품명',
+      headerName: '商品名',
       field: 'productName',
       minWidth: 300,
       flex: 2,
     },
     {
-      headerName: '상품 분류',
+      headerName: '商品区分',
       field: 'productCategory',
       minWidth: 100,
       flex: 1,
       valueFormatter: (params) => {
         const value = params.value;
-        if (value === 1) return '상시 판매';
-        else return '예약 판매';
+        if (value === 1) return '通常販売';
+        else return '予約販売';
       },
     },
     {
-      headerName: '재고',
+      headerName: '在庫',
       field: 'totalQty',
       minWidth: 80,
       maxWidth: 100,
@@ -48,41 +48,41 @@ export default function CM_90_1053() {
       },
     },
     {
-      headerName: '장바구니',
+      headerName: 'カート',
       field: 'cartQty',
       minWidth: 120,
       maxWidth: 180,
       flex: 1,
     },
     {
-      headerName: '불량',
+      headerName: '不良',
       field: 'defectiveQty',
       minWidth: 120,
       maxWidth: 180,
       flex: 1,
     },
     {
-      headerName: '가용 재고',
+      headerName: '利用可能在庫',
       field: 'availableQty',
       minWidth: 120,
       maxWidth: 180,
       flex: 1,
     },
     {
-      headerName: '상태',
+      headerName: 'ステータス',
       field: 'saleStatus',
       minWidth: 120,
       maxWidth: 180,
       flex: 1,
       valueFormatter: (params) => {
         const value = params.value;
-        if (value === 1) return '품절';
-        if (value === 2) return '판매가능';
-        else return '판매중';
+        if (value === 1) return '売り切れ';
+        if (value === 2) return '販売可能';
+        else return '販売中';
       },
     },
     {
-      headerName: '등록일',
+      headerName: '登録日',
       field: 'createdAt',
       minWidth: 120,
       maxWidth: 180,
@@ -99,7 +99,7 @@ export default function CM_90_1053() {
       },
     },
     {
-      headerName: '등록자',
+      headerName: '登録者',
       field: 'createdBy',
       minWidth: 120,
       maxWidth: 180,
@@ -133,7 +133,7 @@ export default function CM_90_1053() {
   return (
     <div className="d-flex">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">재고 상태 확인</h5>
+        <h2 className="border-bottom pb-2 mb-3">在庫状態確認</h2>
         <div className="row mb-3">
           <div className="col-12">
             <div className="d-flex align-items-center w-100">
@@ -143,30 +143,30 @@ export default function CM_90_1053() {
                   value={searchType}
                   onChange={(e) => setSearchType(e.target.value)}
                 >
-                  <option value="1">상품 코드</option>
-                  <option value="2">상품 명</option>
+                  <option value="1">商品コード</option>
+                  <option value="2">商品名</option>
                 </select>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="상품코드 / 상품명을 입력하세요"
+                  placeholder="商品コード／商品名を入力してください"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
               </div>
               <button className="btn btn-primary me-2 btn-min-width" onClick={handleSearch}>
-                검색
+                検索
               </button>
               <div className="small mt-2 mt-md-0 ms-auto">
                 <div>
-                  <strong>품절</strong>: 가용 재고 0
+                  <strong>売り切れ</strong>: 利用可能在庫 0
                 </div>
                 <div>
-                  <strong>판매가능</strong>: 재고 등록 & 상품 미등록
+                  <strong>販売可能</strong>: 在庫登録済み & 商品未登録
                 </div>
                 <div>
-                  <strong>판매중</strong>: 재고 등록 & 상품 등록
+                  <strong>販売中</strong>: 在庫登録済み & 商品登録済み
                 </div>
               </div>
             </div>

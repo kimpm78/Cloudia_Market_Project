@@ -10,58 +10,58 @@ import com.cloudia.backend.CM_90_1065.model.ProductCodeDto;
 @Mapper
 public interface CM901065Mapper {
     /**
-     * 상품 코드 조회
+     * 商品コード取得
      * 
-     * @return 상품코드 리스트
+     * @return 商品コード一覧
      */
     List<ProductCodeDto> getProductCode();
 
     /**
-     * 상품 코드 조회
+     * 商品コード検索
      * 
-     * @param searchTerm 키워드
-     * @param searchType 타입 (1:상품 코드, 2:상품명)
-     * @return 유저 리스트
+     * @param searchTerm キーワード
+     * @param searchType 種別（1:商品コード、2:商品名）
+     * @return 商品コード一覧
      */
     List<ProductCodeDto> findByProductCode(@Param("searchTerm") String searchTerm, @Param("searchType") int searchType);
 
     /**
-     * 상품 코드 조회
+     * 商品コード取得（単件）
      * 
-     * @param searchTerm 키워드
-     * @param searchType 타입 (1:상품 코드, 2:상품명)
-     * @return 유저 리스트
+     * @param searchTerm キーワード
+     * @param searchType 種別（1:商品コード、2:商品名）
+     * @return 商品コード
      */
     ProductCodeDto findByOneCode(@Param("searchTerm") String searchTerm, @Param("searchType") int searchType,
             @Param("category") String category);
 
     /**
-     * 상품 코드 등록
+     * 商品コード登録
      * 
-     * @param entity 상품 코드 정보
+     * @param entity 商品コード情報
      */
     Integer insCode(ProductCodeDto entity);
 
     /**
-     * 상품 코드 삭제
+     * 商品コード更新
      * 
-     * @param res 상품 코드 정보
+     * @param entity 商品コード情報
      */
     Integer uptCode(ProductCodeDto entity);
 
     /**
-     * 재고 조회
+     * 在庫取得
      * 
-     * @param searchTerm 키워드
-     * @return 유저 리스트
+     * @param searchTerm キーワード
+     * @return 在庫情報
      */
     ProductCodeDto findByOneStock(@Param("searchTerm") String searchTerm);
 
     /**
-     * 상품 조회
+     * 商品取得
      * 
-     * @param searchTerm 키워드
-     * @return 유저 리스트
+     * @param searchTerm キーワード
+     * @return 商品情報
      */
     ProductCodeDto findByOneProduct(@Param("searchTerm") String searchTerm);
 }

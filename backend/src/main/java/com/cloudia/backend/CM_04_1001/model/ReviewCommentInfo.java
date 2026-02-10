@@ -10,9 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 
-/**
- * 리뷰 댓글 정보 (comments 테이블 기반)
- */
 @Getter
 @Setter
 @Builder
@@ -20,16 +17,16 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class ReviewCommentInfo {
-    private Long commentId;     // 댓글 ID
-    private Long reviewId;      // 부모 리뷰 ID
-    private Long userId;        // 댓글 작성자 ID
-    private Long parentCommentId; // 부모 댓글 ID (null이면 최상위 댓글)
-    private String content;     // 댓글 본문
-    private Integer deleteFlag;   // 삭제 여부 (0: 정상, 1: 삭제)
-    private String createdBy;   // 등록자
-    private String createdAt;   // 등록일
-    private String updatedBy;   // 수정자
-    private String updatedAt;   // 수정일
+    private Long commentId;         // コメントID
+    private Long reviewId;          // 親レビューID
+    private Long userId;            // コメント作成者ID
+    private Long parentCommentId;   // 親コメントID（nullの場合は最上位コメント）
+    private String content;         // コメント本文
+    private Integer deleteFlag;     // 削除フラグ（0: 有効、1: 削除）
+    private String createdBy;       // 登録者
+    private String createdAt;       // 登録日
+    private String updatedBy;       // 更新者
+    private String updatedAt;       // 更新日
     @Builder.Default
-    private List<ReviewCommentInfo> children = new ArrayList<>(); // 대댓글 목록
+    private List<ReviewCommentInfo> children = new ArrayList<>(); // 返信コメント一覧
 }

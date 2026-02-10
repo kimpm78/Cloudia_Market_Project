@@ -14,7 +14,7 @@ import lombok.ToString;
 @Builder
 @ToString
 public class ResponseModel<T> {
-    private boolean result;// 처리 결과
-    private String message; // 메시지
-    private T resultList; // 결과
+    private boolean result;   // 処理結果
+    private String message;   // メッセージ
+    private T resultList;     // 結果
 }

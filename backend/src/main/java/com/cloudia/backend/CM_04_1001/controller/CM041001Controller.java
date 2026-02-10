@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +20,7 @@ import com.cloudia.backend.CM_04_1001.service.CM041001Service;
 
 import com.cloudia.backend.CM_04_1001.model.ReviewCommentRequest;
 import com.cloudia.backend.CM_04_1001.model.ReviewCommentInfo;
-import com.cloudia.backend.CM_04_1001.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/guest")
-@CrossOrigin(origins = "*")
 public class CM041001Controller {
 
     private final CM041001Service cm041001Service;
 
     /**
-     * 특정 리뷰에 대한 댓글 목록 조회
+     * 特定レビューのコメント一覧取得
      */
     @GetMapping("/reviews/{reviewId}/comments")
     public ResponseEntity<ResponseModel<List<ReviewCommentInfo>>> getReviewComments(@PathVariable Long reviewId) {
@@ -49,23 +47,19 @@ public class CM041001Controller {
     }
 
     /**
-     * 리뷰 댓글 등록
-     * 변경: 
-     * - 유효성 검사 중복 코드 제거를 위해 handleValidationErrors() 헬퍼 메서드 사용
-     * - 반환 타입을 ResponseEntity<ResponseModel<Long>>로 변경하여 생성된 댓글 ID 반환
-     * - 서비스 호출에서 parentId 파라미터 제거 (서비스에서 변경됨을 가정)
+     * レビューコメント登録
      */
     @PostMapping("/reviews/{reviewId}/comments")
     public ResponseEntity<ResponseModel<Long>> createReviewComment(@PathVariable Long reviewId,
             @RequestBody @Valid ReviewCommentRequest commentRequest,
             BindingResult bindingResult) {
-        // 유효성 검사 에러 처리 헬퍼 사용
+        // バリデーションエラー処理ヘルパーを使用
         ResponseEntity<ResponseModel<Long>> errorResponse = handleValidationErrors(bindingResult);
         if (errorResponse != null) {
             return errorResponse;
         }
         commentRequest.setReviewId(reviewId);
-        // 서비스는 생성된 댓글의 ID(Long)를 반환해야 함
+        // サービスは作成されたコメントのID(Long)を返却する必要がある
         Long createdId = cm041001Service.saveComment(commentRequest);
         if (createdId != null && createdId == -3L) {
             return ResponseEntity.badRequest()
@@ -82,25 +76,21 @@ public class CM041001Controller {
     }
 
     /**
-     * 대댓글 등록
-     * 변경:
-     * - 유효성 검사 중복 코드 제거를 위해 handleValidationErrors() 헬퍼 메서드 사용
-     * - 반환 타입을 ResponseEntity<ResponseModel<Long>>로 변경하여 생성된 대댓글 ID 반환
-     * - 서비스 호출에서 parentId 파라미터 제거 (서비스에서 변경됨을 가정)
+     * 返信コメント登録
      */
     @PostMapping("/reviews/{reviewId}/comments/{parentId}/replies")
     public ResponseEntity<ResponseModel<Long>> createReplyComment(@PathVariable Long reviewId,
         @PathVariable Long parentId,
         @RequestBody @Valid ReviewCommentRequest replyRequest,
         BindingResult bindingResult) {
-        // 유효성 검사 에러 처리 헬퍼 사용
+        // バリデーションエラー処理ヘルパーを使用
         ResponseEntity<ResponseModel<Long>> errorResponse = handleValidationErrors(bindingResult);
         if (errorResponse != null) {
             return errorResponse;
         }
         replyRequest.setReviewId(reviewId);
         replyRequest.setParentCommentId(parentId);
-        // 서비스는 생성된 대댓글의 ID(Long)를 반환해야 함
+        // サービスは作成された返信コメントのID(Long)を返却する必要がある
         Long createdId = cm041001Service.saveComment(replyRequest);
         if (createdId != null && createdId == -3L) {
             return ResponseEntity.badRequest()
@@ -117,8 +107,7 @@ public class CM041001Controller {
         return ResponseEntity.ok(setResponseDto(createdId, true, CM041001MessageConstant.REPLY_CREATE_SUCCESS));
     }
     /**
-     * BindingResult 에러를 처리하여 ResponseEntity 반환하는 헬퍼 메서드
-     * (유효성 검사 코드 중복 제거)
+     * BindingResultのエラーを処理してResponseEntityを返すヘルパー
      */
     private ResponseEntity<ResponseModel<Long>> handleValidationErrors(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -132,7 +121,7 @@ public class CM041001Controller {
     }
 
     /**
-     * 댓글 수정 (본인만 가능)
+     * コメント更新（本人のみ）
      */
     @PutMapping("/reviews/{reviewId}/comments/{commentId}")
     public ResponseEntity<ResponseModel<Void>> updateReviewComment(
@@ -141,7 +130,7 @@ public class CM041001Controller {
             @RequestBody @Valid ReviewCommentRequest updateRequest,
             BindingResult bindingResult) {
         
-        // 유효성 검사
+        // バリデーション
         ResponseEntity<ResponseModel<Long>> errorResponse = handleValidationErrors(bindingResult);
         if (errorResponse != null) {
             return ResponseEntity.badRequest()
@@ -168,7 +157,7 @@ public class CM041001Controller {
     }
 
     /**
-     * 댓글 삭제 (본인만 가능, 소프트 딜리트)
+     * コメント削除（本人のみ、ソフトデリート）
      */
     @DeleteMapping("/reviews/{reviewId}/comments/{commentId}")
     public ResponseEntity<ResponseModel<Void>> deleteReviewComment(
@@ -193,12 +182,12 @@ public class CM041001Controller {
     }
 
     /**
-     * 공통 응답 포맷 설정
+     * 共通レスポンスフォーマット設定
      *
-     * @param resultList 결과 데이터
-     * @param ret        성공 여부
-     * @param msg        메시지
-     * @return 공통 응답 모델
+     * @param resultList 結果データ
+     * @param ret        成功可否
+     * @param msg        メッセージ
+     * @return 共通レスポンスモデル
      */
     private <T> ResponseModel<T> setResponseDto(T resultList, boolean ret, String msg) {
         return ResponseModel.<T>builder()

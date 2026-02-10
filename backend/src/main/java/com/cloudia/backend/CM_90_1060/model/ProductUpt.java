@@ -16,19 +16,19 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductUpt {
-    private String category;// 카테고리
-    private String productCode;// 상품 코드
-    private String productCategory; // 상품 분류
-    private String productName;// 상품 명
-    private int productPrice;// 상품 가격
-    private int deliveryPrice;// 배송비
-    private String purchasePrice;// 사입가
-    private int purchaseLimit; // 구매 수량
-    private String expectedDeliveryDate;// 출고 예정일
-    private String reservationDeadline; // 예약 마감일
-    private String productFile;// 상품 이미지
-    private List<String> detailImages; // 상세 이미지
-    private String productnote;// 상품 설명
-    private Double weight;// 중량
-    private int availableQty; // 가용 재고
+    private String category;                // カテゴリ
+    private String productCode;             // 商品コード
+    private String productCategory;         // 商品区分
+    private String productName;             // 商品名
+    private int productPrice;               // 商品価格
+    private int deliveryPrice;              // 配送料
+    private String purchasePrice;           // 仕入価格
+    private int purchaseLimit;              // 購入数量
+    private String expectedDeliveryDate;    // 出荷予定日
+    private String reservationDeadline;     // 予約締切日
+    private String productFile;             // 商品画像
+    private List<String> detailImages;      // 詳細画像
+    private String productnote;             // 商品説明
+    private Double weight;                  // 重量
+    private int availableQty;               // 利用可能在庫
 }

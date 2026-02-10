@@ -22,7 +22,7 @@ public class CM011003Controller {
     private final CM011003Service CM011003Service;
 
     /**
-     * 비밀번호 재설정 인증 코드 발송
+     * パスワード再設定用の認証コード送信
      */
     @PostMapping("/reset-password/send-code")
     public ResponseEntity<ResponseModel<Map<String, Object>>> sendCode(@RequestBody ResetPasswordRequest request) {
@@ -36,7 +36,7 @@ public class CM011003Controller {
     }
 
     /**
-     * 비밀번호 재설정 인증 코드 검증
+     * パスワード再設定用の認証コード検証
      */
     @PostMapping("/reset-password/verify")
     public ResponseEntity<ResponseModel<Map<String, Object>>> verifyCode(@RequestBody Map<String, String> request) {
@@ -51,7 +51,7 @@ public class CM011003Controller {
     }
 
     /**
-     * 비밀번호 변경 실행
+     * パスワード再設定実行
      */
     @PostMapping("/reset-password")
     public ResponseEntity<ResponseModel<Map<String, String>>> resetPassword(

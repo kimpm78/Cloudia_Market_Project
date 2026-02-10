@@ -30,21 +30,20 @@ export default function CookieBanner() {
     <>
       <div className="cookie-banner fixed-bottom">
         <div className="cookie-banner_text">
-          당사 웹사이트는 쿠키를 사용하여 장바구니 기능과 맞춤형 서비스를 제공합니다. 계속 이용 시
-          쿠키 사용에 동의하신 것으로 간주됩니다.{' '}
+          当社ウェブサイトは、クッキーを使用してカート機能およびパーソナライズされたサービスを提供します。引き続きご利用いただくことで、クッキーの使用に同意したものとみなされます。{' '}
           <a href="/cookie" className="text-primary text-decoration-none fw-semibold ms-1">
-            자세히 보기
+            詳細を見る
           </a>
         </div>
         <div className="cookie-banner_actions">
           <button className="btn btn-outline-primary btn-sm" onClick={() => setShowModal(true)}>
-            쿠키 설정
+            クッキー設定
           </button>
           <button className="btn btn-outline-secondary btn-sm" onClick={handleDecline}>
-            모두 거절
+            すべて拒否
           </button>
           <button className="btn btn-primary btn-sm" onClick={handleAccept}>
-            승인
+            同意
           </button>
         </div>
       </div>

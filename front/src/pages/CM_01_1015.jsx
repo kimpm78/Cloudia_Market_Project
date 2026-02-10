@@ -7,9 +7,9 @@ import CM_SearchBar from '../components/CM_99_1012_searchBar';
 import CM_Pagination from '../components/CM_99_1013_pagination';
 
 const SEARCH_OPTIONS = [
-  { value: 'all', name: '전체' },
-  { value: 'orderNo', name: '주문번호' },
-  { value: 'productName', name: '상품명' },
+  { value: 'all', name: '全体' },
+  { value: 'orderNo', name: '注文番号' },
+  { value: 'productName', name: '商品名' },
 ];
 
 const dateFormatter = (params) => {
@@ -55,10 +55,10 @@ export default function CM_01_1015() {
     setLoading(true);
     try {
       const data = await getRequest('/user/returns');
-      console.log('서버 응답 데이터:', data);
+      console.log('サーバー応答データ:', data);
       setReturns(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('조회 실패:', error);
+      console.error('取得失敗:', error);
       setReturns([]);
     } finally {
       setLoading(false);
@@ -93,36 +93,36 @@ export default function CM_01_1015() {
   // --- [디자인] 1006 스타일의 컬럼 정의 ---
   const columnDefs = [
     {
-      headerName: '처리상태',
+      headerName: '処理状態',
       field: 'returnStatusName',
       width: 120,
       cellRenderer: (params) => {
         const isComplete = params.value?.includes('완료');
         return (
           <span className={`fw-bold ${isComplete ? 'text-primary' : 'text-danger'}`}>
-            {params.value || '처리중'}
+            {params.value || '処理中'}
           </span>
         );
       },
     },
     {
-      headerName: '주문번호',
+      headerName: '注文番号',
       field: 'orderNo',
       width: 160,
     },
     {
-      headerName: '상품명',
+      headerName: '商品名',
       field: 'productName',
       flex: 1,
     },
     {
-      headerName: '신청일',
+      headerName: '申請日',
       field: 'requestedAt',
       width: 150,
       valueFormatter: dateFormatter,
     },
     {
-      headerName: '완료일',
+      headerName: '完了日',
       field: 'completedAt',
       width: 150,
       valueFormatter: dateFormatter,
@@ -135,12 +135,12 @@ export default function CM_01_1015() {
   };
 
   return (
-    <div className="return-container mt-2">
+    <div className="container mt-2">
       <div className="d-flex justify-content-between align-items-end pb-4 mb-4 border-bottom">
-        <h3 className="fw-bolder m-0">교환/반품 내역</h3>
+        <h2 className="fw-bolder mt-3">交換・返品履歴</h2>
         <button className="btn btn-primary" onClick={() => navigate('/mypage/returns/write')}>
           <i className="bi bi-pencil-square me-1"></i>
-          신청하기
+          申請する
         </button>
       </div>
 
@@ -152,8 +152,8 @@ export default function CM_01_1015() {
           onRowClicked={(e) => navigate(`/mypage/returns/${e.data.returnId}`)}
           headerHeight={45}
           rowHeight={48}
-          overlayLoadingTemplate={'<span class="loading-message">불러오는 중...</span>'}
-          overlayNoRowsTemplate={'<span class="no-rows">내역이 없습니다.</span>'}
+          overlayLoadingTemplate={'<span class="loading-message">読み込み中...</span>'}
+          overlayNoRowsTemplate={'<span class="no-rows">履歴がありません。</span>'}
           theme="legacy"
         />
       </div>

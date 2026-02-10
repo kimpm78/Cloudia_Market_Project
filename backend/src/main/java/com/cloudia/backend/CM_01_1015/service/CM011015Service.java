@@ -10,27 +10,27 @@ import java.util.Map;
 public interface CM011015Service {
 
     /**
-     * 교환/반품 내역 조회
+     * 交換・返品履歴取得
      */
     ResponseModel<List<ReturnResponse>> getReturnHistory(String loginId);
 
     /**
-     * 교환/반품 신청
+     * 交換・返品申請
      */
     ResponseEntity<ResponseModel<Object>> createReturnRequest(String loginId, ReturnRequest request);
 
     /**
-     * 상세 조회
+     * 詳細取得
      */
     ResponseModel<ReturnResponse> getReturnDetail(String loginId, int returnId);
 
     /**
-     * 주문별 상품 목록 조회
+     * 注文別商品一覧取得
      */
     ResponseEntity<List<ReturnResponse.ProductInfo>> getOrderProducts(String loginId, String orderNo);
 
     /**
-     * 신청 가능한 구매 확정 주문 목록 조회
+     * 申請可能な購入確定注文一覧取得
      */
     ResponseModel<List<Map<String, Object>>> getReturnableOrderList(String loginId);
 }

@@ -19,7 +19,7 @@ import com.cloudia.backend.CM_03_1001.model.CategoryGroupForCheckbox;
 import com.cloudia.backend.CM_03_1001.model.CategoryItem;
 import com.cloudia.backend.CM_03_1001.model.ProductDetails;
 import com.cloudia.backend.CM_03_1001.model.ProductInfo;
-import com.cloudia.backend.CM_03_1001.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_03_1001.service.CM031001Service;
 import com.cloudia.backend.common.util.DateCalculator;
 import com.cloudia.backend.constants.CMMessageConstant;
@@ -54,29 +54,26 @@ public class CM031001ServiceImpl implements CM031001Service {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseModel<List<ProductInfo>>> getProductDetail(Long productId) {
         try {
-            // 1) 기본 상품 정보 (단건)
+            // 基本商品情報（単件）
             ProductInfo info = cm031001Mapper.selectProductDetail(productId);
 
             if (info == null) {
                 log.info(CM031001MessageConstant.PRODUCT_FIND_BY_ID_COMPLETE, productId, 0);
-                // 기존 호환: 빈 리스트 + 성공 메시지
+                // 既存互換：空リスト＋成功メッセージ
                 return ResponseEntity.ok(setResponseDto(Collections.emptyList(), true, CM031001MessageConstant.SUCCESS_PRODUCT_FIND));
             }
 
-            // 2) 상세(썸네일/설명/무게 등) 조회 후, 비었을 때만 주입 (덮어쓰기 방지)
+            // 詳細（サムネイル/説明/重量など）を取得し、空の場合のみ注入（上書き防止）
             ProductDetails details = cm031001Mapper.selectProductDetails(productId);
             if (details != null) {
-                // thumbnailUrl
                 if ((info.getThumbnailUrl() == null || info.getThumbnailUrl().isBlank())
                         && details.getThumbnailUrl() != null && !details.getThumbnailUrl().isBlank()) {
                     info.setThumbnailUrl(details.getThumbnailUrl());
                 }
-                // description
                 if ((info.getDescription() == null || info.getDescription().isBlank())
                         && details.getDescription() != null && !details.getDescription().isBlank()) {
                     info.setDescription(details.getDescription());
                 }
-                // weight
                 if (info.getWeight() == null && details.getWeight() != null) {
                     info.setWeight(details.getWeight());
                 }
@@ -237,10 +234,10 @@ public class CM031001ServiceImpl implements CM031001Service {
                 continue;
             }
 
-            // 예약 마감 여부 (비즈니스 규칙)
+            // 予約締切フラグ（ビジネスルール）
             product.setIsReservationClosed(product.getCodeValue() == 4);
 
-            // 품절 판단
+            // 売り切れ判定
             Integer availableQty = product.getAvailableQty();
             if (product.getCodeValue() == 2 || product.getCodeValue() == 4) {
                 product.setIsSoldOut(true);
@@ -250,7 +247,7 @@ public class CM031001ServiceImpl implements CM031001Service {
                 product.setIsSoldOut(availableQty == null || availableQty <= 0);
             }
 
-            // 상시판매 상품 예상 배송일
+            // 通常販売商品の配送予定日
             if (product.getReservationDeadline() == null || product.getReservationDeadline().isBlank()) {
                 product.setEstimatedDeliveryDate(
                     dateCalculator.convertToYYMMDD(dateCalculator.tokyoTime(), 5)

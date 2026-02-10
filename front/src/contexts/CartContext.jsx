@@ -75,7 +75,7 @@ export const CartProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('카트 수량 동기화 실패:', error?.response?.data || error.message);
+      console.error('カート数量の同期に失敗しました:', error?.response?.data || error.message);
     }
   }, [isLoggedIn, user?.userId, updateCartState]);
 
@@ -120,7 +120,7 @@ export const CartProvider = ({ children }) => {
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error('CartContext Error');
+    throw new Error('CartContext エラー');
   }
   return context;
 };

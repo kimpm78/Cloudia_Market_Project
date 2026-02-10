@@ -16,7 +16,7 @@
             menus
         WHERE 
             menu_code_value = 4
-            AND is_active = 1
+            AND is_display = '1'
         ORDER BY 
             sort_order ASC;
     </select>

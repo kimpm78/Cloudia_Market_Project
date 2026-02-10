@@ -16,18 +16,18 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressDto {
-    private Integer addressId; // 주소 아이디
-    private String memberNumber; // 회원번호
-    private String addressNickname; // 배송지명 (별칭)
-    private String recipientName; // 수령인 이름
-    private String postalCode; // 우편번호
-    private String addressMain; // 기본 주소
-    private String addressDetail1; // 상세 주소1
-    private String addressDetail2; // 상세 주소2
-    private String addressDetail3; // 상세 주소3
-    private String recipientPhone; // 수령인 연락처
-    private Boolean isDefault; // 기본 배송지 여부
-    private int isActive; // 삭제 여부
+    private Integer addressId;      // 住所ID
+    private String memberNumber;    // 会員番号
+    private String addressNickname; // 配送先名（別名）
+    private String recipientName;   // 受取人氏名
+    private String postalCode;      // 郵便番号
+    private String addressMain;     // 住所（都道府県・市区町村など）
+    private String addressDetail1;  // 住所詳細1
+    private String addressDetail2;  // 住所詳細2
+    private String addressDetail3;  // 住所詳細3
+    private String recipientPhone;  // 受取人連絡先
+    private Boolean isDefault;      // デフォルト配送先フラグ
+    private int isActive;           // 削除フラグ
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;

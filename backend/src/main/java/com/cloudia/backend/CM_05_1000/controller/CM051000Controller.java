@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.util.DigestUtils;
 
-import com.cloudia.backend.CM_05_1000.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
+import com.cloudia.backend.constants.CMMessageConstant;
 import com.cloudia.backend.CM_05_1000.model.NoticeInfo;
 import com.cloudia.backend.CM_05_1000.service.CM051000Service;
-import com.cloudia.backend.constants.CMMessageConstant;
 import com.cloudia.backend.CM_05_1000.constants.CM051000MessageConstant;
 import com.cloudia.backend.config.jwt.JwtTokenProvider;
 
@@ -34,27 +33,25 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/guest")
-@CrossOrigin(origins = "*")
 public class CM051000Controller {
-    // Service 정의
     private final CM051000Service cm051000Service;
     private final JwtTokenProvider jwtTokenProvider;
     
     /**
-     * 공지사항 전체 리스트 조회
+     * お知らせ一覧（全件）取得
      *
-     * @return 공지사항 전체 목록
+     * @return お知らせの全件一覧
      */
     @GetMapping("/notice")
     public ResponseEntity<ResponseModel<List<NoticeInfo>>> getFindAllBanner() {
         return cm051000Service.findByAllNotice();
     }
     /**
-     * 공지사항 검색
+     * お知らせ検索
      *
-     * @param searchKeyword 검색 키워드
-     * @param searchType    검색 유형 (1: 제목+내용, 2: 제목, 3: 내용)
-     * @return 검색된 공지사항 리스트
+     * @param searchKeyword 検索キーワード
+     * @param searchType    検索タイプ (1: タイトル+内容, 2: タイトル, 3: 内容)
+     * @return 検索されたお知らせリスト
      */
     @GetMapping("/notice/search")
     public ResponseEntity<ResponseModel<List<NoticeInfo>>> getFindNotice(
@@ -63,12 +60,11 @@ public class CM051000Controller {
         return cm051000Service.getFindNotice(searchKeyword, searchType);
     }
 
-
     /**
-     * 특정 공지사항 + 이전/다음 공지사항 조회
+     * 特定のお知らせ + 前後（前/次）のお知らせ取得
      *
-     * @param noticeId 공지사항 아이디
-     * @return current, prev, next 포함된 공지사항 정보
+     * @param noticeId お知らせID
+     * @return current, prev, next を含むお知らせ情報
      */
     @GetMapping("/notice/{noticeId}")
     public ResponseEntity<ResponseModel<java.util.Map<String, NoticeInfo>>> getFindIdNotice(@RequestParam int noticeId) {
@@ -76,10 +72,10 @@ public class CM051000Controller {
     }
 
     /**
-     * 공지사항 조회수 증가 (하루 1회 제한)
+     * お知らせ閲覧数の増加（1日1回まで）
      *
-     * @param noticeId 공지사항 ID
-     * @return 처리 결과
+     * @param noticeId お知らせID
+     * @return 処理結果
      */
     @PostMapping("/notice/{noticeId}/view")
     public ResponseEntity<ResponseModel<Boolean>> increaseViewCount(
@@ -101,11 +97,11 @@ public class CM051000Controller {
     }
 
     /**
-     * 공지사항 등록
+     * お知らせ登録
      *
-     * @param entity         등록할 공지사항 정보
-     * @param bindingResult  유효성 검증 결과
-     * @return 등록 처리 결과
+     * @param entity        登録するお知らせ情報
+     * @param bindingResult バリデーション結果
+     * @return 登録処理結果
      */
     @PostMapping("/notice/upload")
     public ResponseEntity<ResponseModel<Integer>> postNoticeUpload(@Valid @RequestBody NoticeInfo entity,
@@ -126,11 +122,11 @@ public class CM051000Controller {
     }
 
     /**
-     * 공지사항 수정
+     * お知らせ更新
      *
-     * @param entity         수정할 공지사항 정보
-     * @param bindingResult  유효성 검증 결과
-     * @return 수정 처리 결과
+     * @param entity        更新するお知らせ情報
+     * @param bindingResult バリデーション結果
+     * @return 更新処理結果
      */
     @PostMapping("/notice/update")
     public ResponseEntity<ResponseModel<Integer>> putNoticeUpdate(@Valid @RequestBody NoticeInfo entity,
@@ -149,12 +145,13 @@ public class CM051000Controller {
         }
         return cm051000Service.noticeUpdate(entity);
     }
+
     /**
-     * 공지사항 삭제
+     * お知らせ削除
      *
-     * @param noticeId 삭제할 공지사항 ID
-     * @param userId   요청자 ID
-     * @return 삭제 처리 결과
+     * @param noticeId 削除するお知らせID
+     * @param userId   リクエストユーザーID
+     * @return 削除処理結果
      */
     @DeleteMapping("/notice/{noticeId}")
     public ResponseEntity<ResponseModel<Integer>> deleteNotice(
@@ -166,13 +163,14 @@ public class CM051000Controller {
         }
         return cm051000Service.deleteNotice(noticeId);
     }
+
     /**
-     * 공통 응답 포맷 설정
+     * 共通レスポンス形式の設定
      *
-     * @param resultList 결과 데이터
-     * @param ret        성공 여부
-     * @param msg        메시지
-     * @return 공통 응답 모델
+     * @param resultList 結果データ
+     * @param ret        成否
+     * @param msg        メッセージ
+     * @return 共通レスポンスモデル
      */
     private <T> ResponseModel<T> setResponseDto(T resultList, boolean ret, String msg) {
         return ResponseModel.<T>builder()

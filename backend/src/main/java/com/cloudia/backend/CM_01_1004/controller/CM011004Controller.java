@@ -1,5 +1,6 @@
 package com.cloudia.backend.CM_01_1004.controller;
 
+import com.cloudia.backend.CM_01_1004.constants.CM011004MessageConstant;
 import com.cloudia.backend.CM_01_1004.service.CM011004Service;
 import com.cloudia.backend.CM_90_1000.model.Menu;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +20,13 @@ public class CM011004Controller {
     private final CM011004Service mypageMenuService;
 
     /**
-     * 마이페이지 사이드바 메뉴 목록을 조회
+     * マイページのサイドバーメニュー一覧を取得
      */
     @GetMapping("/mypage/menus")
     public ResponseEntity<List<Menu>> getMyPageMenus() {
-        log.info("마이페이지 메뉴 목록 조회 요청 시작");
+        log.info(CM011004MessageConstant.MYPAGE_MENU_REQUEST_START);
         List<Menu> menuList = mypageMenuService.getMyPageMenus();
-        log.info("마이페이지 메뉴 목록 조회 요청 종료");
+        log.info(CM011004MessageConstant.MYPAGE_MENU_REQUEST_END);
         return ResponseEntity.ok(menuList);
     }
 }

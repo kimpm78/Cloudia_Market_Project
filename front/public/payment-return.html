@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>결제 처리 중...</title>
+    <title>決済処理中...</title>
     <meta http-equiv="Cache-Control" content="no-store" />
     <meta http-equiv="Pragma" content="no-cache" />
 
@@ -70,10 +70,10 @@
 
   <body>
     <div class="box">
-      <h1 class="title">결제 처리 중...</h1>
+      <h1 class="title">決済処理中...</h1>
       <p class="desc">
-        결제 인증이 완료되었습니다.<br />
-        승인/결과 확정 중이니 잠시만 기다려주세요.
+        決済認証が完了しました。<br />
+        承認／結果確定中のため、しばらくお待ちください。
       </p>
       <div class="spinner" aria-label="loading"></div>
 
@@ -94,7 +94,7 @@
           }
         };
 
-        // 쿼리스트링/해시 파라미터 파싱 (대소문자 무시)
+        // クエリ文字列／ハッシュのパラメータ解析（大文字小文字を無視）
         const searchParams = new URLSearchParams(window.location.search);
         const hashRaw = (window.location.hash || '').replace(/^#\??/, '');
         const hashParams = hashRaw ? new URLSearchParams(hashRaw) : null;
@@ -147,13 +147,13 @@
 
         const ctx = readOrderContext();
 
-        // 파라미터 우선, 없으면 로컬 컨텍스트로 보완
+        // パラメータ優先。なければローカルコンテキストで補完
         let orderId = safeTrim(getParam('orderid'));
         const orderNoParam = safeTrim(getParam('orderno') || getParam('order_no'));
         let orderNumber = safeTrim(getParam('ordernumber') || getParam('order_number'));
         let paymentMethod = safeTrim(getParam('paymentmethod')) || null;
 
-        // PG 결과 코드/메시지 (케이스/표기 차이 대응)
+        // PG結果コード／メッセージ（表記ゆれ対応）
         let resultCode =
           safeTrim(getParam('rtn_cd') || getParam('resultcode') || getParam('result_code')) || '';
         let resultMsg =
@@ -214,7 +214,7 @@
         };
 
         const publishResult = (payload) => {
-          // 1) 같은 오리진의 opener가 있으면 postMessage
+          // 1️⃣ 親ウィンドウへ結果送信
           try {
             if (window.opener && !window.opener.closed) {
               window.opener.postMessage(
@@ -226,7 +226,7 @@
             // ignore
           }
 
-          // 2) BroadcastChannel 지원 시 브로드캐스트
+          // 2️⃣ 少し待ってからポップアップを閉じる
           try {
             if (window.BroadcastChannel) {
               const channel = new BroadcastChannel(RESULT_CHANNEL_KEY);
@@ -310,21 +310,21 @@
             // ignore
           }
 
-          // 1️⃣ 부모 창으로 결과 전송
+          // 1️⃣ 親ウィンドウへ結果送信
           publishResult(payload);
 
-          // 2️⃣ 약간의 딜레이 후 팝업 닫기
+          // 2️⃣ 少し待ってからポップアップを閉じる
           setTimeout(() => {
             try {
-              // opener가 있으면 팝업 닫기
+              // opener があればポップアップを閉じる
               if (window.opener && !window.opener.closed) {
                 window.close();
               } else {
-                // opener가 없으면 결과 페이지로 이동
+                // opener がなければ結果ページへ遷移
                 redirectToResultPage(paymentStatus, cancelReason);
               }
             } catch (err) {
-              // 닫기 실패하면 결과 페이지로 이동
+              // 閉じられない場合は結果ページへ遷移
               redirectToResultPage(paymentStatus, cancelReason);
             }
           }, 300);
@@ -370,7 +370,7 @@
           }
         };
 
-        // 명시적 status 처리 (cancel/fail/error)
+        // 明示的なstatusの処理（cancel/fail/error）
         if (statusParam === 'cancel' || statusParam === 'fail' || statusParam === 'error') {
           const reason = cancelReasonParam || `PG_${statusParam.toUpperCase()}`;
           await callFailApi(reason);
@@ -378,7 +378,7 @@
           return;
         }
 
-        // resultCode가 0000이 아니면 실패 처리
+        // resultCode が 0000 以外の場合は失敗扱い
         if (resultCode && resultCode !== '0000') {
           const reason = resultMsg || resultCode;
           await callFailApi(reason);
@@ -386,7 +386,7 @@
           return;
         }
 
-        // tid 없으면 승인 요청 불가
+        // tid がない場合は承認リクエスト不可
         if (!tid && encData) {
           const decrypted = await callCallbackDecrypt(encData);
           if (decrypted) {
@@ -411,7 +411,7 @@
           return;
         }
 
-        // 4) 승인 요청
+        // 4) 承認リクエスト
         const apiBase = getApiBase();
         if (!apiBase) {
           finalize('fail', 'MISSING_API_BASE');

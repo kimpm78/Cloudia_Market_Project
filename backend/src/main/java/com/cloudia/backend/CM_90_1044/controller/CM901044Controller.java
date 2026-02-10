@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cloudia.backend.CM_90_1044.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_90_1044.model.NoticeInfo;
 import com.cloudia.backend.CM_90_1044.service.CM901044Service;
 import com.cloudia.backend.config.jwt.JwtTokenProvider;
@@ -29,14 +29,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequestMapping("/api/admin/menu")
 public class CM901044Controller {
-    // Service 정의
     private final CM901044Service cm901044Service;
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 공지사항 전체 리스트 조회
+     * お知らせ全件一覧取得
      * 
-     * @return 공지사항 전체 리스트
+     * @return お知らせ全件一覧
      */
     @GetMapping("/notice/findAll")
     public ResponseEntity<ResponseModel<List<NoticeInfo>>> getFindAllBanner() {
@@ -44,11 +43,11 @@ public class CM901044Controller {
     }
 
     /**
-     * 특정 공지사항 리스트 조회
+     * お知らせ検索（条件一覧取得）
      * 
-     * @param searchKeyword 키워드
-     * @param searchType    타입 (1:제목 + 내용, 2:제목, 3:내용)
-     * @return 배너 리스트
+     * @param searchKeyword キーワード
+     * @param searchType    種別（1:タイトル＋本文、2:タイトル、3:本文）
+     * @return お知らせ一覧
      */
     @GetMapping("/notice/findNotice")
     public ResponseEntity<ResponseModel<List<NoticeInfo>>> getFindNotice(@RequestParam String searchKeyword,
@@ -57,10 +56,10 @@ public class CM901044Controller {
     }
 
     /**
-     * 특정 공지사항 리스트 조회
+     * お知らせID指定取得
      * 
-     * @param noticeId 공지사항 아이디
-     * @return 공지사항 리스트
+     * @param noticeId お知らせID
+     * @return お知らせ一覧
      */
     @GetMapping("/notice/findIdNotice")
     public ResponseEntity<ResponseModel<List<NoticeInfo>>> getFindIdNotice(@RequestParam int noticeId) {
@@ -68,10 +67,10 @@ public class CM901044Controller {
     }
 
     /**
-     * 공지사항 업데이트
+     * お知らせ更新
      * 
-     * @param entity 업데이트 할 공지사항 정보
-     * @return 업데이트 여부
+     * @param entity 更新対象のお知らせ情報
+     * @return 更新結果
      */
     @PostMapping("/notice/update")
     public ResponseEntity<ResponseModel<Integer>> putNoticeUpdate(@Valid @RequestBody NoticeInfo entity,
@@ -91,10 +90,10 @@ public class CM901044Controller {
     }
 
     /**
-     * 공지사항 등록
+     * お知らせ登録
      * 
-     * @param entity 등록 할 공지사항 정보
-     * @return 등록 여부
+     * @param entity 登録対象のお知らせ情報
+     * @return 登録結果
      */
     @PostMapping("/notice/upload")
     public ResponseEntity<ResponseModel<Integer>> postNoticeUpload(@Valid @RequestBody NoticeInfo entity,
@@ -114,12 +113,12 @@ public class CM901044Controller {
     }
 
     /**
-     * ResponseModel을 셋팅
+     * ResponseModelの設定
      * 
-     * @param resultList 리스트 정보
-     * @param ret        처리 결과
-     * @param msg        메시지
-     * @return {@link ResponseModel} 리스트 정보 결과
+     * @param resultList 一覧情報
+     * @param ret        処理結果
+     * @param msg        メッセージ
+     * @return {@link ResponseModel} 一覧情報結果
      */
     private <T> ResponseModel<T> setResponseDto(T resultList, boolean ret, String msg) {
         return ResponseModel.<T>builder()

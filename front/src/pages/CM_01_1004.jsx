@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import CM_01_1004_sideBar from '../components/CM_01_1004_sideBar';
+import CM_01_1004_sideBar from '../components/CM_01_1004_SideBar';
 import '../styles/CM_01_1004.css';
 
 export default function CM_01_1004() {

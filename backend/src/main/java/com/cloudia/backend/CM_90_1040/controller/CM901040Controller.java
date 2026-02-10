@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_90_1040.model.BannerInfo;
-import com.cloudia.backend.CM_90_1040.model.ResponseModel;
 import com.cloudia.backend.CM_90_1040.service.CM901040Service;
 import com.cloudia.backend.config.jwt.JwtTokenProvider;
 import com.cloudia.backend.CM_90_1040.constants.CM901040MessageConstant;
@@ -31,14 +31,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Slf4j
 @RequestMapping("/api/admin/menu")
 public class CM901040Controller {
-    // Service 정의
     private final CM901040Service cm901040Service;
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 배너 전체 리스트 조회
+     * バナー全件一覧取得
      * 
-     * @return 배너 전체 리스트
+     * @return バナー全件一覧
      */
     @GetMapping("/banner/findAll")
     public ResponseEntity<ResponseModel<List<BannerInfo>>> getFindAllBanner() {
@@ -46,10 +45,10 @@ public class CM901040Controller {
     }
 
     /**
-     * 특정 배너 리스트 조회
+     * 特定バナー一覧取得
      * 
-     * @param searchTerm 배너명
-     * @return 배너 리스트
+     * @param searchTerm バナー名
+     * @return バナー一覧
      */
     @GetMapping("/banner/findBanner")
     public ResponseEntity<ResponseModel<List<BannerInfo>>> getFindBanner(@RequestParam String searchTerm) {
@@ -57,10 +56,10 @@ public class CM901040Controller {
     }
 
     /**
-     * 업데이트 배너 리스트 조회
+     * 更新対象バナー取得
      * 
-     * @param bannerId 배너 아이디
-     * @return 배너 리스트
+     * @param bannerId バナーID
+     * @return バナー情報
      */
     @GetMapping("/banner/findIdBanner")
     public ResponseEntity<ResponseModel<BannerInfo>> getFindBanner(@RequestParam int bannerId) {
@@ -68,10 +67,10 @@ public class CM901040Controller {
     }
 
     /**
-     * 배너 삭제
+     * バナー削除
      * 
-     * @param entity 배너 삭제 항목 리스트
-     * @return 삭제 여부
+     * @param entity 削除対象バナー一覧
+     * @return 削除結果
      */
     @DeleteMapping("/banner/del")
     public ResponseEntity<ResponseModel<Integer>> BannerDel(@RequestBody List<BannerInfo> entity) {
@@ -79,10 +78,10 @@ public class CM901040Controller {
     }
 
     /**
-     * 배너 등록
+     * バナー登録
      * 
-     * @param entity 등록 할 배너 정보
-     * @return 등록 여부
+     * @param entity 登録するバナー情報
+     * @return 登録結果
      */
     @PostMapping("/banner/upload")
     public ResponseEntity<ResponseModel<Integer>> postBannerUpload(@Valid @ModelAttribute BannerInfo entity,
@@ -102,10 +101,10 @@ public class CM901040Controller {
     }
 
     /**
-     * 배너 업데이트
+     * バナー更新
      * 
-     * @param entity 업데이트 할 배너 정보
-     * @return 업데이트 여부
+     * @param entity 更新するバナー情報
+     * @return 更新結果
      */
     @PostMapping("/banner/update")
     public ResponseEntity<ResponseModel<Integer>> postBannerUpdate(@Valid @ModelAttribute BannerInfo entity,
@@ -125,9 +124,9 @@ public class CM901040Controller {
     }
 
     /**
-     * 배너 전체 리스트 조회
+     * 使用可能な表示順取得
      * 
-     * @return 배너 전체 리스트
+     * @return 使用可能な表示順一覧
      */
     @GetMapping("/banner/availableDisplayOrders")
     public ResponseEntity<ResponseModel<List<Integer>>> getFindDisplayOrder() {
@@ -135,12 +134,12 @@ public class CM901040Controller {
     }
 
     /**
-     * ResponseModel을 셋팅
+     * ResponseModelを設定
      * 
-     * @param resultList 리스트 정보
-     * @param ret        처리 결과
-     * @param msg        메시지
-     * @return {@link ResponseModel} 리스트 정보 결과
+     * @param resultList 結果データ
+     * @param ret        処理結果
+     * @param msg        メッセージ
+     * @return {@link ResponseModel} 結果データ
      */
     private <T> ResponseModel<T> setResponseDto(T resultList, boolean ret, String msg) {
         return ResponseModel.<T>builder()

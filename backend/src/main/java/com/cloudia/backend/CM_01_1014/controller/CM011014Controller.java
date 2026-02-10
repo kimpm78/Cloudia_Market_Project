@@ -20,7 +20,7 @@ public class CM011014Controller {
     private final CM011014Service service;
 
     /**
-     * 환불 계좌 조회
+     * 返金口座情報の取得
      */
     @GetMapping("/account")
     public ResponseEntity<ResponseModel<UserAccount>> getAccount(@AuthenticationPrincipal UserDetails userDetails) {
@@ -31,7 +31,7 @@ public class CM011014Controller {
     }
 
     /**
-     * 환불 계좌 수정
+     * 返金口座情報の更新
      */
     @PutMapping("/account")
     public ResponseEntity<ResponseModel<Object>> updateAccount(

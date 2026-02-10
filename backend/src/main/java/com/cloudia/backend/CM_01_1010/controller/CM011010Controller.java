@@ -1,6 +1,5 @@
 package com.cloudia.backend.CM_01_1010.controller;
 
-import com.cloudia.backend.CM_01_1003.constants.CM011003MessageConstant;
 import com.cloudia.backend.CM_01_1010.constants.CM011010MessageConstant;
 import com.cloudia.backend.CM_01_1010.model.Unsubscribe;
 import com.cloudia.backend.CM_01_1010.service.CM011010Service;

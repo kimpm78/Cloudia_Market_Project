@@ -36,7 +36,7 @@ const EditorContainer = ({
         <EditorProvider
           extensions={getExtensions(
             placeholder ||
-              '내용을 입력해주세요.\n교환 및 취소 및 반품 문의는 1:1 문의로 상담부탁드립니다.'
+              '内容を入力してください。\n交換・キャンセル・返品に関するお問い合わせは、1:1お問い合わせよりご相談ください。'
           )}
           content={content}
           slotBefore={<MenuBar field={field} onImageAdd={onImageAdd} />}

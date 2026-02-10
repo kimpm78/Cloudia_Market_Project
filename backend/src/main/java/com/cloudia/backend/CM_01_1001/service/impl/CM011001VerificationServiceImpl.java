@@ -41,7 +41,7 @@ public class CM011001VerificationServiceImpl implements CM011001VerificationServ
     private static final String EMAIL_VERIFIED_STATUS_PREFIX = "email:verification:status:";
 
     /**
-     * 이메일 주소로 인증 코드를 발송하고 Redis에 저장
+     * メールアドレス宛に認証コードを送信し、Redisに保存
      */
     @Override
     @Transactional
@@ -55,7 +55,7 @@ public class CM011001VerificationServiceImpl implements CM011001VerificationServ
 
         log.info(CM011001MessageConstant.EMAIL_SEND_START, email);
         try {
-            // 이메일 중복 체크
+            // メールアドレスの重複チェック
             if (userMapper.countByEmail(email) > 0) {
                 log.warn(CM011001MessageConstant.SIGNUP_WARN_EMAIL_CONFLICT, email);
                 return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -63,13 +63,13 @@ public class CM011001VerificationServiceImpl implements CM011001VerificationServ
                                 CM011001MessageConstant.FAIL_EMAIL_CONFLICT));
             }
 
-            // 인증 코드 생성
+            // 認証コードの生成
             String verificationCode = emailService.generateVerificationCode();
-            // Redis에 인증 코드 저장
+            // Redisに認証コードを保存する
             redisTemplate.opsForValue().set(EMAIL_VERIFICATION_CODE_PREFIX + email, verificationCode,
                     expirationMinutes, TimeUnit.MINUTES);
 
-            // EmailDto 생성 및 발송
+            // EmailDtoの生成および送信
             EmailDto emailInfo = new EmailDto();
             emailInfo.setSendEmail(email);
             emailInfo.setVerificationCode(verificationCode);
@@ -103,7 +103,7 @@ public class CM011001VerificationServiceImpl implements CM011001VerificationServ
     }
 
     /**
-     * 입력된 인증 코드를 검증
+     * 入力された認証コードを検証する
      */
     @Override
     public ResponseEntity<ResponseModel<Map<String, Object>>> verifyEmail(String email, String code) {
@@ -113,7 +113,7 @@ public class CM011001VerificationServiceImpl implements CM011001VerificationServ
             String key = EMAIL_VERIFICATION_CODE_PREFIX + email;
             String storedCode = redisTemplate.opsForValue().get(key);
 
-            // 코드가 없거나 만료된 경우
+            // コードが存在しない、または期限切れの場合
             if (storedCode == null) {
                 log.warn(CM011001MessageConstant.EMAIL_VERIFY_WARN_NOT_EXIST_OR_EXPIRED, email);
                 return ResponseEntity.badRequest().body(
@@ -121,11 +121,11 @@ public class CM011001VerificationServiceImpl implements CM011001VerificationServ
                                 CM011001MessageConstant.FAIL_INVALID_VERIFICATION_CODE));
             }
 
-            // 코드가 일치하는 경우
+            // コードが一致する場合
             if (storedCode.equals(code)) {
-                redisTemplate.delete(key); // 인증 코드 삭제
+                redisTemplate.delete(key); // 認証コード削除
 
-                // 인증 완료 상태 저장 (30분 유효)
+                // 認証完了状態保存 (30分有効)
                 redisTemplate.opsForValue().set(EMAIL_VERIFIED_STATUS_PREFIX + email, "true", 30, TimeUnit.MINUTES);
 
                 log.info(CM011001MessageConstant.EMAIL_VERIFY_SUCCESS_LOG, email);
@@ -134,7 +134,7 @@ public class CM011001VerificationServiceImpl implements CM011001VerificationServ
                         true,
                         CM011001MessageConstant.SUCCESS_EMAIL_VERIFY));
             } else {
-                // 코드가 일치하는 않은 경우
+                // コードが一致しない場合
                 log.warn(CM011001MessageConstant.EMAIL_VERIFY_WARN_CODE_MISMATCH, email, code, storedCode);
                 return ResponseEntity.badRequest().body(
                         createResponseModel(Map.of("verified", false), false,

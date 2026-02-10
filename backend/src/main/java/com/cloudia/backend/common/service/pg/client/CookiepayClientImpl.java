@@ -22,40 +22,40 @@ public class CookiepayClientImpl {
     private final RestTemplate cookiepayRestTemplate;
     private final ObjectMapper objectMapper;
 
-    /** Cookiepay 가맹점 정보 */
+    /** Cookiepay 加盟店情報 */
     @Value("${cookiepay.store-id}")
     private String storeId;
 
-    /** Cookiepay 시크릿 키 */
+    /** Cookiepay シークレットキー */
     @Value("${cookiepay.secret-key}")
     private String secretKey;
 
-    /** Cookiepay 결제 준비 URL */
+    /** Cookiepay 決済準備 URL */
     @Value("${cookiepay.ready-url}")
     private String readyUrl;
 
-    /** Cookiepay 결제 인증 URL */
+    /** Cookiepay 決済認証 URL */
     @Value("${cookiepay.paycert-url}")
     private String payCertUrl;
 
-    /** Cookiepay 토큰 발급 URL */
+    /** Cookiepay トークン発行 URL */
     @Value("${cookiepay.token-url}")
     private String tokenUrl;
 
-    /** Cookiepay 암호화 URL */
+    /** Cookiepay 復号 URL */
     @Value("${cookiepay.decrypt-url}")
     private String decryptUrl;
 
-    /** Cookiepay 결제 취소 URL */
+    /** Cookiepay 決済取消 URL */
     @Value("${cookiepay.cancel-url}")
     private String cancelUrl;
 
-    /** Cookiepay 결제 내역 조회 URL */
+    /** Cookiepay 決済履歴照会 URL */
     @Value("${cookiepay.paylist-url}")
     private String paylistUrl;
 
     /**
-     * 공통 POST 요청 메서드
+     * 共通 POST リクエストメソッド
      * 
      * @param url
      * @param payload
@@ -332,7 +332,7 @@ public class CookiepayClientImpl {
     }
 
     /**
-     * 인증 정보 추가
+     * 認証情報を追加
      * 
      * @param payload
      * @return
@@ -362,7 +362,7 @@ public class CookiepayClientImpl {
     }
 
     /**
-     * 승인
+     * 承認
      * 
      * @param payload
      * @return
@@ -372,7 +372,7 @@ public class CookiepayClientImpl {
     }
 
     /**
-     * 취소
+     * 取消
      * 
      * @param payload
      * @return
@@ -382,7 +382,7 @@ public class CookiepayClientImpl {
     }
 
     /**
-     * 복원
+     * 復号
      * 
      * @param payload
      * @return
@@ -392,7 +392,7 @@ public class CookiepayClientImpl {
     }
 
     /**
-     * 결제 인증
+     * 決済認証
      * 
      * @param payload
      * @return
@@ -402,7 +402,7 @@ public class CookiepayClientImpl {
     }
 
     /**
-     * 영수증 발급
+     * 領収書発行
      * 
      * @param payload
      * @return

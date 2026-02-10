@@ -9,42 +9,42 @@ import com.cloudia.backend.CM_90_1063.model.StockInfo;
 
 public interface CM901063Service {
     /**
-     * 상품 코드 전체 리스트 조회
-     * 
-     * @return 상품 코드 전체 리스트
+     * 商品コード全件リスト取得
+     *
+     * @return 商品コード全件リスト
      */
     List<ProductCode> findAllProductCode();
 
     /**
-     * 재고 입/출고 등록
+     * 在庫入出庫登録（登録/更新）
      *
-     * @param entity 등록 할 재고 정보 엔티티
-     * 
-     * @return 등록 성공 여부
+     * @param entity 登録する在庫情報エンティティ
+     * @param userId 実行ユーザーID
+     * @return 登録成功可否
      **/
     Integer stockUpsert(ProductCode entity, String userId);
 
     /**
-     * 입/출고 일람 전체 조회
-     * 
-     * @return 입/출고 일람 전체 리스트
+     * 入出庫一覧全件取得
+     *
+     * @return 入出庫一覧全件リスト
      */
     List<StockInfo> findAllStocks();
 
     /**
-     * 선택 된 상품 코드 / 상품명의 상품 가격 정보 조회
-     * 
-     * @param searchType 검색 타입 (1: 상품 코드 2: 상품 명)
-     * @param searchTerm 검색어
-     * @return 상품 정보
+     * 選択した商品コード／商品名に紐づく商品価格情報取得
+     *
+     * @param searchType 検索タイプ（1: 商品コード 2: 商品名）
+     * @param searchTerm 検索ワード
+     * @return 商品情報
      */
     List<StockInfo> findByStocks(String searchType, String searchTerm);
 
     /**
-     * 특정 상품 코드 가격 조회
-     * 
-     * @param searchCode 검색 상품 코드
-     * @return 상품 코드 리스트
+     * 指定した商品コードの価格取得
+     *
+     * @param searchCode 検索商品コード
+     * @return 商品情報（任意）
      */
     Optional<Stock> getStockByCode(String searchCode);
 }

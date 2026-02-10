@@ -39,8 +39,8 @@ const IMAGE_CONSTRAINTS = {
 };
 
 const PRODUCT_CATEGORY_LABEL = {
-  1: '상시 판매',
-  2: '예약 판매',
+  1: '通常販売',
+  2: '予約販売',
 };
 
 const formatPrice = (value) => {
@@ -148,7 +148,7 @@ const SelectField = ({
   onChange,
   options = [],
   error,
-  placeholder = '선택하세요',
+  placeholder = '選択してください',
   ...props
 }) => (
   <div className="mb-3">
@@ -221,7 +221,7 @@ const CategorySelectGroup = ({
   error,
 }) => (
   <div className="mb-3">
-    <label className="form-label">카테고리</label>
+    <label className="form-label">カテゴリ</label>
     <div className="d-flex gap-2">
       <Select
         isMulti
@@ -230,7 +230,7 @@ const CategorySelectGroup = ({
         className="flex-grow-1 select-unified"
         classNamePrefix="select"
         onChange={onCategoryGroupChange}
-        placeholder="선택하세요"
+        placeholder="選択してください"
       />
       <Select
         isMulti
@@ -239,7 +239,7 @@ const CategorySelectGroup = ({
         className="flex-grow-1 select-unified"
         classNamePrefix="select"
         onChange={onCategoryChange}
-        placeholder="선택하세요"
+        placeholder="選択してください"
       />
     </div>
     {error && <div className="text-danger">{error}</div>}
@@ -261,11 +261,11 @@ const ImageUploadField = ({ id, label, file, preview, onChange, error }) => (
     <img
       src={preview}
       className="img-thumbnail mt-2"
-      alt="상품 이미지"
+      alt="商品画像"
       style={{ width: '200px', height: '200px', objectFit: 'cover' }}
     />
     <div>
-      ※최소사이즈 <b>200 X 200 픽셀</b>의 크기를 권장합니다.
+      ※最小サイズ <b>200 × 200 ピクセル</b>を推奨します。
     </div>
     {error && <div className="text-danger">{error}</div>}
   </div>
@@ -279,7 +279,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
 
   const validateAndProcessFiles = (files) => {
     if (images.length + files.length > MAX_IMAGES) {
-      onError(`이미지는 최대 ${MAX_IMAGES}개까지만 업로드할 수 있습니다.`);
+      onError(`画像は最大 ${MAX_IMAGES} 枚までアップロードできます。`);
       return;
     }
 
@@ -289,7 +289,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
     const imagePromises = files.map((file, index) => {
       return new Promise((resolve, reject) => {
         if (!file.type.startsWith('image/')) {
-          reject('이미지 파일만 업로드 가능합니다.');
+          reject('画像ファイルのみアップロードできます。');
           return;
         }
 
@@ -302,8 +302,8 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
               image.height < IMAGE_CONSTRAINTS.DETAIL_MIN_HEIGHT
             ) {
               reject(
-                `상세 이미지는 최소 ${IMAGE_CONSTRAINTS.DETAIL_MIN_WIDTH}x${IMAGE_CONSTRAINTS.DETAIL_MIN_HEIGHT} 픽셀 이상이어야 합니다. ` +
-                  `(현재 이미지: ${image.width}x${image.height})`
+                `詳細画像は最小 ${IMAGE_CONSTRAINTS.DETAIL_MIN_WIDTH}×${IMAGE_CONSTRAINTS.DETAIL_MIN_HEIGHT} ピクセル以上である必要があります。 ` +
+                  `(現在の画像: ${image.width}×${image.height})`
               );
               return;
             }
@@ -317,10 +317,10 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
 
             resolve(newImage);
           };
-          image.onerror = () => reject('이미지 로드 실패');
+          image.onerror = () => reject('画像の読み込みに失敗しました');
           image.src = e.target.result;
         };
-        reader.onerror = () => reject('파일 읽기 실패');
+        reader.onerror = () => reject('ファイルの読み込みに失敗しました');
         reader.readAsDataURL(file);
       });
     });
@@ -346,7 +346,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
 
   const handleUploadClick = () => {
     if (images.length >= MAX_IMAGES) {
-      onError(`이미지는 최대 ${MAX_IMAGES}개까지만 업로드할 수 있습니다.`);
+      onError(`画像は最大 ${MAX_IMAGES} 枚までアップロードできます。`);
       return;
     }
     onError('');
@@ -384,14 +384,14 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
     setIsDragging(false);
 
     if (images.length >= MAX_IMAGES) {
-      onError(`이미지는 최대 ${MAX_IMAGES}개까지만 업로드할 수 있습니다.`);
+      onError(`画像は最大 ${MAX_IMAGES} 枚までアップロードできます。`);
       return;
     }
 
     const files = Array.from(e.dataTransfer.files).filter((file) => file.type.startsWith('image/'));
 
     if (files.length === 0) {
-      onError('이미지 파일만 업로드 가능합니다.');
+      onError('画像ファイルのみアップロードできます。');
       return;
     }
 
@@ -403,7 +403,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
       {/* 헤더 */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <label className="form-label mb-0">
-          상세 이미지 <span className="text-muted">({images.length}개)</span>
+          詳細画像 <span className="text-muted">({images.length}枚)</span>
         </label>
         <button
           type="button"
@@ -462,7 +462,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
           >
             <div className="text-center">
               <i className="bi bi-cloud-upload fs-1 text-primary"></i>
-              <p className="mt-2 mb-0 text-primary fw-bold">이미지를 여기에 드롭하세요</p>
+              <p className="mt-2 mb-0 text-primary fw-bold">ここに画像をドロップしてください</p>
             </div>
           </div>
         )}
@@ -470,9 +470,9 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
         {images.length === 0 ? (
           <div className="text-center py-4 text-muted">
             <i className="bi bi-image fs-1 opacity-25"></i>
-            <p className="mt-2 mb-0">업로드된 이미지가 없습니다.</p>
+            <p className="mt-2 mb-0">アップロードされた画像はありません。</p>
             <p className="mb-0">
-              <small>파일을 드래그하거나 Upload 버튼을 클릭하세요</small>
+              <small>ファイルをドラッグするか、Upload ボタンをクリックしてください</small>
             </p>
           </div>
         ) : (
@@ -504,7 +504,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
                 type="button"
                 className="btn btn-outline-danger btn-sm"
                 onClick={() => handleRemoveImage(image.id)}
-                title="이미지 삭제"
+                title="画像を削除"
               >
                 <i className="bi bi-trash3"></i>
               </button>
@@ -518,7 +518,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
         <div className="mt-2">
           <div className="d-flex justify-content-between align-items-center mb-1">
             <small className="text-muted">
-              업로드 진행률: {images.length} / {MAX_IMAGES}
+              アップロード進捗: {images.length} / {MAX_IMAGES}
             </small>
             <small className="text-muted">{((images.length / MAX_IMAGES) * 100).toFixed(0)}%</small>
           </div>
@@ -533,7 +533,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
       )}
       {/* 이미지 목록 */}
       <div>
-        ※최소사이즈 <b>150 X 150 픽셀</b>의 크기를 권장합니다.
+        ※最小サイズ <b>150 × 150 ピクセル</b>を推奨します。
       </div>
       {error && <div className="text-danger mt-1">{error}</div>}
     </div>
@@ -674,53 +674,53 @@ export default function CM_90_1061() {
     const newErrors = {};
     const MAX_INT = 2147483647;
     if (!form.categoryGroup || form.categoryGroup.length === 0) {
-      newErrors.categoryGroup = '카테고리 그룹을 선택하세요.';
+      newErrors.categoryGroup = 'カテゴリグループを選択してください。';
     }
 
     if (!form.category || form.category.length === 0) {
-      newErrors.category = '카테고리를 선택하세요.';
+      newErrors.category = 'カテゴリを選択してください。';
     }
 
     if (!form.productName) {
-      newErrors.productName = '상품을 선택하세요.';
+      newErrors.productName = '商品を選択してください。';
     }
 
     if (PRODUCT_CATEGORY_LABEL[1] === form.productCategory) {
       if (form.expectedDeliveryDate) {
-        newErrors.expectedDeliveryDate = '출고일을 비워주세요.';
+        newErrors.expectedDeliveryDate = '出荷予定月は空にしてください。';
       }
       if (form.reservationDeadline) {
-        newErrors.reservationDeadline = '예약일을 비워주세요.';
+        newErrors.reservationDeadline = '予約締切日は空にしてください。';
       }
     } else if (PRODUCT_CATEGORY_LABEL[2] === form.productCategory) {
       if (!form.expectedDeliveryDate) {
-        newErrors.expectedDeliveryDate = '출고일을 입력해주세요.';
+        newErrors.expectedDeliveryDate = '出荷予定月を入力してください。';
       }
       if (!form.reservationDeadline) {
-        newErrors.reservationDeadline = '예약일을 입력해주세요.';
+        newErrors.reservationDeadline = '予約締切日を入力してください。';
       }
     }
 
     if (!form.productPrice || isNaN(form.productPrice) || Number(form.productPrice) <= 0) {
-      newErrors.productPrice = '판매가를 입력하세요.';
+      newErrors.productPrice = '販売単価を入力してください。';
     } else if (form.productPrice > MAX_INT) {
-      newErrors.productPrice = '최대 판매 가격을 넘었습니다.';
+      newErrors.productPrice = '販売単価が上限を超えています。';
     }
 
     if (!form.productFile) {
-      newErrors.productFile = '이미지를 선택해주세요.';
+      newErrors.productFile = '画像を選択してください。';
     }
 
     if (!form.purchaseLimit) {
-      newErrors.purchaseLimit = '구매 수량을 입력해주세요.';
+      newErrors.purchaseLimit = '最大購入数量を入力してください。';
     } else if (form.purchaseLimit > MAX_INT) {
-      newErrors.purchaseLimit = '구매 최대 수량을 넘었습니다.';
+      newErrors.purchaseLimit = '最大購入数量が上限を超えています。';
     }
 
     if (!form.weight) {
-      newErrors.weight = '중량을 입력해주세요.';
+      newErrors.weight = '重量を入力してください。';
     } else if (form.weight > MAX_INT) {
-      newErrors.weight = '최대 중량을 넘었습니다.';
+      newErrors.weight = '重量が上限を超えています。';
     }
 
     setErrors(newErrors);
@@ -732,12 +732,12 @@ export default function CM_90_1061() {
       e.preventDefault();
 
       if (!validateForm()) {
-        open('info', '필수 항목을 확인해주세요.');
+        open('info', '必須項目を確認してください。');
         return;
       }
 
       if (form.productPrice <= form.purchasePrice) {
-        open('confirm', '사입가 보다 금액이 같거나 낮습니다.');
+        open('confirm', '仕入価格より金額が同じ、または低いです。');
         return;
       }
 
@@ -787,7 +787,7 @@ export default function CM_90_1061() {
         open('error', result.data.message);
       }
     } catch (error) {
-      open('error', '상품 수정 중 오류가 발생했습니다.');
+      open('error', '商品登録中にエラーが発生しました。');
     }
   };
 
@@ -810,7 +810,7 @@ export default function CM_90_1061() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">상품 등록</h5>
+        <h5 className="border-bottom pb-2 mb-3">商品登録</h5>
 
         <form onSubmit={handleRegister}>
           {/* 카테고리 선택 */}
@@ -826,17 +826,17 @@ export default function CM_90_1061() {
           {/* 상품명 */}
           <div className="mb-3">
             <label htmlFor="productName" className="form-label">
-              상품명
+              商品名
             </label>
             <Select
               id="productName"
               value={productCodeOptions.find((option) => option.value === form.productCode) || null}
               options={productCodeOptions}
               onChange={(selected) => handleProductCodeChange(selected?.value || '')}
-              placeholder="상품을 검색하거나 선택하세요"
+              placeholder="商品を検索または選択してください"
               isClearable
               isSearchable
-              noOptionsMessage={() => '검색 결과가 없습니다'}
+              noOptionsMessage={() => '検索結果がありません'}
               styles={{
                 control: (base) => ({
                   ...base,
@@ -861,7 +861,7 @@ export default function CM_90_1061() {
             {/* 상품코드 (자동 입력)  */}
             <InputGroupItem
               id="productCode"
-              label="상품코드 (자동 입력)"
+              label="商品コード（自動入力）"
               value={form.productCode}
               onChange={() => {}}
               readOnly
@@ -870,7 +870,7 @@ export default function CM_90_1061() {
             {/* 상품분류 (자동 입력)  */}
             <InputGroupItem
               id="productCategory"
-              label="상품분류 (자동 입력)"
+              label="商品区分（自動入力）"
               value={form.productCategory}
               onChange={() => {}}
               readOnly
@@ -881,7 +881,7 @@ export default function CM_90_1061() {
           <InputGroup>
             <InputGroupItem
               id="availableQty"
-              label="상품 재고(자동으로 입력)"
+              label="在庫数（自動入力）"
               type="text"
               value={form.availableQty}
               onChange={() => {}}
@@ -890,7 +890,7 @@ export default function CM_90_1061() {
             />
             <InputGroupItem
               id="purchasePrice"
-              label="상품 사입가(자동으로 입력)"
+              label="仕入価格（自動入力）"
               type="text"
               value={form.purchasePrice}
               onChange={() => {}}
@@ -903,7 +903,7 @@ export default function CM_90_1061() {
           <InputGroup>
             <InputGroupItem
               id="productPrice"
-              label="판매 단가"
+              label="販売単価"
               type="text"
               value={formatPrice(form.productPrice)}
               onChange={handlePriceChange('productPrice')}
@@ -913,7 +913,7 @@ export default function CM_90_1061() {
             {/* 중량 */}
             <InputGroupItem
               id="weight"
-              label="중량 (g)"
+              label="重量（g）"
               type="text"
               value={form.weight}
               onChange={handlePriceChange('weight')}
@@ -924,7 +924,7 @@ export default function CM_90_1061() {
           {/* 구매 수량 */}
           <InputField
             id="purchaseLimit"
-            label="최대 구매 수량"
+            label="最大購入数量"
             type="text"
             value={form.purchaseLimit}
             onChange={handlePriceChange('purchaseLimit')}
@@ -934,7 +934,7 @@ export default function CM_90_1061() {
           {/* 출고 예정일 */}
           <InputField
             id="expectedDeliveryDate"
-            label="출고 예정일"
+            label="出荷予定月"
             type="month"
             value={form.expectedDeliveryDate}
             onChange={(value) => updateForm('expectedDeliveryDate', value)}
@@ -944,7 +944,7 @@ export default function CM_90_1061() {
           {/* 예약 마감일 */}
           <InputField
             id="reservationDeadline"
-            label="예약 마감일"
+            label="予約締切日"
             type="date"
             value={form.reservationDeadline}
             onChange={(value) => updateForm('reservationDeadline', value)}
@@ -954,7 +954,7 @@ export default function CM_90_1061() {
           {/* 상품 이미지 */}
           <ImageUploadField
             id="productFile"
-            label="상품 이미지"
+            label="商品画像"
             file={form.productFile}
             preview={preview}
             onChange={handleFileChange}
@@ -972,7 +972,7 @@ export default function CM_90_1061() {
           {/* 상품 설명 */}
           <div className="mb-3">
             <label htmlFor="productnote" className="form-label">
-              상품 설명
+              商品説明
             </label>
             <TiptapEditor
               field="product"
@@ -984,10 +984,10 @@ export default function CM_90_1061() {
           {/* 버튼 그룹 */}
           <div className="d-flex justify-content-center gap-2">
             <button type="submit" className="btn btn-primary btn-fixed-width">
-              등록
+              登録
             </button>
             <Link to="/admin/products" className="btn btn-secondary btn-fixed-width">
-              뒤로 가기
+              戻る
             </Link>
           </div>
         </form>

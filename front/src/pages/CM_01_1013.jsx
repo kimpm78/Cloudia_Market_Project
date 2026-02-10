@@ -15,9 +15,9 @@ const formatDate = (dateString) => {
 
 const resolveInquiryStatus = (statusCode, statusValue) => {
   if (statusValue === 2 || statusCode === 'ANSWERED') {
-    return { label: '답변 완료', badgeClass: 'bg-success text-white' };
+    return { label: '回答済み', badgeClass: 'bg-success text-white' };
   }
-  return { label: '답변 대기', badgeClass: 'bg-secondary text-white' };
+  return { label: '回答待ち', badgeClass: 'bg-secondary text-white' };
 };
 
 export default function CM_01_1013() {
@@ -87,12 +87,12 @@ export default function CM_01_1013() {
         }
         return true;
       } catch (err) {
-        console.error('1:1 문의 상세 로드 실패:', err?.message || err);
+        console.error('1:1お問い合わせ 詳細の読み込みに失敗:', err?.message || err);
         if (!options.silent) {
           const message =
             err?.response?.status === 403
-              ? '비공개 글입니다. 접근 권한이 없습니다.'
-              : err?.response?.data?.message || err?.message || '문의를 불러오지 못했습니다.';
+              ? '非公開の投稿です。アクセス権限がありません。'
+              : err?.response?.data?.message || err?.message || 'お問い合わせを読み込めませんでした。';
 
           setErrorPopup({ open: true, message: message });
           setInquiry({ notFound: true });
@@ -109,7 +109,7 @@ export default function CM_01_1013() {
 
   useEffect(() => {
     if (!inquiryId) {
-      setErrorPopup({ open: true, message: '문의 ID가 필요합니다.' });
+      setErrorPopup({ open: true, message: 'お問い合わせIDが必要です。' });
       setInquiry({ notFound: true });
       setLoading(false);
       return undefined;
@@ -137,8 +137,8 @@ export default function CM_01_1013() {
   if (loading) {
     return (
       <div className="container-fluid px-5 py-5">
-        <h1 className="m-2">1:1 문의</h1>
-        <div className="text-center py-5">불러오는 중입니다...</div>
+        <h1 className="m-2">1:1お問い合わせ</h1>
+        <div className="text-center py-5">読み込み中です...</div>
       </div>
     );
   }
@@ -147,8 +147,8 @@ export default function CM_01_1013() {
     return (
       <>
         <div className="container-fluid px-5 py-5">
-          <h1 className="m-2">1:1 문의</h1>
-          <div className="text-center py-5 text-danger">해당 문의를 찾을 수 없습니다.</div>
+          <h1 className="m-2">1:1お問い合わせ</h1>
+          <div className="text-center py-5 text-danger">該当のお問い合わせが見つかりません。</div>
         </div>
         <CM_99_1003
           isOpen={errorPopup.open}
@@ -182,17 +182,17 @@ export default function CM_01_1013() {
   const handleAnswerSubmit = async () => {
     const trimmed = answerDraft.trim();
     if (!trimmed) {
-      setAnswerError('답변 내용을 입력해주세요.');
+      setAnswerError('回答内容を入力してください。');
       return;
     }
     setSubmittingAnswer(true);
     try {
       await answerInquiry({ inquiryId: inquiry.inquiryId, answerContent: trimmed });
       const refreshed = await loadInquiryDetail({ silent: true });
-      if (!refreshed) setAnswerError('최신 데이터를 가져오지 못했습니다.');
+      if (!refreshed) setAnswerError('最新データを取得できませんでした。');
       else setEditingAnswer(false);
     } catch (err) {
-      setAnswerError(err?.response?.data?.message || '답변 저장 실패');
+      setAnswerError(err?.response?.data?.message || '回答の保存に失敗しました。');
     } finally {
       setSubmittingAnswer(false);
     }
@@ -200,12 +200,12 @@ export default function CM_01_1013() {
 
   const handleDeleteClick = () => {
     if (hasAnswer) {
-      setErrorPopup({ open: true, message: '답변이 완료된 문의는 삭제할 수 없습니다.' });
+      setErrorPopup({ open: true, message: '回答済みのお問い合わせは削除できません。' });
       return;
     }
     setConfirmPopup({
       open: true,
-      message: '정말로 이 문의를 삭제하시겠습니까?',
+      message: 'このお問い合わせを削除してもよろしいですか？',
     });
   };
 
@@ -215,12 +215,12 @@ export default function CM_01_1013() {
     try {
       await deleteInquiry({ inquiryId });
 
-      setSuccessPopup({ open: true, message: '문의가 정상적으로 삭제되었습니다.' });
+      setSuccessPopup({ open: true, message: 'お問い合わせを削除しました。' });
     } catch (err) {
       const msg =
         err?.response?.headers?.['x-error-message'] ||
         err?.response?.data?.message ||
-        '삭제 중 오류가 발생했습니다.';
+        '削除中にエラーが発生しました。';
       setErrorPopup({ open: true, message: msg });
     } finally {
       setIsDeleting(false);
@@ -236,7 +236,7 @@ export default function CM_01_1013() {
     if (canManageAnswer) {
       return (
         <div className="border rounded p-3 bg-light">
-          <div className="fw-semibold mb-2">답변</div>
+          <div className="fw-semibold mb-2">回答</div>
           {answerError && <div className="text-danger small mb-2">{answerError}</div>}
           {editingAnswer ? (
             <>
@@ -254,7 +254,7 @@ export default function CM_01_1013() {
                   onClick={handleAnswerSubmit}
                   disabled={submittingAnswer}
                 >
-                  {submittingAnswer ? '저장 중...' : '저장'}
+                  {submittingAnswer ? '保存中...' : '保存'}
                 </button>
                 <button
                   type="button"
@@ -262,15 +262,15 @@ export default function CM_01_1013() {
                   onClick={handleAnswerCancel}
                   disabled={submittingAnswer}
                 >
-                  취소
+                  キャンセル
                 </button>
               </div>
             </>
           ) : hasAnswer ? (
             <>
               <div className="text-muted small mb-2">
-                {inquiry.answererName || inquiry.answererLoginId || '관리자'} / {answerDate}에
-                작성됨
+                {inquiry.answererName || inquiry.answererLoginId || '管理者'} / {answerDate}に
+                作成
               </div>
               <div style={{ whiteSpace: 'pre-line' }}>{inquiry.answerContent}</div>
               <div className="d-flex justify-content-end gap-2 mt-3">
@@ -279,19 +279,19 @@ export default function CM_01_1013() {
                   className="btn btn-outline-primary btn-sm"
                   onClick={handleAnswerEditStart}
                 >
-                  답변 수정
+                  回答を編集
                 </button>
               </div>
             </>
           ) : (
             <div className="d-flex justify-content-between align-items-center">
-              <span className="text-muted small">등록된 답변이 없습니다.</span>
+              <span className="text-muted small">登録された回答がありません。</span>
               <button
                 type="button"
                 className="btn btn-outline-primary btn-sm"
                 onClick={handleAnswerEditStart}
               >
-                답변 작성
+                回答を作成
               </button>
             </div>
           )}
@@ -304,18 +304,18 @@ export default function CM_01_1013() {
         {hasAnswer ? (
           <>
             <div className="d-flex justify-content-between align-items-center mb-2">
-              <div className="fw-semibold">답변</div>
+              <div className="fw-semibold">回答</div>
               <div className="text-muted small">
-                {inquiry.answererRoleId === 1 ? '운영자' : inquiry.answererLoginId} / {answerDate}에
-                작성됨
+                {inquiry.answererRoleId === 1 ? '運営者' : inquiry.answererLoginId} / {answerDate}に
+                作成
               </div>
             </div>
             <div style={{ whiteSpace: 'pre-line' }}>{inquiry.answerContent}</div>
           </>
         ) : (
           <>
-            <div className="fw-semibold mb-2">답변</div>
-            <span className="text-muted small">등록된 답변이 없습니다.</span>
+            <div className="fw-semibold mb-2">回答</div>
+            <span className="text-muted small">登録された回答がありません。</span>
           </>
         )}
       </div>
@@ -324,7 +324,7 @@ export default function CM_01_1013() {
 
   return (
     <>
-      <h1>1:1 문의</h1>
+      <h1>1:1お問い合わせ</h1>
       <div className="container-fluid px-3 px-md-5 py-4">
         <div className="border-top border-bottom py-3 px-2 d-flex justify-content-between fs-6 fs-sm-5">
           <div className="flex-grow-1">
@@ -356,7 +356,7 @@ export default function CM_01_1013() {
         <div className="border-top fs-5 mt-4">
           <div className="d-flex text-muted small border-bottom py-2">
             <span className="d-flex align-items-center gap-1">
-              이전글<i className="bi bi-caret-up-fill"></i>
+              前の記事<i className="bi bi-caret-up-fill"></i>
             </span>
             {prev ? (
               <span
@@ -367,12 +367,12 @@ export default function CM_01_1013() {
                 {prev.title}
               </span>
             ) : (
-              <span className="fs-6 ms-3 text-muted">이전글 내용이 없습니다.</span>
+              <span className="fs-6 ms-3 text-muted">前の記事はありません。</span>
             )}
           </div>
           <div className="d-flex small py-2">
             <span className="d-flex align-items-center gap-1">
-              다음글<i className="bi bi-caret-down-fill"></i>
+              次の記事<i className="bi bi-caret-down-fill"></i>
             </span>
             {next ? (
               <span
@@ -383,7 +383,7 @@ export default function CM_01_1013() {
                 {next.title}
               </span>
             ) : (
-              <span className="fs-6 ms-3 text-muted">다음글 내용이 없습니다.</span>
+              <span className="fs-6 ms-3 text-muted">次の記事はありません。</span>
             )}
           </div>
         </div>
@@ -391,7 +391,7 @@ export default function CM_01_1013() {
         {/* 버튼 */}
         <div className="d-flex justify-content-center align-items-center mt-4 gap-2">
           <button className="btn btn-secondary px-5" onClick={() => navigate('/mypage/inquiries')}>
-            목록
+            一覧
           </button>
           {isAuthor && !hasAnswer && (
             <button
@@ -399,7 +399,7 @@ export default function CM_01_1013() {
               onClick={handleDeleteClick}
               disabled={isDeleting}
             >
-              {isDeleting ? '삭제 중...' : '삭제'}
+              {isDeleting ? '削除中...' : '削除'}
             </button>
           )}
         </div>

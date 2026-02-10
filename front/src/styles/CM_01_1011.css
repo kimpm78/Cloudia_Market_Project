@@ -21,7 +21,7 @@
 .ag-grid-compact .ag-root-wrapper,
 .ag-grid-compact .ag-center-cols-viewport,
 .ag-grid-compact .ag-body-viewport {
-  min-height: 0 !important; /* unset도 가능 */
+  min-height: 0 !important;
 }
 
 @media (max-width: 576px) {

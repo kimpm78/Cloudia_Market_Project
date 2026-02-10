@@ -17,35 +17,35 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CM901053ServiceImpl implements CM901053Service {
 
-    // Mapper 정의
+    // Mapper定義
     private final CM901053Mapper cm901053Mapper;
 
     /**
-     * 재고 현황 조회
+     * 在庫状況取得
      * 
-     * @return 재고 현황 리스트
+     * @return 在庫状況リスト
      */
     @Override
     @Transactional(readOnly = true)
     public List<Stocks> findAllStockStatus() {
         List<Stocks> StocksList = cm901053Mapper.findAllStockStatus();
-        log.info("조회된 재고 현황 : {}", StocksList == null ? 0 : StocksList.size());
+        log.info("取得した在庫状況: {}", StocksList == null ? 0 : StocksList.size());
         return StocksList;
 
     }
 
     /**
-     * 선택 된 상품 코드 / 상품명의 재고 현황 정보 조회
+     * 選択された商品コード／商品名の在庫状況情報取得
      * 
-     * @param searchType 검색 타입 (1: 상품 코드 2: 상품 명)
-     * @param searchTerm 검색어
-     * @return 재고 현황 정보
+     * @param searchType 検索タイプ（1: 商品コード 2: 商品名）
+     * @param searchTerm 検索キーワード
+     * @return 在庫状況情報
      */
     @Override
     @Transactional(readOnly = true)
     public List<Stocks> findByStockStatus(String searchType, String searchTerm) {
         List<Stocks> StocksList = cm901053Mapper.findByStockStatus(searchType, searchTerm);
-        log.info("조회된 재고 현황 : {}", StocksList == null ? 0 : StocksList.size());
+        log.info("取得した在庫状況: {}", StocksList == null ? 0 : StocksList.size());
         return StocksList;
     }
 }

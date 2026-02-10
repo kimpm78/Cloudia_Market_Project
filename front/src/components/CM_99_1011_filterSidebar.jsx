@@ -9,7 +9,7 @@ export default function CM_99_1011_filterSideBar({
   onReset,
   keyword,
   onKeywordChange,
-  categoryLabel = '카테고리',
+  categoryLabel = 'カテゴリー',
   groupSelectionMode = 'include-children',
 }) {
   const [visible, setVisible] = useState(true);
@@ -51,7 +51,7 @@ export default function CM_99_1011_filterSideBar({
         setLocalCategoryGroups(mappedGroups);
         setLocalCategories(mappedDetails);
       } catch (err) {
-        console.error('[필터] 카테고리 로드 실패:', err);
+        console.error('[フィルター] カテゴリーの読み込みに失敗しました:', err);
       }
     };
 
@@ -70,7 +70,7 @@ export default function CM_99_1011_filterSideBar({
         <input
           type="text"
           className="form-control ps-5"
-          placeholder="키워드 검색"
+          placeholder="キーワード検索"
           value={keyword || ''}
           onChange={(e) => onKeywordChange(e.target.value)}
           style={{ height: '40px' }}
@@ -83,16 +83,16 @@ export default function CM_99_1011_filterSideBar({
           onClick={() => setVisible((prev) => !prev)}
         >
           <i className="bi bi-filter"></i>
-          {visible ? '필터 숨기기' : '필터 보이기'}
+          {visible ? 'フィルターを非表示' : 'フィルターを表示'}
         </h5>
         <hr className="border-3 border-dark" />
 
         {visible && (
           <>
             <div className="d-flex justify-content-between align-items-center mb-2">
-              <p className="mb-0">선택된 키워드</p>
+              <p className="mb-0">選択中のフィルター</p>
               <button className="btn btn-link p-0 text-danger" onClick={onReset}>
-                초기화
+                リセット
               </button>
             </div>
 
@@ -117,18 +117,18 @@ export default function CM_99_1011_filterSideBar({
             </div>
 
             <hr />
-            <h5>상품 정보</h5>
+            <h5>商品情報</h5>
             <hr className="border-3 border-dark" />
             <div className="form-check">
               <input
                 className="form-check-input"
                 type="checkbox"
                 id="outOfStock"
-                checked={selectedFilters.includes('품절상품 보기')}
-                onChange={() => onFilterChange('품절상품 보기')}
+                checked={selectedFilters.includes('売り切れ商品を表示')}
+                onChange={() => onFilterChange('売り切れ商品を表示')}
               />
               <label className="form-check-label" htmlFor="outOfStock">
-                품절상품 보기
+                売り切れ商品を表示
               </label>
             </div>
             <div className="form-check">
@@ -136,11 +136,11 @@ export default function CM_99_1011_filterSideBar({
                 className="form-check-input"
                 type="checkbox"
                 id="closedReservation"
-                checked={selectedFilters.includes('마감된 상품 보기')}
-                onChange={() => onFilterChange('마감된 상품 보기')}
+                checked={selectedFilters.includes('受付終了商品を表示')}
+                onChange={() => onFilterChange('受付終了商品を表示')}
               />
               <label className="form-check-label" htmlFor="closedReservation">
-                마감된 상품 보기
+                受付終了商品を表示
               </label>
             </div>
             <div className="form-check">
@@ -148,26 +148,26 @@ export default function CM_99_1011_filterSideBar({
                 className="form-check-input"
                 type="checkbox"
                 id="endOfReservation"
-                checked={selectedFilters.includes('예약종료상품 제외')}
-                onChange={() => onFilterChange('예약종료상품 제외')}
+                checked={selectedFilters.includes('予約終了商品を除外')}
+                onChange={() => onFilterChange('予約終了商品を除外')}
               />
               <label className="form-check-label" htmlFor="endOfReservation">
-                예약종료상품 제외
+                予約終了商品を除外
               </label>
             </div>
             <hr />
-            <h5>가격대별</h5>
+            <h5>価格帯</h5>
             <hr className="border-3 border-dark" />
             <div className="form-check">
               <input
                 className="form-check-input"
                 type="checkbox"
                 id="priceOver10000"
-                checked={selectedFilters.includes('1만원 이상')}
-                onChange={() => onFilterChange('1만원 이상')}
+                checked={selectedFilters.includes('10,000円以上')}
+                onChange={() => onFilterChange('10,000円以上')}
               />
               <label className="form-check-label" htmlFor="priceOver10000">
-                1만원 이상
+                10,000円以上
               </label>
             </div>
             <div className="form-check">
@@ -175,11 +175,11 @@ export default function CM_99_1011_filterSideBar({
                 className="form-check-input"
                 type="checkbox"
                 id="priceOver50000"
-                checked={selectedFilters.includes('5만원 이상')}
-                onChange={() => onFilterChange('5만원 이상')}
+                checked={selectedFilters.includes('50,000円以上')}
+                onChange={() => onFilterChange('50,000円以上')}
               />
               <label className="form-check-label" htmlFor="priceOver50000">
-                5만원 이상
+                50,000円以上
               </label>
             </div>
             <div className="form-check">
@@ -187,11 +187,11 @@ export default function CM_99_1011_filterSideBar({
                 className="form-check-input"
                 type="checkbox"
                 id="priceOver100000"
-                checked={selectedFilters.includes('10만원 이상')}
-                onChange={() => onFilterChange('10만원 이상')}
+                checked={selectedFilters.includes('100,000円以上')}
+                onChange={() => onFilterChange('100,000円以上')}
               />
               <label className="form-check-label" htmlFor="priceOver100000">
-                10만원 이상
+                100,000円以上
               </label>
             </div>
 

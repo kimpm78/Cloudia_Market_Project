@@ -13,149 +13,133 @@ import com.cloudia.backend.CM_04_1000.model.ReviewRequest;
 @Mapper
 public interface CM041000Mapper {
 
-    // ================================
-    // 리뷰 CRUD 관련 메서드
-    // ================================
-
     /**
-     * 리뷰 목록 조회 (상품별, 페이지네이션 포함)
+     * レビュー一覧を取得（商品別、ページネーション対応）
      *
-     * @param params 파라미터 맵 (productId, size, offset 등)
-     * @return 리뷰 리스트
+     * @param params パラメータマップ（productId, size, offset など）
+     * @return レビュー一覧
      */
     List<ReviewInfo> selectReviews(java.util.Map<String, Object> params);
 
     /**
-     * 리뷰 단건 조회
+     * レビューを1件取得
      *
-     * @param reviewId 리뷰 ID
-     * @return 리뷰 상세 정보
+     * @param reviewId レビューID
+     * @return レビュー詳細
      */
     ReviewInfo selectReviewById(@Param("reviewId") Long reviewId);
 
     /**
-     * 리뷰 작성
+     * レビュー作成
      *
-     * @param review 작성할 리뷰 요청 정보
-     * @return 생성된 리뷰 ID
+     * @param review 作成するレビューのリクエスト情報
+     * @return 作成されたレビューID
      */
     Long writeReview(ReviewRequest review);
 
     /**
-     * 리뷰 수정
+     * レビュー更新
      *
-     * @param reviewId 수정할 리뷰 ID
-     * @param review 수정할 리뷰 요청 정보
-     * @return 수정된 행 수 (성공: 1, 실패: 0)
+     * @param reviewId 更新対象のレビューID
+     * @param review 更新するレビューのリクエスト情報
+     * @return 更新件数（成功: 1, 失敗: 0）
      */
     int updateReview(@Param("reviewId") Long reviewId, 
         @Param("review") ReviewRequest review);
 
     /**
-     * 리뷰 삭제
+     * レビュー削除
      *
-     * @param reviewId 삭제할 리뷰 ID
-     * @param userId 삭제를 요청한 사용자 ID
-     * @return 삭제된 행 수
+     * @param reviewId 削除対象のレビューID
+     * @param userId 削除をリクエストしたユーザーID
+     * @return 削除件数
      */
     int deleteReview(@Param("reviewId") Long reviewId, @Param("userId") Long userId);
 
     /**
-     * 리뷰 조회수 +1
+     * レビュー閲覧数を+1
      *
-     * @param reviewId 조회수 증가 대상 리뷰 ID
+     * @param reviewId 閲覧数を増加させるレビューID
      */
     int incrementViewCount(@Param("reviewId") Long reviewId);
 
-    // ================================
-    // 주문 및 상품 관련 메서드
-    // ================================
-
     /**
-     * 작성자용 주문 + 상품 목록 조회
+     * 投稿者向け：注文＋商品一覧を取得
      *
-     * @param memberNumber 회원 번호
-     * @return 주문 + 상품 목록
+     * @param memberNumber 会員番号
+     * @return 注文＋商品一覧
      */
     List<OrderDetailResponse> selectOrdersWithProducts(@Param("memberNumber") String memberNumber);
 
     /**
-     * 주문 내 상품 존재 여부 확인 (리뷰 작성 전 검증)
+     * 注文内に商品が存在するか確認（レビュー作成前の検証）
      *
-     * @param memberNumber 회원 번호
-     * @param orderNumber 주문 번호
-     * @param productCode 상품 코드
-     * @return 존재하면 1 이상, 없으면 0
+     * @param memberNumber 会員番号
+     * @param orderNumber 注文番号
+     * @param productCode 商品コード
+     * @return 存在する場合は1以上、存在しない場合は0
      */
     int checkOrderProduct(@Param("memberNumber") String memberNumber,
         @Param("orderNumber") String orderNumber,
         @Param("productCode") String productCode);
 
     /**
-     * productCode로 productId 조회 (리뷰 등록 시 변환용)
+     * productCode から productId を取得（レビュー登録時の変換用）
      *
-     * @param productCode 상품 코드
-     * @return 상품 PK
+     * @param productCode 商品コード
+     * @return 商品PK
      */
     Long findProductIdByCode(@Param("productCode") String productCode);
 
-    // ================================
-    // 이미지 관리 관련 메서드
-    // ================================
-
     /**
-     * 리뷰 메인 이미지 업데이트
+     * レビューのメイン画像を更新
      *
-     * @param reviewId 리뷰 ID
-     * @param imageUrl 메인 이미지 URL
-     * @return 성공한 행 수
+     * @param reviewId レビューID
+     * @param imageUrl メイン画像URL
+     * @return 更新件数
      */
     int updateReviewImage(@Param("reviewId") Long reviewId, @Param("imageUrl") String imageUrl);
         
     /**
-     * 리뷰 에디터 이미지 등록
+     * レビューエディター画像を登録
      *
-     * @param attachment 등록할 첨부 이미지 정보
-     * @return 등록된 행 수
+     * @param attachment 登録する添付画像情報
+     * @return 登録件数
      */
     int insertReviewAttachment(Attachments attachment);
 
     /**
-     * 리뷰 에디터 이미지 수정
+     * レビューエディター画像を更新
      *
-     * @param attachment 수정할 첨부 이미지 정보
-     * @return 수정된 행 수
+     * @param attachment 更新する添付画像情報
+     * @return 更新件数
      */
     // int updateReviewAttachment(Attachments attachment);
 
     /**
-     * 리뷰 에디터 이미지 조회
+     * レビューエディター画像を取得
      *
-     * @param reviewId 리뷰 ID
-     * @return 첨부 이미지 리스트
+     * @param reviewId レビューID
+     * @return 添付画像一覧
      */
     List<Attachments> selectReviewAttachments(@Param("reviewId") Long reviewId);
 
     /**
-     * 리뷰 에디터 이미지 삭제
+     * レビューエディター画像を削除
      *
-     * @param imageId 첨부 이미지 ID
-     * @param reviewId 리뷰 ID
-     * @return 삭제된 행 수
+     * @param imageId 添付画像ID
+     * @param reviewId レビューID
+     * @return 削除件数
      */
     int deleteReviewAttachment(@Param("imageId") Long imageId, @Param("reviewId") Long reviewId);
 
-    // ================================
-    // 리뷰 본문 내용 업데이트 관련 메서드
-    // ================================
-
     /**
-     * 리뷰 본문 내용 업데이트
+     * レビュー本文を更新
      *
-     * @param reviewId 리뷰 ID
-     * @param content  수정된 HTML 콘텐츠
-     * @param updatedBy 수정자
-     * @return 업데이트된 행 수
+     * @param reviewId レビューID
+     * @param content  更新後のHTMLコンテンツ
+     * @param updatedBy 更新者
+     * @return 更新件数
      */
     int updateReviewContent(@Param("reviewId") Long reviewId,
         @Param("content") String content,

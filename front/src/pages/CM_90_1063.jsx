@@ -12,20 +12,20 @@ export default function CM_90_1063() {
   const [rowData, setRowData] = useState([]);
   const columnDefs = [
     {
-      headerName: '상품 코드',
+      headerName: '商品コード',
       field: 'productCode',
       minWidth: 100,
       maxWidth: 120,
       flex: 1,
     },
     {
-      headerName: '상품명',
+      headerName: '商品名',
       field: 'productName',
       minWidth: 300,
       flex: 2,
     },
     {
-      headerName: '수량',
+      headerName: '数量',
       field: 'qty',
       minWidth: 80,
       maxWidth: 100,
@@ -41,13 +41,13 @@ export default function CM_90_1063() {
       },
     },
     {
-      headerName: '비고',
+      headerName: '備考',
       field: 'reason',
       minWidth: 100,
       flex: 1,
     },
     {
-      headerName: '재고 등록일',
+      headerName: '在庫登録日',
       field: 'createdAt',
       minWidth: 120,
       maxWidth: 180,
@@ -64,7 +64,7 @@ export default function CM_90_1063() {
       },
     },
     {
-      headerName: '재고 등록자',
+      headerName: '在庫登録者',
       field: 'createdBy',
       minWidth: 120,
       maxWidth: 180,
@@ -98,7 +98,7 @@ export default function CM_90_1063() {
   return (
     <div className="d-flex">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">재고 목록</h5>
+        <h2 className="border-bottom pb-2 mb-3">在庫一覧</h2>
 
         <div className="row mb-3">
           <div className="col-12">
@@ -109,25 +109,25 @@ export default function CM_90_1063() {
                   value={searchType}
                   onChange={(e) => setSearchType(e.target.value)}
                 >
-                  <option value="1">상품 코드</option>
-                  <option value="2">상품 명</option>
+                  <option value="1">商品コード</option>
+                  <option value="2">商品名</option>
                 </select>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="상품코드 / 상품명을 입력하세요"
+                  placeholder="商品コード/商品名を入力してください"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
               </div>
               <button className="btn btn-primary me-2 btn-min-width" onClick={handleSearch}>
-                검색
+                検索
               </button>
               <div className="spacer-30px"></div>
               <div className="ms-auto">
                 <Link to="/admin/products/stock/register" className="btn btn-primary btn-min-width">
-                  등록
+                  登録
                 </Link>
               </div>
             </div>

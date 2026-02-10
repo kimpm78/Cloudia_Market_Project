@@ -13,8 +13,8 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class WeeklySalesDto {
-    private Integer dayNum;      // 요일(숫자)
-    private String dayOfWeek;    // 요일(문자)
-    private Integer totalAmount; // 총금액
+public class WeeklySales {
+    private Integer dayNum;      // 曜日（数値）
+    private String dayOfWeek;    // 曜日（文字列）
+    private Integer totalAmount; // 合計金額
 }

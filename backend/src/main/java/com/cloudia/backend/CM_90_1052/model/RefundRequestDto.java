@@ -17,93 +17,27 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefundRequestDto {
-    /**
-     * 요청 번호
-     */
-    private String requestNo;
+    private String requestNo;                   // 返金リクエスト番号
+    private String refundNumber;                // 返金番号
+    private String orderNumber;                 // 注文番号
+    private String refundType;                  // 返金種別
+    private String exchangeParts;               // 交換部品有無（Y/N）
+    private List<RefundProductDto> products;    // 返金商品一覧
+    private String shippingFee;                 // 配送料
+    private Integer shippingAmount;             // 配送料金額
+    private Integer productTotalAmount;         // 商品合計金額
+    private Integer totalAmount;                // 合計金額
+    private String memo;                        // メモ    
 
-    /**
-     * 회원 번호
-     */
-    private String refundNumber;
-
-    /**
-     * 구매 번호
-     */
-    private String orderNumber;
-
-    /**
-     * 환불 타입 (0: 환불, 1: 교환)
-     */
-    private String refundType;
-
-    /**
-     * 교환 부품 (0: 풀패키지, 1: 본체, 2: 파츠)
-     */
-    private String exchangeParts;
-
-    /**
-     * 상품 리스트
-     */
-    private List<RefundProductDto> products;
-
-    /**
-     * 배송비 부담 (0: 무기와라 장터, 1: 구매자)
-     */
-    private String shippingFee;
-
-    /**
-     * 배송 금액
-     */
-    private Integer shippingAmount;
-
-    /**
-     * 취소 상품 총 금액
-     */
-    private Integer productTotalAmount;
-
-    /**
-     * 총 취소 금액
-     */
-    private Integer totalAmount;
-
-    /**
-     * 메모
-     */
-    private String memo;
-
-    /**
-     * 환불 상품 상세 DTO
-     */
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RefundProductDto {
-
-        /**
-         * 상품 번호
-         */
-        private String productNumber;
-
-        /**
-         * 상품명
-         */
-        private String productName;
-
-        /**
-         * 수량
-         */
-        private Integer quantity;
-
-        /**
-         * 단가
-         */
-        private Integer unitPrice;
-
-        /**
-         * 총 금액
-         */
-        private Integer totalPrice;
+        private String productNumber;           // 商品番号
+        private String productName;             // 商品名
+        private Integer quantity;               // 数量
+        private Integer unitPrice;              // 単価
+        private Integer totalPrice;             // 合計金額
     }
 }

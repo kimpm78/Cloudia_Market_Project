@@ -12,45 +12,45 @@ import java.util.Map;
 public interface CM011015Mapper {
 
         /**
-         * 로그인한 사용자의 교환/반품 신청 내역 목록을 조회
+         * ログイン中ユーザーの交換／返品申請履歴一覧を取得
          */
         List<ReturnResponse> getReturnList(@Param("userId") int userId);
 
         /**
-         * 특정 교환/반품 신청건의 상세 내역을 조회
+         * 特定の交換／返品申請の詳細情報を取得
          */
         ReturnResponse getReturnDetail(@Param("returnId") int returnId, @Param("userId") int userId);
 
         /**
-         * 신청 화면에서 주문번호 선택 시, 해당 주문에 포함된 상품 목록을 조회
+         * 申請画面で注文番号選択時、該当注文に含まれる商品一覧を取得
          */
         List<ReturnResponse.ProductInfo> getProductsByOrderNo(@Param("orderNo") String orderNo,
                         @Param("userId") int userId);
 
         /**
-         * 교환/반품 신청서의 마스터 정보를 저장
+         * 交換／返品申請書のマスター情報を保存
          */
         void insertReturnRequest(@Param("req") ReturnRequest req, @Param("imageUrls") String imageUrls,
                         @Param("userId") int userId, @Param("createdAt") LocalDateTime createdAt);
 
         /**
-         * 교환/반품 신청서에 포함된 개별 상품의 상세 정보를 저장
+         * 交換／返品申請書に含まれる個別商品の詳細情報を保存
          */
         void insertReturnDetail(@Param("productCode") String productCode, @Param("quantity") int quantity,
                         @Param("createdBy") String createdBy);
 
         /**
-         * 주문의 상태를 교환/반품 관련 상태로 업데이트
+         * 注文ステータスを交換／返品関連ステータスに更新
          */
         void updateToExchangeStatus(@Param("orderNo") String orderNo, @Param("memberNumber") String memberNumber);
 
         /**
-         * 현재 세션에서 가장 최근에 생성된 반품 ID를 조회
+         * 現在のセッションで直近に生成された返品IDを取得
          */
         int getCurrentReturnId();
 
         /**
-         * 신청 가능한 구매 확정 주문 목록 조회
+         * 申請可能な購入確定注文一覧を取得
          */
         List<Map<String, Object>> getReturnableOrders(@Param("userId") int userId);
 }

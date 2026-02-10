@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "ShippingCompleted_jp",
+    "SubjectPart": "【クラウディア マーケット】発送完了のお知らせ（自動送信）",
+    "TextPart": "＜本メールは返信できません。ご了承ください。＞\n\n{{name}} 様\nご注文商品の発送が完了しました。\n\n────────────────────\n■ 発送情報\n────────────────────\n注文日：{{orderDate}}\n注文番号：{{orderNumber}}\nお支払い方法：{{paymentMethod}}\n追跡番号：{{trackingNumber}}\n商品情報：{{orderItems}}\n\nお届けまで今しばらくお待ちください。",
+    "HtmlPart": "<html><body style=\"font-family: Arial, sans-serif; color:#000; font-size:14px; line-height:1.7;\"><p>＜本メールは返信できません。ご了承ください。＞</p><p><strong>{{name}}</strong> 様<br>ご注文商品の発送が完了しました。</p><hr><h4>■ 発送情報</h4><p>注文日：{{orderDate}}<br>注文番号：{{orderNumber}}<br>お支払い方法：{{paymentMethod}}<br>追跡番号：<strong style=\"color:#1a73e8;\">{{trackingNumber}}</strong><br>商品情報：{{orderItems}}</p><p>お届けまで今しばらくお待ちください。</p></body></html>"
+  }
+}

@@ -8,17 +8,18 @@ import com.cloudia.backend.common.model.ResponseModel;
 public interface CM011002Service {
 
     /**
-     * * @param email 가입 여부를 확인할 사용자의 이메일
+     * メールアドレスに認証コードを送信
      * 
-     * @return 발송 성공 또는 실패에 대한 응답
+     * @param 登録有無を確認するユーザーのメールアドレス
+     * @return 'message'が含まれた応答
      */
     ResponseEntity<ResponseModel<Map<String, String>>> sendVerificationCodeForFindId(String email);
 
     /**
-     * * @param email 사용자의 이메일
+     * メールアドレスと認証コードを検証し、ログインIDを返す
      * 
-     * @param code 사용자가 입력한 인증 코드
-     * @return 'loginId'가 포함된 응답
+     * @param code ユーザーが入力した認証コード
+     * @return 'loginId'が含まれた応答
      */
     ResponseEntity<ResponseModel<Map<String, Object>>> verifyAndFindId(String email, String code);
 }

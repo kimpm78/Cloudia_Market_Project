@@ -46,16 +46,16 @@
             (
                 SELECT pd.thumbnail_url 
                 FROM order_details od_sub 
-                JOIN products p_sub ON od_sub.product_id = p_sub.product_code 
+                JOIN products p_sub ON od_sub.product_code = p_sub.product_code 
                 JOIN product_details pd ON p_sub.product_id = pd.product_id 
                 WHERE od_sub.order_number = o.order_number 
                 ORDER BY od_sub.order_detail_id ASC 
                 LIMIT 1
             ) AS product_image_url,
             (
-                SELECT p.name 
+                SELECT p.title 
                 FROM order_details od4 
-                JOIN products p ON od4.product_id = p.product_code 
+                JOIN products p ON od4.product_code = p.product_code 
                 WHERE od4.order_number = o.order_number 
                   AND od4.member_number = o.member_number 
                 ORDER BY od4.order_detail_id ASC 
@@ -75,9 +75,9 @@
             o.member_number = #{memberNumber}
         AND EXISTS (
             SELECT 1 FROM order_details od_chk
-            JOIN products p_chk ON od_chk.product_id = p_chk.product_code
+            JOIN products p_chk ON od_chk.product_code = p_chk.product_code
             WHERE od_chk.order_number::TEXT = o.order_number::TEXT
-            AND p_chk.is_display = 1
+            AND CAST(p_chk.is_display AS TEXT) = '1'
             AND (
                 p_chk.code_value::TEXT = '1' 
                 OR (
@@ -89,10 +89,10 @@
         <if test="keyword != null and keyword != ''">
             AND EXISTS (
                 SELECT 1 FROM order_details od_search 
-                JOIN products p_search ON od_search.product_id = p_search.product_code 
+                JOIN products p_search ON od_search.product_code = p_search.product_code 
                 WHERE od_search.order_number = o.order_number 
                   AND od_search.member_number = o.member_number 
-                  AND LOWER(p_search.name) LIKE '%' || LOWER(#{keyword}) || '%'
+                  AND LOWER(p_search.title) LIKE '%' || LOWER(#{keyword}) || '%'
             )
         </if>
         <if test="orderStatusValue != null"> 
@@ -134,9 +134,9 @@
             END AS payment_at,
             da.address_main || ' ' || da.address_detail1 || ' ' || COALESCE(da.address_detail2, '') AS shipping_address,
             (
-                SELECT p_sub.name 
+                SELECT p_sub.title 
                 FROM order_details od4 
-                JOIN products p_sub ON od4.product_id = p_sub.product_code 
+                JOIN products p_sub ON od4.product_code = p_sub.product_code 
                 WHERE od4.order_number = o.order_number 
                   AND od4.member_number = o.member_number 
                 ORDER BY od4.order_detail_id ASC 
@@ -162,21 +162,21 @@
     <select id="findPaymentDetailsByOrderNo" resultType="com.cloudia.backend.CM_01_1005.model.OrderDetailResponse$Payment">
         SELECT
             DISTINCT ON (od.order_detail_id)
-            COALESCE(p.name, od.product_id) AS product,
-            od.product_id AS productCode,
+            COALESCE(p.title, od.product_code) AS product,
+            od.product_code AS productCode,
             od.quantity,
             (COALESCE(od.quantity, 0) * COALESCE(od.unit_price, 0)) AS total,
             pd.thumbnail_url AS imageUrl
         FROM
             order_details od
         LEFT JOIN 
-            products p ON od.product_id = p.product_code
+            products p ON od.product_code = p.product_code
         LEFT JOIN 
             product_details pd ON p.product_id = pd.product_id
         WHERE 
             od.order_number = #{orderNo} 
             AND od.member_number = #{memberNumber}
-            AND p.is_display = 1
+            AND CAST(p.is_display AS TEXT) = '1'
             AND (
                 p.code_value = '1' 
                 OR 
@@ -236,7 +236,7 @@
             delivery_addresses 
         WHERE 
             member_number = #{memberNumber} 
-          AND is_active = 1
+          AND deleted_at IS NULL
         ORDER BY 
             is_default DESC, 
             address_id ASC
@@ -321,7 +321,7 @@
             pg_provider AS pgProvider,
             transaction_id AS transactionId,
             amount,
-            payment_method AS paymentMethod,
+            payment_code AS paymentMethod,
             payment_status_code AS paymentStatusCode
         FROM 
             payments
@@ -333,14 +333,14 @@
 
     <select id="findOrderItemsForStockRestore" resultType="map">
         SELECT 
-            od.product_id AS "productCode",
+            od.product_code AS "productCode",
             od.quantity AS "quantity",
             s.stock_id AS "stockId",
             s.available_qty AS "currentStock"
         FROM 
             order_details od
         LEFT JOIN 
-            stocks s ON od.product_id = s.product_code
+            stocks s ON od.product_code = s.product_code
         WHERE 
             od.order_number = #{orderNo}
     </select>

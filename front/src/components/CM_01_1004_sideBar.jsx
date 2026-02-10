@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import axiosInstance from '../services/axiosInstance';
 import '../styles/CM_01_1004.css';
 
-export default function CM_01_1004_sideBar() {
+export default function CM_01_1004_SideBar() {
   const [menuData, setMenuData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,8 +16,8 @@ export default function CM_01_1004_sideBar() {
         setMenuData(res.data || []);
         setError(null);
       } catch (err) {
-        console.error('마이페이지 메뉴 로딩 실패:', err);
-        setError('메뉴를 불러오는 데 실패했습니다.');
+        console.error('マイページメニューの読み込みに失敗しました:', err);
+        setError('メニューの読み込みに失敗しました。');
         setMenuData([]);
       } finally {
         setLoading(false);
@@ -29,7 +29,7 @@ export default function CM_01_1004_sideBar() {
   if (loading) {
     return (
       <div className="mypage-sidebar">
-        <div className="sidebar-loading">메뉴 로딩 중...</div>
+        <div className="sidebar-loading">メニュー読み込み中...</div>
       </div>
     );
   }
@@ -37,13 +37,25 @@ export default function CM_01_1004_sideBar() {
   if (error) {
     return (
       <div className="mypage-sidebar">
-        <div className="sidebar-error">메뉴 로드 실패</div>
+        <div className="sidebar-error">メニューの読み込みに失敗しました</div>
       </div>
     );
   }
 
   return (
     <div className="sidebar">
+      <div className="sidebar-section">
+        <NavLink
+          to="/mypage"
+          end
+          className={({ isActive }) =>
+            `sidebar-title text-decoration-none mypage-sidebar-link ${isActive ? 'active fw-bold' : ''}`
+          }
+        >
+          マイページ
+        </NavLink>
+      </div>
+
       {menuData.map((section) => (
         <div key={section.menuId} className="sidebar-section">
           <div className="sidebar-title">{section.menuName}</div>
@@ -53,8 +65,9 @@ export default function CM_01_1004_sideBar() {
                 <li key={item.menuId} className="sidebar-item">
                   <NavLink
                     to={item.url}
-                    className={({ isActive }) => `link-body-emphasis ${isActive ? 'fw-bold' : ''}`}
-                    style={{ textDecoration: 'none' }}
+                    className={({ isActive }) =>
+                      `text-decoration-none mypage-sidebar-link ${isActive ? 'active fw-bold' : ''}`
+                    }
                   >
                     {item.menuName}
                   </NavLink>

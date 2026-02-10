@@ -4,22 +4,22 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 
-import com.cloudia.backend.CM_90_1031.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_90_1031.model.ageDto;
 import com.cloudia.backend.CM_90_1031.model.genderDto;
 
 public interface CM901031Service {
     /**
-     * 연령대 리스트 조회
+     * 年齢層一覧取得
      * 
-     * @return 연령대 리스트
+     * @return 年齢層一覧
      */
     ResponseEntity<ResponseModel<List<ageDto>>> findByAllAges();
 
     /**
-     * 성별 리스트 조회
+     * 性別一覧取得
      * 
-     * @return 성별 리스트
+     * @return 性別一覧
      */
     ResponseEntity<ResponseModel<List<genderDto>>> findByAllGenders();
 }

@@ -32,15 +32,15 @@ export default function ResetPasswordSetting({ email, onSuccess }) {
       /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).{8,20}$/;
 
     if (!password) {
-      newErrors.password = '새 비밀번호를 입력해주세요.';
+      newErrors.password = '新しいパスワードを入力してください。';
     } else if (!passwordRegex.test(password)) {
-      newErrors.password = '비밀번호는 8~20자의 영문, 숫자, 특수문자 조합이어야 합니다.';
+      newErrors.password = 'パスワードは8〜20文字の英字・数字・記号の組み合わせで入力してください。';
     }
 
     if (!passwordConfirm) {
-      newErrors.passwordConfirm = '새 비밀번호 확인을 입력해주세요.';
+      newErrors.passwordConfirm = '新しいパスワード（確認）を入力してください。';
     } else if (password !== passwordConfirm) {
-      newErrors.passwordConfirm = '비밀번호가 일치하지 않습니다.';
+      newErrors.passwordConfirm = 'パスワードが一致しません。';
     }
     return newErrors;
   };
@@ -61,7 +61,7 @@ export default function ResetPasswordSetting({ email, onSuccess }) {
       });
       onSuccess();
     } catch (err) {
-      setErrors({ api: err.response?.data?.message || '비밀번호 변경에 실패했습니다.' });
+      setErrors({ api: err.response?.data?.message || 'パスワードの変更に失敗しました。' });
     } finally {
       setLoading(false);
     }
@@ -69,15 +69,15 @@ export default function ResetPasswordSetting({ email, onSuccess }) {
 
   return (
     <>
-      <h4 className="fw-bold mb-3">비밀번호 재설정</h4>
-      <p className="text-muted mb-4">새로운 비밀번호를 입력해주세요.</p>
+      <h4 className="fw-bold mb-3">パスワード再設定</h4>
+      <p className="text-muted mb-4">新しいパスワードを入力してください。</p>
 
       <div className="form-group mb-2">
         <div className="password-input-container">
           <input
             type={showPassword ? 'text' : 'password'}
             name="password"
-            placeholder="새 비밀번호"
+            placeholder="新しいパスワード"
             className={`form-control ${errors.password ? 'is-invalid' : ''}`}
             value={formData.password}
             onChange={handleChange}
@@ -100,7 +100,7 @@ export default function ResetPasswordSetting({ email, onSuccess }) {
           <input
             type={showPasswordConfirm ? 'text' : 'password'}
             name="passwordConfirm"
-            placeholder="새 비밀번호 확인"
+            placeholder="新しいパスワード（確認）"
             className={`form-control ${errors.passwordConfirm ? 'is-invalid' : ''}`}
             value={formData.passwordConfirm}
             onChange={handleChange}
@@ -119,7 +119,7 @@ export default function ResetPasswordSetting({ email, onSuccess }) {
       </div>
       <div className="d-grid mt-4">
         <button className="btn btn-primary" onClick={handleSubmit} disabled={loading}>
-          {loading ? '변경 중...' : '비밀번호 변경'}
+          {loading ? '変更中...' : 'パスワードを変更'}
         </button>
       </div>
       {errors.api && <div className="invalid-feedback d-block text-start">{errors.api}</div>}

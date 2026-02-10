@@ -9,12 +9,13 @@ import { hasReservationClosed } from '../utils/productStatus';
 import CMMessage from '../constants/CMMessage';
 import '../styles/CM_03_1000.css';
 import { loadCartMeta, getEventName } from '../utils/cartMetaStorage';
+import { normalizeImageUrl } from '../utils/htmlContent';
 
 const PRODUCT_STATUS_MAP = {
-  1: '판매중',
+  1: '販売中',
   2: 'SOLD OUT',
-  3: '예약중',
-  4: '예약 마감',
+  3: '予約受付中',
+  4: '予約締切',
 };
 
 const normalizeStatusCode = (value) => {
@@ -57,7 +58,7 @@ export default function CM_03_1000({
       .filter((v) => v.length > 0);
 
     return Boolean(
-      item.isReservation || item.reservationOnly || groupNames.some((name) => name.includes('예약'))
+      item.isReservation || item.reservationOnly || groupNames.some((name) => name.includes('予約'))
     );
   };
 
@@ -113,7 +114,7 @@ export default function CM_03_1000({
         });
         setAllItems(normalized);
       } catch (err) {
-        console.error('신상품 불러오기 실패:', err?.response?.data?.message || err.message);
+        console.error('新商品の取得に失敗しました:', err?.response?.data?.message || err.message);
       } finally {
         setLoading(false);
       }
@@ -166,7 +167,7 @@ export default function CM_03_1000({
     return Array.from(filters);
   };
 
-  const categoryGroupLabels = getCategoryGroupsForPage('신상품');
+  const categoryGroupLabels = getCategoryGroupsForPage('新商品');
 
   const getFilteredItems = () => {
     const effectiveFilters = getEffectiveFilters(selectedFilters, categoryGroupLabels, allItems);
@@ -303,7 +304,7 @@ export default function CM_03_1000({
         label: PRODUCT_STATUS_MAP[explicitCode],
         isReservation: isReservationStatus(explicitCode),
         reservationClosed: explicitCode === '4',
-        // 코드일람 기준으로만 품절/마감 처리 (2=품절, 4=예약 마감)
+        // コード一覧基準でのみ売り切れ／締切を判定（2=売り切れ、4=予約締切）
         soldOut: isSoldOutStatus(explicitCode) || soldOutByStock,
       };
     }
@@ -349,13 +350,15 @@ export default function CM_03_1000({
 
   return (
     <>
-      <h1 ref={topRef}>신상품</h1>
+      <h1 className="m-5" ref={topRef}>
+        新商品
+      </h1>
       <div className="container-fluid my-4">
         <div className="row justify-content-center">
           {showFilter && (
             <div className="col-12 col-md-3 mb-3 mb-md-0">
               <CM_99_1011_filterSidebar
-                pageName="신상품"
+                pageName="新商品"
                 selectedFilters={selectedFilters}
                 onFilterChange={handleFilterChange}
                 onReset={handleReset}
@@ -368,9 +371,7 @@ export default function CM_03_1000({
             {paginatedItems.length === 0 ? (
               <div className="text-center mt-5">
                 <h5 style={{ color: 'red' }}>{CMMessage.MSG_EMPTY_001}</h5>
-                <p className="text-muted">
-                  {CMMessage.MSG_EMPTY_002}
-                </p>
+                <p className="text-muted">{CMMessage.MSG_EMPTY_002}</p>
               </div>
             ) : (
               <div className="row row-cols-2 row-cols-md-5 g-4">
@@ -389,7 +390,7 @@ export default function CM_03_1000({
                   if (!isReservationProduct) {
                     const overlayText = soldOut
                       ? PRODUCT_STATUS_MAP['2']
-                      : status?.label ?? PRODUCT_STATUS_MAP['1'];
+                      : (status?.label ?? PRODUCT_STATUS_MAP['1']);
                     const card = (
                       <div className="card border-0 text-start rounded overflow-hidden h-100 d-flex flex-column">
                         <div className="position-relative">
@@ -397,7 +398,7 @@ export default function CM_03_1000({
                             src={getImageUrl(item.thumbnailUrl || item.image)}
                             onError={(e) => (e.currentTarget.src = noImage)}
                             className="product-card-img rounded"
-                            alt="상품 이미지"
+                            alt="商品画像"
                             style={{ aspectRatio: '1/1', objectFit: 'cover' }}
                           />
                           {soldOut && (
@@ -422,7 +423,7 @@ export default function CM_03_1000({
                           </div>
                           <div className="mt-auto">
                             <div className="fw-bold mt-2 item-price-text fs-5">
-                              {item.price.toLocaleString()}원
+                              {item.price.toLocaleString()}円
                             </div>
                             {item.productnote && (
                               <div
@@ -447,7 +448,7 @@ export default function CM_03_1000({
                       </div>
                     );
                   }
-                  // 예약상품
+                  // 予約商品
                   const badge = buildStatusBadge(status);
                   const overlayText =
                     status?.label ??
@@ -459,7 +460,7 @@ export default function CM_03_1000({
                           src={getImageUrl(item.thumbnailUrl || item.image)}
                           onError={(e) => (e.currentTarget.src = noImage)}
                           className="product-card-img rounded"
-                          alt="상품 이미지"
+                          alt="商品画像"
                         />
                         {soldOut && (
                           <div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-light bg-opacity-75 rounded">
@@ -488,14 +489,15 @@ export default function CM_03_1000({
                           </div>
                         )}
                         <p className="mb-1 text-primary small fw-bold" style={{ fontSize: '12px' }}>
-                          [예약구매] <span className="text-danger">*조기 품절 될 수 있습니다.</span>
+                          [予約購入]{' '}
+                          <span className="text-danger">※早期に売り切れる場合があります。</span>
                         </p>
                         <div className="fw-bold text-secondary" style={{ fontSize: '15px' }}>
                           {item.name}
                         </div>
                         <div className="mt-auto">
                           <div className="fw-bold mt-2 item-price-text fs-5">
-                            {(item.productPrice ?? item.price)?.toLocaleString()}원
+                            {(item.productPrice ?? item.price)?.toLocaleString()}円
                           </div>
                           {item.productnote && (
                             <div

@@ -23,14 +23,14 @@ public class CM901050ServiceImpl implements CM901050Service {
     private final CM901050Mapper cm901050Mapper;
 
     /**
-     * 매출 정보 전체 리스트 조회
+     * 売上情報全件一覧取得
      * 
-     * @return 매출 정보 전체 리스트
+     * @return 売上情報全件一覧
      */
     @Override
     @Transactional(readOnly = true)
     public List<ResultDto> findByAllSales() {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "매출 정보(표)" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "売上情報（表）" });
 
         List<ResultDto> responseList = cm901050Mapper.findByAllSales();
 
@@ -39,21 +39,21 @@ public class CM901050ServiceImpl implements CM901050Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "매출 정보(표)", String.valueOf(responseList.size()) });
+                new String[] { "売上情報（表）", String.valueOf(responseList.size()) });
 
         return responseList;
     }
 
     /**
-     * 특정 매출 정보 리스트 조회
+     * 条件指定売上情報一覧取得
      * 
-     * @param searchRequest 검색 조건
-     * @return 특정 매출 정보 리스트
+     * @param searchRequest 検索条件
+     * @return 売上情報一覧
      */
     @Override
     @Transactional(readOnly = true)
     public List<ResultDto> getFindSales(SearchRequestDto searchRequest) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "매출 정보(표)" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "売上情報（表）" });
 
         List<ResultDto> responseList = cm901050Mapper.getFindSales(searchRequest);
 
@@ -61,7 +61,7 @@ public class CM901050ServiceImpl implements CM901050Service {
             responseList = Collections.emptyList();
         }
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "매출 정보(표)", String.valueOf(responseList.size()) });
+                new String[] { "売上情報（表）", String.valueOf(responseList.size()) });
 
         return responseList;
     }

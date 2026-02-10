@@ -1,27 +1,27 @@
 import { hasReservationClosed } from './productStatus';
 import { isSoldOutBasic } from './productInventory';
 
-// 페이지별로 허용된 카테고리 그룹 설정
+// ページ別カテゴリーグループマッピング 定義
 export const CATEGORY_PAGE_MAP = [
   {
-    page: '신상품',
-    groups: ['예약 상품', '캐릭터', '장르'],
+    page: '新商品',
+    groups: ['予約商品', 'キャラクター', 'ジャンル'],
   },
   {
-    page: '예약 상품',
-    groups: ['예약 상품'],
+    page: '予約商品',
+    groups: ['予約商品'],
   },
   {
-    page: '캐릭터',
-    groups: ['캐릭터'],
+    page: 'キャラクター',
+    groups: ['キャラクター'],
   },
   {
-    page: '장르',
-    groups: ['장르'],
+    page: 'ジャンル',
+    groups: ['ジャンル'],
   },
 ];
 
-// 페이지에 해당하는 카테고리 그룹 라벨들을 반환
+// ページに対応するカテゴリグループラベルを返す
 export const getCategoryGroupsForPage = (page) => {
   const entry = CATEGORY_PAGE_MAP.find((item) => item.page === page);
   return entry ? entry.groups : [];
@@ -42,7 +42,7 @@ const parseItemCategories = (raw) => {
   }
 };
 
-// 카테고리 필터 매칭 (하이픈 구분자 고려)
+// カテゴリフィルターのマッチング（ハイフン区切りを考慮）
 const isCategoryMatch = (filters, categories) => {
   return filters.some(
     (filter) =>
@@ -55,30 +55,30 @@ const isCategoryMatch = (filters, categories) => {
   );
 };
 
-// 선택된 필터들로 아이템 필터링
+// 選択されたフィルターでアイテムを絞り込む
 export const filterItemBySelectedFilters = (item, selectedFilters) => {
   const filtersArray = Array.isArray(selectedFilters) ? selectedFilters : [];
   const normalized = filtersArray.map((f) => String(f ?? '').trim());
 
-  const statusFilters = ['품절상품 제외', '품절상품 보기', '마감된 상품 보기', '예약종료상품 제외'];
-  const priceFilters = ['1만원 이상', '5만원 이상', '10만원 이상'];
+  const statusFilters = ['品切れ商品除外', '品切れ商品表示', '終了商品表示', '予約終了商品除外'];
+  const priceFilters = ['1万円以上', '5万円以上', '10万円以上'];
 
   const evalFilter = (filter) => {
-    if (filter === '품절상품 제외') return !isSoldOutBasic(item);
-    if (filter === '품절상품 보기') return isSoldOutBasic(item);
-    if (filter === '마감된 상품 보기') return hasReservationClosed(item);
-    if (filter === '예약종료상품 제외') return !hasReservationClosed(item);
+    if (filter === '品切れ商品除外') return !isSoldOutBasic(item);
+    if (filter === '品切れ商品表示') return isSoldOutBasic(item);
+    if (filter === '終了商品表示') return hasReservationClosed(item);
+    if (filter === '予約終了商品除外') return !hasReservationClosed(item);
 
     const price = item.productPrice ?? item.price ?? 0;
-    if (filter === '1만원 이상') return price >= 10000;
-    if (filter === '5만원 이상') return price >= 50000;
-    if (filter === '10만원 이상') return price >= 100000;
+    if (filter === '1万円以上') return price >= 10000;
+    if (filter === '5万円以上') return price >= 50000;
+    if (filter === '10万円以上') return price >= 100000;
 
     return true;
   };
 
   const statusSelected = normalized.filter((f) => statusFilters.includes(f));
-  // OR logic for 상태 필터들
+  // ステータスフィルターは OR 条件
   if (statusSelected.length > 0) {
     const anyStatusMatch = statusSelected.some((f) => evalFilter(f));
     if (!anyStatusMatch) {
@@ -86,13 +86,13 @@ export const filterItemBySelectedFilters = (item, selectedFilters) => {
     }
   }
 
-  // 가격 필터는 모두 AND
+  // 価格フィルターはすべて AND 条件
   const priceSelected = normalized.filter((f) => priceFilters.includes(f));
   if (!priceSelected.every((f) => evalFilter(f))) {
     return false;
   }
 
-  // 카테고리 필터는 OR (하나라도 매칭되면 통과)
+  // カテゴリフィルターは OR（いずれかが一致すれば通過）
   const categorySelected = normalized.filter(
     (f) => !statusFilters.includes(f) && !priceFilters.includes(f)
   );

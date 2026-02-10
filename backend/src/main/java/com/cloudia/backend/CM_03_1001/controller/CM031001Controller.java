@@ -7,7 +7,6 @@ import java.util.Collections;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +21,7 @@ import com.cloudia.backend.CM_03_1001.model.CategoryDetails;
 import com.cloudia.backend.CM_03_1001.model.CategoryGroupForCheckbox;
 import com.cloudia.backend.CM_03_1001.model.CategoryItem;
 import com.cloudia.backend.CM_03_1001.model.ProductInfo;
-import com.cloudia.backend.CM_03_1001.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_03_1001.service.CM031001Service;
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/guest")
-@CrossOrigin(origins = "*")
 public class CM031001Controller {
     private final CM031001Service cm031001Service;
 
@@ -65,7 +63,7 @@ public class CM031001Controller {
             log.warn(CM031001MessageConstant.FAIL_PRODUCT_LIST_EMPTY);
             return ResponseEntity.ok(setResponseDto(Collections.emptyList(), true, CM031001MessageConstant.FAIL_PRODUCT_LIST_EMPTY));
         }
-        // 예약 상품만 필터링
+        // 予約商品（プレオーダー）のみをフィルタリング
         log.info(CM031001MessageConstant.PRODUCT_FIND_ALL_COMPLETE, products.size());
         return ResponseEntity.ok(setResponseDto(products, true, CM031001MessageConstant.SUCCESS_PRODUCT_FIND));
     }
@@ -99,7 +97,7 @@ public class CM031001Controller {
             log.info(CM031001MessageConstant.PRODUCT_FIND_BY_ID_COMPLETE, detailId, 1);
             return ResponseEntity.ok(setResponseDto(product, true, CM031001MessageConstant.SUCCESS_PRODUCT_FIND));
         } catch (Exception e) {
-            log.error("상품 상세 조회 중 예외 발생: {}", e.getMessage(), e);
+            log.error("商品詳細取得中に例外が発生しました: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError()
                 .body(setResponseDto(null, false, CM031001MessageConstant.ERROR_INTERNAL_SERVER));
         }
@@ -192,7 +190,7 @@ public class CM031001Controller {
      * @param resultList 結果データ
      * @param ret        成功 有無
      * @param msg        メッセージ
-     * @return 共通応答モデル
+     * @return           共通応答モデル
      */
     private <T> ResponseModel<T> setResponseDto(T resultList, boolean ret, String msg) {
         return ResponseModel.<T>builder()

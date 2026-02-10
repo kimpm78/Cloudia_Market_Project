@@ -22,6 +22,7 @@ const pageSize = 25;
 export default function CM_04_1003() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const isAdminOrManager = user?.roleId === 1 || user?.roleId === 2;
 
   const [rows, setRows] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,10 +53,10 @@ export default function CM_04_1003() {
       })
       .catch((err) => {
         if (err.name === 'CanceledError') return;
-        console.error('Q&A 목록 조회 실패:', err?.message || err);
+        console.error('Q&A リスト取得失敗:', err?.message || err);
         setRows([]);
         setTotalPages(1);
-        setError(err?.message || CMMessage.MSG_ERR_005('Q&A 목록'));
+        setError(err?.message || CMMessage.MSG_ERR_005('Q&A リスト'));
       })
       .finally(() => {
         setLoading(false);
@@ -100,7 +101,7 @@ export default function CM_04_1003() {
   const columnDefs = useMemo(
     () => [
       {
-        headerName: '상태',
+        headerName: '区分',
         field: 'statusLabel',
         width: 140,
         headerClass: 'fs-5',
@@ -111,7 +112,7 @@ export default function CM_04_1003() {
         },
       },
       {
-        headerName: '제목',
+        headerName: 'タイトル',
         field: 'title',
         flex: 1,
         minWidth: 220,
@@ -138,7 +139,7 @@ export default function CM_04_1003() {
         },
       },
       {
-        headerName: '작성자',
+        headerName: '作成者',
         field: 'loginId',
         width: 140,
         headerClass: 'fs-5',
@@ -163,7 +164,7 @@ export default function CM_04_1003() {
         },
       },
       {
-        headerName: '작성일',
+        headerName: '作成日',
         field: 'createdAt',
         width: 140,
         headerClass: 'fs-5',
@@ -210,10 +211,12 @@ export default function CM_04_1003() {
     <>
       <div className="container-fluid px-5 qna-list-container">
         <div className="d-flex justify-content-between align-items-end my-5 qna-list-header">
-          <h1 className="m-0">Q & A</h1>
-          <button className="btn btn-primary" onClick={() => navigate('/qna/edit/new')}>
-            작성 하기
-          </button>
+          <h1>Q & A</h1>
+          {!isAdminOrManager && (
+            <button className="btn btn-primary" onClick={() => navigate('/qna/edit/new')}>
+              作成する
+            </button>
+          )}
         </div>
         {loading && null}
         {error && !loading && <div className="py-3 text-danger">{error}</div>}

@@ -4,7 +4,7 @@
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 
-# 참고서
+# 参考書
 
 - [Bootstrap](https://getbootstrap.kr/)
 - [Bootstrap 5 CheatSheet](https://bootstrap-utilities-cheatsheet.vercel.app/)
@@ -16,7 +16,8 @@
 ページ/画面 ID：CM_XX_XXXX 形式を維持
 変数/関数：camelCase（例：searchKeyword、handleSearch）
 定数：UPPER_SNAKE_CASE（例：SEARCH_TYPE、CATEGORIES）
-## 📦 폴더 구조
+
+## 📦 ディレクトリ構成
 
 src/
 ├── components/ # 共通 UI コンポーネント（ボタン、モーダル、検索バーなど）
@@ -56,7 +57,7 @@ src/
 />
 ```
 
-## 검색바 사용 예시
+## 検索バーの使用例
 
 ```jsx
 import { CATEGORIES, SEARCH_TYPE } from '../constants/constants.js';
@@ -181,7 +182,7 @@ return (
 );
 ```
 
-## 2. 팝업 종류
+## 2. ポップアップ 種類
 
 - `CM_99_1000`: 通知（OK のみ）
 - `CM_99_1001`: 確認/キャンセル
@@ -199,7 +200,7 @@ PW:test123123!
 
 ### 管理者
 
-ID:user16
+ID:admin01
 PW:test123123!
 
 ## 閲覧数カウントが +2 になる問題について

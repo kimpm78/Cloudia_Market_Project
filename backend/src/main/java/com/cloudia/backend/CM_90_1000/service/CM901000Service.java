@@ -6,12 +6,12 @@ import com.cloudia.backend.CM_90_1000.model.Menu;
 
 public interface CM901000Service {
     /*
-     * 전체 사이드 메뉴 리스트 조회
+     * サイドメニュー一覧を取得
      */
     List<Menu> findAllMenus();
 
     /*
-     * 메뉴 리스트를 트리 구조로 변환
+     * メニュー一覧をツリー構造へ変換
      */
     List<Menu> buildMenuTree(List<Menu> flatList);
 }

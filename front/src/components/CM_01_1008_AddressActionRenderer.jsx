@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axiosInstance from '../services/axiosInstance';
-import { countries } from '../data/countries';
+import useCountries from '../hooks/useCountries';
 
 import CM_99_1001 from './commonPopup/CM_99_1001';
 import CM_99_1002 from './commonPopup/CM_99_1002';
@@ -26,12 +26,11 @@ export default function CM_01_1008_AddressActionRenderer() {
   const [searchParams] = useSearchParams();
   const addressId = searchParams.get('id');
   const navigate = useNavigate();
+  const { countries } = useCountries();
 
   const [formData, setFormData] = useState(initialFormData);
   const [phoneParts, setPhoneParts] = useState(initialPhoneParts);
   const [initialLoading, setInitialLoading] = useState(true);
-
-  // --- 팝업 상태를 useState로 직접 관리 ---
   const [modals, setModals] = useState({
     loading: false,
     error: false,
@@ -48,7 +47,7 @@ export default function CM_01_1008_AddressActionRenderer() {
       setFormData((prev) => ({ ...prev, country: country ? country.isoCode : '' }));
       setPhoneParts({ code: parts[1], part1: parts[2], part2: parts[3], part3: parts[4] });
     }
-  }, []);
+  }, [countries]);
 
   useEffect(() => {
     if (addressId) {
@@ -60,7 +59,7 @@ export default function CM_01_1008_AddressActionRenderer() {
           parsePhoneNumber(res.data.recipientPhone);
         })
         .catch((err) => {
-          setModalMessage('주소 정보를 불러오는 데 실패했습니다.');
+          setModalMessage('住所情報の読み込みに失敗しました。');
           setModals((prev) => ({ ...prev, error: true }));
         })
         .finally(() => setInitialLoading(false));
@@ -109,7 +108,7 @@ export default function CM_01_1008_AddressActionRenderer() {
       !formData.recipientPhone ||
       !formData.addressDetail1
     ) {
-      setModalMessage('필수 항목(*)을 모두 입력해주세요.');
+      setModalMessage('必須項目（*）をすべて入力してください。');
       setModals((prev) => ({ ...prev, error: true }));
       return;
     }
@@ -117,18 +116,18 @@ export default function CM_01_1008_AddressActionRenderer() {
     const { part1, part2, part3 } = phoneParts;
 
     if (!part1 || !part2 || !part3) {
-      setModalMessage('휴대전화 번호를 모두 입력해주세요.');
+      setModalMessage('携帯電話番号をすべて入力してください。');
       setModals((prev) => ({ ...prev, error: true }));
       return;
     }
 
     if (part1.length < 3 || part2.length < 4 || part3.length < 4) {
-      setModalMessage('휴대전화 번호를 올바른 형식으로 입력해주세요.');
+      setModalMessage('携帯電話番号を正しい形式で入力してください。');
       setModals((prev) => ({ ...prev, error: true }));
       return;
     }
 
-    setModalMessage(`이 주소를 ${addressId ? '수정' : '저장'}하시겠습니까?`);
+    setModalMessage(`この住所を${addressId ? '修正' : '保存'}しますか？`);
     setModals((prev) => ({ ...prev, confirm: true }));
   };
 
@@ -141,10 +140,10 @@ export default function CM_01_1008_AddressActionRenderer() {
       } else {
         await axiosInstance.post('/user/addresses', payload);
       }
-      setModalMessage('성공적으로 처리되었습니다.');
+      setModalMessage('正常に処理しました。');
       setModals((prev) => ({ ...prev, loading: false, success: true }));
     } catch (error) {
-      setModalMessage(error.response?.data?.message || '저장에 실패했습니다.');
+      setModalMessage(error.response?.data?.message || '保存に失敗しました。');
       setModals((prev) => ({ ...prev, loading: false, error: true }));
     }
   };
@@ -166,7 +165,7 @@ export default function CM_01_1008_AddressActionRenderer() {
         <div className="address-form-container">
           <div className="mb-3">
             <label htmlFor="addressNickname" className="form-label fw-bold">
-              <i className="bi bi-asterisk required-asterisk"></i>배송지 명칭
+              <i className="bi bi-asterisk required-asterisk"></i>配送先名
             </label>
             <input
               type="text"
@@ -175,12 +174,12 @@ export default function CM_01_1008_AddressActionRenderer() {
               name="addressNickname"
               onChange={handleChange}
               value={formData.addressNickname || ''}
-              placeholder="배송지 명칭을 입력해주세요"
+              placeholder="配送先名を入力してください"
             />
           </div>
           <div className="mb-3">
             <label htmlFor="recipientName" className="form-label fw-bold">
-              <i className="bi bi-asterisk required-asterisk"></i>받는 사람
+              <i className="bi bi-asterisk required-asterisk"></i>受取人
             </label>
             <input
               type="text"
@@ -189,12 +188,12 @@ export default function CM_01_1008_AddressActionRenderer() {
               name="recipientName"
               onChange={handleChange}
               value={formData.recipientName || ''}
-              placeholder="받는 사람 이름을 입력해주세요"
+              placeholder="受取人の氏名を入力してください"
             />
           </div>
           <div className="mb-3">
             <label htmlFor="postalCode" className="form-label fw-bold">
-              <i className="bi bi-asterisk required-asterisk"></i>우편번호
+              <i className="bi bi-asterisk required-asterisk"></i>郵便番号
             </label>
             <input
               type="text"
@@ -203,12 +202,12 @@ export default function CM_01_1008_AddressActionRenderer() {
               name="postalCode"
               onChange={handleChange}
               value={formData.postalCode || ''}
-              placeholder="우편번호를 입력해주세요"
+              placeholder="郵便番号を入力してください"
             />
           </div>
           <div className="mb-3">
             <label htmlFor="addressMain" className="form-label fw-bold">
-              <i className="bi bi-asterisk required-asterisk"></i>주소
+              <i className="bi bi-asterisk required-asterisk"></i>住所
             </label>
             <input
               type="text"
@@ -217,12 +216,12 @@ export default function CM_01_1008_AddressActionRenderer() {
               name="addressMain"
               onChange={handleChange}
               value={formData.addressMain || ''}
-              placeholder="주소를 입력해주세요"
+              placeholder="住所を入力してください"
             />
           </div>
           <div className="mb-3">
             <label htmlFor="addressDetail1" className="form-label fw-bold">
-              <i className="bi bi-asterisk required-asterisk"></i>상세 주소 1
+              <i className="bi bi-asterisk required-asterisk"></i>住所詳細 1
             </label>
             <input
               type="text"
@@ -231,12 +230,12 @@ export default function CM_01_1008_AddressActionRenderer() {
               name="addressDetail1"
               onChange={handleChange}
               value={formData.addressDetail1 || ''}
-              placeholder="상세 주소를 입력해주세요"
+              placeholder="住所詳細を入力してください"
             />
           </div>
           <div className="mb-3">
             <label htmlFor="addressDetail2" className="form-label fw-bold">
-              상세 주소 2
+              住所詳細 2
             </label>
             <input
               type="text"
@@ -245,12 +244,12 @@ export default function CM_01_1008_AddressActionRenderer() {
               name="addressDetail2"
               onChange={handleChange}
               value={formData.addressDetail2 || ''}
-              placeholder="상세 주소를 입력해주세요"
+              placeholder="住所詳細を入力してください"
             />
           </div>
           <div className="mb-3">
             <label htmlFor="addressDetail3" className="form-label fw-bold">
-              상세 주소 3
+              住所詳細 3
             </label>
             <input
               type="text"
@@ -259,13 +258,13 @@ export default function CM_01_1008_AddressActionRenderer() {
               name="addressDetail3"
               onChange={handleChange}
               value={formData.addressDetail3 || ''}
-              placeholder="상세 주소를 입력해주세요"
+              placeholder="住所詳細を入力してください"
             />
           </div>
 
           <div className="mb-3">
             <label htmlFor="country" className="form-label fw-bold">
-              국가
+              国籍/地域
             </label>
             <select
               id="country"
@@ -276,14 +275,14 @@ export default function CM_01_1008_AddressActionRenderer() {
             >
               {countries.map((c) => (
                 <option key={c.isoCode} value={c.isoCode}>
-                  {c.name.kr}
+                  {c.name.jp || c.name.en || c.name.kr}
                 </option>
               ))}
             </select>
           </div>
           <div className="mb-3">
             <label className="form-label fw-bold">
-              <i className="bi bi-asterisk required-asterisk"></i>휴대전화 번호
+              <i className="bi bi-asterisk required-asterisk"></i>携帯電話番号
             </label>
             <div className="d-flex align-items-center">
               <input
@@ -323,14 +322,14 @@ export default function CM_01_1008_AddressActionRenderer() {
         </div>
         <div className="d-flex justify-content-center mt-5 mb-5 gap-2">
           <button type="submit" className="btn btn-primary btn-lg px-5" disabled={modals.loading}>
-            {modals.loading ? '처리 중...' : addressId ? '수정하기' : '등록하기'}
+            {modals.loading ? '処理中...' : addressId ? '修正する' : '登録する'}
           </button>
           <button
             type="button"
             className="btn btn-secondary px-5"
             onClick={() => navigate('/mypage')}
           >
-            뒤로 가기
+            戻る
           </button>
         </div>
       </form>

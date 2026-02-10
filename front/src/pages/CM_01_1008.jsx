@@ -9,25 +9,37 @@ export default function CM_01_1008() {
   const isFormMode = mode === 'new' || mode === 'edit';
 
   return (
-    <div>
-      <h4 className="border-bottom fw-bolder pb-3 mb-4 mt-2">住所録管理</h4>
-
-      {isFormMode ? (
-        <p>
-          注文時に選択可能な配送先を新規登録できます。
-          <br />
-          下記の全項目を漏れなく入力してください。
-        </p>
-      ) : (
-        <p>
-          配送先の新規登録・変更・削除は、注文時に選択できる一覧から行えます。
-          <br />
-          &lt;自宅情報を変更する場合&gt;
-          <br />
-          自宅情報は［プロフィール］ページから修正できます。
-          <br />※ 注文ごとに個別入力が必要です。住所録は最大3件まで登録可能です。
-        </p>
-      )}
+    <div className="container mt-2">
+      <h2 className="border-bottom fw-bolder pb-3 mb-4 mt-4">住所録管理</h2>
+      <div className="address-guide-panel mb-4">
+        {isFormMode ? (
+          <>
+            <div className="address-guide-badge">新規登録 / 編集</div>
+            <p className="address-guide-text mb-0">
+              注文時に利用する配送先を登録できます。
+              <br />
+              必須項目（*）を入力して保存してください。
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="address-guide-badge">使い方ガイド</div>
+            <p className="address-guide-text mb-2">
+              配送先の新規登録・変更・削除は、この一覧から操作できます。
+            </p>
+            <p className="address-guide-text mb-1">
+              <span className="address-guide-title">自宅情報を変更する場合</span>
+            </p>
+            <p className="address-guide-text mb-0">
+              自宅情報は［プロフィール］ページから修正してください。
+              <br />
+              <span className="address-guide-note">
+                ※ 住所録は最大3件まで登録できます。
+              </span>
+            </p>
+          </>
+        )}
+      </div>
 
       {isFormMode ? <CM_01_1008_AddressActionRenderer /> : <CM_01_1008_grid />}
     </div>

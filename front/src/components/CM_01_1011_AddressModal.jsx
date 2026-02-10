@@ -24,18 +24,18 @@ export default function CM_01_1011_AddressModal({
       const data = await getRequest('/user/mypage/delivery-addresses');
       setAddressList(data || []);
     } catch (error) {
-      console.error('배송지 목록 조회 실패:', error);
+      console.error('配送先一覧の取得に失敗しました:', error);
     }
   };
 
   const handleSave = async () => {
     if (!selectedAddressId) {
-      alert('변경할 주소를 선택해주세요.');
+      alert('変更する住所を選択してください。');
       return;
     }
     const selectedAddr = addressList.find((addr) => addr.addressId === selectedAddressId);
     if (!selectedAddr) {
-      alert('선택된 주소 정보를 찾을 수 없습니다.');
+      alert('選択された住所情報が見つかりません。');
       return;
     }
     setLoading(true);
@@ -48,12 +48,12 @@ export default function CM_01_1011_AddressModal({
         shippingAddressId: selectedAddr.addressId,
       });
 
-      alert('배송지가 변경되었습니다.');
+      alert('配送先を変更しました。');
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('배송지 변경 실패:', error);
-      alert('배송지 변경에 실패했습니다.');
+      console.error('配送先の変更に失敗しました:', error);
+      alert('配送先の変更に失敗しました。');
     } finally {
       setLoading(false);
     }
@@ -69,7 +69,7 @@ export default function CM_01_1011_AddressModal({
           <div className="modal-content border-0 shadow-lg">
             <div className="modal-header bg-light">
               <h5 className="modal-title fw-bold">
-                <i className="bi bi-geo-alt-fill me-2 text-primary"></i>배송지 변경
+                <i className="bi bi-geo-alt-fill me-2 text-primary"></i>配送先変更
               </h5>
               <button
                 type="button"
@@ -80,7 +80,7 @@ export default function CM_01_1011_AddressModal({
             </div>
 
             <div className="modal-body p-4" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-              <p className="small text-muted mb-3">변경하실 주소를 선택해주세요.</p>
+              <p className="small text-muted mb-3">変更する住所を選択してください。</p>
 
               {addressList.length > 0 ? (
                 <div className="list-group">
@@ -100,7 +100,7 @@ export default function CM_01_1011_AddressModal({
                               checked={selectedAddressId === addr.addressId}
                               onChange={() => setSelectedAddressId(addr.addressId)}
                             />
-                            <span className="fw-bold">{addr.recipientName || '수령인 미지정'}</span>
+                            <span className="fw-bold">{addr.recipientName || '受取人未指定'}</span>
                             {addr.addressName && (
                               <span className="badge bg-secondary ms-2">{addr.addressName}</span>
                             )}
@@ -118,7 +118,7 @@ export default function CM_01_1011_AddressModal({
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <p className="text-muted">등록된 주소가 없습니다.</p>
+                  <p className="text-muted">登録された住所がありません。</p>
                 </div>
               )}
             </div>
@@ -130,7 +130,7 @@ export default function CM_01_1011_AddressModal({
                 onClick={onClose}
                 disabled={loading}
               >
-                취소
+                キャンセル
               </button>
               <button
                 type="button"
@@ -139,7 +139,7 @@ export default function CM_01_1011_AddressModal({
                 disabled={loading || addressList.length === 0}
               >
                 {loading ? <span className="spinner-border spinner-border-sm me-2"></span> : null}
-                변경하기
+                変更する
               </button>
             </div>
           </div>

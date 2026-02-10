@@ -76,7 +76,7 @@ const useApiHandler = (openModal, closeModal) => {
         const result = await apiCall();
         return result;
       } catch (error) {
-        openModal('error', CMMessage.MSG_ERR_001 || '오류가 발생했습니다.');
+        openModal('error', CMMessage.MSG_ERR_001 || 'エラーが発生しました。');
         return null;
       } finally {
         if (showLoading) closeModal('loading');
@@ -86,11 +86,11 @@ const useApiHandler = (openModal, closeModal) => {
   );
 };
 
-// 메인 컴포넌트
+// メインコンポーネント
 export default function CM_90_1043() {
-  // State 선언
+  // State 宣言
   const [categoryTree, setCategoryTree] = useState({
-    title: '카테고리 전체보기',
+    title: 'カテゴリ全体表示',
     isOpen: true,
     children: [],
   });
@@ -109,19 +109,19 @@ export default function CM_90_1043() {
   const { modals, message, open, close } = useModal();
   const apiHandler = useApiHandler(open, close);
 
-  // 드래그 센서 설정 (마우스, 터치 지원)
+  // ドラッグセンサー設定（マウス、タッチ対応）
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
   );
 
-  // 초기 데이터 로드
+  // 初期データロード
   useEffect(() => {
     categoryAll();
   }, []);
 
-  // 카테고리 데이터 조회
+  // カテゴリデータ取得
   const categoryAll = async () => {
     const result = await apiHandler(
       () => axiosInstance.get('/admin/category/findByAllCategory'),
@@ -140,14 +140,14 @@ export default function CM_90_1043() {
     }
   };
 
-  // 트리 구조로 변환
+  // ツリー構造へ変換
   const normalizeTree = (tree) => {
     if (!tree) {
-      return { title: '카테고리 전체보기', isOpen: true, children: [] };
+      return { title: 'カテゴリ全体表示', isOpen: true, children: [] };
     }
 
     const root = {
-      title: tree.title ?? '카테고리 전체보기',
+      title: tree.title ?? 'カテゴリ全体表示',
       isOpen: typeof tree.isOpen === 'boolean' ? tree.isOpen : true,
       children: Array.isArray(tree.children) ? tree.children : [],
     };
@@ -168,7 +168,7 @@ export default function CM_90_1043() {
           id: compositeId,
           originalId: categoryOriginalId,
           groupId: groupOriginalId,
-          title: c.title ?? c.categoryName ?? '무명',
+          title: c.title ?? c.categoryName ?? '名称未設定',
           order: typeof c.order === 'number' ? c.order : ci + 1,
           flag: typeof c.flag === 'number' ? c.flag : 0,
           children: Array.isArray(c.children) ? c.children : [],
@@ -178,7 +178,7 @@ export default function CM_90_1043() {
       return {
         id: groupOriginalId,
         originalId: groupOriginalId,
-        title: g.title ?? g.categoryGroupName ?? '무명 그룹',
+        title: g.title ?? g.categoryGroupName ?? '名称未設定グループ',
         isOpen: typeof g.isOpen === 'boolean' ? g.isOpen : true,
         children: normalizedChildren,
         order: typeof g.order === 'number' ? g.order : gi + 1,
@@ -189,7 +189,7 @@ export default function CM_90_1043() {
     return root;
   };
 
-  // ID로 항목 위치 찾기
+  // IDで項目の位置を検索
   const findLocation = (id) => {
     const groups = categoryTree?.children ?? [];
     for (let i = 0; i < groups.length; i++) {
@@ -203,7 +203,7 @@ export default function CM_90_1043() {
     return null;
   };
 
-  // 순서 재정렬 및 flag 업데이트
+  // 順序の再採番およびflag更新
   const updateOrder = (children) => {
     if (!Array.isArray(children)) return [];
 
@@ -215,7 +215,7 @@ export default function CM_90_1043() {
     }));
   };
 
-  // 전체보기 토글
+  // 全体表示のトグル
   const toggleRoot = () => {
     setCategoryTree((prev) => ({
       ...prev,
@@ -224,7 +224,7 @@ export default function CM_90_1043() {
     }));
   };
 
-  // 특정 그룹 토글
+  // 特定グループのトグル
   const toggleGroup = (idx) => {
     setCategoryTree((prev) => ({
       ...prev,
@@ -232,13 +232,13 @@ export default function CM_90_1043() {
     }));
   };
 
-  // 하위 카테고리 추가
+  // 下位カテゴリ追加
   const addChild = (groupIdx) => {
     const value = (newChildTitles[groupIdx] || '').trim();
     if (!value) return;
 
     if (titleExists(value, categoryTree)) {
-      open('info', '이미 같은 이름의 카테고리가 존재합니다.');
+      open('info', 'すでに同じ名前のカテゴリが存在します。');
       return;
     }
 
@@ -268,12 +268,12 @@ export default function CM_90_1043() {
     setNewChildTitles((prev) => ({ ...prev, [groupIdx]: '' }));
   };
 
-  // 드래그 시작
+  // ドラッグ開始
   const handleDragStart = (event) => {
     setActiveId(event.active.id);
   };
 
-  // 드래그 종료
+  // ドラッグ終了
   const handleDragEnd = (event) => {
     const { active, over } = event;
     setActiveId(null);
@@ -283,7 +283,7 @@ export default function CM_90_1043() {
     const to = findLocation(over.id);
     if (!from || !to) return;
 
-    // 그룹 간 순서 변경
+    // グループ間の順序変更
     if (from.type === 'group' && to.type === 'group') {
       setCategoryTree((prev) => {
         const arr = prev.children.map((g) => ({
@@ -297,7 +297,7 @@ export default function CM_90_1043() {
       return;
     }
 
-    // 동일 그룹 내 카테고리 순서 변경
+    // 同一グループ内のカテゴリ順序変更
     if (from.type === 'child' && to.type === 'child' && from.groupIdx === to.groupIdx) {
       setCategoryTree((prev) => {
         const arr = prev.children.map((g) => ({
@@ -316,7 +316,7 @@ export default function CM_90_1043() {
     }
   };
 
-  // 드래그 오버레이 렌더링
+  // ドラッグオーバーレイ描画
   const renderOverlayItem = () => {
     if (!activeId) return null;
     const loc = findLocation(activeId);
@@ -344,19 +344,19 @@ export default function CM_90_1043() {
     return null;
   };
 
-  // 편집 시작
+  // 編集開始
   const handleEdit = (id, title) => {
     setEditingId(id);
     setPrevTitle(title);
     setEditedTitle(title);
   };
 
-  // 편집 저장
+  // 編集保存
   const saveEdit = () => {
     if (!editedTitle.trim()) return;
 
     if (titleExists(editedTitle, categoryTree, editingId)) {
-      open('info', '이미 같은 이름의 카테고리가 존재합니다.');
+      open('info', 'すでに同じ名前のカテゴリが存在します。');
       return;
     }
 
@@ -377,19 +377,19 @@ export default function CM_90_1043() {
     setEditedTitle('');
   };
 
-  // 편집 취소
+  // 編集キャンセル
   const cancelEdit = () => {
     setEditingId(null);
     setEditedTitle('');
   };
 
-  // 카테고리 삭제 - 확인 모달 열기
+  // カテゴリ削除 - 確認モーダルを開く
   const handleDelete = (id) => {
     setPendingDeleteId(id);
-    open('confirm', '정말 삭제하시겠습니까?');
+    open('confirm', '本当に削除しますか？');
   };
 
-  // 삭제 확인 처리
+  // 削除確認処理
   const handleDeleteConfirm = () => {
     if (!pendingDeleteId) return;
 
@@ -408,10 +408,10 @@ export default function CM_90_1043() {
     close('confirm');
   };
 
-  // 변경사항 저장
+  // 変更内容保存
   const handleSave = async () => {
     try {
-      // 하위 카테고리가 없는 그룹 검증
+      // 下位カテゴリがないグループの検証
       const emptyGroups = categoryTree.children
         .filter((g) => g.flag !== 2)
         .filter((g) => {
@@ -423,13 +423,13 @@ export default function CM_90_1043() {
         const groupNames = emptyGroups.map((g) => `"${g.title}"`).join(', ');
         open(
           'info',
-          `다음 그룹에 하위 카테고리가 없습니다:\n${groupNames}\n\n` +
-            `각 그룹에는 최소 1개 이상의 하위 카테고리가 필요합니다.`
+          `次のグループには下位カテゴリがありません:\n${groupNames}\n\n` +
+            `各グループには最低1件以上の下位カテゴリが必要です。`
         );
         return;
       }
 
-      // 변경사항 수집
+      // 変更内容収集
       const changes = collectChanges(categoryTree);
 
       if (
@@ -437,7 +437,7 @@ export default function CM_90_1043() {
         changes.updated.length === 0 &&
         changes.deleted.length === 0
       ) {
-        open('info', '변경된 내용이 없습니다.');
+        open('info', '変更された内容がありません。');
         return;
       }
 
@@ -446,7 +446,7 @@ export default function CM_90_1043() {
         maxUpdatedAt: maxUpdatedAt,
       };
 
-      // 백엔드 전송
+      // バックエンド送信
       const result = await apiHandler(() =>
         axiosInstance.post('/admin/category/save', requestData)
       );
@@ -455,21 +455,21 @@ export default function CM_90_1043() {
         await categoryAll();
         open('info', CMMessage.MSG_INF_001);
       } else {
-        open('error', result.data.message || '저장에 실패했습니다.');
+        open('error', result.data.message || '保存に失敗しました。');
       }
     } catch (err) {
-      open('error', `저장 중 오류가 발생했습니다: ${err.response?.data?.message || err.message}`);
+      open('error', `保存中にエラーが発生しました: ${err.response?.data?.message || err.message}`);
     }
   };
 
-  // 변경사항 수집 (created, updated, deleted 분류)
+  // 変更内容収集（created, updated, deleted の分類）
   const collectChanges = (tree) => {
     const created = [];
     const updated = [];
     const deleted = [];
     const originalParentMap = new Map();
 
-    // 원본 트리에서 부모 관계 매핑
+    // 元ツリーから親子関係をマッピング
     const buildOriginalMap = (node, parentId = null) => {
       if (!node) return;
       originalParentMap.set(node.id, parentId);
@@ -483,7 +483,7 @@ export default function CM_90_1043() {
       originalTree.children.forEach((group) => buildOriginalMap(group, null));
     }
 
-    // 트리 순회하며 변경사항 수집
+    // ツリーを走査して変更内容を収集
     const processNode = (node, currentParentId = null, depth = 0) => {
       if (!node) return;
 
@@ -491,14 +491,14 @@ export default function CM_90_1043() {
       const compositeKey = node.id;
       const actualCategoryCode = node.originalId;
 
-      // 임시 ID 체크 (타임스탬프 포함된 ID)
+      // 一時IDチェック（タイムスタンプを含むID）
       const isTemporaryId =
         typeof actualCategoryCode === 'string' &&
         (actualCategoryCode.startsWith('grp-') ||
           actualCategoryCode.startsWith('temp-') ||
           (actualCategoryCode.startsWith('c-') && actualCategoryCode.includes('-')));
 
-      // 삭제된 항목
+      // 削除された項目
       if (node.flag === 2) {
         if (!isTemporaryId) {
           const originalParentId = originalParentMap.get(compositeKey);
@@ -509,13 +509,13 @@ export default function CM_90_1043() {
           });
         }
       }
-      // 변경된 항목
+      // 変更された項目
       else if (node.flag === 1) {
         const originalParentId = originalParentMap.get(compositeKey);
         const currentGroupId = node.groupId || currentParentId;
         const isNewItem = originalParentId === undefined;
 
-        // 신규 생성
+        // 新規作成
         if (isTemporaryId || isNewItem) {
           created.push({
             title: node.title,
@@ -524,7 +524,7 @@ export default function CM_90_1043() {
             type: isGroup ? 'group' : 'category',
           });
         }
-        // 기존 항목 수정
+        // 既存項目修正
         else {
           updated.push({
             id: actualCategoryCode,
@@ -537,7 +537,7 @@ export default function CM_90_1043() {
         }
       }
 
-      // 자식 노드 처리
+      // 子ノード処理
       if (Array.isArray(node.children) && node.children.length > 0) {
         node.children.forEach((child) => {
           processNode(child, compositeKey, depth + 1);
@@ -554,19 +554,19 @@ export default function CM_90_1043() {
     return { created, updated, deleted };
   };
 
-  // 초기화
+  // 初期化
   const handleCancel = async () => {
     await categoryAll();
     setEditingId(null);
     setEditedTitle('');
   };
 
-  // 모달 닫기 핸들러
+  // モーダルを閉じるハンドラー
   const handleModalClose = useCallback(() => {
     close('info');
   }, [close]);
 
-  // 카테고리명 중복 체크
+  // カテゴリ名の重複チェック
   const titleExists = (title, tree, ignoreId = null) => {
     const stack = [tree];
     const trimmed = title.trim();
@@ -589,12 +589,12 @@ export default function CM_90_1043() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-4" style={{ width: '100%' }}>
-        <h5 className="border-bottom pb-2 ps-4 mb-4">카테고리 관리</h5>
+        <h2 className="border-bottom pb-2 ps-4 mb-4">カテゴリ管理</h2>
         <h6 className="fw-semibold ps-4 mb-1">
-          카테고리 순서를 변경하고 주제 연결을 설정할 수 있습니다.
+          カテゴリの順序変更や、テーマ連携の設定ができます。
         </h6>
         <p className="text-muted ps-4 mb-4">
-          드래그 앤 드롭으로 카테고리 순서를 변경할 수 있습니다.
+          ドラッグ＆ドロップでカテゴリの順序を変更できます。
         </p>
 
         <DndContext
@@ -606,7 +606,7 @@ export default function CM_90_1043() {
         >
           <div className="category-container">
             <div className="category-scroll" ref={scrollRef}>
-              {/* 루트 */}
+              {/* ルート */}
               <div
                 className="d-flex align-items-center bg-white py-2 px-3 border mb-1"
                 style={{ cursor: 'pointer', userSelect: 'none' }}
@@ -616,7 +616,7 @@ export default function CM_90_1043() {
                 <strong>{categoryTree.title}</strong>
               </div>
 
-              {/* 그룹 + 하위 카테고리 */}
+              {/* グループ + 下位カテゴリ */}
               <div className={`ps-3 fade-slide ${categoryTree.isOpen ? 'open' : ''}`}>
                 <SortableContext
                   items={(categoryTree.children || []).filter((g) => g.flag !== 2).map((g) => g.id)}
@@ -626,7 +626,7 @@ export default function CM_90_1043() {
                     .filter((grp) => grp.flag !== 2)
                     .map((grp, grpIdx) => (
                       <div key={grp.id} className="mb-2">
-                        {/* 그룹 */}
+                        {/* グループ */}
                         <SortableItem id={grp.id}>
                           <div
                             className="item-content d-flex align-items-center bg-white py-2 px-2 border"
@@ -641,7 +641,7 @@ export default function CM_90_1043() {
                           </div>
                         </SortableItem>
 
-                        {/* 하위 카테고리 */}
+                        {/* 下位カテゴリ */}
                         {grp.isOpen && (
                           <div className="ps-4 fade-slide open">
                             <SortableContext
@@ -660,7 +660,7 @@ export default function CM_90_1043() {
                                     >
                                       <span className="me-2">⠿</span>
 
-                                      {/* 편집 모드 */}
+                                      {/* 編集モード */}
                                       {editingId === child.id ? (
                                         <div className="input-group flex-grow-1">
                                           <input
@@ -675,26 +675,26 @@ export default function CM_90_1043() {
                                             style={{ width: 100 }}
                                             onClick={saveEdit}
                                           >
-                                            저장
+                                            保存
                                           </button>
                                           <button
                                             className="btn btn-sm btn-secondary"
                                             style={{ width: 100 }}
                                             onClick={cancelEdit}
                                           >
-                                            취소
+                                            キャンセル
                                           </button>
                                         </div>
                                       ) : (
                                         <span>{child.title}</span>
                                       )}
 
-                                      {/* 편집/삭제 아이콘 */}
+                                      {/* 編集/削除アイコン */}
                                       {editingId !== child.id && (
                                         <div className="hover-icons ms-3" style={{ opacity: 0.5 }}>
                                           <i
                                             className="bi bi-pencil-square me-2"
-                                            title="편집"
+                                            title="編集"
                                             onClick={() => handleEdit(child.id, child.title)}
                                             onMouseEnter={(e) =>
                                               (e.currentTarget.style.color = '#0d6efd')
@@ -705,7 +705,7 @@ export default function CM_90_1043() {
                                           />
                                           <i
                                             className="bi bi-trash"
-                                            title="삭제"
+                                            title="削除"
                                             onClick={() => handleDelete(child.id)}
                                             onMouseEnter={(e) =>
                                               (e.currentTarget.style.color = '#dc3545')
@@ -721,7 +721,7 @@ export default function CM_90_1043() {
                                 ))}
                             </SortableContext>
 
-                            {/* 카테고리 추가 입력 */}
+                            {/* カテゴリ追加入力 */}
                             <div className="d-flex align-items-center my-2">
                               <div className="input-with-button-wrapper">
                                 <button
@@ -734,7 +734,7 @@ export default function CM_90_1043() {
                                 <input
                                   type="text"
                                   className="form-control"
-                                  placeholder="하위 카테고리 추가"
+                                  placeholder="下位カテゴリを追加"
                                   value={newChildTitles[grpIdx] || ''}
                                   onChange={(e) =>
                                     setNewChildTitles((prev) => ({
@@ -759,18 +759,18 @@ export default function CM_90_1043() {
 
           <DragOverlay>{renderOverlayItem()}</DragOverlay>
 
-          {/* 저장/초기화 버튼 */}
+          {/* 保存/初期化ボタン */}
           <div className="mt-4 d-flex gap-2 justify-content-center">
             <button className="btn btn-primary px-4" onClick={handleSave}>
-              저장
+              保存
             </button>
             <button className="btn btn-secondary px-4" onClick={handleCancel}>
-              초기화
+              初期化
             </button>
           </div>
         </DndContext>
 
-        {/* 모달 컴포넌트들 */}
+        {/* モーダルコンポーネント */}
         <CM_99_1001
           isOpen={modals.confirm}
           onClose={() => {

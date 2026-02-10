@@ -94,7 +94,9 @@
 
     <select id="getNextMemberNumber" resultType="string">
         SELECT
-            LPAD(nextval('member_number_seq')::text, 8, '0')
+            LPAD((COALESCE(MAX(member_number::BIGINT), 0) + 1)::TEXT, 8, '0')
+        FROM
+            users
     </select>
 
     <select id="countByLoginId" parameterType="string" resultType="int">
@@ -123,7 +125,7 @@
         FROM
             users u
         LEFT JOIN 
-            permissions p ON u.role_id = p.role_id
+            permissions p ON u.role_id = CAST(p.role_id AS BIGINT)
         WHERE
             u.login_id = #{loginId}
         LIMIT 1
@@ -136,7 +138,7 @@
         FROM
             users u
         LEFT JOIN 
-            permissions p ON u.role_id = p.role_id
+            permissions p ON u.role_id = CAST(p.role_id AS BIGINT)
         WHERE
             u.user_id = #{userId}
         LIMIT 1
@@ -149,7 +151,7 @@
         FROM
             users u
         LEFT JOIN 
-            permissions p ON u.role_id = p.role_id
+            permissions p ON u.role_id = CAST(p.role_id AS BIGINT)
         WHERE
             u.member_number = #{memberNumber}
         LIMIT 1
@@ -162,7 +164,7 @@
         FROM 
             users u
         LEFT JOIN 
-            permissions p ON u.role_id = p.role_id
+            permissions p ON u.role_id = CAST(p.role_id AS BIGINT)
     </select>
 
     <select id="countByPccc" parameterType="string" resultType="int">

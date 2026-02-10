@@ -19,12 +19,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class RefundSearchRequestDto {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateFrom;
-
+    private LocalDate dateFrom;             // 返金日付（From）
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateTo;
-
-    private Integer orderStatusValue;
-
-    private String paymentMethod;
+    private LocalDate dateTo;               // 返金日付（To）
+    private Integer orderStatusValue;       // 注文ステータス
+    private String paymentMethod;           // 支払方法
 }

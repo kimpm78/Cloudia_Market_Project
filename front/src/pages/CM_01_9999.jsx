@@ -46,7 +46,7 @@ export default function CM_01_9999() {
     const code = statusCode;
 
     const statusObj = ORDER_STATUS.find((s) => s.value === code);
-    const label = statusObj ? statusObj.label : '상태 미정';
+    const label = statusObj ? statusObj.label : '状態未定';
 
     let badgeClass = 'bg-secondary';
 
@@ -170,44 +170,44 @@ export default function CM_01_9999() {
     fetchOrders();
   }, [fetchInquiries, fetchOrders]);
 
-  // 메뉴 및 링크 데이터
+  // メニューおよびリンクデータ
   const menuCards = [
-    { to: '/mypage/purchases', icon: 'bi-box-seam', label: '구매 내역' },
-    { to: '/mypage/inquiries', icon: 'bi-chat-dots', label: '문의 내역' },
-    { to: '/mypage/returns', icon: 'bi-arrow-left-right', label: '교환/반품' },
-    { to: '/mypage/address-book', icon: 'bi-geo-alt', label: '주소록 관리' },
-    { to: '/mypage/profile', icon: 'bi-person', label: '프로필' },
-    { to: '/mypage/change-password', icon: 'bi-key', label: '비밀번호 변경' },
+    { to: '/mypage/purchases', icon: 'bi-box-seam', label: '購入履歴' },
+    { to: '/mypage/inquiries', icon: 'bi-chat-dots', label: 'お問い合わせ履歴' },
+    { to: '/mypage/returns', icon: 'bi-arrow-left-right', label: '交換／返品' },
+    { to: '/mypage/address-book', icon: 'bi-geo-alt', label: '住所録管理' },
+    { to: '/mypage/profile', icon: 'bi-person', label: 'プロフィール' },
+    { to: '/mypage/change-password', icon: 'bi-key', label: 'パスワード変更' },
   ];
   const personalLinks = [
     {
       to: '/mypage/profile',
-      title: '프로필',
-      desc: '이름, 등록정보, 전화번호 등 확인과 변경',
+      title: 'プロフィール',
+      desc: '氏名、登録情報、電話番号などの確認・変更',
       color: 'text-primary',
     },
     {
       to: '/mypage/address-book',
-      title: '주소록 관리',
-      desc: '배송지 등록과 변경',
+      title: '住所録管理',
+      desc: '配送先の登録・変更',
       color: 'text-primary',
     },
     {
       to: '/mypage/account',
-      title: '환불 계좌번호 등록',
-      desc: '환불받으실 계좌 정보 등록 및 관리',
+      title: '返金口座の登録',
+      desc: '返金を受け取る口座情報の登録・管理',
       color: 'text-primary',
     },
     {
       to: '/mypage/change-password',
-      title: '비밀번호 변경',
-      desc: '비밀번호 변경',
+      title: 'パスワード変更',
+      desc: 'パスワードの変更',
       color: 'text-primary',
     },
     {
       to: '/mypage/unsubscribe',
-      title: '회원 탈퇴',
-      desc: '무기와라 장터의 회원 탈퇴 수속',
+      title: '退会',
+      desc: 'クラウディアーケットの退会手続き',
       color: 'text-dark',
     },
   ];
@@ -217,9 +217,9 @@ export default function CM_01_9999() {
   );
 
   return (
-    <div className="mypage-wrapper">
-      <h4 className="border-bottom fw-bolder pb-3 mb-4">마이 페이지</h4>
-      {/* 메뉴 카드 */}
+    <div className="mypage-wrapper mt-4">
+      <h2 className="border-bottom fw-bolder pb-3 mb-4">マイページ</h2>
+      {/* メニューカード */}
       <div className="row row-cols-3 row-cols-md-3 row-cols-lg-6 g-3 text-center mb-5">
         {menuCards.map((item, idx) => (
           <div className="col" key={idx}>
@@ -233,12 +233,12 @@ export default function CM_01_9999() {
         ))}
       </div>
 
-      {/* 구매 내역 */}
+      {/* 購入履歴 */}
       <div className="mb-5">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h4 className="fw-bold m-0">구매 내역</h4>
+          <h4 className="fw-bold m-0">購入履歴</h4>
           <Link to="/mypage/purchases" className="text-secondary text-decoration-none">
-            더보기 &gt;
+            もっと見る &gt;
           </Link>
         </div>
 
@@ -252,7 +252,7 @@ export default function CM_01_9999() {
         >
           {loadingOrders ? (
             <div className="w-100 text-center text-secondary py-5 bg-light rounded">
-              불러오는 중...
+              読み込み中...
             </div>
           ) : visibleOrders.length > 0 ? (
             <>
@@ -260,7 +260,7 @@ export default function CM_01_9999() {
                 const { label, badgeClass } = getStatusInfo(item.orderStatusValue);
                 const displayTitle =
                   item.orderItemCount > 1
-                    ? `${item.productName} 외 ${item.orderItemCount - 1}건`
+                    ? `${item.productName} 外 ${item.orderItemCount - 1}件`
                     : item.productName;
                 return (
                   <Link
@@ -285,7 +285,7 @@ export default function CM_01_9999() {
                           <span className="position-absolute bottom-0 start-0 bg-white bg-opacity-90 px-2 py-1 small fw-bold m-2 rounded shadow-sm">
                             {item.deliveryDate.includes('-')
                               ? item.deliveryDate
-                              : `${item.deliveryDate} 발송`}
+                              : `${item.deliveryDate} 発送`}
                           </span>
                         )}
                       </div>
@@ -299,7 +299,7 @@ export default function CM_01_9999() {
 
                         <div className="d-flex flex-column gap-2">
                           <span className="fw-bolder fs-5 text-dark">
-                            {Number(item.totalPrice || 0).toLocaleString()}원
+                            {Number(item.totalPrice || 0).toLocaleString()}円
                           </span>
 
                           <span className={`badge small align-self-start px-2 py-1 ${badgeClass}`}>
@@ -321,23 +321,23 @@ export default function CM_01_9999() {
                 <div className="see-more-icon-wrapper">
                   <i className="bi bi-chevron-right fs-4"></i>
                 </div>
-                <span className="fw-bold">더보기</span>
+                <span className="fw-bold">もっと見る</span>
               </Link>
             </>
           ) : (
             <div className="w-100 text-center text-secondary py-5 bg-light rounded">
-              구매 내역이 없습니다.
+              購入履歴がありません。
             </div>
           )}
         </div>
       </div>
 
-      {/* 문의 내역 */}
+      {/* お問い合わせ履歴 */}
       <div className="mb-5">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h4 className="fw-bold m-0">문의 내역</h4>
+          <h4 className="fw-bold m-0">お問い合わせ履歴</h4>
           <Link to="/mypage/inquiries" className="text-secondary text-decoration-none">
-            더보기 &gt;
+            もっと見る &gt;
           </Link>
         </div>
         <table className="table table-hover align-middle">
@@ -345,7 +345,7 @@ export default function CM_01_9999() {
             {loadingInquiries ? (
               <tr>
                 <td colSpan="3" className="text-center text-secondary py-3 small">
-                  불러오는 중...
+                  読み込み中...
                 </td>
               </tr>
             ) : inquiries.length > 0 ? (
@@ -353,9 +353,9 @@ export default function CM_01_9999() {
                 <tr key={item.inquiryId}>
                   <td className="text-start mypage-inquiry-status mypage-inquiry-status-col">
                     <span
-                      className={`fw-bold ${item.status === '답변완료' ? 'text-primary' : 'text-danger'}`}
+                      className={`fw-bold ${item.status === '回答完了' ? 'text-primary' : 'text-danger'}`}
                     >
-                      {item.status || '답변 대기'}
+                      {item.status || '回答待ち'}
                     </span>
                   </td>
 
@@ -376,7 +376,7 @@ export default function CM_01_9999() {
             ) : (
               <tr>
                 <td colSpan="3" className="text-center text-secondary py-3">
-                  문의 내역이 없습니다.
+                  お問い合わせ履歴がありません。
                 </td>
               </tr>
             )}
@@ -384,9 +384,9 @@ export default function CM_01_9999() {
         </table>
       </div>
 
-      {/* 개인정보 변경 섹션 */}
+      {/* 個人情報変更セクション */}
       <div className="border rounded p-4 mb-5 shadow-sm bg-white">
-        <h5 className="fw-bold mb-3">개인정보 변경</h5>
+        <h5 className="fw-bold mb-3">個人情報の変更</h5>
         <div className="row g-4">
           {personalLinks.map((link, idx) => (
             <div className="col-md-6" key={idx}>

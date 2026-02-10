@@ -7,97 +7,97 @@ import com.cloudia.backend.common.model.EmailDto;
 
 public interface EmailService {
     /**
-     * 계좌이체 안내 이메일 발송
+     * 銀行振込案内メール送信
      */
     String sendBankTransferGuide(EmailDto emailInfo);
 
     /**
-     * 구매 확정 이메일 발송
+     * 購入確定メール送信
      */
     String sendOrderConfirmation(EmailDto emailInfo);
 
     /**
-     * 배송 준비중 이메일 발송
+     * 発送準備中メール送信
      */
     String sendShippingPreparing(EmailDto emailInfo);
 
     /**
-     * 배송중 이메일 발송
+     * 配送中メール送信
      */
     String sendShippingInProgress(EmailDto emailInfo);
 
     /**
-     * 배송 완료 이메일 발송
+     * 配送完了メール送信
      */
     String sendShippingCompleted(EmailDto emailInfo);
 
     /**
-     * 주문 취소 이메일 발송
+     * 注文キャンセルメール送信
      */
     String sendCancel(EmailDto emailInfo);
 
     /**
-     * 계좌이체 마감 안내 발송
+     * 銀行振込期限案内送信
      */
     String sendPaymentDeadlineNotice(EmailDto emailInfo, StringBuilder orders);
 
     /**
-     * 단일 이메일 발송
+     * 単一メール送信
      */
     String sendTemplateEmail(String templateName, String recipientEmail, Map<String, String> templateData);
 
     /**
-     * 다중 이메일 발송
+     * 複数メール送信
      */
     String sendTemplateEmail(String templateName, List<String> recipientEmails, Map<String, String> templateData);
 
     /**
-     * Hard Bounce 처리 - 이메일 주소를 DB에서 즉시 삭제
+     * Hard Bounce 対応 - メールアドレスをDBから即時削除
      */
     void handleHardBounce(String email);
 
     /**
-     * Soft Bounce 처리 - 재시도 횟수 증가 및 3회 초과 시 삭제
+     * Soft Bounce 対応 - 再試行回数を増加し、3回超過で削除
      */
     void handleSoftBounce(String email);
 
     /**
-     * Complaint(스팸 신고) 처리 - 즉시 구독 취소 및 Suppression List 추가
+     * Complaint（スパム報告）対応 - 即時購読解除およびSuppression Listへ追加
      */
     void handleComplaint(String email);
 
     /**
-     * 이메일 인증 코드 생성
+     * メール認証コード生成
      */
     String generateVerificationCode();
 
     /**
-     * 인증 코드 이메일 발송
+     * 認証コードメール送信
      */
     String sendVerificationEmail(EmailDto emailInfo);
 
     /**
-     * 아이디 찾기 인증 코드 이메일 발송
+     * ID検索用認証コードメール送信
      */
     String sendFindIdVerificationEmail(EmailDto emailInfo);
 
     /**
-     * 비밀번호 재설정 인증 코드 이메일 발송
+     * パスワード再設定用認証コードメール送信
      */
     String sendPasswordResetVerificationEmail(EmailDto emailInfo);
 
     /**
-     * 비밀번호 변경 완료 알림 이메일 발송
+     * パスワード変更完了通知メール送信
      */
     String sendPasswordChangedNotification(EmailDto emailInfo);
 
     /**
-     * 회원 탈퇴 완료 알림 이메일 발송
+     * 退会完了通知メール送信
      */
     String sendWithdrawalNotification(EmailDto emailInfo);
 
     /**
-     * 관리자에게 교환/반품 신청 알림 발송
+     * 管理者へ交換／返品申請通知送信
      */
     String sendAdminReturnNotification(List<String> adminEmails, Map<String, String> templateData);
 }

@@ -146,14 +146,14 @@ export default function CM_03_1004() {
   }, [remainingQty, maxPurchaseLimit]);
 
   const statusOverlayLabel = useMemo(() => {
-    if (isReservationClosed) return '마감';
+    if (isReservationClosed) return '締切';
     if (soldOut) return 'SOLD OUT';
     return null;
   }, [isReservationClosed, soldOut]);
 
   const purchaseDeadlineLabel = useMemo(() => {
     if (!isReservationSale) {
-      return '상시판매';
+      return '通常販売';
     }
     if (!reservationDeadlineValue) {
       return '-';
@@ -167,11 +167,11 @@ export default function CM_03_1004() {
 
     if (!reservationDeadlineDate) {
       const formatted = formatDateTime(raw) || raw;
-      return isReservationClosed ? `마감 (${formatted})` : formatted;
+      return isReservationClosed ? `締切（${formatted}）` : formatted;
     }
 
     const formatted = formatDateTime(reservationDeadlineDate);
-    return isReservationClosed ? `마감 (${formatted})` : formatted;
+    return isReservationClosed ? `締切（${formatted}）` : formatted;
   }, [isReservationSale, reservationDeadlineValue, reservationDeadlineDate, isReservationClosed]);
 
   const estimatedDeliveryLabel = useMemo(() => {
@@ -179,7 +179,7 @@ export default function CM_03_1004() {
     if (isReservationSale) {
       return formatYearMonthDot(product?.releaseDate) || '-';
     }
-    return '5일 내 배송';
+    return '5日以内に発送';
   }, [product, isReservationSale]);
 
   const descRef = useRef(null);
@@ -267,7 +267,7 @@ export default function CM_03_1004() {
               : [];
             if (!cancelled) setReviews(filtered);
           } catch (err) {
-            console.error('리뷰 조회 실패:', err);
+            console.error('レビュー取得失敗:', err);
             if (!cancelled) setReviews([]);
           }
         } else if (!cancelled) {
@@ -294,16 +294,16 @@ export default function CM_03_1004() {
             const mapped = safeList.map((item) => {
               const visible = canViewQnaItem(item);
               const statusLabel =
-                item?.statusLabel || (item?.statusValue === 2 ? '답변 완료' : '질문');
+                item?.statusLabel || (item?.statusValue === 2 ? '回答済み' : '質問');
               const baseName = item?.loginId || item?.writerName || `user-${item?.userId ?? ''}`;
               return {
                 qnaId: item?.qnaId,
                 status: statusLabel,
-                question: visible ? item?.title : '비밀글 입니다.',
+                question: visible ? item?.title : '非公開の投稿です。',
                 detail: visible ? item?.content : '',
                 answer: visible ? item?.answerContent || '' : '',
                 answerDate: visible ? formatDateShort(item?.answerCreatedAt) : '',
-                name: visible ? baseName : '비공개',
+                name: visible ? baseName : '非公開',
                 date: formatDateShort(item?.createdAt),
                 secret: !visible,
               };
@@ -311,9 +311,9 @@ export default function CM_03_1004() {
 
             if (!cancelled) setQnaList(mapped);
           } catch (err) {
-            console.error('상품 Q&A 조회 실패:', err);
+            console.error('商品Q&A取得失敗:', err);
             if (!cancelled) {
-              setQnaError(CMMessage.MSG_ERR_005('상품 Q&A'));
+              setQnaError(CMMessage.MSG_ERR_005('商品Q&A'));
               setQnaList([]);
             }
           } finally {
@@ -325,7 +325,7 @@ export default function CM_03_1004() {
           if (!cancelled) instanceRef.current?.update();
         });
       } catch (err) {
-        console.error('상품 상세 정보 불러오기 실패:', err?.response?.data?.message || err.message);
+        console.error('商品詳細情報の取得に失敗:', err?.response?.data?.message || err.message);
         if (!cancelled) {
           setProduct({ thumbnails: [{ thumb: noImage, full: noImage }] });
           setMainImage(noImage);
@@ -379,7 +379,7 @@ export default function CM_03_1004() {
         })
       );
     } catch (err) {
-      console.error('장바구니 개수 갱신 실패:', err?.response?.data || err.message);
+      console.error('カート件数の更新に失敗:', err?.response?.data || err.message);
     }
   };
 
@@ -452,7 +452,7 @@ export default function CM_03_1004() {
     return slides;
   }, [product?.thumbnails, mainImage]);
 
-  // 이미지 라이트박스 열기
+  // 画像ライトボックスを開く
   const openLightboxAt = (url) => {
     const idx = lightboxSlides.findIndex((s) => s.src === url);
     setLightboxIndex(Math.max(0, idx));
@@ -462,7 +462,7 @@ export default function CM_03_1004() {
   return (
     <>
       <section className="product-detail">
-        {/* 왼쪽: 큰 이미지 + 썸네일 */}
+        {/* 左側: メイン画像 + サムネイル */}
         <div className="product-detail-media">
           <figure className="product-detail-image">
             {statusOverlayLabel && (
@@ -476,7 +476,7 @@ export default function CM_03_1004() {
             <img
               src={mainImage || noImage}
               className="product-detail-image-main"
-              alt="디테일 이미지"
+              alt="詳細画像"
               role="button"
               tabIndex={0}
               onClick={() => openLightboxAt(mainImage || noImage)}
@@ -494,7 +494,7 @@ export default function CM_03_1004() {
             <button
               type="button"
               className="product-detail-zoom"
-              aria-label="이미지 확대 보기"
+              aria-label="画像を拡大"
               onClick={(e) => {
                 e.stopPropagation();
                 openLightboxAt(mainImage || noImage);
@@ -518,7 +518,7 @@ export default function CM_03_1004() {
                     <div className="product-detail-thumb">
                       <img
                         src={thumb}
-                        alt={`썸네일 ${index}`}
+                        alt={`サムネイル ${index}`}
                         className={`product-detail-thumb-img ${mainImage === full ? 'is-active' : ''}`}
                         draggable={false}
                         onDragStart={(e) => e.preventDefault()}
@@ -536,7 +536,7 @@ export default function CM_03_1004() {
                   <div className="product-detail-thumb">
                     <img
                       src={mainImage}
-                      alt="썸네일"
+                      alt="サムネイル"
                       className="product-detail-thumb-img is-active"
                       draggable={false}
                       onDragStart={(e) => e.preventDefault()}
@@ -556,7 +556,7 @@ export default function CM_03_1004() {
                       <div className="product-detail-thumb">
                         <img
                           src={noImage}
-                          alt="placeholder"
+                          alt="プレースホルダー"
                           className="product-detail-thumb-img"
                           draggable={false}
                           onDragStart={(e) => e.preventDefault()}
@@ -572,15 +572,15 @@ export default function CM_03_1004() {
             </section>
           </div>
         </div>
-        {/* 오른쪽: 상품 정보 */}
+        {/* 右側: 商品情報 */}
         <article className="product-detail-info">
           <h2 className="product-detail-title">
-            {product?.name || product?.productName || '상품 상세 정보'}
+            {product?.name || product?.productName || '商品詳細情報'}
           </h2>
           <hr className="product-detail-divider" />
 
           <div className="product-detail-row">
-            <span className="product-detail-label">구매마감</span>
+            <span className="product-detail-label">購入締切</span>
             <span
               className={`purchase-deadline product-detail-value ${isReservationClosed ? 'closed' : ''}`}
             >
@@ -589,12 +589,12 @@ export default function CM_03_1004() {
           </div>
 
           <div className="product-detail-row">
-            <span className="product-detail-label">발송예정</span>
+            <span className="product-detail-label">発送予定</span>
             <span className="product-detail-value">{estimatedDeliveryLabel}</span>
           </div>
           <hr className="product-detail-divider" />
           <div className="product-detail-row">
-            <span className="product-detail-label">카테고리</span>
+            <span className="product-detail-label">カテゴリー</span>
             {product?.categoryGroupName ? (
               <span className="product-detail-value d-flex flex-wrap gap-2 justify-content-end">
                 {product.categoryGroupName
@@ -608,22 +608,22 @@ export default function CM_03_1004() {
                   ))}
               </span>
             ) : (
-              <span className="product-detail-value">카테고리 미지정</span>
+              <span className="product-detail-value">カテゴリー未設定</span>
             )}
           </div>
           <hr className="product-detail-divider" />
           <div className="product-detail-price">
-            <span className="product-detail-label fw-semibold">상품 금액 (배송비 별도)</span>
+            <span className="product-detail-label fw-semibold">商品価格（送料別）</span>
             <p className="product-detail-price-value">
               {typeof product?.price === 'number'
                 ? product.price.toLocaleString()
                 : product?.price || '-'}
-              원
+              円
             </p>
           </div>
           <div className="product-detail-row product-detail-row--tight">
             <label htmlFor="quantitySelect" className="product-detail-label">
-              수량
+              数量
             </label>
             <select
               id="quantitySelect"
@@ -650,41 +650,41 @@ export default function CM_03_1004() {
           )}
           {soldOut ? (
             <button className="btn btn-outline-secondary product-detail-cta" disabled>
-              품절
+              在庫切れ
             </button>
           ) : isReservationSale ? (
             <button className="btn btn-primary product-detail-cta" onClick={handleReserveClick}>
-              예약 구매하기
+              予約購入する
             </button>
           ) : (
             <button
               className="btn btn-outline-primary product-detail-cta"
               onClick={() => addToCart({ reservation: false })}
             >
-              장바구니에 담기
+              カートに入れる
             </button>
           )}
           <div className="product-detail-warning text-secondary">
             <div>
               <i className="bi bi-exclamation-circle me-1"></i>
-              상품 불량의 경우를 제외하고는, 반품은 불가능합니다.
+              商品不良の場合を除き、返品はできません。
             </div>
-            <div className="mt-2 ms-3">취소는 결제 수단에 따라 다릅니다.</div>
+            <div className="mt-2 ms-3">キャンセルは決済方法により異なります。</div>
             <div className="mt-2 ms-3">
-              자세한 내용 <i className="bi bi-caret-right-fill mx-1"></i>
+              詳細は <i className="bi bi-caret-right-fill mx-1"></i>
               <a
                 href="/terms?type=e-commerce"
                 className="product-detail-warning-link"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                [가이드 - 반품・교환・취소]
+                [ガイド - 返品・交換・キャンセル]
               </a>
             </div>
           </div>
         </article>
       </section>
-      {/* 상세보기/후기/Q&A */}
+      {/* 商品詳細/レビュー/Q&A */}
       <div className="tab-switch d-flex justify-content-center bg-light py-3 mb-4">
         <button
           id="detailBtn"
@@ -693,7 +693,7 @@ export default function CM_03_1004() {
             detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
         >
-          상세보기
+          商品詳細
         </button>
         <button
           id="reviewBtn"
@@ -702,7 +702,7 @@ export default function CM_03_1004() {
             reviewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
         >
-          리뷰/후기
+          レビュー/口コミ
         </button>
         <button
           id="qnaBtn"
@@ -715,10 +715,9 @@ export default function CM_03_1004() {
         </button>
       </div>
       <section className="product-subsection w-100 px-3">
-        {/* 상세보기 추가 */}
+        {/* 商品詳細 */}
         <div id="detail-section" className="product-description-section mb-5">
           <h5 className="fw-bold mb-3" ref={detailRef}>
-            상세보기
           </h5>{' '}
           {product?.description ? (
             <div
@@ -729,16 +728,16 @@ export default function CM_03_1004() {
               dangerouslySetInnerHTML={{ __html: product.description }}
             />
           ) : (
-            <p>상품 설명이 준비중입니다.</p>
+            <p>商品説明を準備中です。</p>
           )}
         </div>
         <CM_03_1004_ReviewSection reviews={reviews} reviewRef={reviewRef} />
-        {/* Q&A (접이식) */}
+        {/* Q&A（アコーディオン） */}
         <div id="qna-section" className="product-qna-section">
           <h5 className="fw-bold mb-3" ref={qnaRef}>
             Q&A
           </h5>
-          
+
           {!qnaLoading && qnaError && <p className="text-danger small">{qnaError}</p>}
           {!qnaLoading && !qnaError && qnaList.length === 0 && (
             <p className="text-muted">{CMMessage.MSG_EMPTY_007}</p>
@@ -754,64 +753,58 @@ export default function CM_03_1004() {
               />
             ))}
         </div>
-        {/* 배송안내 및 반품/교환/AS (접이식) */}
+        {/* 配送案内・返品/交換/AS（アコーディオン） */}
         <div className="product-faq-section py-5">
           <details className="mb-3 border rounded">
             <summary className="p-3 fw-bold bg-light d-flex justify-content-between align-items-center">
-              배송안내
+              配送案内
               <i className="bi bi-chevron-down"></i>
             </summary>
             <div className="p-3">
-              <p>주문 확인 후 주말, 공휴일을 제외한 영업일 기준으로 평균 1~5일정도 소요됩니다.</p>
+              <p>ご注文確認後、土日祝を除く営業日 기준で平均1〜5日ほどかかります。</p>
               <ul>
-                <li>예약 상품은 상품이 입고된 후에 출고됩니다.</li>
-                <li>도서산간 지역은 추가 배송 기간이 필요할 수 있습니다.</li>
+                <li>予約商品は入荷後に発送されます。</li>
+                <li>離島・山間部は追加の配送日数が必要になる場合があります。</li>
                 <li>
-                  연말, 연초, 명절 등 택배사에 물류가 집중되는 시기에는 평균적인 배송 시기보다 늦을
-                  수 있습니다.
+                  年末年始や連休、繁忙期など配送会社の物量が集中する時期は、通常より遅れる場合があります。
                 </li>
               </ul>
             </div>
           </details>
           <details className="border rounded">
             <summary className="p-3 fw-bold bg-light d-flex justify-content-between align-items-center">
-              반품/교환/AS
+              返品・交換・アフターサービス
               <i className="bi bi-chevron-down"></i>
             </summary>
             <div className="p-3">
-              <h6 className="fw-bold mb-2">반품안내</h6>
+              <h6 className="fw-bold mb-2">返品のご案内</h6>
               <ul className="mb-3">
                 <li>
-                  제품 불량, 오배송 등 당사의 과실로 인한 반품은 당사가 배송비를 부담합니다. 단,
-                  단순 변심 및 고객님의 사정으로 반품하실 경우 배송비는 고객님께서 부담하셔서
-                  보내주시면 됩니다.
+                  商品不良・誤配送など当社都合による返品は当社が送料を負担します。なお、お客様都合（イメージ違い等）の場合は、お客様負担でご返送ください。
                 </li>
               </ul>
 
-              <h6 className="fw-bold mb-2">교환안내</h6>
+              <h6 className="fw-bold mb-2">交換のご案内</h6>
               <ul className="mb-3">
                 <li>
-                  제품 불량, 오배송 등 당사 과실로 인한 반품은 당사가 배송비를 부담합니다. 다른
-                  상품으로는 교환되지 않습니다. (1:1 문의 부탁드립니다)
+                  商品不良・誤配送など当社都合による返品は当社が送料を負担します。別商品への交換はできません。（1:1お問い合わせをお願いします）
                 </li>
               </ul>
 
-              <h6 className="fw-bold mb-2">반품 및 교환 가능 기준</h6>
+              <h6 className="fw-bold mb-2">返品・交換が可能な条件</h6>
               <ul className="mb-3">
-                <li>상품의 포장 등을 훼손, 개봉하지 않은 상태로 반품 접수 후 처리됩니다.</li>
-                <li>구매 후 7일 이내에 반품 의사를 접수해주시기 바랍니다.</li>
+                <li>商品パッケージ等を破損・開封していない状態で返品受付後に対応します。</li>
+                <li>ご購入後7日以内に返品の意思をご連絡ください。</li>
               </ul>
 
-              <h6 className="fw-bold mb-2">반품 및 교환 불가능 기준</h6>
+              <h6 className="fw-bold mb-2">返品・交換ができない条件</h6>
               <ul className="mb-0">
-                <li>상품 패키지는 상품을 포장하는 포장재이며 상품의 일부분이 아닙니다.</li>
+                <li>商品パッケージは梱包材であり、商品本体の一部ではありません。</li>
                 <li>
-                  제품 내용물이 훼손되지 않은 유통 과정에서 발생한 오염이나 패키지 손상은 교환 및
-                  반품 대상이 되지 않습니다.
+                  流通過程で発生した汚れやパッケージの傷み（中身に破損がない場合）は返品・交換の対象外です。
                 </li>
                 <li>
-                  모니터 해상도 설정 차이로 인하여 상품 및 이미지의 색상이 실제와 다를 수 있으며
-                  이는 교환 및 반품 사유가 되지 않습니다.
+                  モニター設定等により商品画像の色味が実物と異なる場合がありますが、返品・交換の理由にはなりません。
                 </li>
               </ul>
             </div>
@@ -825,7 +818,7 @@ export default function CM_03_1004() {
         index={lightboxIndex}
         on={{ view: ({ index }) => setLightboxIndex(index) }}
       />
-      {/* 모달 컴포넌트 */}
+      {/* モーダル */}
       <CM_99_1000 isOpen={open1000} onClose={() => setOpen1000(false)} />
       <CM_99_1004
         isOpen={openCartModal}

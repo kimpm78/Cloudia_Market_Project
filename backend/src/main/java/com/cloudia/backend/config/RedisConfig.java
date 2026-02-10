@@ -30,14 +30,14 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
-    // 로컬 환경
+    // ローカル環境
     @Bean
     @Profile("local")
     public RedisConnectionFactory localRedisConnectionFactory() {
         return new LettuceConnectionFactory(host, port);
     }
 
-    // AWS 환경 (dev, prod)
+    // AWS 環境 (dev, prod) 
     @Bean
     @Profile({ "dev", "prod" })
     public RedisConnectionFactory awsRedisConnectionFactory() {

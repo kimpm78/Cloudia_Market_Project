@@ -126,7 +126,7 @@
           LEFT JOIN users u
             ON u.user_id = CAST(n.user_id AS BIGINT)
          WHERE n.notice_id &lt; #{noticeId}
-           AND n.is_display = 1
+           AND n.is_display = '1'
       ORDER BY n.notice_id DESC
          LIMIT 1
     </select>
@@ -149,7 +149,7 @@
           LEFT JOIN users u
             ON u.user_id = CAST(n.user_id AS BIGINT)
          WHERE n.notice_id &gt; #{noticeId}
-           AND n.is_display = 1
+           AND n.is_display = '1'
       ORDER BY n.notice_id ASC
          LIMIT 1
     </select>

@@ -32,13 +32,13 @@ const useModal = () => {
   return { modals, message, open, close, showCurrentPassword, toggleCurrentPasswordVisibility };
 };
 
-// 탈퇴 사유 목록
+// 退会理由一覧
 const UNSUBSCRIBE_REASONS = [
-  '원하는 상품을 찾을 수 없어서',
-  '배송 일정 등 서비스에 불만이 있어서',
-  '상품 가격이 비싸서',
-  '캐릭터 관련 쇼핑이나 정보가 더 이상 필요 없어서',
-  '기타',
+  '欲しい商品が見つからないため',
+  '配送日程などサービスに不満があるため',
+  '商品の価格が高いため',
+  'キャラクター関連のショッピングや情報がこれ以上必要ないため',
+  'その他',
 ];
 
 export default function CM_01_1010() {
@@ -62,8 +62,9 @@ export default function CM_01_1010() {
     close('confirm');
     open('loading');
     try {
-      const reasonsPayload = selectedReasons.includes('기타')
-        ? selectedReasons.filter((r) => r !== '기타').concat(otherReasonText)
+      const OTHER_REASON = 'その他';
+      const reasonsPayload = selectedReasons.includes(OTHER_REASON)
+        ? selectedReasons.filter((r) => r !== OTHER_REASON).concat(otherReasonText)
         : selectedReasons;
 
       await axiosInstance.post('/user/unsubscribe', {
@@ -74,10 +75,10 @@ export default function CM_01_1010() {
 
       open(
         'success',
-        '그동안 무기와라 장터를 이용해 주셔서 감사합니다.<br/>정상적으로 탈퇴 처리되었습니다.'
+        'これまでクラウディアマーケットをご利用いただき、誠にありがとうございました。<br/>退会処理が正常に完了しました。'
       );
     } catch (error) {
-      console.error('회원탈퇴 처리 실패:', error);
+      console.error('退会処理に失敗しました:', error);
       const serverMessage = error.response?.data?.message;
       open('error', serverMessage);
     } finally {
@@ -93,15 +94,15 @@ export default function CM_01_1010() {
 
   const handleUnsubscribeClick = () => {
     if (selectedReasons.length === 0 && !otherReasonText.trim()) {
-      open('error', '탈퇴 이유를 선택하거나 기타 사유를 입력해주세요.');
+      open('error', '退会理由を選択するか、「その他」の理由を入力してください。');
       return;
     }
-    if (selectedReasons.includes('기타') && !otherReasonText.trim()) {
-      open('error', '기타 이유를 입력해주세요.');
+    if (selectedReasons.includes('その他') && !otherReasonText.trim()) {
+      open('error', '「その他」の理由を入力してください。');
       return;
     }
     if (!password) {
-      open('error', '비밀번호를 입력해주세요.');
+      open('error', 'パスワードを入力してください。');
       return;
     }
     open('confirm');
@@ -109,15 +110,15 @@ export default function CM_01_1010() {
 
   return (
     <>
-      <div className="container-fluid p-0 mt-2">
-        <h4 className="border-bottom fw-bolder pb-3 mb-4">회원 탈퇴</h4>
+      <div className="container mt-2">
+        <h2 className="border-bottom fw-bolder pb-3 mb-4 mt-4">退会</h2>
         <p className="mb-5">
-          무기와라 장터를 탈퇴하겠습니까?
+          クラウディア マーケットを退会しますか？
           <br />
-          괜찮으시다면 회원 탈퇴 이유를 입력해주세요.
+          よろしければ、退会理由をご入力ください。
         </p>
         <div className="mb-3">
-          <h5 className="border-bottom fw-bolder pb-3 mb-4">탈퇴 이유 (중복 회답 가능)</h5>
+          <h5 className="border-bottom fw-bolder pb-3 mb-4">退会理由（複数選択可）</h5>
           {UNSUBSCRIBE_REASONS.map((reason, index) => (
             <div className="form-check mb-2" key={index}>
               <input
@@ -132,11 +133,11 @@ export default function CM_01_1010() {
               </label>
             </div>
           ))}
-          {selectedReasons.includes('기타') && (
+          {selectedReasons.includes('その他') && (
             <textarea
               className="form-control mt-3"
               rows="4"
-              placeholder="기타 사유를 입력해주세요"
+              placeholder="その他の理由を入力してください"
               value={otherReasonText}
               onChange={(e) => setOtherReasonText(e.target.value)}
             ></textarea>
@@ -146,14 +147,14 @@ export default function CM_01_1010() {
         <div className="mb-3">
           <label htmlFor="currentPasswordInput" className="form-label fw-bold">
             <i className="bi bi-asterisk required-asterisk"></i>
-            현재 비밀번호
+            現在のパスワード
           </label>
           <div className="password-input-container">
             <input
               type={showCurrentPassword ? 'text' : 'password'}
               className="form-control"
               id="currentPasswordInput"
-              placeholder="비밀번호를 입력해주세요"
+              placeholder="パスワードを入力してください"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -169,14 +170,14 @@ export default function CM_01_1010() {
 
         <div className="d-flex justify-content-center gap-2 mt-5 mb-3">
           <button className="btn btn-primary px-5" onClick={handleUnsubscribeClick}>
-            확인하기
+            確認する
           </button>
           <button
             type="button"
             className="btn btn-secondary px-5"
             onClick={() => navigate('/mypage')}
           >
-            뒤로 가기
+            戻る
           </button>
         </div>
       </div>
@@ -185,7 +186,7 @@ export default function CM_01_1010() {
         isOpen={modals.confirm}
         onClose={() => close('confirm')}
         onConfirm={handleConfirmUnsubscribe}
-        Message="정말로 회원을 탈퇴하시겠습니까?"
+        Message="本当に退会しますか？"
       />
       <CM_99_1002 isOpen={modals.loading} />
       <CM_99_1003 isOpen={modals.error} onClose={() => close('error')} message={message} />

@@ -18,10 +18,10 @@ import org.springframework.util.StringUtils;
 
 import com.cloudia.backend.CM_05_1000.constants.CM051000Constant;
 import com.cloudia.backend.CM_05_1000.constants.CM051000MessageConstant;
-import com.cloudia.backend.CM_05_1000.model.ResponseModel;
 import com.cloudia.backend.CM_05_1000.mapper.CM051000Mapper;
 import com.cloudia.backend.CM_05_1000.model.NoticeInfo;
 import com.cloudia.backend.CM_05_1000.service.CM051000Service;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.constants.CMMessageConstant;
 import com.cloudia.backend.config.RedisUtils;
 
@@ -38,9 +38,9 @@ public class CM051000ServiceImpl implements CM051000Service {
     private final RedisUtils redisUtils;
 
     /**
-     * 공지사항 전체 리스트 조회
-     * 
-     * @return 공지사항 전체 리스트
+     * お知らせ一覧（全件）取得
+     *
+     * @return お知らせ全件一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -69,11 +69,11 @@ public class CM051000ServiceImpl implements CM051000Service {
     }
 
     /**
-     * 특정 공지사항 리스트 조회
-     * 
-     * @param searchKeyword 키워드
-     * @param searchType    타입 (1:제목 + 내용, 2:제목, 3:내용, 4:작성자)
-     * @return 공지사항 리스트
+     * 特定条件によるお知らせ一覧取得
+     *
+     * @param searchKeyword キーワード
+     * @param searchType    タイプ（1: タイトル+本文、2: タイトル、3: 本文、4: 作成者）
+     * @return お知らせ一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -295,10 +295,10 @@ public class CM051000ServiceImpl implements CM051000Service {
     }
 
     /**
-     * 공지사항 등록 실행
-     * 
-     * @param entity 공지사항 정보
-     * @return 등록 결과
+     * お知らせ登録の実行
+     *
+     * @param entity お知らせ情報
+     * @return 登録結果
      */
     private int insertNotice(NoticeInfo entity) {
         NoticeInfo noticeModel = createNoticeModel(entity);

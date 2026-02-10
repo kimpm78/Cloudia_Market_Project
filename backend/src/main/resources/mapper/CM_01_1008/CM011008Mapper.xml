@@ -13,13 +13,16 @@
     <select id="findAddressesByMemberNumber" resultType="com.cloudia.backend.CM_01_1008.model.DeliveryAddress">
         SELECT * 
         FROM delivery_addresses 
-        WHERE member_number = #{memberNumber} AND is_active = 1 ORDER BY is_default DESC, created_at DESC
+        WHERE member_number = #{memberNumber}
+          AND deleted_at IS NULL
+        ORDER BY is_default DESC, created_at DESC
     </select>
     
     <select id="countAddressesByMemberNumber" resultType="int">
         SELECT COUNT(*) 
         FROM delivery_addresses 
-        WHERE member_number = #{memberNumber} AND is_active = 1
+        WHERE member_number = #{memberNumber}
+          AND deleted_at IS NULL
     </select>
     
     <insert id="insertAddress" parameterType="com.cloudia.backend.CM_01_1008.model.DeliveryAddress">
@@ -60,7 +63,7 @@
         SET is_default = FALSE,
             updated_at = NOW()
         WHERE member_number = #{memberNumber}
-          AND is_active = 1
+          AND deleted_at IS NULL
           AND is_default = TRUE
     </update>
     
@@ -83,12 +86,14 @@
     <select id="findAddressById" resultType="com.cloudia.backend.CM_01_1008.model.DeliveryAddress">
     SELECT * 
     FROM delivery_addresses 
-    WHERE address_id = #{addressId} AND is_active = 1
+    WHERE address_id = #{addressId}
+      AND deleted_at IS NULL
     </select>
 
     <update id="deleteAddressSoft">
         UPDATE delivery_addresses 
-        SET is_active = 0, deleted_at = NOW() 
+        SET deleted_at = NOW(),
+            updated_at = NOW()
         WHERE address_id = #{addressId}
     </update>
 

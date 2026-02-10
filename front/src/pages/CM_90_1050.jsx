@@ -64,28 +64,28 @@ export default function CM_90_1050() {
 
   const columnDefs = useMemo(() => [
     {
-      headerName: '회원 번호',
+      headerName: '会員番号',
       field: 'memberNumber',
       minWidth: 100,
       maxWidth: 120,
       flex: 1,
     },
     {
-      headerName: '구매자 ID',
+      headerName: '購入者ID',
       field: 'loginId',
       minWidth: 100,
       maxWidth: 150,
       flex: 1,
     },
     {
-      headerName: '상품명',
+      headerName: '商品名',
       field: 'productName',
       minWidth: 100,
       maxWidth: 120,
       flex: 2,
     },
     {
-      headerName: '총 정산금액(a+b-c-d)',
+      headerName: '総精算金額（a+b-c-d）',
       field: 'totalAmount',
       minWidth: 100,
       flex: 1,
@@ -94,7 +94,7 @@ export default function CM_90_1050() {
       },
     },
     {
-      headerName: '판매 단가(a)',
+      headerName: '販売単価（a）',
       field: 'unitPrice',
       minWidth: 100,
       flex: 1,
@@ -103,7 +103,7 @@ export default function CM_90_1050() {
       },
     },
     {
-      headerName: '배송비(b)',
+      headerName: '送料（b）',
       field: 'shippingCost',
       minWidth: 100,
       flex: 1,
@@ -112,7 +112,7 @@ export default function CM_90_1050() {
       },
     },
     {
-      headerName: '상품 사입가(c)',
+      headerName: '商品仕入価格（c）',
       field: 'price',
       minWidth: 100,
       flex: 1,
@@ -121,7 +121,7 @@ export default function CM_90_1050() {
       },
     },
     {
-      headerName: '할인가(d)',
+      headerName: '割引額（d）',
       field: 'discountAmount',
       minWidth: 100,
       flex: 1,
@@ -130,14 +130,14 @@ export default function CM_90_1050() {
       },
     },
     {
-      headerName: '구매일',
+      headerName: '購入日',
       field: 'orderDate',
       minWidth: 100,
       flex: 1,
       valueFormatter: (params) => formatDate(params.value),
     },
     {
-      headerName: '판품일',
+      headerName: '販売日',
       field: 'orderDates',
       minWidth: 100,
       flex: 1,
@@ -178,11 +178,11 @@ export default function CM_90_1050() {
     const hasDateTo = dateTo && dateTo.trim() !== '';
 
     if (hasDateFrom && !hasDateTo) {
-      open('error', CMMessage.MSG_ERR_002('시작 날짜'));
+      open('error', CMMessage.MSG_ERR_002('開始日'));
       setLoading(false);
       return;
     } else if (!hasDateFrom && hasDateTo) {
-      open('error', CMMessage.MSG_ERR_002('종료 날짜'));
+      open('error', CMMessage.MSG_ERR_002('終了日'));
       setLoading(false);
       return;
     } else if (hasDateFrom && hasDateTo) {
@@ -259,39 +259,38 @@ export default function CM_90_1050() {
   return (
     <div className="d-flex">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">매출 정보(표)</h5>
-
+        <h2 className="border-bottom pb-2 mb-3">売上情報（表）</h2>
         <div className="row mb-3">
           <div className="col-12">
             <div className="card shadow-sm">
               <div className="card-body">
                 <div className="row g-3 align-items-end">
                   <div className="col-12 col-md-4">
-                    <label className="form-label fw-semibold">조회기간</label>
-                    <div className="d-flex flex-wrap align-items-center">
+                    <label className="form-label fw-semibold">対象期間</label>
+                    <div className="d-flex flex-nowrap align-items-center gap-2">
                       <select
-                        className="form-select me-2 mb-2 mb-md-0"
-                        style={{ width: '120px' }}
+                        className="form-select"
+                        style={{ width: '140px' }}
                         onChange={(e) => handlePeriodSelect(e.target.value)}
                       >
-                        <option value="">기간 선택</option>
-                        <option value="week">최근 1주</option>
-                        <option value="month">최근 1개월</option>
-                        <option value="3months">최근 3개월</option>
+                        <option value="">期間を選択</option>
+                        <option value="week">直近1週間</option>
+                        <option value="month">直近1か月</option>
+                        <option value="3months">直近3か月</option>
                       </select>
                       <input
                         type="date"
-                        className="form-control me-2 mb-2 mb-md-0"
-                        style={{ width: '150px' }}
+                        className="form-control"
+                        style={{ width: '130px' }}
                         value={dateFrom}
                         onChange={(e) => setDateFrom(e.target.value)}
                         onKeyDown={handleKeyDown}
                       />
-                      <span className="me-2">~</span>
+                      <span>~</span>
                       <input
                         type="date"
                         className="form-control"
-                        style={{ width: '150px' }}
+                        style={{ width: '130px' }}
                         value={dateTo}
                         onChange={(e) => setDateTo(e.target.value)}
                         onKeyDown={handleKeyDown}
@@ -306,14 +305,14 @@ export default function CM_90_1050() {
                         onClick={handleSearch}
                         disabled={loading}
                       >
-                        검색
+                        検索
                       </button>
                       <button
                         className="btn btn-primary flex-fill"
                         onClick={handleReset}
                         disabled={loading}
                       >
-                        초기화
+                        リセット
                       </button>
                     </div>
                   </div>

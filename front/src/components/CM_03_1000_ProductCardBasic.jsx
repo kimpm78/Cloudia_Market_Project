@@ -3,17 +3,40 @@ import { hasReservationClosed } from '../utils/productStatus';
 import { isReservationProduct } from '../utils/productPageFilters';
 import noImage from '../images/common/CM-NoImage.png';
 
-export default function ProductCardBasic({ item, imageUrl, soldOut, categoryLabel, noteHtml }) {
+export default function ProductCardBasic({
+  item,
+  imageUrl,
+  soldOut,
+  categoryLabel,
+  noteHtml,
+  statusCode,
+  reservationClosed: reservationClosedProp,
+}) {
   const itemId = item.productId ?? item.id ?? item.productCode;
   const categoryText = categoryLabel ?? item.categoryGroupName;
-  const codeValue = item?.codeValue ?? item?.code_value;
-  const statusCode = codeValue !== undefined && codeValue !== null ? String(codeValue).trim() : '';
-  const reservationFlag = statusCode === '3' || statusCode === '4' || isReservationProduct(item);
-  const reservationClosed = hasReservationClosed(item, { useClientTime: true });
-  const showOverlay = soldOut || reservationClosed;
-  const overlayText = reservationClosed ? '예약 마감' : 'SOLD OUT';
-  const badgeText = reservationClosed ? '예약 마감' : '예약중';
-  const badgeClassName = reservationClosed ? 'bg-secondary text-white' : 'bg-primary text-white';
+  const rawCodeValue = statusCode ?? item?.codeValue ?? item?.code_value;
+  const normalizedStatusCode =
+    rawCodeValue !== undefined && rawCodeValue !== null ? String(rawCodeValue).trim() : '';
+  const reservationFlag =
+    normalizedStatusCode === '3' ||
+    normalizedStatusCode === '4' ||
+    isReservationProduct(item);
+  const reservationClosed =
+    reservationClosedProp ??
+    (normalizedStatusCode === '4' || hasReservationClosed(item, { useClientTime: true }));
+  const soldOutState =
+    soldOut || normalizedStatusCode === '2' || normalizedStatusCode === '4' || reservationClosed;
+  const showOverlay = soldOutState || reservationClosed;
+  const overlayText = reservationClosed ? '予約締切' : 'SOLD OUT';
+  const badgeText =
+    normalizedStatusCode === '2' ? 'SOLD OUT' : reservationClosed ? '予約締切' : '予約中';
+  const badgeClassName =
+    normalizedStatusCode === '2'
+      ? 'bg-warning text-dark'
+      : reservationClosed
+        ? 'bg-secondary text-white'
+        : 'bg-primary text-white';
+  const showBadge = normalizedStatusCode === '2' || reservationFlag;
 
   return (
     <div className="col d-flex" key={itemId}>
@@ -38,9 +61,9 @@ export default function ProductCardBasic({ item, imageUrl, soldOut, categoryLabe
                 </div>
               </div>
             )}
-            {reservationFlag && (
+            {showBadge && (
               <div
-                className={`position-absolute bottom-0 w-100 text-white text-center py-2 item-text ${badgeClassName}`}
+                className={`position-absolute bottom-0 w-100 text-center py-2 item-text ${badgeClassName}`}
                 style={{ fontWeight: 600 }}
               >
                 {badgeText}
@@ -58,9 +81,9 @@ export default function ProductCardBasic({ item, imageUrl, soldOut, categoryLabe
             )}
             {reservationFlag && (
               <p className="mb-1 text-primary small fw-bold" style={{ fontSize: '12px' }}>
-                [{reservationClosed ? '예약마감' : '예약구매'}]{' '}
+                [{reservationClosed ? '予約締切' : '予約購入'}]{' '}
                 {!reservationClosed && (
-                  <span className="text-danger">*조기 품절 될 수 있습니다.</span>
+                  <span className="text-danger">※早期に売り切れる場合があります。</span>
                 )}
               </p>
             )}
@@ -69,7 +92,7 @@ export default function ProductCardBasic({ item, imageUrl, soldOut, categoryLabe
             </div>
             <div className="mt-auto">
               <div className="fw-bold mt-2 item-price-text fs-5">
-                {item.price.toLocaleString()}원
+                {item.price.toLocaleString()}円
               </div>
               {noteHtml && <div className="product-note" dangerouslySetInnerHTML={noteHtml} />}
             </div>

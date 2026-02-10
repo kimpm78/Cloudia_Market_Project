@@ -6,20 +6,20 @@ import com.cloudia.backend.CM_90_1054.model.SalesDto;
 
 public interface CM901054Service {
     /**
-     * 기간별 월 매출 조회
+     * 期間別の月別売上取得
      * 
-     * @param startMonth 시작 월
-     * @param endMonth   끝 월
-     * @return 기간별 월 매출 리스트
+     * @param startMonth 開始月
+     * @param endMonth   終了月
+     * @return 期間別の月別売上リスト
      */
     List<SalesDto> getChart1(String startDate, String endDate);
 
     /**
-     * 기간별 월 순수익 조회
+     * 期間別の月別純利益取得
      * 
-     * @param startMonth 시작 월
-     * @param endMonth   끝 월
-     * @return 기간별 월 순수익 리스트
+     * @param startMonth 開始月
+     * @param endMonth   終了月
+     * @return 期間別の月別純利益リスト
      */
     List<SalesDto> getChart2(String startDate, String endDate);
 }

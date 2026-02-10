@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import ModalBase from './ModalBase.jsx';
+import '../../styles/CM_99_popup.css';
 
 const CM_99_1005 = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -15,18 +16,16 @@ const CM_99_1005 = ({ isOpen, onClose }) => {
 
   return (
     <ModalBase onClose={onClose}>
-      <div className="popup-content-wrapper">
-        <h4 className="popup-title">ログインが必要です</h4>
-        <p className="popup-message">
-          会員のみご利用いただけるサービスです。
-          <br />
-          ログイン後にご利用ください。
-        </p>
-        <div className="popup-actions-horizontal">
-          <button className="btn-action" onClick={() => handleNavigate('/login')}>
-            ログイン
-          </button>
-        </div>
+      <p className="fs-4 fw-semibold mb-4 text-center">ログインが必要です</p>
+      <p className="fs-5 mb-4 text-center">
+        会員のみご利用いただけるサービスです。
+        <br />
+        ログイン後にご利用ください。
+      </p>
+      <div className="d-flex justify-content-center w-100">
+        <button className="btn-action" onClick={() => handleNavigate('/login')}>
+          ログイン
+        </button>
       </div>
     </ModalBase>
   );

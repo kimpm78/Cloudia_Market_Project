@@ -40,7 +40,7 @@
         FROM
             users u
         LEFT JOIN
-            permissions p ON u.role_id = p.role_id
+            permissions p ON u.role_id = CAST(p.role_id AS BIGINT)
         WHERE
             u.login_id = #{loginId}
     </select>

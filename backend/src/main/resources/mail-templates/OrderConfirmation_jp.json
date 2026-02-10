@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "OrderConfirmation_jp",
+    "SubjectPart": "【クラウディア マーケット】ご注文完了のお知らせ（自動送信）",
+    "TextPart": "＜本メールは返信できません。ご了承ください。＞\n\n{{name}} 様\n【クラウディア マーケット】をご利用いただきありがとうございます。\nご注文を受け付けました。\n\n────────────────────\n■ ご注文情報\n────────────────────\n注文日：{{orderDate}}\n注文番号：{{orderNumber}}\nお支払い方法：{{paymentMethod}}\nお支払い金額：{{paymentAmount}}\n注文商品：{{orderItems}}\n\n今後とも【クラウディア マーケット】をよろしくお願いいたします。",
+    "HtmlPart": "<html><body style=\"font-family: Arial, sans-serif; color:#000; font-size:14px; line-height:1.7;\"><p>＜本メールは返信できません。ご了承ください。＞</p><p><strong>{{name}}</strong> 様<br>【クラウディア マーケット】をご利用いただきありがとうございます。<br>ご注文を受け付けました。</p><hr><h4>■ ご注文情報</h4><p>注文日：{{orderDate}}<br>注文番号：<strong style=\"color:#1a73e8;\">{{orderNumber}}</strong><br>お支払い方法：{{paymentMethod}}<br>お支払い金額：{{paymentAmount}}<br>注文商品：{{orderItems}}</p><p>今後とも<strong>【クラウディア マーケット】</strong>をよろしくお願いいたします。</p></body></html>"
+  }
+}

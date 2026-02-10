@@ -28,10 +28,10 @@ public class CM011014ServiceImpl implements CM011014Service {
             account = new UserAccount();
         }
 
-        // ResponseModel로 감싸기
+        // ResponseModel でラップ
         ResponseModel<UserAccount> response = ResponseModel.<UserAccount>builder()
                 .result(true)
-                .message("조회 성공")
+                .message("取得成功")
                 .resultList(account)
                 .build();
 
@@ -42,11 +42,11 @@ public class CM011014ServiceImpl implements CM011014Service {
     public ResponseEntity<ResponseModel<Object>> updateAccount(String loginId, UserAccount accountDto) {
         User user = mapper.findUserByLoginId(loginId);
 
-        // 1. 유저가 없는 경우 에러 응답
+        // ユーザーが存在しない場合はエラーレスポンス
         if (user == null) {
             ResponseModel<Object> errorResponse = ResponseModel.builder()
                     .result(false)
-                    .message("사용자를 찾을 수 없습니다.")
+                    .message("ユーザーが見つかりません。")
                     .build();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
@@ -55,10 +55,10 @@ public class CM011014ServiceImpl implements CM011014Service {
         user.setRefundAccountNumber(accountDto.getRefundAccountNumber());
         user.setRefundAccountHolder(accountDto.getRefundAccountHolder());
 
-        // 3. DB 업데이트
+        // DB更新
         mapper.updateUserAccount(user);
 
-        // 4. 성공 응답 생성
+        // 成功レスポンス生成
         ResponseModel<Object> successResponse = ResponseModel.builder()
                 .result(true)
                 .message(CM011014MessageConstant.SUCCESS_UPDATE_ACCOUNT)

@@ -4,8 +4,8 @@ import { AgGridReact } from 'ag-grid-react';
 import { PAYMENT_METHOD_CODE, ORDER_STATUS_CODE } from '../constants/constants';
 
 const PAYMENT_LABEL = {
-  [PAYMENT_METHOD_CODE.TRANSFER]: '계좌이체',
-  [PAYMENT_METHOD_CODE.CREDIT_CARD]: '신용카드',
+  [PAYMENT_METHOD_CODE.TRANSFER]: '銀行振込',
+  [PAYMENT_METHOD_CODE.CREDIT_CARD]: 'クレジットカード',
 };
 
 export default function CM_01_1005_OrderHistoryTable({ orders, loading }) {
@@ -42,7 +42,7 @@ export default function CM_01_1005_OrderHistoryTable({ orders, loading }) {
   const columnDefs = useMemo(
     () => [
       {
-        headerName: '주문일 / 주문번호',
+        headerName: '注文日/注文番号',
         field: 'orderNo',
         width: isMobile ? 130 : 180,
         cellRenderer: (params) => (
@@ -53,7 +53,7 @@ export default function CM_01_1005_OrderHistoryTable({ orders, loading }) {
         ),
       },
       {
-        headerName: '상품명',
+        headerName: '商品名',
         field: 'productName',
         flex: 1,
         minWidth: 120,
@@ -61,7 +61,7 @@ export default function CM_01_1005_OrderHistoryTable({ orders, loading }) {
         cellRenderer: (params) => {
           const name = params.value || '';
           const count = params.data.orderItemCount;
-          const displayText = count > 1 ? `${name} 외 ${count - 1}건` : name;
+          const displayText = count > 1 ? `${name} 他 ${count - 1}点` : name;
 
           return (
             <div className="text-truncate" style={{ width: '100%' }} title={displayText}>
@@ -71,38 +71,37 @@ export default function CM_01_1005_OrderHistoryTable({ orders, loading }) {
         },
       },
       {
-        headerName: '발송 예정',
+        headerName: '発送予定',
         field: 'deliveryDate',
         width: 130,
         hide: isMobile,
       },
       {
-        headerName: isMobile ? '금액' : '주문금액 / 결제방법',
+        headerName: isMobile ? '金額' : '注文金額／支払い方法',
         field: 'totalPrice',
         width: isMobile ? 90 : 220,
         cellRenderer: (params) => {
           const price = params.value || 0;
-          const method = PAYMENT_LABEL[params.data.paymentValue] || '결제수단';
+          const method = PAYMENT_LABEL[params.data.paymentValue] || '支払い方法';
 
           if (isMobile) {
             return (
               <div className="d-flex align-items-center h-100 justify-content-end">
-                <span className="fw-bold">{price.toLocaleString()}원</span>
+                <span className="fw-bold">{price.toLocaleString()}円</span>
               </div>
             );
           }
 
-          // PC: 금액 + 결제수단 표시
           return (
             <div className="d-flex align-items-center h-100">
-              <span className="fw-bold">{price.toLocaleString()}원</span>
+              <span className="fw-bold">{price.toLocaleString()}円</span>
               <span className="text-secondary ms-2 small">/ {method}</span>
             </div>
           );
         },
       },
       {
-        headerName: '상태',
+        headerName: 'ステータス',
         field: 'orderStatus',
         width: 130,
         hide: isMobile,
@@ -151,9 +150,9 @@ export default function CM_01_1005_OrderHistoryTable({ orders, loading }) {
         rowHeight={65}
         rowClass="border-bottom-light"
         overlayLoadingTemplate={
-          '<span class="loading-message">데이터를 불러오는 중입니다...</span>'
+          '<span class="loading-message">データを読み込み中です...</span>'
         }
-        overlayNoRowsTemplate={'<span class="no-rows">구매 이력이 없습니다.</span>'}
+        overlayNoRowsTemplate={'<span class="no-rows">購入履歴がありません。</span>'}
         theme="legacy"
         loading={loading}
       />

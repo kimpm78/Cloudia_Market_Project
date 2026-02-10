@@ -1,9 +1,17 @@
-import { Link } from 'react-router-dom';
-import { useMenu } from '../contexts/CM_90_1000_sideMenuContext';
+import { Link, useLocation } from 'react-router-dom';
+import { useMenu } from '../contexts/CM_90_1000_SideMenuContext';
 import '../styles/CM_90_1000_sideBar.css';
 
-export default function CM_90_1000_sideBar() {
+export default function CM_90_1000_SideBar() {
   const { menuData, loading, error } = useMenu();
+  const location = useLocation();
+  const safeMenuData = Array.isArray(menuData) ? menuData : [];
+  const normalizePath = (path = '') => {
+    const pathnameOnly = path.split('?')[0];
+    const trimmed = pathnameOnly.replace(/\/+$/, '');
+    return trimmed || '/';
+  };
+  const currentPath = normalizePath(location.pathname);
 
   if (loading) {
     return (
@@ -23,7 +31,7 @@ export default function CM_90_1000_sideBar() {
 
   return (
     <div className="sidebar">
-      {menuData.map((section) => (
+      {safeMenuData.map((section) => (
         <div key={section.menuId} className="sidebar-section">
           <div className="sidebar-title">{section.menuName}</div>
           <ul className="sidebar-list">
@@ -32,8 +40,9 @@ export default function CM_90_1000_sideBar() {
                 <li key={item.menuId} className="sidebar-item">
                   <Link
                     to={item.url}
-                    className={`${section.menuName === 'Account' ? 'link-dark' : 'link-body-emphasis'}`}
-                    style={{ textDecoration: 'none' }}
+                    className={`text-decoration-none admin-sidebar-link ${
+                      currentPath === normalizePath(item.url) ? 'active fw-bold' : ''
+                    }`}
                   >
                     {item.menuName}
                   </Link>

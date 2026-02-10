@@ -5,15 +5,15 @@
 
 <mapper namespace="com.cloudia.backend.CM_03_1003.mapper.CM031003Mapper">
 
-  <!-- 장르 상품 리스트 조회 -->
+  <!-- ジャンル商品リスト取得 -->
   <select id="selectGenreProductList" resultType="com.cloudia.backend.CM_03_1003.model.ProductInfo">
     SELECT 
       p.product_id,
       p.product_code,
-      p.name,
+      p.title AS name,
       p.category,
       p.price,
-      p.delivery_price,
+      0 AS delivery_price,
       p.release_date,
       p.is_display,
       p.code_type,
@@ -40,15 +40,14 @@
       FROM jsonb_array_elements(p.category) AS e
     ) keys ON true
     LEFT JOIN categories cg ON cg.category_group_code = keys.category_key
-    WHERE p.is_display = 1
-      AND cg.category_group_name = '장르'
+    WHERE CAST(p.is_display AS TEXT) = '1'
+      AND cg.category_group_name = 'ジャンル'
     GROUP BY
       p.product_id,
       p.product_code,
-      p.name,
+      p.title,
       p.category,
       p.price,
-      p.delivery_price,
       p.release_date,
       p.is_display,
       p.code_type,
@@ -62,15 +61,15 @@
     ORDER BY p.created_at DESC
   </select>
 
-  <!-- 상품 리스트 조회 -->
+  <!-- 新商品リスト取得 -->
   <select id="selectNewProductList" resultType="com.cloudia.backend.CM_03_1003.model.ProductInfo">
     SELECT 
       p.product_id,
       p.product_code,
-      p.name,
+      p.title AS name,
       p.category,
       p.price,
-      p.delivery_price,
+      0 AS delivery_price,
       p.release_date,
       p.reservation_deadline,
       p.is_display,
@@ -98,14 +97,13 @@
       FROM jsonb_array_elements(p.category) AS e
     ) keys ON true
     LEFT JOIN categories cg ON cg.category_group_code = keys.category_key
-    WHERE p.is_display = 1
+    WHERE CAST(p.is_display AS TEXT) = '1'
     GROUP BY
       p.product_id,
       p.product_code,
-      p.name,
+      p.title,
       p.category,
       p.price,
-      p.delivery_price,
       p.release_date,
       p.reservation_deadline,
       p.is_display,
@@ -125,10 +123,10 @@
     SELECT 
       p.product_id,
       p.product_code,
-      p.name,
+      p.title AS name,
       p.category,
       p.price,
-      p.delivery_price,
+      0 AS delivery_price,
       p.release_date,
       p.reservation_deadline,
       p.is_display,
@@ -161,10 +159,9 @@
     GROUP BY
       p.product_id,
       p.product_code,
-      p.name,
+      p.title,
       p.category,
       p.price,
-      p.delivery_price,
       p.release_date,
       p.reservation_deadline,
       p.is_display,
@@ -179,7 +176,7 @@
       stock.available_qty
   </select>
 
-  <!-- 카테고리 조회-->
+  <!-- カテゴリ取得 -->
   <resultMap id="CategoryGroupWithDetailsResultMap" type="com.cloudia.backend.CM_03_1003.model.Categories">
     <id property="categoryGroupCode" column="category_group_code"/>
     <result property="categoryGroupName" column="category_group_name"/>
@@ -241,20 +238,20 @@
     ORDER BY category_details.category_code
   </select>
   
-  <!-- 상품 장바구니 상품 조회 -->
+  <!-- カート商品取得 -->
   <select id="findCartItem" parameterType="map" resultType="com.cloudia.backend.CM_03_1003.model.CartItem">
     SELECT * FROM cart_items 
     WHERE user_id = #{userId} AND product_id = CAST(#{productId} AS VARCHAR)
   </select>
 
-  <!-- 장바구니 수량 수정 -->
+  <!-- カート商品数量更新 -->
   <update id="updateQuantity" parameterType="map">
     UPDATE cart_items
     SET quantity = quantity + #{quantity}, cart_updated_at = CURRENT_TIMESTAMP
     WHERE user_id = #{userId} AND product_id = CAST(#{productId} AS VARCHAR)
   </update>
 
-  <!-- 장바구니 상품 추가 -->
+  <!-- カート商品追加 -->
   <insert id="insertCartItem" parameterType="map">
     INSERT INTO cart_items (
       user_id,

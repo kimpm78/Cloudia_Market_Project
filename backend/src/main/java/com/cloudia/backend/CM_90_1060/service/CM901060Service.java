@@ -6,90 +6,90 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_90_1060.model.Categories;
 import com.cloudia.backend.CM_90_1060.model.CategoryDetails;
 import com.cloudia.backend.CM_90_1060.model.ProductUpt;
 import com.cloudia.backend.CM_90_1060.model.RequestModel;
-import com.cloudia.backend.CM_90_1060.model.ResponseModel;
 import com.cloudia.backend.CM_90_1060.model.ResponseProducts;
 import com.cloudia.backend.CM_90_1060.model.Stock;
 
 public interface CM901060Service {
     /**
-     * 카테고리 그룹 코드 전체 리스트 조회
+     * カテゴリグループコードの全リストを取得
      * 
-     * @return 카테고리 그룹 코드 전체 리스트
+     * @return カテゴリグループコードの全リスト
      */
     ResponseEntity<ResponseModel<List<Categories>>> findAllCategoryGroupCode();
 
     /**
-     * 선택 된 카테고리 그룹의 하위 카테고리 정보 조회
+     * 選択したカテゴリグループの下位カテゴリ情報を取得
      * 
-     * @param categoryGroupCode 카테고리 그룹 코드
-     * @return 하위 카테고리 정보
+     * @param categoryGroupCode カテゴリグループコード
+     * @return 下位カテゴリ情報
      */
     ResponseEntity<ResponseModel<List<CategoryDetails>>> findCategory(List<String> categoryGroupCode);
 
     /**
-     * 등록 가능한 재고 리스트 조회
+     * 登録可能な在庫リストを取得
      * 
-     * @return 재고 리스트
+     * @return 在庫リスト
      */
     ResponseEntity<ResponseModel<List<Stock>>> findAllStockCode();
 
     /**
-     * 특정 상품 조회
+     * 特定商品の取得
      * 
-     * @param productId 상품 코드
-     * @return 특정 상품 리스트
+     * @param productId 商品コード
+     * @return 特定商品
      */
     ResponseEntity<ResponseModel<ProductUpt>> findByProductCode(int productId);
 
     /**
-     * 상품 등록
+     * 商品登録
      * 
-     * @param entity 등록 할 상품 정보
-     * @return 상품 여부
+     * @param entity 登録する商品情報
+     * @return 登録結果
      */
     ResponseEntity<ResponseModel<Integer>> productUpload(@ModelAttribute RequestModel entity, String userId);
 
     /**
-     * 상품 수정
+     * 商品更新
      * 
-     * @param entity 수정 할 상품 정보
-     * @return 상품 수정 여부
+     * @param entity 更新する商品情報
+     * @return 更新結果
      */
     ResponseEntity<ResponseModel<Integer>> productUpdate(@ModelAttribute RequestModel entity, String userId);
 
     /**
-     * 상품 전체 리스트 조회
+     * 商品の全リストを取得
      * 
-     * @return 상품 전체 리스트
+     * @return 商品の全リスト
      */
     ResponseEntity<ResponseModel<List<ResponseProducts>>> findAllProduct();
 
     /**
-     * 특정 상품 리스트 조회
+     * 条件に一致する商品リストを取得
      * 
-     * @param searchTerm 키워드
-     * @param searchType 타입 (1:상품 코드, 2:상품 명)
-     * @return 상품 리스트
+     * @param searchTerm キーワード
+     * @param searchType 種別（1: 商品コード, 2: 商品名）
+     * @return 商品リスト
      */
     ResponseEntity<ResponseModel<List<ResponseProducts>>> getFindProduct(String searchTerm, int searchType);
 
     /**
-     * 상품 삭제
+     * 商品削除
      * 
-     * @param productIds 삭제 아이디 리스트
-     * @return 삭제 여부
+     * @param productIds 削除対象IDリスト
+     * @return 削除結果
      */
     ResponseEntity<ResponseModel<Integer>> delProduct(List<Integer> productIds, String userId);
 
     /**
-     * 이미지 등록
+     * 画像登録
      * 
-     * @param file 등록 할 이미지 정보
-     * @return 등록 여부
+     * @param file 登録する画像ファイル
+     * @return 登録結果
      */
     ResponseEntity<ResponseModel<String>> imageUpload(MultipartFile file);
 }

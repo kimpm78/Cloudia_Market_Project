@@ -6,12 +6,12 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface CM011014Mapper {
-    // 계좌 정보 조회
+    // 口座情報取得
     UserAccount findAccountByLoginId(String loginId);
 
-    // 업데이트를 위한 유저 조회
+    // 更新のためのユーザー取得
     User findUserByLoginId(String loginId);
 
-    // 계좌 정보 업데이트
+    // 口座情報更新
     void updateUserAccount(User user);
 }

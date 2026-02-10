@@ -3,7 +3,6 @@ package com.cloudia.backend.CM_04_1003.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +21,8 @@ import com.cloudia.backend.CM_04_1003.model.QnaCreateResponse;
 import com.cloudia.backend.CM_04_1003.model.QnaDetailResponse;
 import com.cloudia.backend.CM_04_1003.model.QnaListResponse;
 import com.cloudia.backend.CM_04_1003.model.QnaSummary;
-import com.cloudia.backend.CM_04_1003.model.ResponseModel;
 import com.cloudia.backend.CM_04_1003.service.CM041003Service;
+import com.cloudia.backend.common.model.ResponseModel;
 
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,11 +35,10 @@ import org.springframework.util.StringUtils;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
 @Slf4j
 public class CM041003Controller {
 
-    private final CM041003Service service;
+    private final CM041003Service cm041003Service;
     private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/guest/qna")
@@ -49,14 +47,14 @@ public class CM041003Controller {
             @RequestParam(name = "size", defaultValue = "" + CM041003Constant.DEFAULT_SIZE) int size,
             @RequestParam(name = "searchKeyword", required = false) String searchKeyword,
             @RequestParam(name = "searchType", required = false) Integer searchType) {
-        return service.getQnaList(page, size, searchKeyword, searchType);
+        return cm041003Service.getQnaList(page, size, searchKeyword, searchType);
     }
 
     @GetMapping("/guest/qna/recent")
     public ResponseEntity<ResponseModel<java.util.List<QnaSummary>>> getRecentQna(
             @RequestParam(name = "size", required = false) Integer size,
             @RequestParam(name = "productId", required = false) String productId) {
-        return service.getRecentQna(size, productId);
+        return cm041003Service.getRecentQna(size, productId);
     }
 
     @GetMapping("/guest/qna/{qnaId}")
@@ -65,13 +63,22 @@ public class CM041003Controller {
             HttpServletRequest request) {
         Long requesterId = extractUserId(request);
         boolean isAdmin = hasAdminAuthority();
-        return service.getQnaDetail(qnaId, requesterId, isAdmin);
+        return cm041003Service.getQnaDetail(qnaId, requesterId, isAdmin);
     }
 
     @PostMapping("/user/qna")
     public ResponseEntity<ResponseModel<QnaCreateResponse>> createQna(
             @Valid @RequestBody QnaCreateRequest request,
             BindingResult bindingResult) {
+        if (hasAdminAuthority()) {
+            ResponseModel<QnaCreateResponse> response = ResponseModel.<QnaCreateResponse>builder()
+                    .result(false)
+                    .message(CM041003MessageConstant.QNA_CREATE_FORBIDDEN)
+                    .resultList(null)
+                    .build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+
         if (bindingResult.hasErrors()) {
             String message = bindingResult.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage())
@@ -84,7 +91,7 @@ public class CM041003Controller {
                     .build();
             return ResponseEntity.badRequest().body(response);
         }
-        return service.createQna(request);
+        return cm041003Service.createQna(request);
     }
 
     @PostMapping("/admin/qna/{qnaId}/answer")
@@ -109,7 +116,7 @@ public class CM041003Controller {
         }
 
         String loginId = extractLoginId();
-        return service.answerQna(qnaId, request, answererId, loginId);
+        return cm041003Service.answerQna(qnaId, request, answererId, loginId);
     }
 
     @DeleteMapping("/user/qna/{qnaId}")
@@ -118,7 +125,7 @@ public class CM041003Controller {
             HttpServletRequest request) {
         Long requesterId = extractUserId(request);
         boolean isAdmin = hasAdminAuthority();
-        return service.deleteQna(qnaId, requesterId, isAdmin);
+        return cm041003Service.deleteQna(qnaId, requesterId, isAdmin);
     }
 
     @DeleteMapping("/admin/qna/{qnaId}")
@@ -126,8 +133,8 @@ public class CM041003Controller {
             @PathVariable("qnaId") Long qnaId,
             HttpServletRequest request) {
         Long requesterId = extractUserId(request);
-        // 관리자 경로에서도 동일 로직 사용 (admin 플래그 true)
-        return service.deleteQna(qnaId, requesterId, true);
+        // 管理者ルートでも同一ロジックを使用（adminフラグはtrue）
+        return cm041003Service.deleteQna(qnaId, requesterId, true);
     }
 
     private Long extractUserId(HttpServletRequest request) {

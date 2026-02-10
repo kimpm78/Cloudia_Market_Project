@@ -3,11 +3,11 @@ import axiosInstance from '../services/axiosInstance';
 import noImage from '../images/common/CM-NoImage.png';
 
 const PAYMENT_OPTIONS = [
-  { code: 'CARD', label: '신용카드 결제 (주문 후 결제)' },
-  { code: 'BANK', label: '계좌이체' },
+  { code: 'CARD', label: 'クレジットカード決済（注文後に決済）' },
+  { code: 'BANK', label: '銀行振込' },
 ];
 
-// 이미지 URL 보정
+// 画像URLの補正
 const resolveImage = (url) => {
   if (!url) return noImage;
   if (url.startsWith('http')) return url;
@@ -15,13 +15,13 @@ const resolveImage = (url) => {
   return base ? `${base}/${url.replace(/^\/+/, '')}` : noImage;
 };
 
-// 숫자 변환
+// 数値変換
 const num = (v, fb = 0) => {
   const n = Number(String(v ?? '').replace(/[^0-9.-]/g, ''));
   return Number.isFinite(n) ? n : fb;
 };
 
-// OrderItemInfo or CartItemResponse > front item 모델
+// OrderItemInfo / CartItemResponse → フロント用 item モデル
 const normalizeItems = (raw = []) =>
   raw.map((item, idx) => {
     const quantity = num(item.quantity, 1);
@@ -30,7 +30,7 @@ const normalizeItems = (raw = []) =>
 
     return {
       key: item.orderItemId ?? item.cartItemId ?? idx,
-      name: item.productName ?? `상품 ${idx + 1}`,
+      name: item.productName ?? `商品 ${idx + 1}`,
       quantity,
       unitPrice,
       lineTotal,
@@ -39,7 +39,7 @@ const normalizeItems = (raw = []) =>
     };
   });
 
-/** OrderSummary → front orderData 모델 */
+/** OrderSummary → フロント用 orderData モデル */
 const normalizeSummary = (s) =>
   !s
     ? null
@@ -63,22 +63,22 @@ export function useOrder({ initialOrder, locationState, user, navigate }) {
   const [isOrderLoading, setIsOrderLoading] = useState(false);
   const [orderError, setOrderError] = useState('');
 
-  /** orderId / orderNumber 기준 결정 */
+  /** orderId / orderNumber の基準決定 */
   const orderId = orderData?.orderId ?? initialOrder?.orderId ?? locationState?.orderId ?? null;
 
   const orderNumber =
     orderData?.orderNumber ?? initialOrder?.orderNumber ?? locationState?.orderNumber ?? null;
 
-  /** 로그인 사용자 memberNumber */
+  /** ログインユーザーの memberNumber */
   const memberNumber =
     orderData?.memberNumber ?? locationState?.memberNumber ?? user?.memberNumber ?? null;
 
-  /** 장바구니에서 넘어온 주문 후보(location.state)를 초기 데이터로 사용 */
+  /** カートから渡された注文候補（location.state）を初期データとして使用 */
   useEffect(() => {
-    // 이미 orderId가 있는 경우(실제 주문 상세 조회 모드)는 서버에서 조회만 한다.
+    // すでに orderId がある場合（注文詳細の取得モード）はサーバーから取得のみ行う。
     if (orderId) return;
 
-    // locationState에 준비된 items가 없으면 아무 것도 하지 않는다.
+    // locationState に準備済み items がなければ何もしない。
     if (!locationState || !Array.isArray(locationState.items) || locationState.items.length === 0) {
       return;
     }
@@ -90,7 +90,7 @@ export function useOrder({ initialOrder, locationState, user, navigate }) {
     const shippingFeeFromState = num(totals.shippingFee, 0);
     const totalFromState = num(totals.total, 0);
 
-    // totals 정보가 없을 때를 대비해 프론트에서 한 번 더 계산
+    // totals 情報がない場合に備えてフロント側で再計算
     const subtotalFromState =
       totalFromState > 0
         ? totalFromState - shippingFeeFromState
@@ -114,7 +114,7 @@ export function useOrder({ initialOrder, locationState, user, navigate }) {
     );
   }, [orderId, locationState, user]);
 
-  /** 주문 기본 정보 조회 */
+  /** 注文基本情報の取得 */
   useEffect(() => {
     if (!orderId) return;
 
@@ -135,7 +135,7 @@ export function useOrder({ initialOrder, locationState, user, navigate }) {
 
         console.log('[useOrder] response', data);
 
-        if (!data?.result) throw new Error(data?.message || '주문 정보를 불러오지 못했습니다.');
+        if (!data?.result) throw new Error(data?.message || '注文情報を取得できませんでした。');
 
         if (!active) return;
 
@@ -155,7 +155,7 @@ export function useOrder({ initialOrder, locationState, user, navigate }) {
 
         console.error('[useOrder] error', err);
         setOrderError(
-          err?.response?.data?.message || err.message || '주문 정보를 불러오지 못했습니다.'
+          err?.response?.data?.message || err.message || '注文情報を取得できませんでした。'
         );
       } finally {
         active = false;
@@ -170,15 +170,15 @@ export function useOrder({ initialOrder, locationState, user, navigate }) {
     };
   }, [orderId, memberNumber]);
 
-  /** 수량합 */
+  /** 小計 */
   const subtotal = useMemo(() => {
     return items.reduce((s, i) => s + i.lineTotal, 0);
   }, [items]);
 
-  /** 배송비 */
+  /** 送料 */
   const shippingFee = orderData?.shippingFee ?? 0;
 
-  /** 총합 */
+  /** 合計 */
   const total = subtotal + shippingFee;
 
   return {

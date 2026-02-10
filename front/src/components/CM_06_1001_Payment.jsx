@@ -30,9 +30,9 @@ function CM_06_1001_Payment({
 
   return (
     <>
-      <h5 className="border-bottom pb-2 mt-4">주문결제 입력</h5>
+      <h5 className="border-bottom pb-2 mt-4 fw-semibold">決済方法入力</h5>
       <div className="py-2 d-flex justify-content-between align-items-center">
-        <strong>결제 방법</strong>
+        <strong>決済方法</strong>
       </div>
       <div className="border-bottom py-2 d-flex justify-content-between align-items-center">
         <div className="flex-grow-1 d-flex align-items-center gap-2 flex-wrap">
@@ -58,7 +58,7 @@ function CM_06_1001_Payment({
             style={{ padding: '5px 20px' }}
             onClick={openPaymentModal}
           >
-            편집
+            編集
           </button>
         </div>
       </div>
@@ -82,8 +82,8 @@ function CM_06_1001_Payment({
           >
             <div className="d-flex justify-content-between align-items-start mb-4">
               <div>
-                <h5 className="m-0 fw-semibold">결제 방법 선택</h5>
-                <small className="text-muted">원하는 결제 수단을 선택해 주세요.</small>
+                <h5 className="m-0 fw-semibold">決済方法を選択</h5>
+                <small className="text-muted">ご希望の決済手段を選択してください。</small>
               </div>
               <button type="button" className="btn-close" onClick={closePaymentModal} />
             </div>
@@ -106,8 +106,8 @@ function CM_06_1001_Payment({
                       <div className="fw-semibold mb-2">{option.label}</div>
                       <p className="text-muted small mb-0">
                         {option.code === 'CARD'
-                          ? '신용카드/체크카드 결제를 지원합니다.'
-                          : '계좌 이체를 통한 결제를 지원합니다.'}
+                          ? 'クレジットカード／デビットカード決済に対応しています。'
+                          : '銀行振込による決済に対応しています。'}
                       </p>
                       {option.code === 'CARD' && (
                         <div className="mt-2 d-flex align-items-center gap-2">
@@ -125,7 +125,7 @@ function CM_06_1001_Payment({
                       )}
                       {isSelected && (
                         <div className="badge bg-primary-subtle text-primary mt-3 px-3 py-2 rounded-pill">
-                          선택됨
+                          選択中
                         </div>
                       )}
                     </label>
@@ -135,10 +135,10 @@ function CM_06_1001_Payment({
             </div>
             <div className="d-flex justify-content-end gap-2 mt-4">
               <button className="btn btn-outline-secondary" onClick={closePaymentModal}>
-                취소
+                キャンセル
               </button>
               <button className="btn btn-primary" onClick={confirmPaymentOption}>
-                적용
+                適用
               </button>
             </div>
           </div>

@@ -19,31 +19,31 @@ export default function CM_90_1065() {
 
   const columnDefs = [
     {
-      headerName: '상품 코드',
+      headerName: '商品コード',
       field: 'productCode',
       maxWidth: 100,
       flex: 1,
     },
     {
-      headerName: '상품명',
+      headerName: '商品名',
       field: 'productName',
       minWidth: 300,
       flex: 2,
     },
     {
-      headerName: '상품 분류',
+      headerName: '商品分類',
       field: 'productCategory',
       minWidth: 100,
       maxWidth: 100,
       flex: 1,
       valueFormatter: (params) => {
         const value = params.value;
-        if (value === '1') return '상시 판매';
-        else return '예약 판매';
+        if (value === '1') return '常時販売';
+        else return '予約販売';
       },
     },
     {
-      headerName: '등록일',
+      headerName: '登録日',
       field: 'createdAt',
       minWidth: 120,
       maxWidth: 180,
@@ -60,7 +60,7 @@ export default function CM_90_1065() {
       },
     },
     {
-      headerName: '등록자',
+      headerName: '登録者',
       field: 'createdBy',
       minWidth: 120,
       maxWidth: 180,
@@ -108,11 +108,11 @@ export default function CM_90_1065() {
 
   const handleAlert = (field) => (e) => {
     if (selectedRows.length === 0 && field === 'del') {
-      setMessage('항목을 선택해주세요.');
+      setMessage('項目を選択してください。');
       setOpen1004(true);
       return;
     }
-    setMessage('정말로 삭제 하시겠습니까?');
+    setMessage('本当に削除しますか？');
     setOpen1001(true);
   };
 
@@ -137,7 +137,7 @@ export default function CM_90_1065() {
       const result = await axiosInstance.post('/admin/productCode/insCode', params);
 
       if (result.data.result) {
-        setMessage('등록이 완료되었습니다.');
+        setMessage('登録が完了しました。');
         setOpen1004(true);
         codeAll();
       } else {
@@ -154,7 +154,7 @@ export default function CM_90_1065() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">상품 코드 관리</h5>
+        <h2 className="border-bottom pb-2 mb-3">商品コード管理</h2>
         <div className="row mb-3">
           <div className="col-12">
             <div className="d-flex align-items-center w-100">
@@ -165,13 +165,13 @@ export default function CM_90_1065() {
                     value={searchType}
                     onChange={(e) => setSearchType(e.target.value)}
                   >
-                    <option value="1">상품 코드</option>
-                    <option value="2">상품 명</option>
+                    <option value="1">商品コード</option>
+                    <option value="2">商品名</option>
                   </select>
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="상품코드 / 상품명을 입력하세요"
+                    placeholder="商品コード / 商品名を入力してください。"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -179,18 +179,18 @@ export default function CM_90_1065() {
                 </div>
 
                 <button className="btn btn-primary ms-2 btn-min-width" onClick={handleSearch}>
-                  검색
+                  検索
                 </button>
                 <button
                   className="btn btn-primary ms-2 btn-min-width"
                   onClick={() => setOpenRegisterModal(true)}
                 >
-                  등록
+                  登録
                 </button>
               </div>
               {/* <div className="ms-auto d-flex align-items-center">
                 <button className="btn btn-primary me-2 btn-min-width" onClick={handleAlert('del')}>
-                  삭제
+                  削除
                 </button>
               </div> */}
             </div>

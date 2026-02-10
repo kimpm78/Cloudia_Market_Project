@@ -12,7 +12,7 @@ export default function CM_02_1000() {
   const { user } = useAuth();
   const roleId = Number(user?.roleId);
   const loginId =
-    roleId === 1 ? '관리자' : roleId === 2 ? '매니저' : user?.loginId || user?.userId || '게스트';
+    roleId === 1 ? '管理者' : roleId === 2 ? 'マネージャー' : user?.loginId || user?.userId || 'ゲスト';
   const [banners, setBanners] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [newProductCount, setNewProductCount] = useState(0);
@@ -33,7 +33,7 @@ export default function CM_02_1000() {
           .sort((a, b) => a.displayOrder - b.displayOrder);
         setBanners(sorted);
       } catch (err) {
-        console.error('배너 로드 실패:', err?.response?.data?.message || err.message);
+        console.error('バナー ロード失敗:', err?.response?.data?.message || err.message);
       }
     };
 
@@ -76,7 +76,7 @@ export default function CM_02_1000() {
       <div className="container-fluid d-flex justify-content-center w-100 px-4 px-sm-4">
         <div className="w-100 d-flex justify-content-end py-2 pe-2">
           <span className="text-muted small">
-            어서오세요! <strong>{loginId}</strong> 님
+            ようこそ! <strong>{loginId}</strong> さん
           </span>
         </div>
       </div>
@@ -170,7 +170,7 @@ export default function CM_02_1000() {
             className="btn btn-primary"
             onClick={() => setNewProductLimit((prev) => prev + 10)}
           >
-            신상품 더보기
+            新商品をもっと見る
           </button>
         </div>
       )}
@@ -187,7 +187,7 @@ export default function CM_02_1000() {
             className="btn btn-primary"
             onClick={() => setPreOrderLimit((prev) => prev + 10)}
           >
-            예약상품 더보기
+            予約商品をもっと見る
           </button>
         </div>
       )}

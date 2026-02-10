@@ -11,9 +11,9 @@ const normalizeDeadlineString = (input) => {
   value = value
     .replace(/\//g, '-')
     .replace(/\./g, '-')
-    .replace(/년/g, '-')
-    .replace(/월/g, '-')
-    .replace(/일/g, '')
+    .replace(/年/g, '-')
+    .replace(/月/g, '-')
+    .replace(/日/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 
@@ -79,8 +79,6 @@ const hasClosedStatusKeyword = (value) => {
 
 export const hasReservationClosed = (item, options = {}) => {
   if (!item || typeof item !== 'object') return false;
-
-  // 서버 플래그/코드 우선
   const codeValue = item.codeValue ?? item.reservationCodeValue ?? item.code_value;
   if (item.isReservationClosed === true) return true;
   if (codeValue !== undefined && codeValue !== null && String(codeValue).trim() === '4') {

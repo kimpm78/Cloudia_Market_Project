@@ -20,7 +20,7 @@ ModuleRegistry.registerModules([
   RowSelectionModule,
 ]);
 
-const CM_90_1011_grid = ({
+const CM_90_1011_Grid = ({
   rowData,
   columnDefs,
   itemsPerPage,
@@ -92,4 +92,4 @@ const CM_90_1011_grid = ({
   );
 };
 
-export default CM_90_1011_grid;
+export default CM_90_1011_Grid;

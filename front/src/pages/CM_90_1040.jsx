@@ -18,26 +18,26 @@ export default function CM_90_1040() {
 
   const columnDefs = [
     {
-      headerName: '배너명',
+      headerName: 'バナー名',
       field: 'bannerName',
       minWidth: 100,
       flex: 1,
     },
     {
-      headerName: '링크',
+      headerName: 'リンク',
       field: 'urlLink',
       minWidth: 300,
       flex: 2,
     },
     {
-      headerName: '순서',
+      headerName: '順序',
       field: 'displayOrder',
       minWidth: 30,
       maxWidth: 50,
       flex: 1,
     },
     {
-      headerName: '등록일',
+      headerName: '登録日',
       field: 'createdAt',
       minWidth: 120,
       maxWidth: 180,
@@ -54,7 +54,7 @@ export default function CM_90_1040() {
       },
     },
     {
-      headerName: '이미지',
+      headerName: '画像',
       field: 'imageLink',
       cellRenderer: (params) => {
         const imageUrl = params.value;
@@ -64,7 +64,7 @@ export default function CM_90_1040() {
           <img
             src={fullImageUrl}
             style={{ width: '300px', height: '100px', objectFit: 'fill' }}
-            alt="상품 이미지"
+            alt="商品画像"
           />
         );
       },
@@ -72,15 +72,15 @@ export default function CM_90_1040() {
       flex: 1,
     },
     {
-      headerName: '상태',
+      headerName: 'ステータス',
       field: 'isDisplay',
       minWidth: 120,
       maxWidth: 180,
       flex: 1,
       valueFormatter: (params) => {
         const value = params.value;
-        if (value === 1) return '표시중';
-        else return '미표시중';
+        if (value === 1) return '表示中';
+        else return '非表示';
       },
     },
   ];
@@ -126,18 +126,18 @@ export default function CM_90_1040() {
 
   const handleAlert = (field) => (e) => {
     if (selectedRows.length === 0 && (field === 'edit' || field === 'del')) {
-      setMessage('항목을 선택해주세요.');
+      setMessage('項目を選択してください。');
       setOpen1004(true);
       return;
     } else if (selectedRows.length > 1 && field === 'edit') {
-      setMessage('항목은 하나만 선택해주세요.');
+      setMessage('項目は1件のみ選択してください。');
       setOpen1004(true);
       return;
     }
     if (field === 'edit') {
       handleEditing();
     } else {
-      setMessage('정말로 삭제 하시겠습니까?');
+      setMessage('本当に削除しますか？');
       setOpen1001(true);
     }
   };
@@ -160,7 +160,7 @@ export default function CM_90_1040() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">배너 관리</h5>
+        <h5 className="border-bottom pb-2 mb-3">バナー管理</h5>
         <div className="row mb-3">
           <div className="col-12">
             <div className="d-flex align-items-center w-100">
@@ -169,7 +169,7 @@ export default function CM_90_1040() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="배너명을 입력하세요"
+                    placeholder="バナー名を入力してください"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -178,21 +178,21 @@ export default function CM_90_1040() {
                 </div>
 
                 <button className="btn btn-primary ms-2 btn-min-width" onClick={handleSearch}>
-                  검색
+                  検索
                 </button>
               </div>
               <div className="ms-auto d-flex align-items-center">
                 <button className="btn btn-primary me-2 btn-min-width" onClick={handleAlert('del')}>
-                  삭제
+                  削除
                 </button>
                 <button
                   className="btn btn-primary me-2 btn-min-width"
                   onClick={handleAlert('edit')}
                 >
-                  수정
+                  修正
                 </button>
                 <Link to="/admin/menu/banner/register" className="btn btn-primary btn-min-width">
-                  등록
+                  登録
                 </Link>
               </div>
             </div>

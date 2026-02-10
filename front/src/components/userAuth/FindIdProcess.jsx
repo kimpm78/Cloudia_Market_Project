@@ -36,7 +36,7 @@ export default function FindIdProcess({ onIdFound }) {
   const handleRequest = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-      setFormError('유효한 이메일 형식이 아닙니다.');
+      setFormError('有効なメールアドレス形式ではありません。');
       return;
     }
     setFormError('');
@@ -56,14 +56,14 @@ export default function FindIdProcess({ onIdFound }) {
 
   return (
     <>
-      <h4 className="fw-bold mb-3">아이디 찾기</h4>
-      <p className="text-muted mb-4">가입 시 입력한 이메일 주소를 입력해주세요.</p>
+      <h4 className="fw-bold mb-3">アカウントID検索</h4>
+      <p className="text-muted mb-4">登録時に使用したメールアドレスを入力してください。</p>
 
       <div className="form-group mb-2">
         <input
           type="email"
           className={`form-control ${formError || error ? 'is-invalid' : ''}`}
-          placeholder="이메일 주소"
+          placeholder="メールアドレス"
           value={email}
           onChange={handleEmailChange}
         />
@@ -74,13 +74,13 @@ export default function FindIdProcess({ onIdFound }) {
 
       <div className="d-grid mt-4">
         <button className="btn btn-primary" onClick={handleRequest} disabled={loading}>
-          {loading ? '요청 중...' : '확인'}
+          {loading ? '確認中...' : '確認'}
         </button>
       </div>
 
       <div className="d-grid mt-2">
         <button className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
-          이전으로 돌아가기
+          前に戻る
         </button>
       </div>
 

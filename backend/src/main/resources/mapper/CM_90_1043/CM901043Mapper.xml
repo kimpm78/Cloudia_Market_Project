@@ -19,13 +19,13 @@
              , category_name
              , display_order
           FROM category_details
-         WHERE is_active = 1
+         WHERE is_display = '1'
          ORDER BY 
                category_group_code
              , display_order
     </select>
 
-    <!-- 카테고리 생성 -->
+    <!-- カテゴリ新規作成 -->
     <insert id="insertCategory" parameterType="com.cloudia.backend.CM_90_1043.model.CategoryDetailDTO">
         INSERT INTO category_details (
             category_group_code
@@ -36,7 +36,7 @@
           , created_at
           , updated_by
           , updated_at
-          , is_active
+          , is_display
         ) VALUES (
             #{categoryGroupCode}
           , #{categoryCode}
@@ -46,11 +46,11 @@
           , #{createdAt}
           , #{updatedBy}
           , #{updatedAt}
-          , #{isActive}
+          , CASE WHEN COALESCE(#{isActive}, 1) = 1 THEN '1' ELSE '0' END
         )
     </insert>
 
-    <!-- 카테고리 수정 -->
+    <!-- カテゴリ更新 -->
     <update id="updateCategory" parameterType="com.cloudia.backend.CM_90_1043.model.CategoryDetailDTO">
         UPDATE category_details
            SET category_name = #{categoryName}
@@ -61,10 +61,10 @@
           AND category_group_code = #{categoryGroupCode}
     </update>
 
-    <!-- 카테고리 삭제 -->
+    <!-- カテゴリ削除 -->
     <delete id="deleteCategory" parameterType="com.cloudia.backend.CM_90_1043.model.CategoryDetailDTO">
         UPDATE category_details
-        SET    is_active = #{isActive}
+        SET    is_display = CASE WHEN COALESCE(#{isActive}, 0) = 1 THEN '1' ELSE '0' END
              , updated_by = #{updatedBy}
              , updated_at = #{updatedAt}
         WHERE category_code = #{categoryCode}
@@ -74,7 +74,7 @@
     <select id="selectMaxUpdatedAt" resultType="java.time.LocalDateTime">
         SELECT MAX(updated_at) 
          FROM category_details 
-        WHERE is_active = 1
+        WHERE is_display = '1'
     </select>
 
   <select id="selectNextCategoryCode" parameterType="String" resultType="String">

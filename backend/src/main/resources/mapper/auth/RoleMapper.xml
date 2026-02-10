@@ -6,39 +6,38 @@
 
     <select id="findAll" resultType="com.cloudia.backend.auth.model.Role">
         SELECT
-            role_id AS roleId,
+            CAST(role_id AS INTEGER) AS roleId,
             role_name AS roleName,
             role_type AS roleType,
-            description,
-            is_active AS isActive
+            description
         FROM
             permissions
         WHERE
-            is_active = 1
+            is_display = '1'
     </select>
     
     <select id="findByRoleType" parameterType="String" resultType="com.cloudia.backend.auth.model.Role">
         SELECT
-            role_id AS roleId,
+            CAST(role_id AS INTEGER) AS roleId,
             role_name AS roleName,
-            role_type AS roleType,
-            is_active AS isActive
+            role_type AS roleType
         FROM
             permissions 
         WHERE
             role_type = #{roleType}
+            AND is_display = '1'
     </select>
 
     <select id="findById" parameterType="int" resultType="com.cloudia.backend.auth.model.Role">
         SELECT
-            role_id AS roleId,
+            CAST(role_id AS INTEGER) AS roleId,
             role_name AS roleName,
-            role_type AS roleType,
-            is_active AS isActive
+            role_type AS roleType
         FROM
             permissions 
         WHERE
-            role_id = #{roleId}
+            CAST(role_id AS INTEGER) = #{roleId}
+            AND is_display = '1'
     </select>
 
 </mapper>

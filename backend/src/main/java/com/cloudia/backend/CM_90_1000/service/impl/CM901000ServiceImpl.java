@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cloudia.backend.CM_90_1000.constants.CM0901000MessageConstant;
 import com.cloudia.backend.CM_90_1000.mapper.CM901000Mapper;
 import com.cloudia.backend.CM_90_1000.model.Menu;
 import com.cloudia.backend.CM_90_1000.service.CM901000Service;
@@ -24,30 +25,29 @@ public class CM901000ServiceImpl implements CM901000Service {
 
     private final CM901000Mapper cm901000Mapper;
 
-    /*
-     * 전체 사이드 메뉴 리스트 조회
+    /**
+     * サイドメニュー一覧を取得
      * 
-     * @return 사이드 메뉴 리스트
+     * @return サイドメニュー一覧
      */
     @Override
     @Transactional(readOnly = true)
     public List<Menu> findAllMenus() {
         try {
             List<Menu> sideMenus = cm901000Mapper.findAllMenus();
-            log.info("조회된 메뉴 수: {}", sideMenus.size());
+            log.info(CM0901000MessageConstant.LOG_MENU_FETCHED_COUNT, sideMenus.size());
             return buildMenuTree(sideMenus);
         } catch (Exception e) {
-            log.error("사이드 메뉴 조회 중 오류 발생", e);
-            return null;
+            log.error(CM0901000MessageConstant.LOG_MENU_FIND_ALL_ERROR, e);
+            return List.of();
         }
     }
 
-    /*
-     * 메뉴 리스트를 트리 구조로 변환
+    /**
+     * メニュー一覧をツリー構造へ変換
      * 
-     * @param 전체 조회된 메뉴 리스트
-     * 
-     * @return 사이드 메뉴 트리 구조 리스트
+     * @param 取得したメニュー一覧
+     * @return サイドメニューのツリー構造一覧
      */
     @Override
     public List<Menu> buildMenuTree(List<Menu> menuList) {
@@ -61,7 +61,7 @@ public class CM901000ServiceImpl implements CM901000Service {
             }
         }
 
-        // 하위 메뉴 연결
+        // 子メニュー連結
         for (Menu menu : menuList) {
             String menuId = menu.getMenuId();
             if (!menuId.endsWith("0")) {
@@ -73,7 +73,7 @@ public class CM901000ServiceImpl implements CM901000Service {
             }
         }
 
-        // 결과 트리 만들기
+        // 結果ツリー生成
         resultTree = parentMap.values().stream()
                 .sorted(Comparator.comparingInt(Menu::getSortOrder))
                 .peek(parent -> parent.setChildren(

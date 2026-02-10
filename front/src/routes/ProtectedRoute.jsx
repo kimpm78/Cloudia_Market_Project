@@ -8,18 +8,18 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   const location = useLocation();
 
   if (authLoading || configLoading) {
-    return <div>권한 확인 중...</div>;
+    return <div>権限を確認中...</div>;
   }
 
   const isAuthorized = user && user.roleId <= requiredRole;
 
   if (!user) {
-    // 비로그인 상태면 로그인 페이지로
+    // 未ログインの場合はログインページへ
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (!isAuthorized) {
-    console.warn(`유저권한(${user.roleId})이 요구권한(${requiredRole})보다 낮습니다.`);
+    console.warn(`ユーザー権限（${user.roleId}）が必要権限（${requiredRole}）より低いです。`);
     return <Navigate to="/403" replace />;
   }
 

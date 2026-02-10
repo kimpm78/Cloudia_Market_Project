@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "PaymentDeadlineNotice_jp",
+    "SubjectPart": "【クラウディア マーケット】入金期限切れ注文のお知らせ（管理者向け）",
+    "TextPart": "管理者各位\n\n入金期限を超過した未入金注文が {{pendingCount}} 件あります。\n\n────────────────────\n■ 対象注文一覧\n────────────────────\n{{pendingOrders}}\n\n内容をご確認のうえ、必要な対応をお願いします。",
+    "HtmlPart": "<html><body style=\"font-family: Arial, sans-serif; color:#000; font-size:14px; line-height:1.7;\"><p>管理者各位</p><p>入金期限を超過した未入金注文が <strong style=\"color:#d93025;\">{{pendingCount}} 件</strong>あります。</p><hr><h4>■ 対象注文一覧</h4><pre style=\"white-space:pre-wrap; font-family:Consolas, monospace; background:#f7f7f7; padding:12px; border:1px solid #ddd;\">{{pendingOrders}}</pre><p>内容をご確認のうえ、必要な対応をお願いします。</p></body></html>"
+  }
+}

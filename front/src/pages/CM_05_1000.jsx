@@ -81,8 +81,8 @@ export default function CM_05_1000() {
   }, [sortedNotices, currentPage, pageSize]);
 
   const formatAuthor = (roleId, userId) => {
-    if (Number(roleId) === 1) return '관리자';
-    if (Number(roleId) === 2) return '매니저';
+    if (Number(roleId) === 1) return '管理者';
+    if (Number(roleId) === 2) return 'マネージャー';
     const raw = String(userId ?? '').trim();
     if (!raw) return '-';
     return `user${raw}`;
@@ -96,7 +96,7 @@ export default function CM_05_1000() {
 
   const columnDefs = [
     {
-      headerName: '구분',
+      headerName: '区分',
       field: 'codeValue',
       width: 120,
       headerClass: 'fs-5',
@@ -114,7 +114,7 @@ export default function CM_05_1000() {
       },
     },
     {
-      headerName: '제목',
+      headerName: 'タイトル',
       field: 'title',
       flex: 1,
       minWidth: 200,
@@ -127,7 +127,7 @@ export default function CM_05_1000() {
       ),
     },
     {
-      headerName: '작성자',
+      headerName: '作成者',
       field: 'userId',
       width: 120,
       headerClass: 'fs-5',
@@ -143,7 +143,7 @@ export default function CM_05_1000() {
       },
     },
     {
-      headerName: '작성일',
+      headerName: '作成日',
       field: 'publishedAt',
       width: 120,
       headerClass: 'fs-5',
@@ -156,7 +156,7 @@ export default function CM_05_1000() {
       ),
     },
     {
-      headerName: '조회수',
+      headerName: '閲覧数',
       field: 'viewCount',
       width: 100,
       headerClass: 'fs-5',
@@ -181,7 +181,7 @@ export default function CM_05_1000() {
   return (
     <>
       <div className="container-fluid px-3 px-md-5">
-        <h1 className="m-0 notice-title">공지사항</h1>
+        <h1 className="m-0 notice-title">お知らせ</h1>
         <div className="ag-theme-alpine custom-grid w-100">
           <AgGridReact
             rowData={paginatedNotices}

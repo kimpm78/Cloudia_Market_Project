@@ -10,6 +10,7 @@ import { filterItemsForPage } from '../utils/productPageFilters';
 import ProductCardBasic from '../components/CM_03_1000_ProductCardBasic';
 import { normalizeCartAwareStock, isSoldOutBasic } from '../utils/productInventory';
 import CMMessage from '../constants/CMMessage';
+import { normalizeImageUrl } from '../utils/htmlContent';
 
 import '../styles/CM_03_1000.css';
 
@@ -62,9 +63,9 @@ export default function CM_03_1002({ showFilter = true }) {
   }, []);
 
   const allItems = useMemo(() => normalizeCartAwareStock(rawItems, cartMeta), [rawItems, cartMeta]);
-  const categoryGroupLabels = getCategoryGroupsForPage('캐릭터');
+  const categoryGroupLabels = getCategoryGroupsForPage('キャラクター');
 
-  const sourceItems = filterItemsForPage(allItems, '캐릭터');
+  const sourceItems = filterItemsForPage(allItems, 'キャラクター');
   const {
     currentPage,
     selectedFilters,
@@ -94,13 +95,13 @@ export default function CM_03_1002({ showFilter = true }) {
 
   return (
     <>
-      <h1 ref={topRef}>캐릭터</h1>
+      <h1 className="m-5" ref={topRef}>キャラクター</h1>
       <div className="container-fluid my-4">
         <div className="row justify-content-center">
           {showFilter && (
             <div className="col-12 col-md-3 mb-3 mb-md-0">
               <CM_99_1011_filterSidebar
-                pageName="캐릭터"
+                pageName="キャラクター"
                 selectedFilters={selectedFilters}
                 onFilterChange={handleFilterChange}
                 onReset={handleReset}
@@ -131,7 +132,6 @@ export default function CM_03_1002({ showFilter = true }) {
                       item={item}
                       imageUrl={imageUrl}
                       soldOut={soldOut}
-                      categoryLabel="캐릭터"
                       noteHtml={noteHtml}
                     />
                   );
