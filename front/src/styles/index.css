@@ -30,22 +30,25 @@ body {
   flex: 1;
 }
 
-/* フォント サイズ */
+/* Typography (global defaults only) */
+h1,
+h2,
+h3 {
+  line-height: 1.1;
+  font-weight: 600;
+  margin: 0;
+}
+
 h1 {
   font-size: 50px;
-  line-height: 1.1;
-  font-weight: 600;
-  margin: 50px;
 }
+
 h2 {
   font-size: 30px;
-  line-height: 1.1;
-  font-weight: 600;
 }
+
 h3 {
   font-size: 24px;
-  line-height: 1.1;
-  font-weight: 600;
 }
 
 /* layout */
@@ -57,26 +60,29 @@ h3 {
   box-sizing: border-box;
 }
 
-/* 모바일: 0 ~ 767px */
+/* Mobile: 0 ~ 767px */
 @media screen and (max-width: 767px) {
   html {
     font-size: 14px;
   }
+
   .container {
-    padding: 0 1rem !important;
+    padding: 0 1rem;
+  }
+
+  h1 {
+    font-size: 30px;
   }
 }
 
-/* 모바일 및 태블릿: 0 ~ 1023px */
-@media screen and (max-width: 1023px) {
+/* Tablet: 768 ~ 1023px */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
   html {
     font-size: 15px;
   }
+
   .container {
     padding: 0 2rem;
-  }
-  h1 {
-    margin: 20px;
   }
 }
 
@@ -85,15 +91,8 @@ h3 {
   html {
     font-size: 16px;
   }
+
   .container {
     padding: 0 3rem;
-  }
-}
-
-@media screen and (max-width: 767px) {
-  h1 {
-    font-size: 30px;
-    margin-top: 24px;
-    margin-bottom: 24px;
   }
 }

@@ -7,27 +7,27 @@
     <select id="getRefundCount" resultType="int">
         SELECT COUNT(*)
           FROM returns
-         WHERE order_no = #{requestNo}
-           AND customer_id = #{refundNumber}
+         WHERE order_number = #{requestNo}
+           AND member_number = #{refundNumber}
     </select>
 
     <select id="getOrderDetail" resultType="com.cloudia.backend.CM_90_1052.model.OrderDetailDto">
         SELECT pc.product_name
-             , od.product_id
+             , od.product_code AS product_id
              , od.quantity
              , od.unit_price
           FROM order_details od
      LEFT JOIN product_code pc
-            ON od.product_id = pc.product_code
+            ON od.product_code = pc.product_code
          WHERE member_number = #{refundNumber}
            AND order_number = #{orderNumber}
       ORDER BY product_id
     </select>
 
     <select id="getRefunds" resultType="com.cloudia.backend.CM_90_1052.model.ReturnsDto">
-        SELECT return_id
-             , order_no
-             , customer_id
+        SELECT return_id AS return_id
+             , order_number AS order_no
+             , member_number AS customer_id
              , return_status_value
              , requested_at
              , completed_at
@@ -40,12 +40,13 @@
              , refund_amount
           FROM returns
          WHERE return_status_value IN (2,3,4,5)
+           AND is_display = '1'
     </select>
 
     <select id="getPeriod" resultType="com.cloudia.backend.CM_90_1052.model.ReturnsDto">
-        SELECT return_id
-             , order_no
-             , customer_id
+        SELECT return_id AS return_id
+             , order_number AS order_no
+             , member_number AS customer_id
              , return_status_value
              , requested_at
              , completed_at
@@ -58,6 +59,7 @@
              , refund_amount
           FROM returns
          WHERE return_status_value IN (2,3,4,5)
+           AND is_display = '1'
            AND requested_at::date <![CDATA[>=]]> #{dateFrom}::date
            AND requested_at::date <![CDATA[<=]]> #{dateTo}::date
     </select>
@@ -65,8 +67,9 @@
     <select id="getRefund" resultType="com.cloudia.backend.CM_90_1052.model.ReturnsDto">
         SELECT return_id
           FROM returns
-         WHERE order_no = #{requestNo}
-           AND customer_id = #{refundNumber}
+         WHERE order_number = #{requestNo}
+           AND member_number = #{refundNumber}
+           AND is_display = '1'
     </select>
 
     <update id="updateRefund" parameterType="com.cloudia.backend.CM_90_1052.model.ReturnsDto">
@@ -83,27 +86,33 @@
             </if>
              , updated_by = #{updatedBy}
              , updated_at = #{updatedAt}
-        WHERE order_no = #{orderNo}
-        AND   customer_id  = #{customerId}
+        WHERE order_number = #{orderNo}
+        AND   member_number = #{customerId}
+        AND   is_display = '1'
     </update>
 
     <insert id="updateRefundDetail" parameterType="com.cloudia.backend.CM_90_1052.model.ReturnDetailsDto">
         INSERT INTO return_details (
-              return_id
+              member_number
             , product_code
             , quantity
             , unit_price
-            , is_active
+            , is_display
             , created_by
             , created_at
             , updated_by
             , updated_at
         ) VALUES (
-              #{returnId}
+              (
+                SELECT r.member_number
+                FROM returns r
+                WHERE r.return_id = #{returnId}
+                LIMIT 1
+              )
             , #{productCode}
             , #{quantity}
             , #{unitPrice}
-            , 1
+            , '1'
             , #{createdBy}
             , #{createdAt}
             , #{updatedBy}

@@ -24,7 +24,7 @@ export default function CM_company() {
             </tr>
             <tr>
               <th scope="row">所在地</th>
-              <td>〒135-0062 東京都江東区東雲2-7-5 トミンタワー403</td>
+              <td>〒163-0627 東京都 新宿区 西新宿 新宿センタービル 27階</td>
             </tr>
             <tr>
               <th scope="row">メールアドレス</th>

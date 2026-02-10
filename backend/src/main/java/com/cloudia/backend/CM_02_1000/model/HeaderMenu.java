@@ -15,9 +15,9 @@ import lombok.ToString;
 @AllArgsConstructor
 
 public class HeaderMenu {
-    private String menuId; // 메뉴 ID
-    private String menuName; // 메뉴명 
-    private String url; // URL
-    private Integer sortOrder; // 정렬 순서
-    private String icon; // 아이콘 클래스 (선택)
+    private String menuId;      // メニュー ID
+    private String menuName;    // メニュー名 
+    private String url;         // URL
+    private Integer sortOrder;  // 並び順
+    private String icon;        // アイコン
 }

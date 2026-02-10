@@ -21,7 +21,7 @@
         i.inquiries_code_value AS inquiriesCodeValue,
         i.order_id AS orderId,
         i.order_number AS orderNumber,
-        i.product_id AS productId,
+        i.product_code AS productId,
         i.name AS productName,
         to_char(i.created_at, 'YYYY-MM-DD HH24:MI') AS createdAt,
         to_char(i.updated_at, 'YYYY-MM-DD HH24:MI') AS updatedAt,
@@ -165,7 +165,7 @@
             inquiries_code_value,
             order_id,
             order_number,
-            product_id,
+            product_code,
             name
         ) VALUES (
             #{memberNumber},
@@ -253,7 +253,7 @@
         ) latest ON TRUE
         <where>
             <if test="productId != null and productId != ''">
-                i.product_id = #{productId}
+                i.product_code = #{productId}
             </if>
         </where>
         ORDER BY i.inquiry_id DESC

@@ -31,7 +31,7 @@ export default function CM_01_1011_RefundModal({ isOpen, onClose, order, onSucce
   const isBankTransfer = order.paymentValue === 1;
 
   const handleSubmit = async () => {
-    if (!window.confirm('정말로 주문을 취소하시겠습니까?')) return;
+    if (!window.confirm('本当に注文をキャンセルしますか？')) return;
 
     setLoading(true);
     try {
@@ -42,11 +42,11 @@ export default function CM_01_1011_RefundModal({ isOpen, onClose, order, onSucce
         accountNumber: isBankTransfer ? order.userRefundInfo.accountNumber : null,
         accountHolder: isBankTransfer ? order.userRefundInfo.accountHolder : null,
       });
-      alert('취소가 완료되었습니다.');
+      alert('キャンセルが完了しました。');
       onSuccess();
       onClose();
     } catch (error) {
-      alert('취소 처리 중 오류가 발생했습니다.');
+      alert('キャンセル処理中にエラーが発生しました。');
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ export default function CM_01_1011_RefundModal({ isOpen, onClose, order, onSucce
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content border-0 shadow-lg">
             <div className="modal-header bg-light">
-              <h5 className="modal-title fw-bold">주문 취소 신청</h5>
+              <h5 className="modal-title fw-bold">注文キャンセル申請</h5>
               <button
                 type="button"
                 className="btn-close"
@@ -77,21 +77,21 @@ export default function CM_01_1011_RefundModal({ isOpen, onClose, order, onSucce
                       style={{ fontSize: '3.5rem' }}
                     ></i>
                   </div>
-                  <h5 className="fw-bold mb-3">등록된 환불 계좌가 없습니다.</h5>
+                  <h5 className="fw-bold mb-3">登録済みの返金口座がありません。</h5>
                   <p className="text-muted mb-4">
-                    무통장 입금 취소는 계좌 정보가 필수입니다.
+                    銀行振込のキャンセルには口座情報が必須です。
                     <br />
-                    계좌를 먼저 등록하신 후 다시 시도해주세요.
+                    先に口座を登録してから、再度お試しください。
                   </p>
                 </div>
               ) : (
                 <>
                   <div className="alert alert-secondary border-0 mb-4">
                     <div className="small text-secondary mb-1">
-                      <strong>주문번호:</strong> {order.orderNo}
+                      <strong>注文番号:</strong> {order.orderNo}
                     </div>
                     <div className="small text-secondary">
-                      <strong>상품명:</strong> {order.productName}
+                      <strong>商品名:</strong> {order.productName}
                     </div>
                   </div>
 
@@ -101,21 +101,21 @@ export default function CM_01_1011_RefundModal({ isOpen, onClose, order, onSucce
                       style={{ backgroundColor: '#f8f9fa', border: '1px solid #dee2e6' }}
                     >
                       <h6 className="fw-bold mb-3 small text-primary">
-                        <i className="bi bi-check2-circle me-1"></i> 환불 예정 계좌 정보
+                        <i className="bi bi-check2-circle me-1"></i> 返金予定口座情報
                       </h6>
                       <div className="d-flex flex-column gap-2">
                         <div className="d-flex justify-content-between border-bottom pb-1">
-                          <span className="text-muted small">은행명</span>
+                          <span className="text-muted small">銀行名</span>
                           <span className="fw-bold small">{order.userRefundInfo.bankName}</span>
                         </div>
                         <div className="d-flex justify-content-between border-bottom pb-1">
-                          <span className="text-muted small">환불계좌</span>
+                          <span className="text-muted small">返金口座</span>
                           <span className="fw-bold small">
                             {order.userRefundInfo.accountNumber}
                           </span>
                         </div>
                         <div className="d-flex justify-content-between">
-                          <span className="text-muted small">계좌명</span>
+                          <span className="text-muted small">口座名義</span>
                           <span className="fw-bold small">
                             {order.userRefundInfo.accountHolder}
                           </span>
@@ -125,11 +125,11 @@ export default function CM_01_1011_RefundModal({ isOpen, onClose, order, onSucce
                   )}
 
                   <div className="mb-0">
-                    <label className="form-label fw-bold small">취소 사유 (선택)</label>
+                    <label className="form-label fw-bold small">キャンセル理由（任意）</label>
                     <textarea
                       className="form-control"
                       rows="3"
-                      placeholder="사유를 입력해주세요."
+                      placeholder="理由を入力してください。"
                       value={refundInfo.reason}
                       onChange={(e) => setRefundInfo({ reason: e.target.value })}
                     />
@@ -142,26 +142,26 @@ export default function CM_01_1011_RefundModal({ isOpen, onClose, order, onSucce
               {isBankTransfer && !isAccountReady ? (
                 <>
                   <button className="btn btn-secondary px-4" onClick={onClose}>
-                    닫기
+                    閉じる
                   </button>
                   <button
                     className="btn btn-primary px-4 fw-bold"
                     onClick={() => navigate('/mypage/account')}
                   >
-                    계좌 등록하러 가기
+                    口座登録へ
                   </button>
                 </>
               ) : (
                 <>
                   <button className="btn btn-secondary px-4" onClick={onClose} disabled={loading}>
-                    닫기
+                    閉じる
                   </button>
                   <button
                     className="btn btn-danger px-4 fw-bold"
                     onClick={handleSubmit}
                     disabled={loading}
                   >
-                    주문 취소하기
+                    注文をキャンセルする
                   </button>
                 </>
               )}

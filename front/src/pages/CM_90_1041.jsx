@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../services/axiosInstance';
 import CM_99_1004 from '../components/commonPopup/CM_99_1004';
-import CM1050560 from '../images/common/CM-1050560.png';
+import noImage from '../images/common/CM-NoImage.png';
 
 export default function CM_90_1041() {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ export default function CM_90_1041() {
       } else {
         setAvailableOrders([0]);
       }
-      setPreview(CM1050560);
+      setPreview(noImage);
     };
     fetchData();
   }, []);
@@ -44,7 +44,7 @@ export default function CM_90_1041() {
     const file = e.target.files[0];
     if (!file) return;
     if (file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/jpg') {
-      setMessage('JPG 또는 PNG 형식의 이미지만 업로드할 수 있습니다.');
+      setMessage('JPG または PNG 形式の画像のみアップロードできます。');
       setPopupType('typeError');
       setOpen1004(true);
       return;
@@ -55,23 +55,23 @@ export default function CM_90_1041() {
       image.onload = () => {
         if (image.width < 1050 || image.height < 560) {
           setMessage(
-            `이미지 크기는 1050x560 이하는 허용되지않습니다. 현재: ${image.width}x${image.height}`
+            `画像サイズは 1050×560 未満は許可されません。現在: ${image.width}×${image.height}`
           );
           setPopupType('sizeError');
           setForm((prev) => ({
             ...prev,
             imageFile: '',
           }));
-          setPreview(CM1050560);
+          setPreview(noImage);
           setOpen1004(true);
         } else if (file.size > 20 * 1024 * 1024) {
-          setMessage(`이미지 사이즈는 20MB 이상은 허용되지않습니다. 현재: ${file.size}`);
+          setMessage(`画像サイズは 20MB 以上は許可されません。現在: ${file.size}`);
           setPopupType('sizeError');
           setForm((prev) => ({
             ...prev,
             imageUrl: '',
           }));
-          setPreview(CM1050560);
+          setPreview(noImage);
           setOpen1004(true);
         } else {
           setForm((prev) => ({
@@ -88,11 +88,11 @@ export default function CM_90_1041() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (form.bannerName.trim().length === 0) newErrors.bannerName = '배너명을 입력하세요.';
-    if (form.urlLink.trim().length === 0) newErrors.urlLink = '배너링크를 입력하세요.';
-    if (!form.imageFile) newErrors.imageFile = '이미지를 선택해주세요.';
+    if (form.bannerName.trim().length === 0) newErrors.bannerName = 'バナー名を入力してください。';
+    if (form.urlLink.trim().length === 0) newErrors.urlLink = 'バナーリンクを入力してください。';
+    if (!form.imageFile) newErrors.imageFile = '画像を選択してください。';
     if (form.isDisplay === '1') {
-      if (form.displayOrder === 0) newErrors.displayOrder = '배너 순서를 입력하세요.';
+      if (form.displayOrder === 0) newErrors.displayOrder = 'バナー順序を選択してください。';
     }
 
     setErrors(newErrors);
@@ -129,12 +129,12 @@ export default function CM_90_1041() {
   return (
     <div className="d-flex">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">배너 등록</h5>
+        <h2 className="border-bottom pb-2 mb-3">バナー登録</h2>
         <form>
-          {/* 배너명 */}
+          {/* バナー名 */}
           <div className="mb-3">
             <label htmlFor="bannerName" className="form-label">
-              배너명
+              バナー名
             </label>
             <input
               type="text"
@@ -151,10 +151,10 @@ export default function CM_90_1041() {
             {errors.bannerName && <div className="text-danger">{errors.bannerName}</div>}
           </div>
 
-          {/* 링크 */}
+          {/* リンク */}
           <div className="mb-3">
             <label htmlFor="urlLink" className="form-label">
-              배너 링크(URL**/주소입력**)
+              バナーリンク（URL / 住所入力）
             </label>
             <input
               type="text"
@@ -171,9 +171,9 @@ export default function CM_90_1041() {
             {errors.urlLink && <div className="text-danger">{errors.urlLink}</div>}
           </div>
 
-          {/* 사용 여부 */}
+          {/* 表示設定 */}
           <div className="mb-3">
-            <label className="form-label d-block">사용 여부</label>
+            <label className="form-label d-block">表示設定</label>
             <div className="form-check form-check-inline">
               <input
                 className="form-check-input"
@@ -190,7 +190,7 @@ export default function CM_90_1041() {
                 }
               />
               <label className="form-check-label" htmlFor="isDisplayDisplay">
-                표시
+                表示
               </label>
             </div>
             <div className="form-check form-check-inline">
@@ -209,15 +209,15 @@ export default function CM_90_1041() {
                 }
               />
               <label className="form-check-label" htmlFor="isDisplayHide">
-                미표시
+                非表示
               </label>
             </div>
           </div>
 
-          {/* 배너 순서 */}
+          {/* バナー順序 */}
           <div className="mb-3">
             <label htmlFor="displayOrder" className="form-label">
-              배너 순서
+              バナー順序
             </label>
             <select
               className="form-select"
@@ -244,10 +244,10 @@ export default function CM_90_1041() {
             {errors.displayOrder && <div className="text-danger">{errors.displayOrder}</div>}
           </div>
 
-          {/* 배너 이미지 */}
+          {/* バナー画像 */}
           <div className="mb-3">
             <label htmlFor="imageFile" className="form-label">
-              배너 이미지
+              バナー画像
             </label>
             <input
               type="file"
@@ -260,25 +260,25 @@ export default function CM_90_1041() {
             <img
               src={preview}
               className="img-thumbnail mt-2"
-              alt="상품 이미지"
+              alt="商品画像"
               style={{ width: '200px', height: '200px', objectFit: 'fill' }}
             />
             <div>
-              ※최소사이즈 <b>1050 X 560 픽셀</b>의 크기를 권장합니다.
+              ※最小サイズ <b>1050 × 560 ピクセル</b>を推奨します。
             </div>
           </div>
 
-          {/* 버튼 */}
+          {/* ボタン */}
           <div className="d-flex justify-content-center">
             <button
               type="button"
               className="btn btn-primary me-2 btn-fixed-width"
               onClick={handleRegisterClick}
             >
-              등록
+              登録
             </button>
             <Link to="/admin/menu/banner" className="btn btn-secondary btn-fixed-width">
-              뒤로 가기
+              戻る
             </Link>
           </div>
         </form>

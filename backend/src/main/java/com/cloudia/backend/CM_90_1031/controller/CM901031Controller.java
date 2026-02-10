@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cloudia.backend.CM_90_1031.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_90_1031.model.ageDto;
 import com.cloudia.backend.CM_90_1031.model.genderDto;
 import com.cloudia.backend.CM_90_1031.service.CM901031Service;
@@ -25,9 +25,9 @@ public class CM901031Controller {
     CM901031Service cm901031Service;
 
     /**
-     * 연령대 리스트 조회
+     * 年齢層一覧取得
      * 
-     * @return 연령대 리스트
+     * @return 年齢層一覧
      */
     @GetMapping("/findAllAges")
     public ResponseEntity<ResponseModel<List<ageDto>>> getFindAllAges() {
@@ -35,9 +35,9 @@ public class CM901031Controller {
     }
 
     /**
-     * 연령대 리스트 조회
+     * 性別一覧取得
      * 
-     * @return 연령대 리스트
+     * @return 性別一覧
      */
     @GetMapping("/findAllGenders")
     public ResponseEntity<ResponseModel<List<genderDto>>> getFindAllGenders() {

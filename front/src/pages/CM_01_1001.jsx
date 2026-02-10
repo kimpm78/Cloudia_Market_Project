@@ -1,16 +1,12 @@
 // React
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
 import axios from 'axios';
-
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { ko } from 'date-fns/locale';
 
 import { useEmailVerification } from '../hooks/useEmailVerification';
 
@@ -18,7 +14,7 @@ import VerificationModal from '../components/verificationModal';
 import SignupSuccessLayout from '../components/layouts/SignupSuccessLayout';
 import CM_99_1002 from '../components/commonPopup/CM_99_1002';
 
-import { countries } from '../data/countries';
+import useCountries from '../hooks/useCountries';
 
 import '../styles/CM_01_1001.css';
 
@@ -92,6 +88,16 @@ const signupSchema = z
         message: '生年月日を選択してください。',
         path: ['birthDate'],
       });
+    } else {
+      const today = new Date();
+      const minAllowedBirthDate = new Date(today.getFullYear() - 12, today.getMonth(), today.getDate());
+      if (data.birthDate > minAllowedBirthDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '満12歳以上のみ登録できます。',
+          path: ['birthDate'],
+        });
+      }
     }
 
     if (data.nationality === 'KR') {
@@ -112,8 +118,10 @@ const signupSchema = z
     }
   });
 
-const today = new Date();
-const minAgeDate = new Date(today.getFullYear() - 12, today.getMonth(), today.getDate());
+const defaultGenderOptions = [
+  { codeValue: 1, codeValueName: '男性' },
+  { codeValue: 2, codeValueName: '女性' },
+];
 
 export default function CM_01_1001() {
   const [isIdChecked, setIsIdChecked] = useState(false);
@@ -123,20 +131,23 @@ export default function CM_01_1001() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [signupError, setSignupError] = useState('');
+  const [birthParts, setBirthParts] = useState({ year: '', month: '', day: '' });
+  const monthRef = useRef(null);
+  const dayRef = useRef(null);
+  const { countries } = useCountries();
   const {
     register,
     handleSubmit,
-    control,
     watch,
     setError,
+    setValue,
     clearErrors,
-    trigger,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(signupSchema),
     mode: 'onTouched',
     defaultValues: {
-      nationality: 'KR',
+      nationality: 'JP',
       termsAgreed: false,
       gender: '',
       birthDate: null,
@@ -169,6 +180,50 @@ export default function CM_01_1001() {
   const watchNationality = watch('nationality');
   const watchLoginId = watch('loginId');
   const watchEmail = watch('email');
+
+  const handleBirthPartChange = (part, rawValue) => {
+    const maxLen = part === 'year' ? 4 : 2;
+    const nextValue = rawValue.replace(/\D/g, '').slice(0, maxLen);
+    setBirthParts((prev) => ({ ...prev, [part]: nextValue }));
+    clearErrors('birthDate');
+
+    if (part === 'year' && nextValue.length === 4) {
+      monthRef.current?.focus();
+    } else if (part === 'month' && nextValue.length === 2) {
+      dayRef.current?.focus();
+    }
+  };
+
+  useEffect(() => {
+    const { year, month, day } = birthParts;
+    if (!year && !month && !day) {
+      setValue('birthDate', null, { shouldValidate: false });
+      return;
+    }
+
+    if (year.length !== 4 || month.length !== 2 || day.length !== 2) {
+      setValue('birthDate', null, { shouldValidate: false });
+      return;
+    }
+
+    const y = Number(year);
+    const m = Number(month);
+    const d = Number(day);
+    const date = new Date(y, m - 1, d);
+    const isValidDate =
+      Number.isInteger(y) &&
+      Number.isInteger(m) &&
+      Number.isInteger(d) &&
+      m >= 1 &&
+      m <= 12 &&
+      d >= 1 &&
+      d <= 31 &&
+      date.getFullYear() === y &&
+      date.getMonth() === m - 1 &&
+      date.getDate() === d;
+
+    setValue('birthDate', isValidDate ? date : null, { shouldValidate: false });
+  }, [birthParts, setValue]);
   const {
     verificationCode,
     setVerificationCode,
@@ -186,8 +241,14 @@ export default function CM_01_1001() {
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_API_BASE_URL}/common-codes?group=010`)
-      .then((res) => setGenderOptions(res.data))
-      .catch((err) => console.error(err));
+      .then((res) => {
+        const fetched = Array.isArray(res.data) ? res.data : res.data?.resultList || [];
+        setGenderOptions(fetched.length > 0 ? fetched : defaultGenderOptions);
+      })
+      .catch((err) => {
+        console.error(err);
+        setGenderOptions(defaultGenderOptions);
+      });
   }, []);
 
   const handleCheckId = async () => {
@@ -246,6 +307,7 @@ export default function CM_01_1001() {
     }
 
     const selectedCountry = countries.find((c) => c.isoCode === data.nationality);
+    const phoneCode = selectedCountry?.phoneCode || '81';
     const birthStr = data.birthDate
       ? `${data.birthDate.getFullYear()}-${String(data.birthDate.getMonth() + 1).padStart(2, '0')}-${String(data.birthDate.getDate()).padStart(2, '0')}`
       : '';
@@ -254,7 +316,7 @@ export default function CM_01_1001() {
         ...data,
         genderValue: parseInt(data.gender),
         birthDate: birthStr,
-        phoneNumber: `(+${selectedCountry?.phoneCode})${data.phone1}-${data.phone2}-${data.phone3}`,
+        phoneNumber: `(+${phoneCode})${data.phone1}-${data.phone2}-${data.phone3}`,
       },
       address: {
         addressNickname: '基本住所',
@@ -296,7 +358,7 @@ export default function CM_01_1001() {
                   />
                   <button
                     type="button"
-                    className="btn btn-primary fixed-btn-size ms-2"
+                    className="btn btn-primary fixed-btn-size ms-2 dup-check-btn"
                     onClick={handleCheckId}
                   >
                     重複チェック
@@ -328,7 +390,7 @@ export default function CM_01_1001() {
                     className="password-toggle-button"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>{' '}
+                    <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                   </button>
                 </div>
                 {errors.password && (
@@ -441,7 +503,7 @@ export default function CM_01_1001() {
                 <select {...register('nationality')} className="form-select">
                   {countries.map((c) => (
                     <option key={c.isoCode} value={c.isoCode}>
-                      {c.name.kr}
+                      {c.name.jp}
                     </option>
                   ))}
                 </select>
@@ -456,7 +518,7 @@ export default function CM_01_1001() {
                     type="text"
                     className="form-control me-2"
                     style={{ width: '85px', backgroundColor: '#f8f9fa' }}
-                    value={`+${countries.find((c) => c.isoCode === watchNationality)?.phoneCode || '82'}`}
+                    value={`+${countries.find((c) => c.isoCode === watchNationality)?.phoneCode || '81'}`}
                     readOnly
                   />
                   <input
@@ -488,27 +550,45 @@ export default function CM_01_1001() {
                 <label className="form-label d-block font-weight">
                   <i className="bi bi-asterisk required-asterisk"></i> 生年月日
                 </label>
-                <Controller
-                  control={control}
-                  name="birthDate"
-                  render={({ field }) => (
-                    <DatePicker
-                      selected={field.value}
-                      onChange={(date) => field.onChange(date)}
-                      dateFormat="yyyy-MM-dd"
-                      maxDate={minAgeDate}
-                      showYearDropdown
-                      showMonthDropdown
-                      dropdownMode="select"
-                      dropdscrollableYearDropdown
-                      yearDropdownItemNumber={50}
-                      locale={ko}
-                      wrapperClassName="w-100"
-                      className={`form-control ${errors.birthDate ? 'is-invalid' : ''}`}
-                      placeholderText="日付を選択してください"
-                    />
-                  )}
-                />
+                <input type="hidden" {...register('birthDate')} />
+                <div className="d-flex align-items-center gap-2">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className={`form-control ${errors.birthDate ? 'is-invalid' : ''}`}
+                    style={{ maxWidth: '120px' }}
+                    placeholder="YYYY"
+                    maxLength={4}
+                    value={birthParts.year}
+                    onChange={(e) => handleBirthPartChange('year', e.target.value)}
+                  />
+                  <span>年</span>
+                  <input
+                    ref={monthRef}
+                    type="text"
+                    inputMode="numeric"
+                    className={`form-control ${errors.birthDate ? 'is-invalid' : ''}`}
+                    style={{ maxWidth: '90px' }}
+                    placeholder="MM"
+                    maxLength={2}
+                    value={birthParts.month}
+                    onChange={(e) => handleBirthPartChange('month', e.target.value)}
+                  />
+                  <span>月</span>
+                  <input
+                    ref={dayRef}
+                    type="text"
+                    inputMode="numeric"
+                    className={`form-control ${errors.birthDate ? 'is-invalid' : ''}`}
+                    style={{ maxWidth: '90px' }}
+                    placeholder="DD"
+                    maxLength={2}
+                    value={birthParts.day}
+                    onChange={(e) => handleBirthPartChange('day', e.target.value)}
+                  />
+                  <span>日</span>
+                </div>
+                <small className="form-text text-muted">例: 1998年 03月 21日</small>
                 {errors.birthDate && (
                   <div className="invalid-feedback d-block">{errors.birthDate.message}</div>
                 )}
@@ -589,11 +669,11 @@ export default function CM_01_1001() {
               )}
             </fieldset>
 
-            <div className="form-check mb-4 mt-5">
+            <div className="form-check mb-4 mt-5 terms-agree-check">
               <input
                 type="checkbox"
                 {...register('termsAgreed')}
-                className="form-check-input"
+                className="form-check-input terms-agree-input"
                 id="termsAgreed"
               />
               <label className="form-check-label" htmlFor="termsAgreed">

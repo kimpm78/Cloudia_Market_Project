@@ -29,11 +29,11 @@ export default function CM_04_1002() {
   const [selectedTag, setSelectedTag] = useState('');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [open1002, setOpen1002] = useState(false); // 로딩 팝업
-  const [open1004, setOpen1004] = useState(false); // 완료 안내 팝업
-  const [popupMessage, setPopupMessage] = useState(''); // 완료 메시지
+  const [open1002, setOpen1002] = useState(false);
+  const [open1004, setOpen1004] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
-  // 주문/상품 연동 상태
+  // 注文・商品連携ステータス
   const [selectedOrderNumber, setSelectedOrderNumber] = useState('');
   const [availableProducts, setAvailableProducts] = useState([]);
   const [orderList, setOrderList] = useState([]);
@@ -49,16 +49,16 @@ export default function CM_04_1002() {
   const productRef = useRef(null);
   const imageRef = useRef(null);
   const contentRef = useRef(null);
-
-  const isReview = useMemo(() => selectedTag === '0', [selectedTag]); // 0=리뷰, 1=후기
+  // 0＝レビュー、1＝口コミ
+  const isReview = useMemo(() => selectedTag === '0', [selectedTag]);
 
   const tagLabel = useMemo(() => {
-    if (selectedTag === '0') return '리뷰';
-    if (selectedTag === '1') return '후기';
+    if (selectedTag === '0') return 'レビュー';
+    if (selectedTag === '1') return '口コミ';
     return '';
   }, [selectedTag]);
 
-  // 숫자형 userId 보정 (문자/undefined 방지)
+  // 数値型userIdの補正（文字列／undefinedの混入防止）
   const numericUserId = useMemo(() => {
     const raw = user?.userId ?? user?.id;
     if (raw === undefined || raw === null || raw === '') return null;
@@ -87,12 +87,12 @@ export default function CM_04_1002() {
       try {
         const relativePath = await uploadReviewEditorImage(file);
         if (!relativePath) {
-          console.warn('에디터 이미지 업로드가 실패했습니다.');
+          console.warn('エディタ画像アップロードが失敗しました。');
           return null;
         }
         return buildEditorImageUrl(relativePath);
       } catch (error) {
-        console.error('에디터 이미지 업로드 중 오류 발생:', error);
+        console.error('エディタ画像アップロード中にエラーが発生しました:', error);
         return null;
       }
     },
@@ -127,14 +127,14 @@ export default function CM_04_1002() {
         setImagePreview(review.imageUrl ? buildImageUrl(review.imageUrl) : '');
       })
       .catch((err) => {
-        console.error('리뷰 상세 불러오기 실패:', err);
+        console.error('レビュー詳細取得失敗:', err);
       });
     return () => {
       isMounted = false;
     };
   }, [isEditMode, writeId]);
 
-  // 주문번호 + 상품 조회 API (GET)
+  // 注文番号＋商品取得API（GET）
   useEffect(() => {
     if (!user?.memberNumber) return;
 
@@ -144,11 +144,11 @@ export default function CM_04_1002() {
         setOrderList(list);
       })
       .catch((err) => {
-        console.error('주문/상품 불러오기 실패:', err);
+        console.error('注文/商品取得に失敗:', err);
       });
   }, [user, navigate]);
 
-  // 주문 선택 시 상품 목록/선택 상태 세팅
+  // 注文選択時に商品一覧 / 選択状態をセット
   useEffect(() => {
     if (!selectedOrderNumber) {
       setSelectedOrder(null);
@@ -188,7 +188,7 @@ export default function CM_04_1002() {
     }
   }, [selectedOrderNumber, orderList, selectedProductCode]);
 
-  // 유효성 검사 함수
+  // バリデーション関数
   const validateForm = () => {
     const newErrors = {};
     if (!title.trim()) newErrors.title = CMMessage.MSG_VAL_002;
@@ -200,7 +200,7 @@ export default function CM_04_1002() {
     return newErrors;
   };
 
-  // postData 생성 함수
+  // postData 生成関数
   const buildPostData = () => ({
     userId: numericUserId,
     memberNumber: user.memberNumber,
@@ -215,11 +215,11 @@ export default function CM_04_1002() {
     updatedBy: user.loginId,
   });
 
-  // 리뷰 작성 API (POST)
+  // レビュー作成 API (POST)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setOpen1002(true); // 로딩 팝업 표시
+    setOpen1002(true);
 
     const newErrors = validateForm();
     setErrors(newErrors);
@@ -248,7 +248,7 @@ export default function CM_04_1002() {
     if (!numericUserId || !user?.memberNumber) {
       alert(CMMessage.MSG_ERR_011);
       setIsLoading(false);
-      setOpen1002(false); // 로딩 팝업 닫기
+      setOpen1002(false); // ローディングポップアップを閉じる
       navigate('/login');
       return;
     }
@@ -269,17 +269,17 @@ export default function CM_04_1002() {
           setPopupMessage(CMMessage.MSG_INF_007);
           setOpen1004(true);
         } else {
-          alert(res?.message || CMMessage.MSG_ERR_007('수정'));
+          alert(res?.message || CMMessage.MSG_ERR_007('修正'));
         }
       } else {
-        // 리뷰 생성 (백엔드에서 메인 이미지/에디터 이미지 모두 처리)
+        // レビュー作成（バックエンドでメイン画像/エディタ画像を両方処理）
         await createReview(payload);
         setOpen1002(false);
         setPopupMessage(CMMessage.MSG_INF_008);
         setOpen1004(true);
       }
     } catch (err) {
-      console.error('리뷰 저장 실패:', err);
+      console.error('レビュー保存失敗:', err);
       setOpen1002(false);
       alert(err?.response?.data?.message || err.message);
     } finally {
@@ -289,7 +289,9 @@ export default function CM_04_1002() {
 
   return (
     <>
-      <h1 className="review-form-title">리뷰/후기 ({isEditMode ? '수정하기' : '작성하기'})</h1>
+      <h1 className="review-form-title m-5">
+        レビュー/口コミ ({isEditMode ? '修正する' : '作成する'})
+      </h1>
       <div className="pt-0 px-4 pb-5">
         <CM_99_1002
           isOpen={open1002}
@@ -307,13 +309,11 @@ export default function CM_04_1002() {
               navigate('/review');
             }
           }}
-          Message={
-            popupMessage || (isEditMode ? CMMessage.MSG_INF_007 : CMMessage.MSG_INF_008)
-          }
+          Message={popupMessage || (isEditMode ? CMMessage.MSG_INF_007 : CMMessage.MSG_INF_008)}
         />
         <form onSubmit={handleSubmit}>
           <div className="mb-3 w-50 review-title-field" ref={titleRef}>
-            <label className="form-label">제목</label>
+            <label className="form-label">タイトル</label>
             <div className="input-group">
               {tagLabel && <span className="input-group-text">{tagLabel}</span>}
               <input
@@ -329,7 +329,7 @@ export default function CM_04_1002() {
           </div>
 
           <div className="mb-3" ref={tagRef}>
-            <label className="form-label">옵션</label>
+            <label className="form-label">オプション</label>
             <div>
               <div className="form-check form-check-inline">
                 <input
@@ -345,7 +345,7 @@ export default function CM_04_1002() {
                   }}
                 />
                 <label className="form-check-label" htmlFor="tag-review">
-                  리뷰
+                  レビュー
                 </label>
               </div>
               <div className="form-check form-check-inline">
@@ -362,7 +362,7 @@ export default function CM_04_1002() {
                   }}
                 />
                 <label className="form-check-label" htmlFor="tag-comment">
-                  후기
+                  口コミ
                 </label>
               </div>
             </div>
@@ -372,7 +372,7 @@ export default function CM_04_1002() {
           <div className="mb-3 w-100 d-flex gap-3">
             <div className="w-50" ref={orderRef}>
               <label className="form-label">
-                {isReview ? '주문번호 (선택)' : '주문번호 (필수)'}
+                {isReview ? '注文番号 (選択)' : '注文番号 (必須)'}
               </label>
               <select
                 className="form-select"
@@ -385,15 +385,15 @@ export default function CM_04_1002() {
               >
                 <option value="">
                   {orderList.length === 0
-                    ? '구매 내역이 없습니다'
+                    ? '購入した注文がありません'
                     : isReview
-                      ? '선택 (선택 사항)'
-                      : '주문번호를 선택해주세요'}
+                      ? '選択 (選択事項)'
+                      : '注文番号を選択してください'}
                 </option>
                 {orderList.map((order) => {
                   const labelParts = [order.displayOrderNumber || order.orderNumber];
                   if (order.displayOrderDate) {
-                    labelParts.push(`구매일: ${order.displayOrderDate}`);
+                    labelParts.push(`購入日: ${order.displayOrderDate}`);
                   }
                   return (
                     <option key={order.orderId} value={order.orderNumber}>
@@ -406,7 +406,7 @@ export default function CM_04_1002() {
             </div>
 
             <div className="w-50" ref={productRef}>
-              <label className="form-label">상품{isReview ? ' (주문 선택 시)' : ' (필수)'}</label>
+              <label className="form-label">商品{isReview ? ' (注文選択時)' : ' (必須)'}</label>
               <select
                 className="form-select"
                 value={selectedProductCode}
@@ -420,7 +420,7 @@ export default function CM_04_1002() {
                 }}
                 disabled={availableProducts.length === 0}
               >
-                <option value="">선택해주세요</option>
+                <option value="">選択してください</option>
                 {availableProducts.map((product) => (
                   <option key={product.productId} value={product.productCode}>
                     {product.productName}
@@ -434,18 +434,18 @@ export default function CM_04_1002() {
           {selectedOrder && selectedProductCode && (
             <div className="alert alert-secondary small">
               <div>
-                <strong>선택한 주문</strong> :{' '}
+                <strong>選択した注文</strong> :{' '}
                 {selectedOrder.displayOrderNumber || selectedOrder.orderNumber}
                 {selectedOrder.displayOrderDate ? ` / ${selectedOrder.displayOrderDate}` : ''}
               </div>
               <div>
-                <strong>선택한 상품</strong> : {selectedProductName || selectedProductCode}
+                <strong>選択した商品</strong> : {selectedProductName || selectedProductCode}
               </div>
             </div>
           )}
 
           <div className="mb-3 w-100" ref={imageRef}>
-            <label className="form-label">리뷰 메인 이미지</label>
+            <label className="form-label">レビューメイン画像</label>
             <input
               type="file"
               className="form-control"
@@ -469,7 +469,7 @@ export default function CM_04_1002() {
               <div className="mt-2">
                 <img
                   src={imagePreview}
-                  alt="미리보기"
+                  alt="レビュー画像プレビュー"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = '/no-image.png';
@@ -487,13 +487,13 @@ export default function CM_04_1002() {
           </div>
 
           <div className="mb-3" ref={contentRef}>
-            <label className="form-label">내용 입력</label>
+            <label className="form-label">内容入力</label>
             <TiptapEditor
               field="review"
               content={content}
               onContentChange={handleEditorContentChange}
               onImageAdd={handleEditorImageAdd}
-              placeholder="리뷰/후기를 자유롭게 입력해주세요."
+              placeholder="レビューや口コミを自由に入力してください。"
               error={errors.content}
             />
           </div>
@@ -506,11 +506,11 @@ export default function CM_04_1002() {
             >
               {isLoading
                 ? isEditMode
-                  ? '수정 중...'
-                  : '작성 중...'
+                  ? '更新中...'
+                  : '作成中...'
                 : isEditMode
-                  ? '수정 완료'
-                  : '작성 완료'}
+                  ? '更新完了'
+                  : '作成完了'}
             </button>
             <button
               type="button"
@@ -518,7 +518,7 @@ export default function CM_04_1002() {
               onClick={() => navigate(-1)}
               disabled={isLoading}
             >
-              뒤로 가기
+              戻る
             </button>
           </div>
         </form>

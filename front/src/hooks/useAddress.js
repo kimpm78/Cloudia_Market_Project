@@ -2,19 +2,19 @@ import { useCallback, useEffect, useMemo, useState, useReducer, useRef } from 'r
 import axiosInstance from '../services/axiosInstance';
 
 export function useAddress({ memberNumber, shippingDefaults, initialShippingOverride = null }) {
-  // 배송지 목록 및 관련 상태
-  const [deliveryAddresses, setDeliveryAddresses] = useState([]); // 배송지 목록
-  const [isAddressLoading, setIsAddressLoading] = useState(false); // 목록 로딩 상태
-  const [addressError, setAddressError] = useState(''); // 목록 에러
-  // 배송지 선택 및 모달 상태
-  const [showAddressModal, setShowAddressModal] = useState(false); // 배송지 모달 표시 여부
-  const [selectedAddressId, setSelectedAddressId] = useState(null); // 선택된 배송지 ID
-  const [shippingOverride, setShippingOverride] = useState(initialShippingOverride); // 선택・수정된 배송지 오버라이드
+  // 配送先一覧および関連状態
+  const [deliveryAddresses, setDeliveryAddresses] = useState([]); // 配送先一覧
+  const [isAddressLoading, setIsAddressLoading] = useState(false); // 一覧のローディング状態
+  const [addressError, setAddressError] = useState(''); // 一覧エラー
+  // 配送先選択およびモーダル状態
+  const [showAddressModal, setShowAddressModal] = useState(false); // 配送先モーダル表示有無
+  const [selectedAddressId, setSelectedAddressId] = useState(null); // 選択中の配送先ID
+  const [shippingOverride, setShippingOverride] = useState(initialShippingOverride); // 選択・編集された配送先オーバーライド
 
-  // 배송지 폼 상태
+  // 配送先フォーム状態
   const [addressFormMode, setAddressFormMode] = useState(null);
 
-  // 초기 상태 정의
+  // 初期状態定義
   const initialFormState = {
     addressNickname: '',
     recipientName: '',
@@ -27,7 +27,7 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
     isDefault: false,
   };
 
-  // 리듀서 정의
+  // リデューサー定義
   function addressFormReducer(state, action) {
     switch (action.type) {
       case 'SET_FIELD':
@@ -41,14 +41,14 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
     }
   }
 
-  // useReducer로 addressFormData 관리
+  // useReducerでaddressFormDataを管理
   const [addressFormData, dispatchForm] = useReducer(addressFormReducer, initialFormState);
 
   const [addressFormError, setAddressFormError] = useState('');
   const [addressFormSubmitting, setAddressFormSubmitting] = useState(false);
   const [isSavingDefault, setIsSavingDefault] = useState(false);
 
-  // preferredDefaultId를 useRef로 관리
+  // preferredDefaultIdをuseRefで管理
   const preferredDefaultIdRef = useRef(null);
   useEffect(() => {
     if (shippingOverride?.addressId && normalizeDefaultFlag(shippingOverride?.isDefault)) {
@@ -58,7 +58,7 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
     }
   }, [shippingOverride?.addressId, shippingOverride?.isDefault]);
 
-  // adaptAddressList를 일반 함수로 변환
+  // adaptAddressListを通常関数に変更
   function adaptAddressList(rawList) {
     if (!Array.isArray(rawList)) {
       return [];
@@ -101,7 +101,7 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
     return top;
   }
 
-  // adaptAddressList 내부에서 ref를 사용하므로 의존성 배열을 비워둡니다.
+  // adaptAddressList内でrefを使用するため、依存配列は空にします。
   const refreshAddresses = useCallback(async () => {
     setIsAddressLoading(true);
     setAddressError('');
@@ -111,7 +111,9 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
       setDeliveryAddresses(list);
       return list;
     } catch (error) {
-      setAddressError(error?.response?.data?.message || '배송지 목록을 불러오지 못했습니다.');
+      setAddressError(
+        error?.response?.data?.message || '配送先一覧を取得できませんでした。'
+      );
       setDeliveryAddresses([]);
       return null;
     } finally {
@@ -206,7 +208,7 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
       dispatchForm({
         type: 'SET_ALL',
         payload: {
-          addressNickname: defaults.addressNickname || '새 배송지',
+          addressNickname: defaults.addressNickname || '新しい配送先',
           recipientName: defaults.recipientName || shippingDefaults?.recipientName || '',
           recipientPhone: defaults.recipientPhone || shippingDefaults?.recipientPhone || '',
           postalCode: defaults.postalCode || shippingDefaults?.postalCode || '',
@@ -270,7 +272,7 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
     (isDefault = false) =>
       buildAddressPayload({
         addressNickname:
-          shippingOverride?.addressNickname || shippingDefaults?.addressNickname || '주문 배송지',
+          shippingOverride?.addressNickname || shippingDefaults?.addressNickname || '注文配送先',
         recipientName: shippingOverride?.recipientName || shippingDefaults?.recipientName || '',
         recipientPhone: shippingOverride?.recipientPhone || shippingDefaults?.recipientPhone || '',
         postalCode: shippingOverride?.postalCode || shippingDefaults?.postalCode || '',
@@ -310,13 +312,13 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
     }
   }, []);
 
-  // CRUD 핸들러
+  // CRUDハンドラー
   const handleAddressFormSubmit = useCallback(
     async (event) => {
       event?.preventDefault();
       if (!addressFormMode) return;
       if (!addressFormData.recipientName || !addressFormData.addressMain) {
-        setAddressFormError('이름과 주소는 필수입니다.');
+        setAddressFormError('氏名と住所は必須です。');
         return;
       }
       setAddressFormSubmitting(true);
@@ -330,11 +332,13 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
         }
         resetAddressForm();
         await refreshAddresses();
-        window.CM_showToast('배송지 저장이 완료되었습니다.');
+        window.CM_showToast('配送先の保存が完了しました。');
       } catch (error) {
-        console.error('배송지 저장 실패:', error);
-        setAddressFormError(error?.response?.data?.message || '배송지를 저장하지 못했습니다.');
-        showErrorPopup(error?.response?.data?.message || '배송지를 저장하지 못했습니다.');
+        console.error('配送先の保存に失敗しました:', error);
+        setAddressFormError(
+          error?.response?.data?.message || '配送先を保存できませんでした。'
+        );
+        showErrorPopup(error?.response?.data?.message || '配送先を保存できませんでした。');
       } finally {
         setAddressFormSubmitting(false);
       }
@@ -351,7 +355,7 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
 
   const handleDeleteAddress = useCallback(
     async (addressId) => {
-      const confirm = await showConfirmPopup('선택한 배송지를 삭제하시겠습니까?');
+      const confirm = await showConfirmPopup('選択した配送先を削除しますか？');
       if (!confirm) {
         return;
       }
@@ -362,10 +366,10 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
           setShippingOverride(null);
         }
         await refreshAddresses();
-        window.CM_showToast('배송지 삭제가 완료되었습니다.');
+        window.CM_showToast('配送先の削除が完了しました。');
       } catch (error) {
-        console.error('배송지 삭제 실패:', error);
-        showErrorPopup(error?.response?.data?.message || '배송지를 삭제하지 못했습니다.');
+        console.error('配送先の削除に失敗しました:', error);
+        showErrorPopup(error?.response?.data?.message || '配送先を削除できませんでした。');
       }
     },
     [refreshAddresses, selectedAddressId, deleteAddress]
@@ -374,6 +378,18 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
   const handleToggleDefaultCheckbox = useCallback(
     async (event, options = {}) => {
       const checked = event.target.checked;
+      const hasText = (value) => String(value || '').trim().length > 0;
+      const payloadCandidate = currentAddressRecord || shippingOverride || shippingDefaults || {};
+      const hasMinimumAddressData =
+        hasText(payloadCandidate.recipientName) &&
+        hasText(payloadCandidate.addressMain) &&
+        hasText(payloadCandidate.recipientPhone);
+
+      if (checked && !hasMinimumAddressData) {
+        window.CM_showToast('配送先情報を先に追加してください。');
+        return;
+      }
+
       setIsSavingDefault(true);
       try {
         if (checked) {
@@ -448,10 +464,12 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
           return { ...base, isDefault: checked };
         });
         if (checked && !options.suppressToast) {
-          window.CM_showToast('기본 배송지 설정이 완료되었습니다.');
+          window.CM_showToast('デフォルト配送先の設定が完了しました。');
         }
       } catch (error) {
-        showErrorPopup(error?.response?.data?.message || '기본 배송지 설정에 실패했습니다.');
+        showErrorPopup(
+          error?.response?.data?.message || 'デフォルト配送先の設定に失敗しました。'
+        );
       } finally {
         setIsSavingDefault(false);
       }
@@ -500,7 +518,7 @@ export function useAddress({ memberNumber, shippingDefaults, initialShippingOver
   };
 }
 
-// 다양한 타입의 기본값 플래그를 boolean으로 변환
+// さまざまな型のデフォルトフラグをbooleanに変換
 const normalizeDefaultFlag = (value) => {
   if (typeof value === 'boolean') return value;
   if (typeof value === 'number') return value === 1;

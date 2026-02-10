@@ -62,7 +62,7 @@ public class CM011015ServiceImpl implements CM011015Service {
     private S3Service s3Service;
 
     /**
-     * 교환/반품 신청 내역 목록 조회
+     * 交換・返品申請履歴一覧取得
      */
     @Override
     public ResponseModel<List<ReturnResponse>> getReturnHistory(String loginId) {
@@ -70,7 +70,7 @@ public class CM011015ServiceImpl implements CM011015Service {
         if (user == null) {
             return ResponseModel.<List<ReturnResponse>>builder()
                     .result(false)
-                    .message("사용자 정보 없음")
+                    .message("ユーザー情報なし")
                     .build();
         }
 
@@ -85,13 +85,13 @@ public class CM011015ServiceImpl implements CM011015Service {
         }
         return ResponseModel.<List<ReturnResponse>>builder()
                 .result(true)
-                .message("조회 성공")
+                .message("取得成功")
                 .resultList(list)
                 .build();
     }
 
     /**
-     * 교환/반품 통합 신청 요청
+     * 交換・返品の統合申請リクエスト
      */
     @Override
     @Transactional
@@ -99,13 +99,13 @@ public class CM011015ServiceImpl implements CM011015Service {
         try {
             User user = cm011001UserMapper.findByLoginId(loginId);
             if (user == null) {
-                return ResponseEntity.ok(ResponseModel.builder().result(false).message("로그인이 필요합니다.").build());
+                return ResponseEntity.ok(ResponseModel.builder().result(false).message("ログインが必要です。").build());
             }
 
             LocalDateTime tokyoNow = dateCalculator.tokyoTime();
             int userId = user.getUserId().intValue();
 
-            // 이미지 업로드 처리
+            // 画像アップロード処理
             List<String> imageUrls = new ArrayList<>();
 
             String folderName = "returns/" + tokyoNow.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -119,17 +119,17 @@ public class CM011015ServiceImpl implements CM011015Service {
                                 imageUrls.add(folderName + "/" + savedFileName);
                             }
                         } catch (Exception e) {
-                            log.error("파일 저장 실패: {}", file.getOriginalFilename(), e);
+                            log.error("ファイル保存失敗: {}", file.getOriginalFilename(), e);
                         }
                     }
                 }
             }
 
-            // 신청 마스터 정보 저장
+            // 申請マスター情報保存
             String joinedImageUrls = String.join(",", imageUrls);
             cm011015Mapper.insertReturnRequest(request, joinedImageUrls, userId, tokyoNow);
 
-            // 상세 상품 정보 저장
+            // 詳細商品情報保存
             List<String> codeListForEmail = new ArrayList<>();
             if (request.getProductCode() != null && !request.getProductCode().isEmpty()) {
                 String[] products = request.getProductCode().split(",");
@@ -157,31 +157,31 @@ public class CM011015ServiceImpl implements CM011015Service {
 
             return ResponseEntity.ok(ResponseModel.builder()
                     .result(true)
-                    .message((request.getType() == 0 ? "반품" : "교환") + " 신청이 정상적으로 처리되었습니다.")
+                    .message((request.getType() == 0 ? "返品" : "交換") + "申請が正常に処理されました。")
                     .build());
 
         } catch (Exception e) {
-            log.error("신청 처리 에러: ", e);
+            log.error("申請処理エラー: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ResponseModel.builder().result(false).message("서버 오류 발생").build());
+                    .body(ResponseModel.builder().result(false).message("サーバーエラーが発生しました").build());
         }
     }
 
     /**
-     * 교환/반품 상세 정보 조회
+     * 交換・返品申請詳細取得
      */
     @Override
     public ResponseModel<ReturnResponse> getReturnDetail(String loginId, int returnId) {
         User user = cm011001UserMapper.findByLoginId(loginId);
         if (user == null) {
-            return ResponseModel.<ReturnResponse>builder().result(false).message("인증 오류").build();
+            return ResponseModel.<ReturnResponse>builder().result(false).message("認証エラー").build();
         }
 
         int userId = user.getUserId().intValue();
         ReturnResponse response = cm011015Mapper.getReturnDetail(returnId, userId);
 
         if (response == null) {
-            return ResponseModel.<ReturnResponse>builder().result(false).message("내역 없음").build();
+            return ResponseModel.<ReturnResponse>builder().result(false).message("履歴なし").build();
         }
 
         CodeMaster code = codeMasterService.getCodeByValue("005", response.getReturnStatusValue());
@@ -189,11 +189,11 @@ public class CM011015ServiceImpl implements CM011015Service {
             response.setReturnStatusName(code.getCodeValueName());
         }
 
-        return ResponseModel.<ReturnResponse>builder().result(true).message("조회 성공").resultList(response).build();
+        return ResponseModel.<ReturnResponse>builder().result(true).message("取得成功").resultList(response).build();
     }
 
     /**
-     * 주문 상품 목록 조회
+     * 注文商品一覧取得
      */
     @Override
     public ResponseEntity<List<ReturnResponse.ProductInfo>> getOrderProducts(String loginId, String orderNo) {
@@ -205,38 +205,38 @@ public class CM011015ServiceImpl implements CM011015Service {
         int userId = user.getUserId().intValue();
         List<ReturnResponse.ProductInfo> products = cm011015Mapper.getProductsByOrderNo(orderNo, userId);
 
-        log.info("주문번호 {} 상품 조회 완료 (사용자ID: {})", orderNo, userId);
+        log.info("注文番号 {} の商品取得完了 (ユーザーID: {})", orderNo, userId);
         return ResponseEntity.ok(products);
     }
 
     /**
-     * 파일 저장
+     * ファイル保存
      * 
-     * @param file 파일 정보
-     * @return 저장된 파일명
-     * @throws IOException       파일 저장 중 오류 발생 시
-     * @throws SecurityException 보안 검증 실패 시
+     * @param file ファイル情報
+     * @return 保存されたファイル名
+     * @throws IOException       ファイル保存中にエラーが発生した場合
+     * @throws SecurityException セキュリティ検証に失敗した場合
      */
     private String saveFile(MultipartFile file, String path) throws IOException {
-        // 추가 보안 검증
+        // 追加セキュリティ検証
         if (!isValidImageFile(file)) {
-            log.error("유효하지 않은 파일 형식입니다.");
-            throw new IOException("유효하지 않은 파일 형식입니다.");
+            log.error("無効なファイル形式です。");
+            throw new IOException("無効なファイル形式です。");
         }
 
-        // 2. S3 업로드 로직 (다른 파일과 맥락 통일)
+        // 2. S3アップロードロジック（他ファイルと文脈統一）
         if ("s3".equals(uploadType) && s3Service != null) {
             try {
-                // 핵심: 여기서 "images/"를 붙여줌으로써 호출부의 부담을 덜어줌
+                // ポイント: ここで "images/" を付与して呼び出し側の負担を軽減
                 String tmpUrl = "images/".concat(path);
                 String fileUrl = s3Service.uploadFile(file, tmpUrl);
 
-                log.debug("S3 업로드 완료: {}", fileUrl);
-                // S3에서 반환된 URL에서 파일명만 추출해서 반환
+                log.debug("S3アップロード完了: {}", fileUrl);
+                // S3から返却されたURLからファイル名のみ抽出して返却
                 return Paths.get(fileUrl).getFileName().toString();
             } catch (IOException e) {
-                log.error("S3 업로드 실패", e);
-                throw new IOException("S3 파일 저장 실패", e);
+                log.error("S3アップロード失敗", e);
+                throw new IOException("S3ファイル保存失敗", e);
             }
         }
 
@@ -244,11 +244,11 @@ public class CM011015ServiceImpl implements CM011015Service {
         try {
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
-                log.debug("디렉토리 생성됨: {}", uploadPath.toString());
+                log.debug("ディレクトリ作成完了: {}", uploadPath.toString());
             }
         } catch (IOException e) {
-            log.error("디렉토리 생성 실패", e);
-            throw new IOException("파일 업로드 디렉토리 생성 실패", e);
+            log.error("ディレクトリ作成失敗", e);
+            throw new IOException("ファイルアップロード用ディレクトリ作成失敗", e);
         }
 
         String originalFileName = file.getOriginalFilename();
@@ -263,24 +263,24 @@ public class CM011015ServiceImpl implements CM011015Service {
         Path filePath = uploadPath.resolve(savedFileName);
         try {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            log.debug("로컬 파일 저장 완료: {}", savedFileName);
+            log.debug("ローカルファイル保存完了: {}", savedFileName);
             return savedFileName;
         } catch (IOException e) {
-            log.error("파일 저장 실패: {}", savedFileName, e);
+            log.error("ファイル保存失敗: {}", savedFileName, e);
             try {
                 Files.deleteIfExists(filePath);
             } catch (IOException deleteException) {
-                log.warn("파일 삭제 실패 (정리 중)", deleteException);
+                log.warn("ファイル削除失敗（クリーンアップ中）", deleteException);
             }
-            throw new IOException("파일 저장 실패", e);
+            throw new IOException("ファイル保存失敗", e);
         }
     }
 
     /**
-     * 보안을 위한 랜덤 문자열 생성
+     * セキュリティ用ランダム文字列生成
      * 
-     * @param length 생성할 문자열 길이
-     * @return 랜덤 문자열
+     * @param length 生成する文字列の長さ
+     * @return ランダム文字列
      */
     private String generateSecureRandomString(int length) {
         SecureRandom random = new SecureRandom();
@@ -295,13 +295,13 @@ public class CM011015ServiceImpl implements CM011015Service {
     }
 
     /**
-     * 관리자 알림 메일 발송
+     * 管理者通知メール送信
      */
     private void sendAdminNotification(User user, ReturnRequest request, List<String> codes, int returnNumber) {
 
         List<String> adminEmails = cm011001UserMapper.findEmailsByRoleId(1);
         if (adminEmails == null || adminEmails.isEmpty()) {
-            log.warn("관리자 권한 유저가 없어 메일을 발송하지 못했습니다.");
+            log.warn("管理者権限ユーザーがいないためメールを送信できませんでした。\n");
             return;
         }
 
@@ -313,7 +313,7 @@ public class CM011015ServiceImpl implements CM011015Service {
 
         Map<String, String> templateData = new HashMap<>();
         templateData.put("title", request.getTitle());
-        templateData.put("type", request.getType() == 0 ? "반품" : "교환");
+        templateData.put("type", request.getType() == 0 ? "反품" : "교환");
         templateData.put("returnNumber", String.valueOf(returnNumber));
         templateData.put("orderNumber", request.getOrderNo());
         templateData.put("memberNumber", user.getMemberNumber());
@@ -323,15 +323,15 @@ public class CM011015ServiceImpl implements CM011015Service {
         try {
             emailService.sendAdminReturnNotification(adminEmails, templateData);
         } catch (Exception e) {
-            log.error("메일 발송 중 오류", e);
+            log.error("メール送信中エラー", e);
         }
     }
 
     /**
-     * 이미지 파일 형식 검증
+     * 画像ファイル形式検証
      * 
-     * @param file 파일
-     * @return 유효한 이미지 파일 여부
+     * @param file ファイル
+     * @return 有効な画像ファイルかどうか
      */
     private boolean isValidImageFile(MultipartFile file) {
         String originalFileName = file.getOriginalFilename();
@@ -349,7 +349,7 @@ public class CM011015ServiceImpl implements CM011015Service {
     }
 
     /**
-     * 신청 가능한 주문 목록 조회
+     * 申請可能な注文一覧取得
      */
     @Override
     public ResponseModel<List<Map<String, Object>>> getReturnableOrderList(String loginId) {
@@ -357,7 +357,7 @@ public class CM011015ServiceImpl implements CM011015Service {
         if (user == null) {
             return ResponseModel.<List<Map<String, Object>>>builder()
                     .result(false)
-                    .message("사용자 정보가 없습니다.")
+                    .message("ユーザー情報がありません。")
                     .build();
         }
 
@@ -366,7 +366,7 @@ public class CM011015ServiceImpl implements CM011015Service {
 
         return ResponseModel.<List<Map<String, Object>>>builder()
                 .result(true)
-                .message("신청 가능 목록 조회 성공")
+                .message("申請可能一覧の取得成功")
                 .resultList(list)
                 .build();
     }

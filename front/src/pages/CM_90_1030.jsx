@@ -59,20 +59,20 @@ export default function CM_90_1030() {
 
   const translateChannel = (channel) => {
     const translationMap = {
-      Direct: '직접 유입',
-      'Organic Search': '자연 검색',
-      'Paid Search': '유료 검색',
-      'Organic Social': '자연 소셜',
-      'Paid Social': '유료 소셜',
-      Email: '이메일',
-      Referral: '추천',
-      Display: '디스플레이 광고',
-      Unassigned: '미분류',
+      Direct: '直接流入',
+      'Organic Search': '自然検索',
+      'Paid Search': '有料検索',
+      'Organic Social': '自然ソーシャル',
+      'Paid Social': '有料ソーシャル',
+      Email: 'メール',
+      Referral: '参照（リファラ）',
+      Display: 'ディスプレイ広告',
+      Unassigned: '未分類',
     };
     return translationMap[channel] || channel;
   };
 
-  // 채널별 색상 지정 함수
+  // チャネル別の色指定関数
   const getChannelColor = (channel) => {
     const colorMap = {
       'Organic Search': '#4285F4',
@@ -87,37 +87,37 @@ export default function CM_90_1030() {
     return colorMap[channel] || '#6B7280';
   };
 
-  // 데이터 가져오기 함수
+  // データ取得関数
   const fetchAnalyticsData = useCallback(async () => {
     if (!startDate || !endDate) {
-      open('error', '시작일과 종료일을 모두 선택해주세요.');
+      open('error', '開始日と終了日を両方選択してください。');
       return;
     }
 
     try {
       open('loading');
 
-      // 신규/재방문자
+      // 新規/再訪問者
       const newVsReturningResponse = await axiosInstance.get('/admin/visits/newReturning', {
         params: { startDate, endDate },
       });
 
-      // 기기별 세션
+      // デバイス別セッション
       const deviceResponse = await axiosInstance.get('/admin/visits/sessionsDevice', {
         params: { startDate, endDate },
       });
 
-      // 채널별 세션
+      // チャネル別セッション
       const channelResponse = await axiosInstance.get('/admin/visits/sessionsChannel', {
         params: { startDate, endDate },
       });
 
-      // 페이지별 평균 머문 시간
+      // ページ別平均滞在時間
       const pageEngagementResponse = await axiosInstance.get('/admin/visits/pageEngagement', {
         params: { startDate, endDate },
       });
 
-      // 채널 데이터를 trafficSources 형식으로 변환
+      // チャネルデータをtrafficSources形式に変換
       const trafficSources = channelResponse.data.resultList.map((item) => ({
         name: translateChannel(item.channel),
         value: Math.round(item.percentage),
@@ -125,7 +125,7 @@ export default function CM_90_1030() {
         color: getChannelColor(item.channel),
       }));
 
-      // 페이지별 데이터를 sessionTimeline 형식으로 변환
+      // ページ別データをsessionTimeline形式に変換
       const sessionTimeline = pageEngagementResponse.data.resultList.map((item) => ({
         date: item.pageTitle,
         value: item.avgDuration,
@@ -156,7 +156,7 @@ export default function CM_90_1030() {
       close('loading');
     } catch (error) {
       close('loading');
-      open('error', 'Analytics 데이터를 불러오는데 실패했습니다.');
+      open('error', 'Analyticsデータの読み込みに失敗しました。');
     }
   }, [startDate, endDate, open, close, translateChannel, getChannelColor]);
 
@@ -165,7 +165,7 @@ export default function CM_90_1030() {
       labels: visitData.sessionTimeline.map((item) => item.date),
       datasets: [
         {
-          label: '평균 머문 시간 (분)',
+          label: '平均滞在時間（分）',
           data: visitData.sessionTimeline.map((item) => item.value),
           backgroundColor: 'rgba(99, 102, 241, 0.7)',
           borderColor: 'rgba(99, 102, 241, 1)',
@@ -179,7 +179,7 @@ export default function CM_90_1030() {
 
   const newVsReturningChartData = useMemo(
     () => ({
-      labels: ['신규', '재방문'],
+      labels: ['新規', '再訪問'],
       datasets: [
         {
           data: [visitData.newVsReturning.new, visitData.newVsReturning.returning],
@@ -193,7 +193,7 @@ export default function CM_90_1030() {
 
   const deviceChartData = useMemo(
     () => ({
-      labels: ['모바일', '데스크톱', '태블릿'],
+      labels: ['モバイル', 'デスクトップ', 'タブレット'],
       datasets: [
         {
           data: [
@@ -216,7 +216,7 @@ export default function CM_90_1030() {
   const formatDuration = (minutes) => {
     const h = Math.floor(minutes / 60);
     const m = Math.round(minutes % 60);
-    return h > 0 ? `${h}시간 ${m}분` : `${m}분`;
+    return h > 0 ? `${h}時間 ${m}分` : `${m}分`;
   };
 
   const pageEngagementBarOptions = {
@@ -228,7 +228,7 @@ export default function CM_90_1030() {
         callbacks: {
           label: function (context) {
             const minutes = context.parsed.y;
-            return `평균 머문 시간: ${formatDuration(minutes)}`;
+            return `平均滞在時間: ${formatDuration(minutes)}`;
           },
         },
       },
@@ -239,7 +239,7 @@ export default function CM_90_1030() {
         reverse: false,
         title: {
           display: true,
-          text: '시간',
+          text: '時間',
         },
         ticks: {
           callback: function (value) {
@@ -251,7 +251,7 @@ export default function CM_90_1030() {
       x: {
         title: {
           display: true,
-          text: '페이지',
+          text: 'ページ',
         },
         grid: { display: false },
       },
@@ -273,14 +273,14 @@ export default function CM_90_1030() {
   return (
     <div className="d-flex flex-grow-1 bg-light">
       <div className="content-wrapper p-4 w-100">
-        <h5 className="border-bottom pb-2 mb-4">방문 데이터</h5>
+        <h2 className="border-bottom pb-2 mb-4">訪問データ</h2>
 
-        {/* 날짜 범위 선택 */}
+        {/* 日付範囲選択 */}
         <div className="row mb-4 align-items-center">
           <div className="col-md-6">
             <div className="d-flex align-items-end gap-2">
               <div style={{ width: '180px' }}>
-                <label className="form-label small mb-1">시작일</label>
+                <label className="form-label small mb-1">開始日</label>
                 <input
                   type="date"
                   className="form-control"
@@ -292,7 +292,7 @@ export default function CM_90_1030() {
                 <span>~</span>
               </div>
               <div style={{ width: '180px' }}>
-                <label className="form-label small mb-1">종료일</label>
+                <label className="form-label small mb-1">終了日</label>
                 <input
                   type="date"
                   className="form-control"
@@ -307,19 +307,19 @@ export default function CM_90_1030() {
                   onClick={fetchAnalyticsData}
                   disabled={!startDate || !endDate}
                 >
-                  검색
+                  検索
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 상단 카드: 사이트 세션 + 고유 방문자 */}
+        {/* 上部カード：サイトセッション + ユニーク訪問者 */}
         <div className="row g-3 mb-3">
           <div className="col-md-6">
             <div className="card shadow-sm h-100 text-center">
               <div className="card-body">
-                <h6 className="text-muted mb-2">사이트 세션</h6>
+                <h6 className="text-muted mb-2">サイトセッション</h6>
                 <h3 className="mb-0">{visitData.totalSessions}</h3>
               </div>
             </div>
@@ -327,20 +327,20 @@ export default function CM_90_1030() {
           <div className="col-md-6">
             <div className="card shadow-sm h-100 text-center">
               <div className="card-body">
-                <h6 className="text-muted mb-2">고유 방문자</h6>
+                <h6 className="text-muted mb-2">ユニーク訪問者</h6>
                 <h3 className="mb-0">{visitData.totalUsers}</h3>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 중간 카드: 세션(채널별) */}
+        {/* 中間カード：セッション（チャネル別） */}
         <div className="card shadow-sm mb-4">
           <div className="card-body">
             <div className="d-flex justify-content-between align-items-center mb-2">
-              <h6 className="mb-0">세션</h6>
+              <h6 className="mb-0">セッション</h6>
               <select className="form-select form-select-sm w-auto">
-                <option>기준: 유입 경로 카테고리</option>
+                <option>基準：流入経路カテゴリ</option>
               </select>
             </div>
             <div className="mt-3">
@@ -350,7 +350,7 @@ export default function CM_90_1030() {
                     <div className="d-flex align-items-center">
                       <span className="me-2">{source.name}</span>
                     </div>
-                    <span className="text-muted small">{source.sessions} 세션</span>
+                    <span className="text-muted small">{source.sessions} セッション</span>
                   </div>
                   <div className="progress" style={{ height: '8px' }}>
                     <div
@@ -368,22 +368,22 @@ export default function CM_90_1030() {
           </div>
         </div>
 
-        {/* 페이지별 평균 머문 시간 차트 */}
+        {/* ページ別平均滞在時間チャート */}
         <div className="card shadow-sm mb-4">
           <div className="card-body">
-            <h6 className="card-title mb-3">페이지별 평균 머문 시간 (시/분)</h6>
+            <h6 className="card-title mb-3">ページ別平均滞在時間（時/分）</h6>
             <div style={{ height: '400px' }}>
               <Bar data={pageEngagementChartData} options={pageEngagementBarOptions} />
             </div>
           </div>
         </div>
 
-        {/* 신규 방문자 vs 재방문자, 기기별 */}
+        {/* 新規訪問者 vs 再訪問者、デバイス別 */}
         <div className="row g-3 mb-4">
           <div className="col-md-6">
             <div className="card shadow-sm h-100">
               <div className="card-body d-flex flex-column">
-                <h6 className="card-title mb-3">신규 방문자 vs 재방문자</h6>
+                <h6 className="card-title mb-3">新規訪問者 vs 再訪問者</h6>
                 <div className="flex-grow-1 position-relative" style={{ minHeight: '300px' }}>
                   <Doughnut data={newVsReturningChartData} options={doughnutOptions} />
                   <div
@@ -396,7 +396,7 @@ export default function CM_90_1030() {
                       pointerEvents: 'none',
                     }}
                   >
-                    <div className="fw-bold">고유 방문자</div>
+                    <div className="fw-bold">ユニーク訪問者</div>
                     <div className="h4 mb-0">{visitData.totalUsers}</div>
                   </div>
                 </div>
@@ -407,7 +407,7 @@ export default function CM_90_1030() {
           <div className="col-md-6">
             <div className="card shadow-sm h-100">
               <div className="card-body d-flex flex-column">
-                <h6 className="card-title mb-3">기기별 세션</h6>
+                <h6 className="card-title mb-3">デバイス別セッション</h6>
                 <div className="flex-grow-1 position-relative" style={{ minHeight: '300px' }}>
                   <Doughnut data={deviceChartData} options={doughnutOptions} />
                   <div
@@ -420,7 +420,7 @@ export default function CM_90_1030() {
                       pointerEvents: 'none',
                     }}
                   >
-                    <div className="fw-bold">사이트 세션</div>
+                    <div className="fw-bold">サイトセッション</div>
                     <div className="h4 mb-0">{visitData.totalSessions}</div>
                   </div>
                 </div>

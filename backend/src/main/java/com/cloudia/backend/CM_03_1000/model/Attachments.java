@@ -10,8 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 에디터 이미지 정보를 표현하기 위한 DTO.
- * 마이바티스 매퍼에서 조회 결과를 매핑할 때 사용한다.
+ * エディタ画像情報を表現するためのDTO
  */
 @Getter
 @Setter
@@ -20,12 +19,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Attachments {
-    private Long attachmentId;
-    private String productCode;
-    private String fileName;
-    private String filePath;
-    private String fileType;
-    private Long fileSize;
-    private String createdBy;
-    private LocalDateTime createdAt;
+    private Long attachmentId;        // 添付ファイルID
+    private String productCode;       // 商品コード
+    private String fileName;          // ファイル名
+    private String filePath;          // ファイルパス
+    private String fileType;          // ファイル種別
+    private Long fileSize;            // ファイルサイズ
+    private String createdBy;         // 作成者
+    private LocalDateTime createdAt;  // 作成日時
 }

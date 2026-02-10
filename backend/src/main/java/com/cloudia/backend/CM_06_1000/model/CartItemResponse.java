@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * 장바구니 조회/주문 준비 응답 DTO
+ * カート取得・注文準備レスポンスDTO
  */
 @Data
 @Builder
@@ -23,16 +23,16 @@ import lombok.ToString;
 public class CartItemResponse implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long cartItemId; // 장바구니 아이템 고유 아이디
-    private String productId; // 상품 고유 아이디
-    private String productName; // 상품명
-    private Integer productPrice; // 상품 가격(주문 시점 단가, 원화 단위)
-    private String imageLink; // 상품 이미지 링크
-    private Integer quantity; // 수량
-    private Integer lineTotal; // 합계 금액(상품 가격 * 수량, 원화 단위)
-    private Integer shippingFee; // 배송비(원화 단위)
-    private Double productWeight; // 상품 무게(kg 단위)
-    private String reservationDeadline; // 예약 마감일 (YYYY-MM-DD)
-    private String releaseDate; // 출시일 (YYYY-MM-DD)
-    private Integer purchaseLimit; // 최대 구매 수량
+    private Long cartItemId;            // カートアイテム固有ID
+    private String productId;           // 商品固有ID
+    private String productName;         // 商品名
+    private Integer productPrice;       // 商品価格（注文時点の単価、ウォン単位）
+    private String imageLink;           // 商品画像リンク
+    private Integer quantity;           // 数量
+    private Integer lineTotal;          // 合計金額（商品価格 × 数量、ウォン単位）
+    private Integer shippingFee;        // 配送料（ウォン単位）
+    private Double productWeight;       // 商品重量（kg単位）
+    private String reservationDeadline; // 予約締切日（YYYY-MM-DD）
+    private String releaseDate;         // 発売日（YYYY-MM-DD）
+    private Integer purchaseLimit;      // 最大購入数量
 }

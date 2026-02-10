@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { countries } from '../data/countries';
 import axiosInstance from '../services/axiosInstance';
+import useCountries from '../hooks/useCountries';
 import CMMessage from '../constants/CMMessage';
 import CM_99_1001 from '../components/commonPopup/CM_99_1001';
 import CM_99_1002 from '../components/commonPopup/CM_99_1002';
@@ -38,34 +38,21 @@ const INITIAL_FORM_STATE = {
   pccc: '',
 };
 
-const PHONE_COUNTRY_CODES = countries
-  .reduce((acc, country) => {
-    const phoneCode = `+${country.phoneCode}`;
-    if (!acc.find((item) => item.value === phoneCode)) {
-      acc.push({
-        value: phoneCode,
-        label: phoneCode,
-      });
-    }
-    return acc;
-  }, [])
-  .sort((a, b) => parseInt(a.value.slice(1)) - parseInt(b.value.slice(1)));
-
 const AUTHORITY_OPTIONS = [
   { value: 2, label: 'Manager' },
   { value: 3, label: 'User' },
 ];
 
 const STATUS_OPTIONS = [
-  { value: 1, label: '활성화' },
-  { value: 2, label: '비활성화' },
-  { value: 3, label: '탈퇴' },
+  { value: 1, label: '有効' },
+  { value: 2, label: '無効' },
+  { value: 3, label: '退会' },
 ];
 
 const GENDER_OPTIONS = [
-  { value: '1', label: '남성' },
-  { value: '2', label: '여성' },
-  { value: '3', label: '선택안함' },
+  { value: '1', label: '男性' },
+  { value: '2', label: '女性' },
+  { value: '3', label: '選択しない' },
 ];
 
 const useModal = () => {
@@ -115,7 +102,7 @@ const SelectField = ({
   onChange,
   options = [],
   error,
-  placeholder = '선택하세요',
+  placeholder = '選択してください',
   required = false,
   ...props
 }) => (
@@ -174,6 +161,7 @@ const PhoneNumberField = ({
   phoneNumber1,
   phoneNumber2,
   phoneNumber3,
+  phoneCountryCodes,
   onCountryCodeChange,
   onPhoneNumber1Change,
   onPhoneNumber2Change,
@@ -182,7 +170,7 @@ const PhoneNumberField = ({
   required = false,
 }) => (
   <div className="mb-3">
-    <label className="form-label">휴대폰 번호</label>
+    <label className="form-label">携帯電話番号</label>
     <div className="d-flex gap-2">
       <select
         className="form-select"
@@ -190,7 +178,7 @@ const PhoneNumberField = ({
         value={countryCode}
         onChange={(e) => onCountryCodeChange(e.target.value)}
       >
-        {PHONE_COUNTRY_CODES.map((option) => (
+        {phoneCountryCodes.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
@@ -314,10 +302,10 @@ const BirthDateField = ({
 
   return (
     <div className="mb-3">
-      <label className="form-label">생년월일</label>
+      <label className="form-label">生年月日</label>
       <div className="d-flex gap-2">
         <select className="form-select" value={year} onChange={(e) => onYearChange(e.target.value)}>
-          <option value="">년</option>
+          <option value="">年</option>
           {yearOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -329,7 +317,7 @@ const BirthDateField = ({
           value={month}
           onChange={(e) => onMonthChange(e.target.value)}
         >
-          <option value="">월</option>
+          <option value="">月</option>
           {monthOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -337,7 +325,7 @@ const BirthDateField = ({
           ))}
         </select>
         <select className="form-select" value={day} onChange={(e) => onDayChange(e.target.value)}>
-          <option value="">일</option>
+          <option value="">日</option>
           {dayOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -360,27 +348,24 @@ export default function CM_90_1021() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { countries } = useCountries();
 
-  // 특정 유저 조회
-  const fetchByUser = useCallback(async () => {
-    setLoading(true);
-    const result = await apiHandler(() =>
-      axiosInstance.get('/admin/users/findUser', {
-        params: { memberId: memberId },
-      })
-    );
-    if (result.data.result) {
-      const mappedData = mapServerDataToForm(result.data.resultList);
-      setForm(mappedData);
-    }
-    setLoading(false);
-  }, [apiHandler, navigate]);
+  const phoneCountryCodes = useMemo(() => {
+    return countries
+      .reduce((acc, country) => {
+        const phoneCode = `+${country.phoneCode}`;
+        if (!acc.find((item) => item.value === phoneCode)) {
+          acc.push({
+            value: phoneCode,
+            label: phoneCode,
+          });
+        }
+        return acc;
+      }, [])
+      .sort((a, b) => parseInt(a.value.slice(1), 10) - parseInt(b.value.slice(1), 10));
+  }, [countries]);
 
-  useEffect(() => {
-    fetchByUser();
-  }, [fetchByUser]);
-
-  const mapServerDataToForm = (resultData) => {
+  const mapServerDataToForm = useCallback((resultData) => {
     const parsePhoneNumber = (phoneNumber) => {
       if (!phoneNumber) return { countryCode: '+82', number1: '010', number2: '', number3: '' };
 
@@ -449,7 +434,26 @@ export default function CM_90_1021() {
       refundAccountBank: resultData.refundAccountBank || '',
       pccc: resultData.pccc || '',
     };
-  };
+  }, [countries]);
+
+  // 特定ユーザー取得
+  const fetchByUser = useCallback(async () => {
+    setLoading(true);
+    const result = await apiHandler(() =>
+      axiosInstance.get('/admin/users/findUser', {
+        params: { memberId: memberId },
+      })
+    );
+    if (result?.data?.result) {
+      const mappedData = mapServerDataToForm(result.data.resultList);
+      setForm(mappedData);
+    }
+    setLoading(false);
+  }, [apiHandler, memberId, mapServerDataToForm]);
+
+  useEffect(() => {
+    fetchByUser();
+  }, [fetchByUser]);
 
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
@@ -468,7 +472,7 @@ export default function CM_90_1021() {
       value: country.name.en,
       label: country.name.kr,
     }));
-  }, []);
+  }, [countries]);
 
   const handleNationalityChange = useCallback(
     (nationality) => {
@@ -479,31 +483,31 @@ export default function CM_90_1021() {
         updateForm('phoneCountryCode', phoneCode);
       }
     },
-    [updateForm]
+    [updateForm, countries]
   );
 
   const validateForm = useCallback(() => {
     const newErrors = {};
 
-    if (!form.name) newErrors.name = '이름을 입력하세요.';
-    if (!form.nationality) newErrors.nationality = '국적/거주국가를 선택하세요.';
+    if (!form.name) newErrors.name = '氏名を入力してください。';
+    if (!form.nationality) newErrors.nationality = '国籍／居住国を選択してください。';
     if (form.password) {
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
       if (!passwordRegex.test(form.password)) {
-        newErrors.password = '영문+숫자+특수문자 조합으로 최소 8자 이상 입력하세요.';
+        newErrors.password = '英字＋数字＋記号の組み合わせで、8文字以上で入力してください。';
       }
     }
     if (form.password !== form.passwordConfirm)
-      newErrors.passwordConfirm = '비밀번호가 일치하지 않습니다.';
+      newErrors.passwordConfirm = 'パスワードが一致しません。';
     if (!form.phoneNumber2 || !form.phoneNumber3)
-      newErrors.phoneNumber = '휴대폰 번호를 입력하세요.';
-    if (!form.email) newErrors.email = '이메일 주소를 입력하세요.';
-    if (!form.postalCode) newErrors.postalCode = '우편번호를 입력하세요.';
-    if (!form.addressMain) newErrors.addressMain = '주소를 입력하세요.';
-    if (!form.addressDetail1) newErrors.addressDetail1 = '상세 주소를 입력하세요.';
-    if (!form.genderValue) newErrors.genderValue = '성별을 선택하세요.';
+      newErrors.phoneNumber = '携帯電話番号を入力してください。';
+    if (!form.email) newErrors.email = 'メールアドレスを入力してください。';
+    if (!form.postalCode) newErrors.postalCode = '郵便番号を入力してください。';
+    if (!form.addressMain) newErrors.addressMain = '住所を入力してください。';
+    if (!form.addressDetail1) newErrors.addressDetail1 = '住所詳細を入力してください。';
+    if (!form.genderValue) newErrors.genderValue = '性別を選択してください。';
     if (!form.birthYear || !form.birthMonth || !form.birthDay)
-      newErrors.birthDate = '생년월일을 입력하세요.';
+      newErrors.birthDate = '生年月日を入力してください。';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -514,7 +518,7 @@ export default function CM_90_1021() {
       e.preventDefault();
 
       if (!validateForm()) {
-        console.log('?');
+        console.log('');
         return;
       }
       const userData = {
@@ -560,7 +564,7 @@ export default function CM_90_1021() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">{memberId} 조회/수정</h5>
+        <h2 className="border-bottom pb-2 mb-3">{memberId} 照会／修正</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="row">
@@ -576,10 +580,10 @@ export default function CM_90_1021() {
 
             <div className="mb-3">
               <label htmlFor="password" className="form-label">
-                비밀번호
+                パスワード
               </label>
               <div className="mb-1">
-                <small className="text-muted">• 영문+숫자+특수문자 조합 (최소 8자 이상)</small>
+                <small className="text-muted">•英字＋数字＋記号の組み合わせ（8文字以上）</small>
               </div>
               <div className="position-relative">
                 <input
@@ -588,7 +592,7 @@ export default function CM_90_1021() {
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
                   onChange={(e) => updateForm('password', e.target.value)}
-                  placeholder="비밀번호를 입력해주세요"
+                  placeholder="パスワードを入力してください。"
                 />
                 <button
                   type="button"
@@ -604,7 +608,7 @@ export default function CM_90_1021() {
 
             <div className="mb-3">
               <label htmlFor="passwordConfirm" className="form-label">
-                비밀번호 확인
+                パスワード確認
               </label>
               <div className="position-relative">
                 <input
@@ -613,7 +617,7 @@ export default function CM_90_1021() {
                   type={showPasswordConfirm ? 'text' : 'password'}
                   value={form.passwordConfirm}
                   onChange={(e) => updateForm('passwordConfirm', e.target.value)}
-                  placeholder="비밀번호를 입력해주세요"
+                  placeholder="パスワードを入力してください。"
                 />
                 <button
                   type="button"
@@ -631,7 +635,7 @@ export default function CM_90_1021() {
 
             <InputField
               id="name"
-              label="이름"
+              label="氏名"
               value={form.name}
               onChange={(value) => updateForm('name', value)}
               error={errors.name}
@@ -640,7 +644,7 @@ export default function CM_90_1021() {
 
             <InputField
               id="email"
-              label="이메일 주소"
+              label="メールアドレス"
               type="email"
               value={form.email}
               onChange={(value) => updateForm('email', value)}
@@ -650,7 +654,7 @@ export default function CM_90_1021() {
             />
 
             <RadioButtonGroup
-              label="성별"
+              label="性別"
               name="genderValue"
               value={form.genderValue}
               onChange={(value) => updateForm('genderValue', value)}
@@ -672,7 +676,7 @@ export default function CM_90_1021() {
 
             <SelectField
               id="nationality"
-              label="국적 / 거주국가"
+              label="国籍 / 居住国"
               value={form.nationality}
               onChange={handleNationalityChange}
               options={nationalityOptions}
@@ -685,6 +689,7 @@ export default function CM_90_1021() {
               phoneNumber1={form.phoneNumber1}
               phoneNumber2={form.phoneNumber2}
               phoneNumber3={form.phoneNumber3}
+              phoneCountryCodes={phoneCountryCodes}
               onCountryCodeChange={(value) => updateForm('phoneCountryCode', value)}
               onPhoneNumber1Change={(value) => updateForm('phoneNumber1', value)}
               onPhoneNumber2Change={(value) => updateForm('phoneNumber2', value)}
@@ -695,7 +700,7 @@ export default function CM_90_1021() {
 
             <InputField
               id="postalCode"
-              label="우편번호"
+              label="郵便番号"
               value={form.postalCode}
               onChange={(value) => updateForm('postalCode', value)}
               error={errors.postalCode}
@@ -704,7 +709,7 @@ export default function CM_90_1021() {
 
             <InputField
               id="addressMain"
-              label="주소"
+              label="住所"
               value={form.addressMain}
               onChange={(value) => updateForm('addressMain', value)}
               error={errors.addressMain}
@@ -713,7 +718,7 @@ export default function CM_90_1021() {
 
             <InputField
               id="addressDetail1"
-              label="상세 주소 1"
+              label="住所詳細 1"
               value={form.addressDetail1}
               onChange={(value) => updateForm('addressDetail1', value)}
               error={errors.addressMain}
@@ -722,51 +727,51 @@ export default function CM_90_1021() {
 
             <InputField
               id="addressDetail2"
-              label="상세 주소 2"
+              label="住所詳細 2"
               value={form.addressDetail2}
               onChange={(value) => updateForm('addressDetail2', value)}
             />
 
             <InputField
               id="addressDetail3"
-              label="상세 주소 3"
+              label="住所詳細 3"
               value={form.addressDetail3}
               onChange={(value) => updateForm('addressDetail3', value)}
             />
 
             <InputField
               id="refundAccountHolder"
-              label="환불 예금주"
+              label="返金口座名義"
               value={form.refundAccountHolder}
               onChange={(value) => updateForm('refundAccountHolder', value)}
             />
             <InputField
               id="refundAccountNumber"
-              label="환불 계좌번호"
+              label="返金口座番号"
               value={form.refundAccountNumber}
               onChange={(value) => updateForm('refundAccountNumber', value)}
             />
             <InputField
               id="refundAccountBank"
-              label="환불 은행"
+              label="返金銀行"
               value={form.refundAccountBank}
               onChange={(value) => updateForm('refundAccountBank', value)}
             />
             <InputField
               id="pccc"
-              label="통관 번호"
+              label="通関番号(韓国のみ）"
               value={form.pccc}
               onChange={(value) => updateForm('pccc', value)}
             />
             <InputField
               id="note"
-              label="비고"
+              label="備考"
               value={form.note}
               onChange={(value) => updateForm('note', value)}
             />
             <SelectField
               id="roleId"
-              label="권한"
+              label="権限"
               value={form.roleId}
               onChange={(value) => updateForm('roleId', value)}
               options={AUTHORITY_OPTIONS}
@@ -775,7 +780,7 @@ export default function CM_90_1021() {
 
             <SelectField
               id="userStatusValue"
-              label="상태"
+              label="状態"
               value={form.userStatusValue}
               onChange={(value) => updateForm('userStatusValue', value)}
               options={STATUS_OPTIONS}
@@ -784,7 +789,7 @@ export default function CM_90_1021() {
 
             <InputField
               id="note"
-              label="비고"
+              label="備考"
               value={form.note}
               onChange={(value) => updateForm('note', value)}
             />
@@ -792,7 +797,7 @@ export default function CM_90_1021() {
 
           <div className="d-flex justify-content-center gap-2 mt-4">
             <button type="submit" className="btn btn-primary btn-fixed-width">
-              변경 하기
+              変更する
             </button>
           </div>
         </form>

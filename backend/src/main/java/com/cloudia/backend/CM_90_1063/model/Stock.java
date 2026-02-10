@@ -16,15 +16,15 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Stock {
-    private int stockId; // 재고 ID
-    private String productCode; // 상품 코드
-    private int price; // 상품 가격
-    private int defectiveQty; // 불량 재고
-    private int totalQty; // 총 재고
-    private int availableQty; // 가용 재고
-    private String productCategory; // 상품 분류
-    private String createdBy; // 등록자
-    private LocalDateTime createdAt; // 등록일
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일
+    private int stockId;                // 在庫ID
+    private String productCode;         // 商品コード
+    private int price;                  // 商品価格
+    private int defectiveQty;           // 不良在庫
+    private int totalQty;               // 総在庫
+    private int availableQty;           // 利用可能在庫
+    private String productCategory;     // 商品分類
+    private String createdBy;           // 登録者
+    private LocalDateTime createdAt;    // 登録日
+    private String updatedBy;           // 更新者
+    private LocalDateTime updatedAt;    // 更新日
 }

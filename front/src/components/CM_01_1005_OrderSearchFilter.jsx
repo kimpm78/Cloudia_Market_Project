@@ -1,10 +1,10 @@
-const ALL_OPTION = { value: '', name: '전체' };
+const ALL_OPTION = { value: '', name: 'すべて' };
 const currentYear = new Date().getFullYear();
 export const YEAR_OPTIONS = [
   ALL_OPTION,
   ...Array.from({ length: 5 }, (_, i) => ({
     value: String(currentYear - i),
-    name: `${currentYear - i}년`,
+    name: `${currentYear - i}年`,
   })),
 ];
 export const MONTH_OPTIONS = [
@@ -31,7 +31,7 @@ export default function CM_01_1005_OrderSearchFilter({
       <div className="row g-3 align-items-center mb-3">
         <div className="col-auto">
           <label className="fw-bold mb-0" htmlFor="year">
-            주문 기간
+            注文期間
           </label>
         </div>
         <div className="col-auto" style={{ width: '130px' }}>
@@ -65,7 +65,7 @@ export default function CM_01_1005_OrderSearchFilter({
 
         <div className="col-auto ms-4">
           <label className="fw-bold mb-0" htmlFor="status">
-            현재 상태
+            現在のステータス
           </label>
         </div>
         <div className="col-auto" style={{ width: '150px' }}>
@@ -85,10 +85,10 @@ export default function CM_01_1005_OrderSearchFilter({
       </div>
 
       <div className="row g-3 align-items-center">
-        {/* 결제 방법 */}
+        {/* 支払い方法 */}
         <div className="col-auto">
           <label className="fw-bold mb-0" htmlFor="paymentMethod">
-            결제 방법
+            支払い方法
           </label>
         </div>
         <div className="col-auto" style={{ width: '130px' }}>
@@ -108,7 +108,7 @@ export default function CM_01_1005_OrderSearchFilter({
 
         <div className="col-auto ms-4">
           <label className="fw-bold mb-0" htmlFor="keyword">
-            상품명
+            商品名
           </label>
         </div>
         <div className="col" style={{ maxWidth: '400px' }}>
@@ -117,7 +117,7 @@ export default function CM_01_1005_OrderSearchFilter({
               type="text"
               className="form-control"
               id="keyword"
-              placeholder="주문하신 상품명을 입력하세요"
+              placeholder="注文した商品名を入力してください"
               value={filters.keyword}
               onChange={handleFilterChange}
               onKeyDown={onKeyDown}
@@ -133,7 +133,7 @@ export default function CM_01_1005_OrderSearchFilter({
               ) : (
                 <i className="bi bi-search me-2"></i>
               )}
-              조회
+              検索
             </button>
           </div>
         </div>

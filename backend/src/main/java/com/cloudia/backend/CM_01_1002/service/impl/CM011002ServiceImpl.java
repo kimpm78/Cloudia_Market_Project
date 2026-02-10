@@ -55,10 +55,10 @@ public class CM011002ServiceImpl implements CM011002Service {
             CM011002MesaageConstant.FIND_ID_EMAIL_NOT_REGISTERED));
         }
         try {
-        // 인증 코드 생성
+        // 認証コードの生成
         String verificationCode = emailService.generateVerificationCode();
 
-        // Redis 저장
+        // Redis 格納
         redisTemplate.opsForValue().set(EMAIL_VERIFICATION_PREFIX + email, verificationCode,
                         expirationMinutes, TimeUnit.MINUTES);
 

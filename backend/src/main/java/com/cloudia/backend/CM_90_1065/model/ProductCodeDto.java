@@ -17,11 +17,11 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductCodeDto {
-    private String productCode;         // 상품 코드
-    private String productName;         // 상품명
-    private String productCategory;     // 상품 분류
-    private String createdBy;           // 등록자
-    private LocalDateTime createdAt;    // 등록일
-    private String updatedBy;           // 수정자
-    private LocalDateTime updatedAt;    // 수정일
+    private String productCode;         // 商品コード
+    private String productName;         // 商品名
+    private String productCategory;     // 商品分類
+    private String createdBy;           // 登録者
+    private LocalDateTime createdAt;    // 登録日
+    private String updatedBy;           // 更新者
+    private LocalDateTime updatedAt;    // 更新日
 }

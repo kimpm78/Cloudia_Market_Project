@@ -12,7 +12,7 @@ import CMMessage from '../constants/CMMessage';
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title, ChartDataLabels);
 
-// 모달 및 메시지
+// モーダルおよびメッセージ
 const useModal = () => {
   const [modals, setModals] = useState({
     loading: false,
@@ -32,7 +32,7 @@ const useModal = () => {
   return { modals, message, open, close };
 };
 
-// API 호출
+// API呼び出し
 const useApiHandler = (navigate, openModal, closeModal) => {
   return useCallback(
     async (apiCall, showLoading = true) => {
@@ -72,7 +72,7 @@ export default function CM_90_1031() {
     setLoading(false);
   }, [apiHandler, navigate]);
 
-  // 초기 데이터 로드
+  // 初期データロード
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
@@ -145,32 +145,32 @@ export default function CM_90_1031() {
   };
 
   const ageColumnDefs = [
-    { field: 'ageGroup', headerName: '연령대', flex: 1 },
+    { field: 'ageGroup', headerName: '年齢層', flex: 1 },
     {
       field: 'userCount',
-      headerName: '가입자',
+      headerName: '登録者',
       flex: 1,
       valueFormatter: (params) => formatNumber(params.value),
     },
     {
       field: 'avgAmountPerUser',
-      headerName: '평균 단가 (1년 단위)',
+      headerName: '平均単価（年単位）',
       flex: 2,
       valueFormatter: (params) => formatNumber(params.value),
     },
   ];
 
   const genderColumnDefs = [
-    { field: 'genderGroup', headerName: '성별', flex: 1 },
+    { field: 'genderGroup', headerName: '性別', flex: 1 },
     {
       field: 'userCount',
-      headerName: '가입자',
+      headerName: '登録者',
       flex: 1,
       valueFormatter: (params) => formatNumber(params.value),
     },
     {
       field: 'avgAmountPerUser',
-      headerName: '평균 단가 (분기 단위)',
+      headerName: '平均単価（四半期単位）',
       flex: 2,
       valueFormatter: (params) => formatNumber(params.value),
     },
@@ -179,16 +179,16 @@ export default function CM_90_1031() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-4">성별/연령대 분석</h5>
+        <h2 className="border-bottom pb-2 mb-4">性別 / 年齢層分析</h2>
 
-        {/* 주요 측정항목 */}
-        <h6 className="mb-3" style={{ fontWeight: 'bold' }}>
-          주요 측정항목
+        {/* 主要指標 */}
+        <h6 className="mb-3 fw-semibold">
+          主要指標
         </h6>
 
-        {/* 차트 섹션 */}
+        {/* チャートセクション */}
         <div className="row mb-5">
-          {/* 연령대 차트 */}
+          {/* 年齢層チャート */}
           <div className="col-md-6">
             <div
               className="card h-100"
@@ -196,7 +196,7 @@ export default function CM_90_1031() {
             >
               <div className="card-header bg-white" style={{ borderBottom: '1px solid #e0e0e0' }}>
                 <h6 className="mb-0" style={{ color: '#007bff', fontWeight: 'bold' }}>
-                  연령대
+                  年齢層
                 </h6>
               </div>
               <div
@@ -210,7 +210,7 @@ export default function CM_90_1031() {
             </div>
           </div>
 
-          {/* 성별 차트 */}
+          {/* 性別チャート */}
           <div className="col-md-6">
             <div
               className="card h-100"
@@ -218,7 +218,7 @@ export default function CM_90_1031() {
             >
               <div className="card-header bg-white" style={{ borderBottom: '1px solid #e0e0e0' }}>
                 <h6 className="mb-0" style={{ color: '#007bff', fontWeight: 'bold' }}>
-                  성별
+                  性別
                 </h6>
               </div>
               <div
@@ -233,13 +233,13 @@ export default function CM_90_1031() {
           </div>
         </div>
 
-        {/* 테이블 섹션 */}
+        {/* テーブルセクション */}
         <h6 className="mb-3" style={{ fontWeight: 'bold' }}>
-          성별 / 연령대
+          性別／年齢層
         </h6>
 
         <div className="row">
-          {/* 연령대 AG Grid */}
+          {/* 年齢層 AG Grid */}
           <div className="col-md-6 mb-4">
             <div className="ag-theme-alpine custom-grid w-100">
               <AgGridReact
@@ -253,7 +253,7 @@ export default function CM_90_1031() {
             </div>
           </div>
 
-          {/* 성별 AG Grid */}
+          {/* 性別 AG Grid */}
           <div className="col-md-6 mb-4">
             <div className="ag-theme-alpine custom-grid w-100">
               <AgGridReact

@@ -39,10 +39,10 @@ import org.springframework.http.*;
 public class CM901052Controller {
 
     @Value("${cookiepay.store-id}")
-    private String API_ID; // 쿠키페이 결제 연동 key
+    private String API_ID;
 
     @Value("${cookiepay.secret-key}")
-    private String API_KEY; // 쿠키페이 결제 연동 key
+    private String API_KEY;
 
     @Value("${cookiepay.api.domain:https://sandbox.cookiepayments.com}")
     private String API_DOMAIN;
@@ -55,37 +55,37 @@ public class CM901052Controller {
     @GetMapping("/test")
     public String getMethodName() {
         try {
-            // 1. 토큰 발행 요청
+            // 1. トークン発行リクエスト
             String token = getAuthToken();
             if (token == null) {
                 return null;
             }
 
-            // 2. 결제 취소 요청
+            // 2. 決済取消リクエスト
             String cancelUrl = API_DOMAIN + "/api/cancel";
 
-            // 요청 헤더 설정
+            // リクエストヘッダー設定
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("ApiKey", API_KEY);
             headers.set("TOKEN", token);
 
-            // 요청 바디 설정
+            // リクエストボディ設定
             Map<String, String> cancelData = new HashMap<>();
             cancelData.put("tid", "260131144253GU00KCCV");
-            cancelData.put("reason", "고객변심");
+            cancelData.put("reason", "お客様都合");
             HttpEntity<Map<String, String>> cancelRequest = new HttpEntity<>(cancelData, headers);
 
-            // API 호출
+            // API呼び出し
             ResponseEntity<String> cancelResponse = restTemplate.exchange(
                     cancelUrl,
                     HttpMethod.POST,
                     cancelRequest,
                     String.class);
 
-            // 응답 파싱
+            // レスポンス解析
             JsonNode cancelResult = objectMapper.readTree(cancelResponse.getBody());
-            log.info("결제 취소 응답: {}", cancelResult);
+            log.info("決済取消レスポンス: {}", cancelResult);
 
             Map<String, Object> result = new HashMap<>();
             result.put("result", true);
@@ -93,98 +93,98 @@ public class CM901052Controller {
 
             return new String();
         } catch (Exception e) {
-            log.error("결제 취소 중 오류 발생", e);
+            log.error("決済取消中にエラーが発生しました", e);
             return null;
         }
     }
 
     /**
-     * 쿠키페이 인증 토큰 발행
+     * CookiePay 認証トークン発行
      */
     private String getAuthToken() {
         try {
             String tokenUrl = API_DOMAIN + "/payAuth/token";
 
-            // 요청 헤더 설정
+            // リクエストヘッダー設定
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // 요청 바디 설정
+            // リクエストボディ設定
             Map<String, String> tokenData = new HashMap<>();
             tokenData.put("pay2_id", API_ID);
             tokenData.put("pay2_key", API_KEY);
 
             HttpEntity<Map<String, String>> tokenRequest = new HttpEntity<>(tokenData, headers);
 
-            // API 호출
+            // API呼び出し
             ResponseEntity<String> tokenResponse = restTemplate.exchange(
                     tokenUrl,
                     HttpMethod.POST,
                     tokenRequest,
                     String.class);
 
-            // 응답 파싱
+            // レスポンス解析
             JsonNode tokenResult = objectMapper.readTree(tokenResponse.getBody());
             String rtnCd = tokenResult.get("RTN_CD").asText();
 
-            // 0000: 성공
+            // 0000: 成功
             if ("0000".equals(rtnCd)) {
                 return tokenResult.get("TOKEN").asText();
             } else {
-                log.error("토큰 발행 실패: RTN_CD={}", rtnCd);
+                log.error("トークン発行失敗: RTN_CD={}", rtnCd);
                 return null;
             }
 
         } catch (Exception e) {
-            log.error("토큰 발행 중 오류 발생", e);
+            log.error("トークン発行中にエラーが発生しました", e);
             return null;
         }
     }
 
     /**
-     * 환불/교환 리스트 조회
+     * 返金・交換一覧取得
      * 
-     * @return 환불/교환 리스트
+     * @return 返金・交換一覧
      */
     @GetMapping("/findByPeriod")
 
     public ResponseEntity<ResponseModel<List<ReturnsDto>>> getPeriod(RefundSearchRequestDto searchDto) {
         List<ReturnsDto> result = cm901052Service.getPeriod(searchDto);
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得成功"));
     }
 
     /**
-     * 환불/교환 리스트 조회
+     * 返金・交換一覧取得
      * 
-     * @return 환불/교환 리스트
+     * @return 返金・交換一覧
      */
     @GetMapping("/findAll")
     public ResponseEntity<ResponseModel<List<ReturnsDto>>> getRefund() {
         List<ReturnsDto> result = cm901052Service.getRefund();
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得成功"));
     }
 
     /**
-     * 환불 상품 리스트
+     * 返金商品一覧
      * 
-     * @param requestNo    요청 번호
-     * @param refundNumber 사원 번호
-     * @param orderNumber  주문 번호
-     * @return 환불 상품 리스트
+     * @param requestNo    リクエスト番号
+     * @param refundNumber 社員番号
+     * @param orderNumber  注文番号
+     * @return 返金商品一覧
      */
     @GetMapping("/orderDetail")
     public ResponseEntity<ResponseModel<List<OrderDetailDto>>> getOrderDetail(@RequestParam String requestNo,
             @RequestParam String refundNumber,
             @RequestParam String orderNumber) {
         List<OrderDetailDto> result = cm901052Service.getOrderDetail(requestNo, refundNumber, orderNumber);
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得成功"));
     }
 
     /**
-     * 환불 진행 처리
+     * 返金処理
      * 
-     * @param requestNo 환불 정보
-     * @return 환불 진행 업데이트
+     * @param requestNo 返金情報
+     * @return 返金処理更新
      */
     @PostMapping("/process")
     public ResponseEntity<ResponseModel<Integer>> updateRefund(@RequestBody RefundRequestDto requestDto,
@@ -193,6 +193,6 @@ public class CM901052Controller {
                 .getUserIdFromToken(jwtTokenProvider.resolveToken(request))
                 .toString();
         Integer result = cm901052Service.updateRefund(requestDto, userId);
-        return ResponseEntity.ok(ResponseHelper.success(result, "업데이트 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "更新成功"));
     }
 }

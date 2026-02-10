@@ -14,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartRequest {
-    private Long userId; // 사용자 ID
-    private String productId; // 상품 ID
-    private Integer quantity; //장바구니에 담을 수량
+    private Long userId;      // ユーザーID
+    private String productId; // 商品ID
+    private Integer quantity; // カートに追加する数量
 }

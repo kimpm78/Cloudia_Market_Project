@@ -51,7 +51,7 @@ public class CM011003ServiceImpl implements CM011003Service {
         String email = request.getEmail();
 
         try {
-            // 이메일로 사용자가 존재하는지만 확인
+            // メールアドレスでユーザーの存在有無のみを確認
             User user = mapper.findByEmail(email);
             if (user == null) {
                 log.error(CM011003MessageConstant.USER_NOT_FOUND_LOG, email);
@@ -60,13 +60,13 @@ public class CM011003ServiceImpl implements CM011003Service {
                                 CM011003MessageConstant.USER_NOT_FOUND));
             }
 
-            // 인증 코드 생성
+            // 認証コード生成
             String code = emailService.generateVerificationCode();
 
-            // Redis 저장
+            // Redis 格納
             redisTemplate.opsForValue().set(PW_VERIFICATION_PREFIX + email, code, expirationMinutes, TimeUnit.MINUTES);
 
-            // EmailDto 생성 및 발송
+            // EmailDto 生成とメール送信
             EmailDto emailInfo = new EmailDto();
             emailInfo.setSendEmail(email);
             emailInfo.setVerificationCode(code);
@@ -107,7 +107,7 @@ public class CM011003ServiceImpl implements CM011003Service {
         }
 
         log.info(CM011003MessageConstant.VERIFY_SUCCESS_LOG, email);
-        // 인증 성공 시 Redis 키를 바로 삭제하지 않고, 최종 비밀번호 변경 시 삭제합니다.
+        // 認証成功時にRedisキーは即時削除せず、最終的なパスワード変更時に削除
         return ResponseEntity.ok(createResponseModel(
                 Map.of("verified", true),
                 true,
@@ -121,7 +121,7 @@ public class CM011003ServiceImpl implements CM011003Service {
         String newPassword = request.getNewPassword();
         String key = PW_VERIFICATION_PREFIX + email;
 
-        // 인증이 완료되었는지 확인
+        // 認証が完了しているか確認
         if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
             log.warn(CM011003MessageConstant.VERIFICATION_REQUIRED_LOG, email);
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -130,7 +130,7 @@ public class CM011003ServiceImpl implements CM011003Service {
         }
 
         try {
-            // 사용자 정보 조회
+            // ユーザー情報を取得
             User user = mapper.findByEmail(email);
             if (user == null) {
                 log.error(CM011003MessageConstant.USER_NOT_FOUND_LOG, email);
@@ -139,11 +139,11 @@ public class CM011003ServiceImpl implements CM011003Service {
                                 CM011003MessageConstant.USER_NOT_FOUND));
             }
 
-            // 비밀번호 재사용 검사
+            // パスワード再利用検査
             List<PasswordHistory> history = passwordHistoryMapper.findByMemberNumber(user.getMemberNumber());
             for (PasswordHistory oldPassword : history) {
                 if (passwordEncoder.matches(newPassword, oldPassword.getPassword())) {
-                    // 6개월 이내에 사용한 비밀번호인지 확인
+                    // 過去6か月以内に使用したパスワードかどうかを確認
                     if (oldPassword.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(6))) {
                         log.warn(CM011003MessageConstant.PASSWORD_REUSE_LOG, email);
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -153,7 +153,7 @@ public class CM011003ServiceImpl implements CM011003Service {
                 }
             }
 
-            // 현재 비밀번호를 이력에 추가
+            // 現在のパスワードを履歴に追加
             PasswordHistory passwordHistory = new PasswordHistory();
             passwordHistory.setMemberNumber(user.getMemberNumber());
             passwordHistory.setPassword(user.getPassword());
@@ -161,11 +161,11 @@ public class CM011003ServiceImpl implements CM011003Service {
             passwordHistoryMapper.insertPasswordHistory(passwordHistory);
             log.info(CM011003MessageConstant.ADD_RESET_PASSWORD_HISTORY, user.getMemberNumber());
 
-            // 새 비밀번호로 업데이트
+            // 新しいパスワードに更新
             user.setPassword(passwordEncoder.encode(newPassword));
             mapper.updatePassword(user);
 
-            // 성공 시 Redis 키 삭제
+            // 成功時にRedisキー削除
             redisTemplate.delete(key);
             log.info(CM011003MessageConstant.RESET_PASSWORD_SUCCESS_LOG, email);
 

@@ -14,9 +14,9 @@ import java.util.List;
 public interface CM031002Mapper {
 
     /**
-     * 장바구니 관련 리스트 조회
-     * 
-     * @return 장바구니 관련 전체 리스트
+     * カート関連一覧取得
+     *
+     * @return カート関連の全件一覧
      */
     List<CartItem> findActiveCartItemsByUserId(Long userId);
     CartItem findCartItem(@Param("userId") Long userId, @Param("productId") String productId);
@@ -26,20 +26,20 @@ public interface CM031002Mapper {
     ProductInfo selectProductDetail(@Param("productId") Long productId);
 
     /**
-     * 전체 리스트 조회 (reservationDeadline이 없는 상품만)
+     * 全件一覧取得（reservationDeadline がない商品のみ）
      *
-     * @param categories 선택된 카테고리 리스트
-     * @return 신상품 리스트
+     * @param categories 選択されたカテゴリ一覧
+     * @return 新商品一覧
      */
     List<ProductInfo> selectNewProductList(@Param("categories") List<String> categories);
 
     /**
-     * 전체 카테고리 그룹 리스트 조회
+     * カテゴリーグループ全件一覧取得
      */
     List<Categories> findAllCategoryGroupCode();
 
     /**
-     * 선택된 카테고리 그룹의 하위 카테고리 정보 조회
+     * 選択されたカテゴリーグループ配下のカテゴリ情報を取得
      */
     List<CategoryDetails> findCategory(@Param("categoryGroupCodes") List<String> categoryGroupCode);
 }

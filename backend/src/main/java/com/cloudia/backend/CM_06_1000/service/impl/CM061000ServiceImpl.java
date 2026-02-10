@@ -36,16 +36,16 @@ public class CM061000ServiceImpl implements CM061000Service {
     private final CM061000Mapper cm061000Mapper;
 
     /**
-     * 장바구니 목록 조회
-     * @param userId 사용자 ID
-     * @return 장바구니 항목 리스트
+     * カート一覧取得
+     * @param userId ユーザーID
+     * @return カートアイテム一覧
      */
     @Override
     @Transactional
     public List<CartItemResponse> getCart(Long userId) {
         try {
             if (userId == null) {
-                LogHelper.log(LogMessage.VALIDATION_INPUT_INVALID, new String[] { "장바구니 조회" });
+                LogHelper.log(LogMessage.VALIDATION_INPUT_INVALID, new String[] { "カート取得" });
                 throw new IllegalArgumentException(ErrorCode.INVALID_INPUT_VALUE.getMessage());
             }
             expireCartIfNecessary(userId);
@@ -53,15 +53,15 @@ public class CM061000ServiceImpl implements CM061000Service {
             log.info(CM061000MessageConstant.CART_FETCH_SUCCESS);
             return list;
         } catch (Exception e) {
-            LogHelper.log(LogMessage.DB_ACCESS_ERROR, new String[] { "장바구니 조회" }, e);
+            LogHelper.log(LogMessage.DB_ACCESS_ERROR, new String[] { "カート取得" }, e);
             throw e;
         }
     }
 
     /**
-     * 장바구니 마지막 갱신 시각 조회
-     * @param userId 사용자 ID
-     * @return 마지막 cart_updated_at (없으면 null)
+     * カート最終更新日時取得
+     * @param userId ユーザーID
+     * @return 最終 cart_updated_at（存在しない場合は null）
      */
     @Override
     public LocalDateTime getLastUpdatedAt(Long userId) {
@@ -73,9 +73,9 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 장바구니 최초 생성 시각 조회 (TTL 기준)
-     * @param userId 사용자 ID
-     * @return 최초 created_at (없으면 null)
+     * カート初回作成日時取得（TTL基準）
+     * @param userId ユーザーID
+     * @return 初回 created_at（存在しない場合は null）
      */
     @Override
     public LocalDateTime getCreatedAt(Long userId) {
@@ -87,16 +87,16 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 장바구니 담기 시 예약/상시 혼합 규칙 검증
+     * カート追加時の予約/通常商品の混在ルール検証
      *
-     * @param userId 사용자 ID
-     * @param productId 상품 ID 또는 코드
+     * @param userId ユーザーID
+     * @param productId 商品IDまたはコード
      */
     @Override
     @Transactional(readOnly = true)
     public void validateCartMixOnAdd(Long userId, String productId) {
         if (userId == null) {
-            LogHelper.log(LogMessage.VALIDATION_INPUT_INVALID, new String[] { "장바구니 담기" });
+            LogHelper.log(LogMessage.VALIDATION_INPUT_INVALID, new String[] { "カート追加" });
             throw new IllegalArgumentException(ErrorCode.INVALID_INPUT_VALUE.getMessage());
         }
         if (productId == null || productId.isBlank()) {
@@ -110,11 +110,11 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 장바구니 담기
-     * @param userId    사용자 ID
-     * @param productId 상품 ID
-     * @param quantity  수량(1 이상)
-     * @return 추가 또는 증가된 장바구니 항목 ID
+     * カート追加
+     * @param userId    ユーザーID
+     * @param productId 商品ID
+     * @param quantity  数量（1以上）
+     * @return 追加または増加されたカートアイテムID
      */
     @Override
     @Transactional
@@ -153,7 +153,7 @@ public class CM061000ServiceImpl implements CM061000Service {
 
                 applyCartStockDelta(normalizedProductId, quantity);
                 cm061000Mapper.increaseQuantity(existingItem.getCartItemId(), quantity, updater);
-                log.info("장바구니 수량 증가 - userId: {}, productId: {}, cartItemId: {}, addQty: {}",
+                log.info("カート数量増加 - userId: {}, productId: {}, cartItemId: {}, addQty: {}",
                         userId, normalizedProductId, existingItem.getCartItemId(), quantity);
                 return existingItem.getCartItemId();
             }
@@ -171,27 +171,27 @@ public class CM061000ServiceImpl implements CM061000Service {
                     .updatedBy(updater)
                     .build();
             cm061000Mapper.insertCartItem(item);
-            log.info("장바구니 신규 추가 - userId: {}, productId: {}, cartItemId: {}, quantity: {}",
+            log.info("カート新規追加 - userId: {}, productId: {}, cartItemId: {}, quantity: {}",
                     userId, normalizedProductId, item.getCartItemId(), quantity);
             return item.getCartItemId();
 
         } catch (IllegalStateException | IllegalArgumentException e) {
             // 비즈니스/검증 오류는 WARN 레벨 + 메시지
-            log.warn("장바구니 담기 실패 - userId: {}, productId: {}, reason: {}",
+            log.warn("カート追加失敗 - userId: {}, productId: {}, reason: {}",
                     userId, productId, e.getMessage());
             throw e;
         } catch (Exception e) {
             // 시스템/DB 오류는 ERROR 레벨
-            LogHelper.log(LogMessage.DB_ACCESS_ERROR, new String[] { "장바구니 담기" }, e);
+            LogHelper.log(LogMessage.DB_ACCESS_ERROR, new String[] { "カート追加" }, e);
             throw e;
         }
     }
 
     /**
-     * 수량 변경 (절대값 지정)
-     * @param userId     사용자 ID
-     * @param cartItemId 장바구니 항목 ID
-     * @param quantity   변경 수량(1 이상)
+     * 数量変更（絶対値指定）
+     * @param userId     ユーザーID
+     * @param cartItemId カートアイテムID
+     * @param quantity   変更数量（1以上）
      */
     @Override
     @Transactional
@@ -231,13 +231,13 @@ public class CM061000ServiceImpl implements CM061000Service {
             cm061000Mapper.updateQuantity(cartItemId, quantity, resolveUpdater());
 
             log.info(
-                    "장바구니 수량 변경 성공 - userId: {}, cartItemId: {}, productId: {}, from: {}, to: {}",
+                    "カート数量変更成功 - userId: {}, cartItemId: {}, productId: {}, from: {}, to: {}",
                     userId, cartItemId, cartItem.getProductId(), cartItem.getQuantity(), quantity);
 
         } catch (IllegalStateException | IllegalArgumentException e) {
             // 비즈니스/검증 오류
             log.warn(
-                    "장바구니 수량 변경 실패 - userId: {}, cartItemId: {}, reason: {}",
+                    "カート数量変更失敗 - userId: {}, cartItemId: {}, reason: {}",
                     userId, cartItemId, e.getMessage());
             throw e;
         } catch (Exception e) {
@@ -248,10 +248,10 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 장바구니 항목 삭제 (소프트 딜리트).
+     * カートアイテム削除（ソフトデリート）
      *
-     * @param userId     사용자 ID
-     * @param cartItemId 장바구니 항목 ID
+     * @param userId     ユーザーID
+     * @param cartItemId カートアイテムID
      */
     @Override
     @Transactional
@@ -273,12 +273,12 @@ public class CM061000ServiceImpl implements CM061000Service {
             // 소프트 삭제
             cm061000Mapper.softDelete(cartItemId, resolveUpdater());
             log.info(
-                    "장바구니 항목 삭제 성공 - userId: {}, cartItemId: {}, productId: {}",
+                    "カートアイテム削除成功 - userId: {}, cartItemId: {}, productId: {}",
                     userId, cartItemId, cartItem.getProductId());
         } catch (IllegalStateException | IllegalArgumentException e) {
             // 비즈니스/검증 에러
             log.warn(
-                    "장바구니 항목 삭제 실패 - userId: {}, cartItemId: {}, reason: {}",
+                    "カートアイテム削除失敗 - userId: {}, cartItemId: {}, reason: {}",
                     userId, cartItemId, e.getMessage());
             throw e;
         } catch (Exception e) {
@@ -289,8 +289,8 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 장바구니 전체 삭제 (소프트 딜리트)
-     * @param userId 사용자 ID
+     * カート全件削除（ソフトデリート）
+     * @param userId ユーザーID
      */
     @Override
     @Transactional
@@ -299,7 +299,7 @@ public class CM061000ServiceImpl implements CM061000Service {
             List<CartItem> items = cm061000Mapper.findActiveCartItemsByUser(userId);
             releaseCartReservations(items);
             cm061000Mapper.expireCartByUser(userId, resolveUpdater());
-            log.info("장바구니 전체 삭제 - userId: {}", userId);
+            log.info("カート全件削除 - userId: {}", userId);
         } catch (Exception e) {
             log.error(CM061000MessageConstant.CART_DB_ERROR, e.getMessage(), e);
             throw e;
@@ -307,16 +307,16 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 선택된 장바구니 항목 삭제 (소프트 딜리트)
-     * @param userId      사용자 ID
-     * @param cartItemIds 삭제할 장바구니 항목 ID 리스트
+     * 選択したカートアイテム削除（ソフトデリート）
+     * @param userId      ユーザーID
+     * @param cartItemIds 削除するカートアイテムID一覧
      */
     @Override
     @Transactional
     public void deleteSelected(Long userId, List<Long> cartItemIds) {
         try {
             if (userId == null) {
-                throw new IllegalArgumentException("userId는 필수입니다.");
+                throw new IllegalArgumentException("userId は必須です。");
             }
             if (cartItemIds == null || cartItemIds.isEmpty()) {
                 throw new IllegalArgumentException(CM061000MessageConstant.CART_PREPARE_ORDER_EMPTY);
@@ -328,11 +328,11 @@ public class CM061000ServiceImpl implements CM061000Service {
                 throw new IllegalStateException(CM061000MessageConstant.CART_ITEM_NOT_FOUND);
             }
             log.info(
-                    "선택된 장바구니 항목 삭제 성공 - userId: {}, cartItemIds: {}, count: {}",
+                    "選択したカートアイテム削除成功 - userId: {}, cartItemIds: {}, count: {}",
                     userId, cartItemIds, affected);
         } catch (IllegalArgumentException | IllegalStateException e) {
             log.warn(
-                    "선택된 장바구니 항목 삭제 실패 - userId: {}, cartItemIds: {}, reason: {}",
+                    "選択したカートアイテム削除失敗 - userId: {}, cartItemIds: {}, reason: {}",
                     userId, cartItemIds, e.getMessage());
             throw e;
         } catch (Exception e) {
@@ -342,10 +342,10 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 주문 준비 - 선택된 장바구니 항목 조회
-     * @param userId      사용자 ID
-     * @param cartItemIds 장바구니 항목 ID 리스트
-     * @return 선택된 장바구니 항목 리스트
+     * 注文準備 - 選択したカートアイテム取得
+     * @param userId      ユーザーID
+     * @param cartItemIds カートアイテムID一覧
+     * @return 選択したカートアイテム一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -361,7 +361,7 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * (재고 available_qty) - (TTL 내 활성 장바구니 예약 합계) + (내 예약 수량)   기준으로 검증
+     * （在庫 available_qty）-（TTL内の有効カート予約合計）+（自分の予約数量）を基準に検証
      */
     private void ensureStockAvailable(Long userId, String productId, int desiredQuantity) {
         if (productId == null || productId.isBlank()) {
@@ -377,16 +377,16 @@ public class CM061000ServiceImpl implements CM061000Service {
 
         if (resolvedMax <= 0 || desiredQuantity > resolvedMax) {
             log.warn(
-                    "재고 부족(예약 반영) - productId: {}, desired: {}, maxAllowed: {}",
+                    "在庫不足（予約反映）- productId: {}, desired: {}, maxAllowed: {}",
                     normalizedProductId, desiredQuantity, resolvedMax);
             throw new IllegalStateException(CM061000MessageConstant.CART_OUT_OF_STOCK);
         }
     }
 
     /**
-     * 상품 ID를 정규화
-     * @param rawProductId 원본 상품 코드
-     * @return 정규화된 코드, 유효하지 않으면 null
+     * 商品IDを正規化
+     * @param rawProductId 元の商品コード
+     * @return 正規化されたコード（無効な場合は null）
      */
     private String normalizeProductId(String rawProductId) {
         if (rawProductId == null) {
@@ -397,29 +397,29 @@ public class CM061000ServiceImpl implements CM061000Service {
             return null;
         }
 
-        // DB 조회 오류는 상위에서 처리하도록 예외를 그대로 전파
+        // DB参照エラーは上位で処理するため、例外はそのまま伝播
         String canonical = cm061000Mapper.findCanonicalProductId(trimmed);
         if (canonical != null && !canonical.isBlank()) {
             return canonical.trim();
         }
 
-        // 정규화 정보가 없으면 trim 된 원본 사용
+        // 正規化情報がない場合は trim 済みの原本を使用
         return trimmed;
     }
 
     /**
-     * 마지막 갱신 시각을 기준으로 장바구니를 만료 처리한다.
-     * @param userId 사용자 ID
+     * 最終更新日時を基準にカートを期限切れ処理する。
+     * @param userId ユーザーID
      */
     private void expireCartIfNecessary(Long userId) {
         if (userId == null) {
             return;
         }
 
-        // 활성 장바구니 중 "최초 생성 시각"을 기준으로 TTL 판단
+        // 有効カートの「初回作成日時」を基準にTTL判定
         LocalDateTime createdAt = cm061000Mapper.findCartCreatedAt(userId);
         if (createdAt == null) {
-            // 활성 장바구니가 없으면 종료
+            // 有効カートがなければ終了
             return;
         }
 
@@ -431,13 +431,13 @@ public class CM061000ServiceImpl implements CM061000Service {
             releaseCartReservations(items);
             cm061000Mapper.expireCartByUser(userId, resolveUpdater());
             log.info(
-                    "장바구니 만료 처리 - userId: {}, createdAt: {}, threshold: {}",
+                    "カート期限切れ処理 - userId: {}, createdAt: {}, threshold: {}",
                     userId, createdAt, threshold);
         }
     }
 
     /**
-     * 장바구니 수량 제한 검증
+     * カート数量上限の検証
      * @param userId
      * @param currentItemQuantity
      * @param desiredItemQuantity
@@ -449,7 +449,7 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 장바구니 재고 예약 수량 증감 적용
+     * カート在庫予約数量の増減を反映
      * 
      * @param productId
      * @param delta
@@ -469,7 +469,7 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /** 
-     * 장바구니 예약 수량 해제 적용
+     * カート予約数量の解放を反映
      * 
      * @param items
      */
@@ -492,7 +492,7 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 상품별 최대 구매 수량 제한 검증
+     * 商品別の最大購入数量制限の検証
      * @param productId
      * @param desiredItemQuantity
      */
@@ -510,7 +510,7 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 장바구니 담기 시 예약/상시 혼합 규칙 검증
+     * カート追加時の予約/通常商品の混在ルール検証
      * 
      * @param userId
      * @param productId
@@ -565,7 +565,7 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * 출시월 문자열 정규화 (YYYY-MM)
+     * 発売月文字列の正規化（YYYY-MM）
      * 
      * @param source
      * @return
@@ -582,8 +582,8 @@ public class CM061000ServiceImpl implements CM061000Service {
     }
 
     /**
-     * DB의 createdBy / updatedBy 에 설정할 사용자 식별자.
-     * @return 현재 인증된 사용자 이름 또는 "SYSTEM"
+     * DBの createdBy / updatedBy に設定するユーザー識別子。
+     * @return 現在認証されたユーザー名、または "SYSTEM"
      */
     private String resolveUpdater() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

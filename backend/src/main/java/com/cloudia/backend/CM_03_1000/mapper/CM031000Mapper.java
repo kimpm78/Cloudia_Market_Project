@@ -14,9 +14,9 @@ import java.util.List;
 public interface CM031000Mapper {
 
     /**
-     * 장바구니 관련 리스트 조회
+     * カート関連一覧取得
      * 
-     * @return 장바구니 관련 전체 리스트
+     * @return カート関連一覧
      */
     List<CartItem> findActiveCartItemsByUserId(Long userId);
     CartItem findCartItem(@Param("userId") Long userId, @Param("productId") String productId);
@@ -31,27 +31,27 @@ public interface CM031000Mapper {
         @Param("updatedBy") String updatedBy);
 
     /**
-     * 상품 관련 리스트 조회 (선택된 카테고리 필터 포함)
+     * 商品一覧取得（選択カテゴリのフィルタ含む）
      *
-     * @param categories 선택된 카테고리 리스트
-     * @return 필터링된 상품 리스트
+     * @param categories 選択されたカテゴリ一覧
+     * @return フィルタ後の商品一覧
      */
     List<ProductInfo> selectNewProductList(@Param("categories") List<String> categories);
     ProductInfo selectProductDetail(@Param("productId") Long productId);
     List<String> selectProductDetailImages(@Param("productId") Long productId);
     
     /**
-     * 카테고리 그룹 코드 전체 리스트 조회
+     * カテゴリグループコード一覧取得
      * 
-     * @return 카테고리 그룹 코드 전체 리스트
+     * @return カテゴリグループコード一覧
      */
     List<Categories> findAllCategoryGroupCode();
 
     /**
-     * 선택 된 카테고리 그룹의 하위 카테고리 정보 조회
+     * 選択したカテゴリグループの下位カテゴリ情報取得
      * 
-     * @param categoryGroupCode 카테고리 그룹 코드드
-     * @return 하위 카테고리 정보
+     * @param categoryGroupCode カテゴリグループコード
+     * @return 下位カテゴリ情報
      */
     List<CategoryDetails> findCategory(@Param("categoryGroupCodes") List<String> categoryGroupCode);
 }

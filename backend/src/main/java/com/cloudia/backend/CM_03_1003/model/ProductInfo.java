@@ -15,20 +15,20 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductInfo {
-    private Long productId; // 상품ID
-    private String productCode; // 상품 코드
-    private String name; // 상품명
-    private int price; // 상품 가격
-    private int deliveryPrice; // 배달비
-    private String releaseDate; // 출고일
-    private String reservationDeadline; // 예약마감일
-    private int codeValue; // 코드 값
-    private String category; // 카테고리
-    private String categoryGroupName; // 카테고리 그룹 명
-    private String createdBy; // 등록자
-    private LocalDateTime createdAt; // 등록일
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일
-    private String thumbnailUrl; // 썸네일 이미지
-    private Integer availableQty; // 가용 재고 수량
+    private Long productId;             // 商品ID
+    private String productCode;         // 商品コード
+    private String name;                // 商品名
+    private int price;                  // 商品価格
+    private int deliveryPrice;          // 配送料
+    private String releaseDate;         // 出荷日
+    private String reservationDeadline; // 予約締切日
+    private int codeValue;              // コード値
+    private String category;            // カテゴリ
+    private String categoryGroupName;   // カテゴリグループ名
+    private String createdBy;           // 登録者
+    private LocalDateTime createdAt;    // 登録日
+    private String updatedBy;           // 更新者
+    private LocalDateTime updatedAt;    // 更新日
+    private String thumbnailUrl;        // サムネイル画像
+    private Integer availableQty;       // 利用可能在庫数
 }

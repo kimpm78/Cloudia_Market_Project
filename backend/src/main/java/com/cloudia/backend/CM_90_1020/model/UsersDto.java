@@ -16,30 +16,30 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsersDto {
-    private String memberNumber; // 사원 번호
-    private Integer roleId; // 사용자 권한
-    private String loginId; // 로그인 아이디
-    private String password; // 비밀번호
-    private String passwordConfirm; // 비밀번호 확인
-    private String email; // 이메일 주소
-    private String name; // 성명
-    private Integer genderValue; // 성별
-    private LocalDate birthDate; // 생년월일
-    private String nationality; // 국적/지역
-    private String phoneNumber; // 휴대폰 번호
-    private Boolean termsAgreed; // 이용 약관
-    private Integer userStatusValue; // 유저 상태
-    private String note; // 비고
-    private String postalCode;// 우편번호
-    private String addressMain;// 주소
-    private String addressDetail1;// 상세 주소 1
-    private String addressDetail2;// 상세 주소 2
-    private String addressDetail3;// 상세 주소 3
-    private LocalDateTime createdAt; // 가입일
-    private String updatedBy; // 업데이트자
-    private LocalDateTime updatedAt; // 업데이트일
-    private String refundAccountHolder;// 환불 예금주
-    private String refundAccountNumber;// 환불 계좌번호
-    private String refundAccountBank;// 환불 은행
-    private String pccc;// 통관 번호
+    private String memberNumber;        // 社員番号
+    private Integer roleId;             // ユーザー権限
+    private String loginId;             // ログインID
+    private String password;            // パスワード
+    private String passwordConfirm;     // パスワード確認
+    private String email;               // メールアドレス
+    private String name;                // 氏名
+    private Integer genderValue;        // 性別
+    private LocalDate birthDate;        // 生年月日
+    private String nationality;         // 国籍／地域
+    private String phoneNumber;         // 携帯電話番号
+    private Boolean termsAgreed;        // 利用規約
+    private Integer userStatusValue;    // ユーザーステータス
+    private String note;                // 備考
+    private String postalCode;          // 郵便番号
+    private String addressMain;         // 住所
+    private String addressDetail1;      // 住所詳細1
+    private String addressDetail2;      // 住所詳細2
+    private String addressDetail3;      // 住所詳細3
+    private LocalDateTime createdAt;    // 登録日
+    private String updatedBy;           // 更新者
+    private LocalDateTime updatedAt;    // 更新日
+    private String refundAccountHolder; // 返金口座名義
+    private String refundAccountNumber; // 返金口座番号
+    private String refundAccountBank;   // 返金銀行
+    private String pccc;                // 個人通関固有番号 (PCCC-KRのみ)
 }

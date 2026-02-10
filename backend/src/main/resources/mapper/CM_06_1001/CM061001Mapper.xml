@@ -4,12 +4,27 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.cloudia.backend.CM_06_1001.mapper.CM061001Mapper">
-    <!-- 주문번호 생성 -->
+    <!-- 注文番号生成 -->
     <select id="selectNextOrderNumber" resultType="string">
-        SELECT LPAD(nextval('order_number_seq')::text, 7, '0')
+        SELECT LPAD(
+            (
+                COALESCE(
+                    MAX(
+                        CASE
+                            WHEN order_number ~ '^[0-9]+$' THEN CAST(order_number AS BIGINT)
+                            ELSE NULL
+                        END
+                    ),
+                    0
+                ) + 1
+            )::text,
+            7,
+            '0'
+        )
+        FROM payments
     </select>
 
-    <!-- 회원별 주문번호 생성 (00001부터 시작) -->
+    <!-- 会員別の注文番号生成（00001から開始） -->
     <select id="selectNextOrderNumberByMember" resultType="string">
         SELECT LPAD(
             (
@@ -30,7 +45,7 @@
         WHERE member_number = #{memberNumber}
     </select>
 
-    <!-- 주문 저장 -->
+    <!-- 注文保存 -->
     <insert id="createOrder"
             parameterType="com.cloudia.backend.CM_06_1001.model.OrderInfo"
             useGeneratedKeys="true"
@@ -75,7 +90,7 @@
         )
     </insert>
 
-    <!-- 주문 상품 조회 -->
+    <!-- 注文商品取得 -->
     <select id="findOrderItems"
             parameterType="long"
             resultType="com.cloudia.backend.CM_06_1001.model.OrderItemInfo">
@@ -83,32 +98,32 @@
             od.order_detail_id AS orderItemId,
             od.member_number   AS memberNumber,
             od.order_number    AS orderNumber,
-            od.product_id      AS productId,
+            od.product_code    AS productId,
             od.quantity        AS quantity,
             od.unit_price      AS price,
             od.total_price     AS lineTotal,
-            p.name             AS productName,
-            p.delivery_price   AS shippingFee,
+            p.title            AS productName,
+            0                  AS shippingFee,
             pd.thumbnail_url   AS imageLink
         FROM order_details od
         JOIN orders o
             ON o.order_number = od.order_number
         LEFT JOIN products p
-            ON p.product_code = od.product_id
+            ON p.product_code = od.product_code
         LEFT JOIN product_details pd
             ON pd.product_id = p.product_id
         WHERE o.order_id = #{orderId}
         ORDER BY od.order_detail_id ASC
     </select>
 
-    <!-- 주문 소유자 조회 -->
+    <!-- 注文の所有者取得 -->
     <select id="findOrderOwner" resultType="string">
         SELECT member_number
         FROM orders
         WHERE order_id = #{orderId}
     </select>
 
-    <!-- 회원 이메일 조회 -->
+    <!-- 会員メールアドレス取得 -->
     <select id="findEmailByMemberNumber" resultType="string">
         SELECT u.email
         FROM users u
@@ -116,7 +131,7 @@
         LIMIT 1
     </select>
 
-    <!-- 주문 소유자 user_id 조회 -->
+    <!-- 注文所有者のuser_id取得 -->
     <select id="findOrderUserId" resultType="string">
         SELECT u.user_id::text
         FROM orders o
@@ -125,7 +140,7 @@
         WHERE o.order_id = #{orderId}
     </select>
 
-    <!-- 주문 요약 조회 -->
+    <!-- 注文サマリー取得 -->
     <select id="findOrderSummary"
             resultType="com.cloudia.backend.CM_06_1001.model.OrderSummary">
         SELECT
@@ -149,7 +164,7 @@
     </select>
 
 
-    <!-- 주문 + 회원 검증용 상세 조회 -->
+    <!-- 注文＋会員 検証用の詳細取得 -->
     <select id="selectOrderByIdAndMember"
             parameterType="map"
             resultType="com.cloudia.backend.CM_06_1001.model.OrderInfo">
@@ -175,7 +190,7 @@
     </select>
 
 
-    <!-- 주문 완료 처리 -->
+    <!-- 注文完了処理 -->
     <update id="updateOrderStatusToCompleted">
         UPDATE orders
         SET order_status_type  = '008',
@@ -185,7 +200,7 @@
         WHERE order_id = #{orderId}
     </update>
 
-    <!-- 주문 상품 저장 / 조회 -->
+    <!-- 注文商品 保存／取得 -->
     <insert id="insertOrderItem"
             parameterType="com.cloudia.backend.CM_06_1001.model.OrderItemInfo"
             useGeneratedKeys="true"
@@ -195,7 +210,7 @@
         INSERT INTO order_details (
             member_number,
             order_number,
-            product_id,
+            product_code,
             quantity,
             unit_price,
             total_price,
@@ -219,7 +234,7 @@
     </insert>
 
 
-    <!-- 주문 상세 삭제 (orderId 기준) -->
+    <!-- 注文詳細削除（orderId基準） -->
     <delete id="deleteOrderDetailsByOrderId">
         DELETE FROM order_details od
         USING orders o
@@ -227,7 +242,7 @@
           AND o.order_id = #{orderId}
     </delete>
 
-    <!-- 결제 저장 / 조회 / 업데이트 -->
+    <!-- 決済 保存/取得/更新 -->
     <insert id="insertPayment"
             parameterType="com.cloudia.backend.CM_06_1001.model.PaymentInfo">
 
@@ -236,7 +251,7 @@
             order_id,
             order_number,
             payment_type,
-            payment_method,
+            payment_code,
             payment_status_type,
             payment_status_code,
             amount,
@@ -249,13 +264,18 @@
             updated_at
         )
         VALUES (
-            #{paymentId},
+            (SELECT COALESCE(MAX(payment_id), 0) + 1 FROM payments),
             #{orderId},
             #{orderNumber},
             COALESCE(#{paymentType}, '011'),
-            #{paymentMethod},
+            CASE
+                WHEN UPPER(COALESCE(#{paymentMethod}, '')) = 'BANK' THEN 1
+                WHEN UPPER(COALESCE(#{paymentMethod}, '')) = 'CARD' THEN 2
+                WHEN #{paymentMethod} ~ '^[0-9]+$' THEN CAST(#{paymentMethod} AS BIGINT)
+                ELSE NULL
+            END,
             #{paymentStatusType},
-            #{paymentStatusCode},
+            CAST(#{paymentStatusCode} AS BIGINT),
             #{amount},
             #{transactionId},
             #{pgProvider},
@@ -267,7 +287,7 @@
         )
     </insert>
 
-    <!-- 결제 정보 업데이트 -->
+    <!-- 決済情報更新 -->
     <update id="updatePayment">
         UPDATE payments
         SET 
@@ -287,7 +307,7 @@
         WHERE payment_id = #{paymentId}
     </update>
 
-    <!-- 최신 결제 정보 조회 -->
+    <!-- 最新の決済情報取得 -->
     <select id="findLatestPayment"
             resultType="com.cloudia.backend.CM_06_1001.model.PaymentInfo">
 
@@ -298,7 +318,7 @@
         LIMIT 1
     </select>
 
-    <!-- 최신 결제 정보 조회 (orderId 기준) -->
+    <!-- 最新の決済情報取得（orderId基準） -->
     <select id="findLatestPaymentByOrderId"
             resultType="com.cloudia.backend.CM_06_1001.model.PaymentInfo">
         SELECT *
@@ -308,7 +328,7 @@
         LIMIT 1
     </select>
 
-    <!-- 최신 결제 정보 조회 (transactionId/TID 기준) -->
+    <!-- 最新の決済情報取得（transactionId/TID基準） -->
     <select id="findLatestPaymentByTransactionId"
             resultType="com.cloudia.backend.CM_06_1001.model.PaymentInfo">
         SELECT *
@@ -318,18 +338,18 @@
         LIMIT 1
     </select>
 
-    <!-- 배송지 주소 소유 검증 -->
+    <!-- 配送先住所の所有確認 -->
     <select id="existsActiveDeliveryAddress" resultType="boolean">
         SELECT EXISTS(
             SELECT 1
             FROM delivery_addresses
             WHERE address_id = #{addressId}
                 AND member_number = #{memberNumber}
-                AND is_active = 1
+                AND deleted_at IS NULL
         )
     </select>
 
-    <!-- 승인 성공/실패 > 결제 정보 업데이트 -->
+    <!-- 承認 成功／失敗 ＞ 決済情報更新 -->
     <update id="updatePaymentStatusOnApprove">
         UPDATE payments
         SET
@@ -342,7 +362,7 @@
         WHERE payment_id = #{paymentId}
     </update>
 
-    <!-- 승인 성공/실패 > 주문 상태 변경 -->
+    <!-- 承認 成功／失敗 ＞ 注文ステータス更新 -->
     <update id="updateOrderStatusOnApprove">
         UPDATE orders
         SET
@@ -356,7 +376,7 @@
                         LEFT JOIN LATERAL (
                             SELECT st.price
                             FROM stocks st
-                            WHERE st.product_code = od.product_id
+                            WHERE st.product_code = od.product_code
                             ORDER BY st.updated_at DESC NULLS LAST
                             LIMIT 1
                         ) s ON TRUE
@@ -374,7 +394,7 @@
         WHERE order_id = #{orderId}
     </update>
 
-    <!-- PG 승인 성공 시 순수익 갱신 -->
+    <!-- PG承認成功時に純利益を更新 -->
     <update id="updateOrderNetProfit">
         UPDATE orders
         SET
@@ -385,7 +405,7 @@
                     LEFT JOIN LATERAL (
                         SELECT st.price
                         FROM stocks st
-                        WHERE st.product_code = od.product_id
+                        WHERE st.product_code = od.product_code
                         ORDER BY st.updated_at DESC NULLS LAST
                         LIMIT 1
                     ) s ON TRUE
@@ -401,7 +421,7 @@
         WHERE order_id = #{orderId}
     </update>
 
-    <!-- PG 취소 > 결제 상태 변경 -->
+    <!-- PGキャンセル > 決済ステータス更新 -->
     <update id="updatePaymentStatusOnCancel">
         UPDATE payments
         SET
@@ -411,7 +431,7 @@
         WHERE payment_id = #{paymentId}
     </update>
 
-    <!-- 실패/닫힘 처리: 결제 상태를 실패로 변경 -->
+    <!-- 失敗/閉じる処理：決済ステータスを失敗に変更 -->
     <update id="updatePaymentStatusToFailed">
         UPDATE payments
         SET
@@ -422,24 +442,22 @@
         WHERE payment_id = #{paymentId}
     </update>
 
-    <!-- PG 취소 > 장바구니 비활성화 -->
+    <!-- PGキャンセル > カートを無効化 -->
     <update id="deactivateCartItemsByOrderId">
         UPDATE cart_items
         SET
-            is_active = 0,
+            is_display = '0',
             updated_by = COALESCE(#{updatedBy}, 'system'),
             updated_at = NOW()
-        WHERE is_active = 1
-          AND user_id = (
-              SELECT u.user_id
-              FROM users u
-              JOIN orders o
-                ON o.member_number = u.member_number
+        WHERE is_display = '1'
+          AND member_number = (
+              SELECT o.member_number
+              FROM orders o
               WHERE o.order_id = #{orderId}
               LIMIT 1
           )
-          AND product_id IN (
-              SELECT od.product_id
+          AND product_code IN (
+              SELECT od.product_code
               FROM order_details od
               JOIN orders o
                 ON o.order_number = od.order_number
@@ -447,7 +465,7 @@
           )
     </update>
 
-    <!-- PG 취소 > 주문 상태 변경 -->
+    <!-- PGキャンセル > 注文ステータス更新 -->
     <update id="updateOrderStatusOnCancel">
         UPDATE orders
         SET
@@ -456,37 +474,44 @@
         WHERE order_id = #{orderId}
     </update>
 
-    <!-- 장바구니 조회 및 비활성화 -->
+    <!-- カート取得および無効化 -->
     <select id="selectCartItemsForOrder"
             resultType="com.cloudia.backend.CM_06_1000.model.CartItemResponse">
         SELECT 
             ci.cart_item_id AS cartItemId,
-            ci.product_id AS productId,
-            p.name AS productName,
+            ci.product_code AS productId,
+            p.title AS productName,
             p.price AS productPrice,
             pd.thumbnail_url AS imageLink,
             ci.quantity,
             (p.price * ci.quantity) AS lineTotal,
-            p.delivery_price AS shippingFee
+            0 AS shippingFee
         FROM cart_items ci
         LEFT JOIN products p 
-               ON p.product_code = ci.product_id
+               ON (
+                   p.product_code = ci.product_code
+                   OR CAST(p.product_id AS VARCHAR) = ci.product_code
+               )
         LEFT JOIN product_details pd 
                ON pd.product_id = p.product_id
-        WHERE ci.user_id = #{userId}
-          AND ci.is_active = 1
-          AND p.is_display = 1
+        WHERE ci.member_number = (
+                  SELECT u.member_number
+                  FROM users u
+                  WHERE u.user_id = CAST(#{userId} AS BIGINT)
+              )
+          AND ci.is_display = '1'
+          AND CAST(p.is_display AS TEXT) = '1'
           AND ci.cart_item_id IN
               <foreach collection="cartItemIds" item="id" open="(" separator="," close=")">
                   #{id}
               </foreach>
     </select>
 
-    <!-- 장바구니 항목 비활성화 -->
+    <!-- カート項目の無効化 -->
     <update id="deactivateCartItems">
         UPDATE cart_items
         SET 
-            is_active = 0,
+            is_display = '0',
             updated_by = #{updatedBy},
             updated_at = NOW()
         WHERE cart_item_id IN
@@ -496,7 +521,7 @@
     </update>
 
 
-    <!-- 재고 감소 -->
+    <!-- 在庫減算 -->
     <update id="decreaseStock">
         UPDATE stocks
         SET 
@@ -507,7 +532,7 @@
           AND total_qty >= #{quantity}
     </update>
 
-    <!-- 재고 조회 및 관리 -->
+    <!-- 在庫取得および管理 -->
     <select id="findStockIdByProductCode" resultType="long">
         SELECT stock_id
         FROM stocks

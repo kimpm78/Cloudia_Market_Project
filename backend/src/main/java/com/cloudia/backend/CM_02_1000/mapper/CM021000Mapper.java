@@ -12,27 +12,27 @@ import com.cloudia.backend.CM_02_1000.model.CartItem;
 @Mapper
 public interface CM021000Mapper {
     /*
-     * 헤더 메뉴 조회
+     * ヘッダーメニュー取得
      */
     List<HeaderMenu> findHeaderMenus();
     /*
-     * 아이콘 메뉴 조회
+     * アイコンメニュー取得
      */
     List<HeaderMenu> findIconMenus(); 
     
     List<CartItem> findActiveCartItemsByUserId(Long userId);
     Integer selectCartTotalAmount(@Param("userId") Long userId);
     /**
-     * 헤더 배지 표시용 장바구니 아이템 개수 조회
+     * ヘッダーのバッジ表示用カート商品件数取得
      *
-     * @param userId 사용자 ID
-     * @return 담긴 상품 개수
+     * @param userId ユーザーID
+     * @return カート内の商品件数
      */
     Integer selectCartItemCount(@Param("userId") Long userId);
     /**
-     * 배너 전체 리스트 조회
+     * バナー一覧取得
      * 
-     * @return 배너 전체 리스트
+     * @return バナー一覧
      */
     List<BannerInfo> findByAllBanner();
 }

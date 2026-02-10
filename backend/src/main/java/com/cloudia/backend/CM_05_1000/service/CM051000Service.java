@@ -6,63 +6,63 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 
 import com.cloudia.backend.CM_05_1000.model.NoticeInfo;
-import com.cloudia.backend.CM_05_1000.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 
 public interface CM051000Service {
-    /**
-     * 공지사항 전체 리스트 조회
-     * 
-     * @return 공지사항 전체 리스트
-     */
-    ResponseEntity<ResponseModel<List<NoticeInfo>>> findByAllNotice();
+  /**
+   * お知らせ一覧（全件）取得
+   *
+   * @return お知らせ全件一覧
+   */
+  ResponseEntity<ResponseModel<List<NoticeInfo>>> findByAllNotice();
 
-    /**
-     * 특정 공지사항 리스트 조회
-     * 
-     * @param searchKeyword 키워드
-     * @param searchType    타입 (1:제목 + 내용, 2:제목, 3:내용)
-     * @return 배너 리스트
-     */
-    ResponseEntity<ResponseModel<List<NoticeInfo>>> getFindNotice(String searchKeyword, int searchType);
+  /**
+   * お知らせ検索取得
+   *
+   * @param searchKeyword キーワード
+   * @param searchType    タイプ（1: タイトル+本文、2: タイトル、3: 本文）
+   * @return お知らせ一覧
+   */
+  ResponseEntity<ResponseModel<List<NoticeInfo>>> getFindNotice(String searchKeyword, int searchType);
 
-    /**
-     * 특정 공지사항 및 이전/다음 공지사항 조회
-     * 
-     * @param noticeId 공지사항 아이디
-     * @return Map 구조로 current, prev, next 공지사항 객체 반환
-     */
-    ResponseEntity<ResponseModel<Map<String, NoticeInfo>>> getFindIdNotice(int noticeId);
+  /**
+   * 特定のお知らせおよび前後（前/次）のお知らせ取得
+   *
+   * @param noticeId お知らせID
+   * @return Map形式で current, prev, next のお知らせオブジェクトを返却
+   */
+  ResponseEntity<ResponseModel<Map<String, NoticeInfo>>> getFindIdNotice(int noticeId);
 
-    /**
-     * 공지사항 조회수 증가 (하루 1회 제한)
-     *
-     * @param noticeId 공지사항 ID
-     * @param viewerKey 뷰어 키
-     * @return 증가 여부
-     */
-    boolean increaseViewOncePerDay(int noticeId, String viewerKey);
+  /**
+   * お知らせ閲覧数の増加（1日1回まで）
+   *
+   * @param noticeId  お知らせID
+   * @param viewerKey ビューアーキー
+   * @return 増加可否
+   */
+  boolean increaseViewOncePerDay(int noticeId, String viewerKey);
 
-    /**
-     * 공지사항 등록
-     * 
-     * @param entity 등록 할 공지사항 정보
-     * @return 등록 여부
-     */
-    ResponseEntity<ResponseModel<Integer>> noticeUpload(NoticeInfo entity);
+  /**
+   * お知らせ登録
+   *
+   * @param entity 登録するお知らせ情報
+   * @return 登録結果
+   */
+  ResponseEntity<ResponseModel<Integer>> noticeUpload(NoticeInfo entity);
 
-    /**
-     * 공지사항 업데이트
-     * 
-     * @param entity 업데이트 할 공지사항 정보
-     * @return 업데이트 여부
-     */
-    ResponseEntity<ResponseModel<Integer>> noticeUpdate(NoticeInfo entity);
+  /**
+   * お知らせ更新
+   *
+   * @param entity 更新するお知らせ情報
+   * @return 更新結果
+   */
+  ResponseEntity<ResponseModel<Integer>> noticeUpdate(NoticeInfo entity);
 
-    /**
-     * 공지사항 삭제
-     * 
-     * @param noticeId 삭제할 공지사항 ID
-     * @return 삭제 처리 결과
-     */
-    ResponseEntity<ResponseModel<Integer>> deleteNotice(Long noticeId);
+  /**
+   * お知らせ削除
+   *
+   * @param noticeId 削除するお知らせID
+   * @return 削除処理結果
+   */
+  ResponseEntity<ResponseModel<Integer>> deleteNotice(Long noticeId);
 }

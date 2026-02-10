@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudia.backend.common.mapper.CountryMapper">
+
+    <select id="findAll" resultType="com.cloudia.backend.common.model.Country">
+        SELECT
+            iso_code,
+            phone_code,
+            name_kr,
+            name_en,
+            name_jp
+        FROM
+            countries
+        ORDER BY
+            iso_code ASC
+    </select>
+
+</mapper>

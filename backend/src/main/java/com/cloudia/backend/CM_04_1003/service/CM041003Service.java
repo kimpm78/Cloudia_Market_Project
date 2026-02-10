@@ -8,7 +8,7 @@ import com.cloudia.backend.CM_04_1003.model.QnaCreateResponse;
 import com.cloudia.backend.CM_04_1003.model.QnaDetailResponse;
 import com.cloudia.backend.CM_04_1003.model.QnaListResponse;
 import com.cloudia.backend.CM_04_1003.model.QnaSummary;
-import com.cloudia.backend.CM_04_1003.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 
 public interface CM041003Service {
 

@@ -18,25 +18,25 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategorySaveRequest {
-    private List<CategoryItem> created; // 신규 생성
-    private List<CategoryItem> updated; // 수정
-    private List<DeleteItem> deleted; // 삭제
-    private LocalDateTime maxUpdatedAt; // 최신 업데이트날짜
+    private List<CategoryItem> created; // 新規作成
+    private List<CategoryItem> updated; // 更新
+    private List<DeleteItem> deleted;   // 削除
+    private LocalDateTime maxUpdatedAt; // 最新更新日時
 
     @Data
     public static class CategoryItem {
-        private String id; // 기존 ID (수정 시에만)
-        private String title; // 카테고리명
-        private Integer order; // 순서
-        private String parentId; // 부모 ID (null이면 그룹)
-        private String newParentId; // 새로운 부모 ID (SET 절용)
-        private String type; // "group" 또는 "category"
+        private String id;              // 既存ID（更新時のみ）
+        private String title;           // カテゴリ名
+        private Integer order;          // 順序
+        private String parentId;        // 親ID（nullの場合はグループ）
+        private String newParentId;     // 新しい親ID（SET句用）
+        private String type;            // "group" または "category"
     }
 
     @Data
     public static class DeleteItem {
-        private String id; // 삭제할 ID
-        private String parentId; // 부모 ID (null이면 그룹)
-        private String type; // "group" 또는 "category"
+        private String id;              // 削除対象ID
+        private String parentId;        // 親ID（nullの場合はグループ）
+        private String type;            // "group" または "category"
     }
 }

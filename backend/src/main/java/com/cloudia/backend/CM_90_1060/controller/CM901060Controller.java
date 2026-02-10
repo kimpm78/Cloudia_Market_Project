@@ -15,10 +15,10 @@ import com.cloudia.backend.CM_90_1060.model.Categories;
 import com.cloudia.backend.CM_90_1060.model.CategoryDetails;
 import com.cloudia.backend.CM_90_1060.model.ProductUpt;
 import com.cloudia.backend.CM_90_1060.model.RequestModel;
-import com.cloudia.backend.CM_90_1060.model.ResponseModel;
 import com.cloudia.backend.CM_90_1060.model.ResponseProducts;
 import com.cloudia.backend.CM_90_1060.model.Stock;
 import com.cloudia.backend.CM_90_1060.service.CM901060Service;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.config.jwt.JwtTokenProvider;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,14 +32,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Slf4j
 @RequestMapping("/api/admin")
 public class CM901060Controller {
-    // Service 정의
     private final CM901060Service cm901060Service;
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 상품 전체 리스트 조회
+     * 商品全件リスト取得
      * 
-     * @return 상품 전체 리스트
+     * @return 商品全件リスト
      */
     @GetMapping("/product/findAll")
     public ResponseEntity<ResponseModel<List<ResponseProducts>>> getfindAllProduct() {
@@ -47,11 +46,11 @@ public class CM901060Controller {
     }
 
     /**
-     * 특정 상품 리스트 조회
+     * 特定商品リスト取得
      * 
-     * @param searchTerm 키워드
-     * @param searchType 타입 (1:상품 코드, 2:상품 명)
-     * @return 상품 리스트
+     * @param searchTerm キーワード
+     * @param searchType 種別 (1:商品コード, 2:商品名)
+     * @return 商品リスト
      */
     @GetMapping("/product/findProduct")
     public ResponseEntity<ResponseModel<List<ResponseProducts>>> getFindProduct(@RequestParam String searchTerm,
@@ -60,10 +59,10 @@ public class CM901060Controller {
     }
 
     /**
-     * 특정 상품 조회
+     * 特定商品取得
      * 
-     * @param productId 상품 코드
-     * @return 특정 상품 리스트
+     * @param productId 商品コード
+     * @return 特定商品
      */
     @GetMapping("/product/findByProductCode")
     public ResponseEntity<ResponseModel<ProductUpt>> findByProductCode(@RequestParam int productId) {
@@ -71,10 +70,10 @@ public class CM901060Controller {
     }
 
     /**
-     * 상품 삭제
+     * 商品削除
      * 
-     * @param productIds 삭제 아이디 리스트
-     * @return 삭제 여부
+     * @param productIds 削除対象IDリスト
+     * @return 削除結果
      */
     @DeleteMapping("/product/del")
     public ResponseEntity<ResponseModel<Integer>> delProduct(@RequestBody List<Integer> productIds,
@@ -86,52 +85,52 @@ public class CM901060Controller {
     }
 
     /**
-     * 카테고리 그룹 코드 전체 리스트 조회
+     * カテゴリグループコード全件リスト取得
      * 
-     * @return 카테고리 그룹 코드 전체 리스트
+     * @return カテゴリグループコード全件リスト
      */
     @GetMapping("/product/categoryGroupCode")
     public ResponseEntity<ResponseModel<List<Categories>>> findAllCategoryGroupCode() {
-        log.info("카테고리 그룹 코드 리스트 조회 Start");
+        log.info("カテゴリグループコード一覧取得 Start");
         ResponseEntity<ResponseModel<List<Categories>>> response = cm901060Service.findAllCategoryGroupCode();
-        log.info("카테고리 그룹 코드 리스트 조회 End");
+        log.info("カテゴリグループコード一覧取得 End");
         return response;
     }
 
     /**
-     * 등록 가능한 재고 리스트 조회
+     * 登録可能な在庫リスト取得
      * 
-     * @return 재고 리스트
+     * @return 在庫リスト
      */
     @GetMapping("/product/stockCode")
     public ResponseEntity<ResponseModel<List<Stock>>> findAllStockCode() {
-        log.info("재고 코드 리스트 조회 Start");
+        log.info("在庫コード一覧取得 Start");
         ResponseEntity<ResponseModel<List<Stock>>> response = cm901060Service.findAllStockCode();
-        log.info("재고 코드 리스트 조회 End");
+        log.info("在庫コード一覧取得 End");
         return response;
     }
 
     /**
-     * 선택 된 카테고리 그룹의 하위 카테고리 정보 조회
+     * 選択されたカテゴリグループの下位カテゴリ情報取得
      * 
-     * @param categoryGroupCode 카테고리 그룹 코드드
-     * @return 하위 카테고리 정보
+     * @param categoryGroupCodes カテゴリグループコード
+     * @return 下位カテゴリ情報
      */
     @PostMapping("/product/findCategory")
     public ResponseEntity<ResponseModel<List<CategoryDetails>>> findCategory(
             @RequestBody List<String> categoryGroupCodes) {
-        log.info("특정 하위 카테고리 정보 조회 Start");
+        log.info("特定下位カテゴリ情報取得 Start");
         ResponseEntity<ResponseModel<List<CategoryDetails>>> response = cm901060Service
                 .findCategory(categoryGroupCodes);
-        log.info("특정 하위 카테고리 정보 조회 End");
+        log.info("特定下位カテゴリ情報取得 End");
         return response;
     }
 
     /**
-     * 상품 등록
+     * 商品登録
      * 
-     * @param entity 등록 할 상품 정보
-     * @return 상품 여부
+     * @param entity 登録する商品情報
+     * @return 登録結果
      */
     @PostMapping("/product/upload")
     public ResponseEntity<ResponseModel<Integer>> productUpload(@ModelAttribute RequestModel entity,
@@ -143,10 +142,10 @@ public class CM901060Controller {
     }
 
     /**
-     * 상품 수정
+     * 商品更新
      * 
-     * @param entity 수정 할 상품 정보
-     * @return 상품 수정 여부
+     * @param entity 更新する商品情報
+     * @return 更新結果
      */
     @PostMapping("/product/update")
     public ResponseEntity<ResponseModel<Integer>> productUpdate(@ModelAttribute RequestModel entity,
@@ -158,10 +157,10 @@ public class CM901060Controller {
     }
 
     /**
-     * 이미지 등록
+     * 画像登録
      * 
-     * @param file 등록 할 이미지 정보
-     * @return 등록 여부
+     * @param file 登録する画像ファイル
+     * @return 登録結果
      */
     @PostMapping("/product/image/upload")
     public ResponseEntity<ResponseModel<String>> postImageUpload(@RequestBody MultipartFile file) {

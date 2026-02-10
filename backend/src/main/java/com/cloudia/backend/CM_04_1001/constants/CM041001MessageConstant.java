@@ -3,42 +3,42 @@ package com.cloudia.backend.CM_04_1001.constants;
 public class CM041001MessageConstant {
     private CM041001MessageConstant() {
     }
-    // ========================================
-    // 리뷰/후기 댓글 관련
-    // ========================================
 
-    // 등록
-    public static final String COMMENT_CREATE_SUCCESS = "댓글이 성공적으로 등록되었습니다.";
-    public static final String COMMENT_CREATE_FAIL = "댓글 등록 중 오류가 발생했습니다.";
+    // 登録
+    public static final String COMMENT_CREATE_SUCCESS = "コメントが正常に登録されました。";
+    public static final String COMMENT_CREATE_FAIL = "コメント登録中にエラーが発生しました。";
 
-    // 수정
-    public static final String COMMENT_UPDATE_SUCCESS = "댓글이 성공적으로 수정되었습니다.";
-    public static final String COMMENT_UPDATE_FAIL = "댓글 수정 중 오류가 발생했습니다.";
+    // 修正
+    public static final String COMMENT_UPDATE_SUCCESS = "コメントが正常に修正されました。";
+    public static final String COMMENT_UPDATE_FAIL = "コメント修正中にエラーが発生しました。";
 
-    // 삭제
-    public static final String COMMENT_DELETE_SUCCESS = "댓글이 성공적으로 삭제되었습니다.";
-    public static final String COMMENT_DELETE_FAIL = "댓글 삭제 중 오류가 발생했습니다.";
+    // 削除
+    public static final String COMMENT_DELETE_SUCCESS = "コメントが正常に削除されました。";
+    public static final String COMMENT_DELETE_FAIL = "コメント削除中にエラーが発生しました。";
 
-    // 조회
-    public static final String COMMENT_FETCH_SUCCESS = "댓글 목록 조회 성공";
-    public static final String COMMENT_FETCH_EMPTY = "등록된 댓글이 없습니다.";
+    // 取得
+    public static final String COMMENT_FETCH_SUCCESS = "コメント一覧の取得に成功しました";
+    public static final String COMMENT_FETCH_EMPTY = "登録されたコメントがありません。";
 
-    // 대댓글 / 트리 구조
-    public static final String COMMENT_TREE_FETCH_SUCCESS = "댓글 트리 조회 성공";
-    public static final String COMMENT_TREE_EMPTY = "등록된 댓글/대댓글이 없습니다.";
-    public static final String REPLY_CREATE_SUCCESS = "대댓글이 성공적으로 등록되었습니다.";
-    public static final String REPLY_CREATE_FAIL = "대댓글 등록 중 오류가 발생했습니다.";
+    // 返信コメント / ツリー構造
+    public static final String COMMENT_TREE_FETCH_SUCCESS = "コメントツリーの取得に成功しました";
+    public static final String COMMENT_TREE_EMPTY = "登録されたコメント/返信コメントがありません。";
+    public static final String REPLY_CREATE_SUCCESS = "返信コメントが正常に登録されました。";
+    public static final String REPLY_CREATE_FAIL = "返信コメント登録中にエラーが発生しました。";
 
-    // 부모 댓글 유효성
-    public static final String COMMENT_PARENT_NOT_FOUND = "부모 댓글을 찾을 수 없습니다.";
-    public static final String COMMENT_SELF_REPLY_FORBIDDEN = "본인 댓글에는 답글을 작성할 수 없습니다.";
+    // 親コメントの有効性
+    public static final String COMMENT_PARENT_NOT_FOUND = "親コメントが見つかりません。";
+    public static final String COMMENT_SELF_REPLY_FORBIDDEN = "自分のコメントには返信できません。";
 
-    // 댓글 유효성/예외
-    public static final String COMMENT_VALIDATION_FAIL = "댓글 유효성 검사 실패: {}";
-    public static final String COMMENT_DB_ERROR = "댓글 처리 중 DB 오류 발생: {}";
-    public static final String COMMENT_UNEXPECTED_ERROR = "댓글 처리 중 예상치 못한 오류 발생: {}";
+    // コメントのバリデーション/例外
+    public static final String COMMENT_VALIDATION_FAIL = "コメントのバリデーションに失敗しました: {}";
+    public static final String COMMENT_DB_ERROR = "コメント処理中にDBエラーが発生しました: {}";
+    public static final String COMMENT_UNEXPECTED_ERROR = "コメント処理中に予期しないエラーが発生しました: {}";
 
-    // 인증 (권한)
-    public static final String AUTH_REQUIRED = "로그인이 필요합니다.";
-    public static final String AUTH_FORBIDDEN = "권한이 없습니다.";
+    // 認証（権限）
+    public static final String AUTH_REQUIRED = "ログインが必要です。";
+    public static final String AUTH_FORBIDDEN = "権限がありません。";
+
+    // ログ
+    public static final String COMMENT_SOFT_DELETE_CALLED = "softDeleteComment 呼び出し: reviewId={}, reviewCommentId={}, userId={}";
 }

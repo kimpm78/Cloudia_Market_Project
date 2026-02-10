@@ -6,15 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 장바구니 담기 검증용 상품 메타 정보
+ * カート追加検証用の商品メタ情報
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartProductMeta {
-    private String productId; // 상품 코드
-    private String releaseMonth; // 출시월
-    private Boolean reservation; // 예약상품 여부
-    private Integer purchaseLimit; // 최대 구매 수량
+    private String productId;       // 商品コード
+    private String releaseMonth;    // 発売月
+    private Boolean reservation;    // 予約商品 有無
+    private Integer purchaseLimit;  // 最大購入数量
 }

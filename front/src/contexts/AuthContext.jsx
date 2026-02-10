@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
-  // 앱 로드(새로고침) 시 토큰 복구
+  // アプリ起動（リロード）時にトークンを復元
   useEffect(() => {
     const initAuth = async () => {
       const wasLoggedIn = localStorage.getItem('isConnected');
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        // 쿠키에 있는 리프레시 토큰으로 AccessToken 요청
+        // Cookie内のリフレッシュトークンでAccessTokenを再発行
         const response = await authClient.post('/auth/refresh');
 
         const result = response.data.resultList;
@@ -42,10 +42,10 @@ export const AuthProvider = ({ children }) => {
           setAccessToken(result.accessToken);
           dispatch({ type: 'LOGIN', payload: result.user });
         } else {
-          throw new Error('토큰이 없습니다.');
+          throw new Error('トークンがありません。');
         }
       } catch (error) {
-        console.warn('세션 만료됨:', error);
+        console.warn('セッションが期限切れ:', error);
         localStorage.removeItem('isConnected');
         setAccessToken(null);
         dispatch({ type: 'LOGOUT' });
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  // 로그인
+  // ログイン
   const login = async (loginId, password) => {
     try {
       const response = await axiosPublic.post(
@@ -68,21 +68,21 @@ export const AuthProvider = ({ children }) => {
       const result = response.data.resultList;
 
       if (result) {
-        setAccessToken(result.accessToken); // 메모리에 저장
-        localStorage.setItem('isConnected', '1'); // 로그인 흔적 남기기
-        dispatch({ type: 'LOGIN', payload: result.user }); // 상태 업데이트
+        setAccessToken(result.accessToken); // メモリに保存
+        localStorage.setItem('isConnected', '1'); // ログイン状態を保持
+        dispatch({ type: 'LOGIN', payload: result.user }); // 状態を更新
         return true;
       }
 
-      throw new Error('토큰이 없습니다.');
+      throw new Error('トークンがありません。');
     } catch (e) {
-      console.error('로그인 에러:', e);
+      console.error('ログインエラー:', e);
 
-      let errorMessage = '아이디 또는 비밀번호를 확인해주세요.';
+      let errorMessage = 'ログインIDまたはパスワードをご確認ください。';
       if (e.response && e.response.data) {
         const backendError = e.response.data.message || e.response.data.error;
         if (backendError) {
-          // 에러 메시지 파싱 로직은 그대로 유지
+          // エラーメッセージのパースロジックは従来どおり
           if (backendError.startsWith('DORMANT_ACCOUNT:'))
             errorMessage = backendError.substring('DORMANT_ACCOUNT:'.length);
           else if (backendError.startsWith('INACTIVE_ACCOUNT:'))
@@ -115,6 +115,6 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('AuthContext Error');
+  if (!context) throw new Error('AuthContext エラー');
   return context;
 };

@@ -22,8 +22,8 @@ import com.cloudia.backend.CM_90_1040.constants.CM901040MessageConstant;
 import com.cloudia.backend.constants.CMMessageConstant;
 import com.cloudia.backend.CM_90_1040.mapper.CM901040Mapper;
 import com.cloudia.backend.CM_90_1040.model.BannerInfo;
-import com.cloudia.backend.CM_90_1040.model.ResponseModel;
 import com.cloudia.backend.CM_90_1040.service.CM901040Service;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.common.exception.AuthenticationException;
 import com.cloudia.backend.common.exception.ErrorCode;
 import com.cloudia.backend.common.log.LogHelper;
@@ -61,10 +61,10 @@ public class CM901040ServiceImpl implements CM901040Service {
     private final DateCalculator dateCalculator;
 
     /**
-     * 배너 삭제
-     * 
-     * @param entity 배너 삭제 항목 리스트
-     * @return 삭제 여부
+     * バナー削除
+     *
+     * @param entity 削除対象のバナーリスト
+     * @return 削除結果
      */
     @Override
     @Transactional
@@ -126,9 +126,9 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 배너 전체 리스트 조회
-     * 
-     * @return 배너 전체 리스트
+     * バナー全件一覧取得
+     *
+     * @return バナー一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -158,10 +158,10 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 특정 배너 리스트 조회
-     * 
-     * @param searchTerm 배너명
-     * @return 배너 리스트
+     * バナー検索
+     *
+     * @param searchTerm バナー名
+     * @return バナー一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -198,10 +198,10 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 업데이트용 배너 리스트 조회
-     * 
-     * @param bannerId 배너 아이디
-     * @return 배너 리스트
+     * 更新用バナー取得
+     *
+     * @param bannerId バナーID
+     * @return バナー情報
      */
     @Override
     @Transactional(readOnly = true)
@@ -237,17 +237,17 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 배너 등록
-     * 
-     * @param entity 등록할 배너 정보
-     * @return 등록 여부
+     * バナー登録
+     *
+     * @param entity 登録するバナー情報
+     * @return 登録結果
      */
     @Override
     @Transactional
     public ResponseEntity<ResponseModel<Integer>> bannerUpload(BannerInfo entity, String userId) {
         log.info(CM901040MessageConstant.BANNER_UPLOAD_START, entity != null ? entity.getBannerName() : "null");
         if (null == userId || userId.isBlank()) {
-            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "배너 조회" });
+            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "バナー照会" });
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
         try {
@@ -301,10 +301,10 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 배너 업데이트
-     * 
-     * @param entity 업데이트할 배너 정보
-     * @return 업데이트 여부
+     * バナー更新
+     *
+     * @param entity 更新するバナー情報
+     * @return 更新結果
      */
     @Override
     @Transactional
@@ -314,7 +314,7 @@ public class CM901040ServiceImpl implements CM901040Service {
                 entity != null ? entity.getBannerName() : "null");
 
         if (null == userId || userId.isBlank()) {
-            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "배너 조회" });
+            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "バナー照会" });
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
 
@@ -394,9 +394,9 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 사용 가능한 디스플레이 번호 리스트 조회
-     * 
-     * @return 디스플레이 번호 리스트
+     * 使用可能な表示順リスト取得
+     *
+     * @return 表示順リスト
      */
     @Override
     @Transactional(readOnly = true)
@@ -426,10 +426,10 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 이미지 파일 형식 검증
-     * 
-     * @param file 파일
-     * @return 유효한 이미지 파일 여부
+     * 画像ファイル形式の検証
+     *
+     * @param file ファイル
+     * @return 有効な画像ファイルかどうか
      */
     private boolean isValidImageFile(MultipartFile file) {
         String originalFileName = file.getOriginalFilename();
@@ -447,9 +447,9 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 사용중인 배너 개수 조회
-     * 
-     * @return 사용중인 배너 개수
+     * 使用中バナー件数取得
+     *
+     * @return 使用中バナー件数
      */
     private int findByUsedAllBanner() {
         try {
@@ -461,10 +461,10 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 배너 표시 순서 중복 확인
-     * 
-     * @param displayOrder 표시 순서
-     * @return 중복 여부
+     * 表示順の重複チェック
+     *
+     * @param displayOrder 表示順
+     * @return 重複している場合は true
      */
     private boolean isDisplayOrderDuplicated(int displayOrder) {
         try {
@@ -476,11 +476,11 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 배너 업데이트 실행
-     * 
-     * @param entity        배너 정보
-     * @param savedFileName 저장된 파일명
-     * @return 업데이트 결과
+     * バナー更新実行
+     *
+     * @param entity        バナー情報
+     * @param savedFileName 保存されたファイル名
+     * @return 更新結果
      */
     private int updateBanner(BannerInfo entity, String savedFileName, String userId) {
         BannerInfo bannerModel = new BannerInfo();
@@ -504,11 +504,11 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 배너 등록 실행
-     * 
-     * @param entity        배너 정보
-     * @param savedFileName 저장된 파일명
-     * @return 등록 결과
+     * バナー登録実行
+     *
+     * @param entity        バナー情報
+     * @param savedFileName 保存されたファイル名
+     * @return 登録結果
      */
     private int insertBanner(BannerInfo entity, String savedFileName, String userId) {
         BannerInfo bannerModel = new BannerInfo();
@@ -531,20 +531,20 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 파일 저장
-     * 
-     * @param file 파일 정보
-     * @return 저장된 파일 URL (실패 시 null)
+     * ファイル保存
+     *
+     * @param file ファイル情報
+     * @return 保存されたファイルURL（失敗時は null）
      */
     private String saveFile(MultipartFile file) throws IOException, SecurityException {
 
-        // 추가 보안 검증
+        // 追加のセキュリティ検証
         if (!isValidImageFile(file)) {
             log.error(CM901040MessageConstant.FAIL_INVALID_FILE_TYPE);
             return null;
         }
 
-        // S3 업로드 사용
+        // S3アップロードを使用
         if ("s3".equals(uploadType) && s3Service != null) {
             try {
                 String fileUrl = s3Service.uploadFile(file, "images/banner");
@@ -557,7 +557,7 @@ public class CM901040ServiceImpl implements CM901040Service {
             }
         }
 
-        // 로컬 저장
+        // ローカル保存
         Path uploadPath = Paths.get(uploadDir, CM901040Constant.UPLOAD_PATH);
         log.debug(CM901040MessageConstant.FILE_UPLOAD_PATH_DEBUG, uploadPath.toString());
         try {
@@ -598,10 +598,10 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 보안을 위한 랜덤 문자열 생성
-     * 
-     * @param length 생성할 문자열 길이
-     * @return 랜덤 문자열
+     * セキュリティ向けランダム文字列生成
+     *
+     * @param length 生成する文字列の長さ
+     * @return ランダム文字列
      */
     private String generateSecureRandomString(int length) {
         SecureRandom random = new SecureRandom();
@@ -616,9 +616,9 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * 이미지 파일 삭제
-     * 
-     * @param imageLink 파일 링크
+     * 画像ファイル削除
+     *
+     * @param imageLink ファイルリンク
      * @throws IOException
      */
     private void deleteImageFile(String imageLink) throws IOException {
@@ -627,7 +627,7 @@ public class CM901040ServiceImpl implements CM901040Service {
             return;
         }
 
-        // imageLink가 /banner/로 시작하는 경우 제거
+        // imageLink が /banner/ で始まる場合は除去
         String cleanImageLink = imageLink.startsWith(CM901040Constant.BANNER_PATH_PREFIX)
                 ? imageLink.substring(CM901040Constant.BANNER_PATH_PREFIX.length())
                 : imageLink;
@@ -643,11 +643,11 @@ public class CM901040ServiceImpl implements CM901040Service {
     }
 
     /**
-     * ResponseModel 생성
-     * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    메시지
+     * ResponseModel 生成
+     *
+     * @param resultList 結果データ
+     * @param result     処理結果
+     * @param message    メッセージ
      * @return ResponseModel
      */
     private <T> ResponseModel<T> createResponseModel(T resultList, boolean result, String message) {

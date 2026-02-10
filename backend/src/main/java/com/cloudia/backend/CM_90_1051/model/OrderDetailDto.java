@@ -14,9 +14,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetailDto {
-    private Integer orderDetailId; // 주문 상세 ID
-    private String productName; // 상품명
-    private String quantity; // 수량
-    private String totalPrice; // 총 가격
-    private String unitPrice; // 개당 금액
+    private Integer orderDetailId;  // 注文詳細ID
+    private String productName;     // 商品名
+    private String quantity;        // 数量
+    private String totalPrice;      // 合計金額
+    private String unitPrice;       // 単価
 }

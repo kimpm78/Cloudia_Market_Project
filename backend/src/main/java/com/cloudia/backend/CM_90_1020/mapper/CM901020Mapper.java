@@ -12,58 +12,58 @@ import com.cloudia.backend.CM_90_1020.model.UsersDto;
 @Mapper
 public interface CM901020Mapper {
     /**
-     * 유저 전체 리스트 조회
+     * ユーザー全件一覧を取得
      * 
-     * @return 유저 전체 리스트
+     * @return ユーザー全件一覧
      */
     List<UsersDto> findByAllUsers();
 
     /**
-     * 유저 조회
+     * ユーザー検索
      * 
-     * @param searchTerm 키워드
-     * @param searchType 타입 (1:사원 번호, 2:ID)
-     * @return 유저 리스트
+     * @param searchTerm キーワード
+     * @param searchType タイプ（1:社員番号、2:ID）
+     * @return ユーザー一覧
      */
     List<UsersDto> findByUsers(@Param("searchTerm") String searchTerm, @Param("searchType") int searchType);
 
     /**
-     * 특정 유저 조회
+     * 特定ユーザーを取得
      * 
-     * @param searchTerm 키워드
-     * @return 유저 리스트
+     * @param searchTerm キーワード
+     * @return ユーザー情報
      */
     UsersDto findByUser(@Param("searchTerm") String searchTerm);
 
     /**
-     * 유저 업데이트
+     * ユーザー更新
      * 
-     * @param entity 유저 정보
-     * @return 업데이트 결과
+     * @param entity ユーザー情報
+     * @return 更新結果
      */
     int userUpload(UsersDto entity);
 
     /**
-     * 비밀번호 히스토리 저장
+     * パスワード履歴を保存
      * 
-     * @param entity 유저 정보
-     * @return 업데이트 결과
+     * @param entity ユーザー情報
+     * @return 更新結果
      */
     int insertPasswordHistory(UsersDto entity);
 
     /**
-     * 주소 업데이트
+     * 住所を更新
      * 
-     * @param entity 주소 정보
-     * @return 업데이트 결과
+     * @param entity 住所情報
+     * @return 更新結果
      */
     int addressUpload(UsersDto entity);
 
     /**
-     * 비밀번호 히스토리 조회
+     * パスワード履歴を取得
      * 
-     * @param memberNumber 사원 번호
-     * @return 비밀번호 히스토리 리스트
+     * @param memberNumber 社員番号
+     * @return パスワード履歴一覧
      */
     List<PasswordHistoryDto> findRecentPasswordHistory(@Param("memberNumber") String memberNumber,
             @Param("sixMonthsAgo") LocalDateTime sixMonthsAgo);

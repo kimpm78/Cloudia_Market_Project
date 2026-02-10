@@ -3,7 +3,6 @@ package com.cloudia.backend.CM_04_1000.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,11 +16,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudia.backend.CM_04_1000.constants.CM041000MessageConstant;
 import com.cloudia.backend.CM_04_1000.model.OrderDetailResponse;
-import com.cloudia.backend.CM_04_1000.model.ResponseModel;
 import com.cloudia.backend.CM_04_1000.model.ReviewInfo;
 import com.cloudia.backend.CM_04_1000.model.ReviewRequest;
 import com.cloudia.backend.CM_04_1000.service.CM041000Service;
 import com.cloudia.backend.config.jwt.JwtTokenProvider;
+import com.cloudia.backend.common.model.ResponseModel;
 
 import org.springframework.util.DigestUtils;
 
@@ -35,16 +34,14 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/guest")
-@CrossOrigin(origins = "*")
 public class CM041000Controller {
-    // Service 정의
     private final CM041000Service cm041000Service;
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 리뷰 전체 목록 조회
+     * レビュー一覧を取得
      *
-     * @return 리뷰 목록
+     * @return レビュー一覧
      */
     @GetMapping("/reviews")
     public ResponseEntity<ResponseModel<List<ReviewInfo>>> getAllReviews() {
@@ -60,7 +57,7 @@ public class CM041000Controller {
     }
 
     /**
-     * 리뷰 등록 (이미지 포함)
+     * レビュー登録（画像あり）
      */
     @PostMapping("/reviews/upload")
     public ResponseEntity<ResponseModel<Long>> createReviewWithImage(
@@ -76,7 +73,7 @@ public class CM041000Controller {
     }
 
     /**
-     * 리뷰 수정 (이미지 포함)
+     * レビュー更新（画像あり）
      */
     @PostMapping("/reviews/update")
     public ResponseEntity<ResponseModel<Boolean>> updateReviewWithImage(
@@ -92,7 +89,7 @@ public class CM041000Controller {
     }
 
     /**
-     * 리뷰 본문 에디터 이미지 업로드
+     * レビュー本文エディタ画像アップロード
      */
     @PostMapping("/reviews/image/upload")
     public ResponseEntity<ResponseModel<String>> uploadEditorImage(@RequestParam("file") MultipartFile file) {
@@ -100,10 +97,10 @@ public class CM041000Controller {
     }
 
     /**
-     * 리뷰 상세 조회
+     * レビュー詳細を取得
      *
-     * @param reviewId 리뷰 ID
-     * @return 리뷰 단건
+     * @param reviewId レビューID
+     * @return レビュー（単件）
      */
     @GetMapping("/reviews/{reviewId}")
     public ResponseEntity<ResponseModel<ReviewInfo>> getReviewById(@PathVariable Long reviewId) {
@@ -126,10 +123,10 @@ public class CM041000Controller {
     }
 
     /**
-     * 리뷰 조회수 증가 (하루 1회 제한)
+     * レビュー閲覧数を増加（1日1回制限）
      *
-     * @param reviewId 리뷰 ID
-     * @return 처리 결과
+     * @param reviewId レビューID
+     * @return 処理結果
      */
     @PostMapping("/reviews/{reviewId}/view")
     public ResponseEntity<ResponseModel<Boolean>> increaseViewCount(
@@ -152,10 +149,10 @@ public class CM041000Controller {
     }
 
     /**
-     * 작성자용 주문 + 상품 목록 조회
+     * 投稿者向け：注文＋商品一覧を取得
      *
-     * @param memberNumber 회원번호
-     * @return 주문 + 상품 목록
+     * @param memberNumber 会員番号
+     * @return 注文＋商品一覧
      */
     @GetMapping("/reviews/orders")
     public ResponseEntity<ResponseModel<List<OrderDetailResponse>>> getOrdersWithProducts(
@@ -165,17 +162,17 @@ public class CM041000Controller {
             return ResponseEntity.ok(
                 setResponseDto(list, true, CM041000MessageConstant.REVIEW_ORDER_FETCH_SUCCESS));
         } catch (Exception e) {
-            log.error("주문 + 상품 목록 조회 실패: memberNumber={}", memberNumber, e);
+            log.error("注文＋商品一覧の取得に失敗: memberNumber={}", memberNumber, e);
             return ResponseEntity.internalServerError()
                 .body(setResponseDto(null, false, CM041000MessageConstant.REVIEW_ORDER_FETCH_FAIL));
         }
     }
     
     /**
-     * 리뷰 소프트 딜리트 (본인만 가능)
+     * レビューをソフトデリート（本人のみ可能）
      *
-     * @param reviewId 리뷰 ID
-     * @return 소프트 딜리트 결과
+     * @param reviewId レビューID
+     * @return ソフトデリート結果
      */
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<ResponseModel<Integer>> deleteReview(
@@ -192,11 +189,11 @@ public class CM041000Controller {
     }
 
     /**
-     * 리뷰 이미지 삭제 (본인만 가능, imageId 기반)
+     * レビュー画像を削除（本人のみ可能、imageId基準）
      *
-     * @param reviewId 리뷰 ID
-     * @param imageId 리뷰 이미지 PK
-     * @return 삭제 결과
+     * @param reviewId レビューID
+     * @param imageId レビュー画像PK
+     * @return 削除結果
      */
     @DeleteMapping("/reviews/{reviewId}/images/{imageId}")
     public ResponseEntity<ResponseModel<Void>> deleteReviewImage(
@@ -205,7 +202,7 @@ public class CM041000Controller {
         try {
             boolean deleted = cm041000Service.deleteReviewImage(reviewId, imageId);
             if (!deleted) {
-                log.warn("리뷰 이미지 삭제 실패 reviewId={}, imageId={}", reviewId, imageId);
+                log.warn("レビュー画像の削除に失敗 reviewId={}, imageId={}", reviewId, imageId);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(setResponseDto(null, false, CM041000MessageConstant.REVIEW_IMAGE_DELETE_FAIL));
             }
@@ -220,11 +217,11 @@ public class CM041000Controller {
     }
 
     /**
-     * 리뷰 메인 이미지 업로드
+     * レビューのメイン画像をアップロード
      *
-     * @param reviewId 리뷰 ID
-     * @param file 업로드할 이미지
-     * @return 이미지 업로드에 성공하면 업로드된 이미지 URL, 실패 시 null
+     * @param reviewId レビューID
+     * @param file アップロードする画像
+     * @return アップロード成功時は画像URL、失敗時はnull
      */
     @PostMapping("/reviews/{reviewId}/image")
     public ResponseEntity<ResponseModel<String>> uploadReviewMainImage(
@@ -240,10 +237,10 @@ public class CM041000Controller {
     }
 
     /**
-     * JWT 토큰에서 사용자 ID를 추출
+     * JWTトークンからユーザーIDを抽出
      *
-     * @param request HTTP 요청 객체
-     * @return 사용자 ID, 토큰이 없거나 유효하지 않으면 null 반환
+     * @param request HTTPリクエスト
+     * @return ユーザーID（トークンが無い／無効な場合はnull）
      */
     private Long extractUserId(HttpServletRequest request) {
         String token = jwtTokenProvider.resolveToken(request);
@@ -252,18 +249,19 @@ public class CM041000Controller {
         }
         Long userId = jwtTokenProvider.getUserIdFromToken(token);
         if (userId == null) {
-            log.debug("Failed to extract userId from JWT token");
+            log.debug("JWTトークンからuserIdの抽出に失敗しました");
         }
         return userId;
     }
 
     /**
-     * 뷰어 키를 생성. 로그인한 사용자는 "user:{userId}" 형식,
-     * 비로그인 사용자는 클라이언트 IP 주소의 MD5 해시를 이용한 "guest:{hashedIp}" 
-     * 형식으로 생성
-     * @param userId  사용자 ID (로그인 상태일 경우)
-     * @param request HTTP 요청 객체
-     * @return 뷰어 키 문자열
+     * ビューアキーを生成。
+     * ログインユーザーは "user:{userId}"、
+     * 未ログインユーザーはクライアントIPのMD5ハッシュを用いた "guest:{hashedIp}" 形式。
+     *
+     * @param userId  ユーザーID（ログイン時）
+     * @param request HTTPリクエスト
+     * @return ビューアキー
      */
     private String buildViewerKey(Long userId, HttpServletRequest request) {
         if (userId != null) {
@@ -275,11 +273,12 @@ public class CM041000Controller {
     }
 
     /**
-     * 클라이언트의 실제 IP 주소를 추출
-     * "X-Forwarded-For" 헤더가 있으면 첫 번째 IP를 사용하고,
-     * 없으면 요청의 원격 주소를 반환
-     * @param request HTTP 요청 객체
-     * @return 클라이언트 IP 주소 문자열
+     * クライアントの実IPアドレスを取得。
+     * "X-Forwarded-For" ヘッダがあれば先頭のIPを使用し、
+     * なければリモートアドレスを返す。
+     *
+     * @param request HTTPリクエスト
+     * @return クライアントIP
      */
     private String resolveClientIp(HttpServletRequest request) {
         String forwarded = request.getHeader("X-Forwarded-For");
@@ -290,12 +289,12 @@ public class CM041000Controller {
     }
 
     /**
-     * 공통 응답 포맷 설정
+     * 共通レスポンスフォーマット設定
      *
-     * @param resultList 결과 데이터
-     * @param ret        성공 여부
-     * @param msg        메시지
-     * @return 공통 응답 모델
+     * @param resultList 結果データ
+     * @param ret        成功可否
+     * @param msg        メッセージ
+     * @return 共通レスポンスモデル
      */
     private <T> ResponseModel<T> setResponseDto(T resultList, boolean ret, String msg) {
         return ResponseModel.<T>builder()

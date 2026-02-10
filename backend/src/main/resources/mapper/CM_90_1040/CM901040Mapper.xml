@@ -52,10 +52,10 @@
     <select id="getFindDisplayOrder" resultType="int">
        SELECT num
          FROM generate_series(1, 8) AS num
-        WHERE num NOT IN (
-              SELECT display_order
+        WHERE CAST(num AS TEXT) NOT IN (
+              SELECT TRIM(CAST(display_order AS TEXT))
                 FROM banners
-               WHERE is_display = 1
+               WHERE CAST(is_display AS TEXT) = '1'
         )
     </select>
 
@@ -86,14 +86,14 @@
     <select id="countByDisplayOrder" resultType="int">
         SELECT COUNT(*)
           FROM banners
-         WHERE display_order = #{displayOrderId}
-           AND is_display = 1
+         WHERE CAST(display_order AS TEXT) = CAST(#{displayOrderId} AS TEXT)
+           AND CAST(is_display AS TEXT) = '1'
     </select>
 
     <select id="findByUsedAllBanner" resultType="int">
         SELECT COUNT(*)
           FROM banners
-         WHERE is_display = 1
+         WHERE CAST(is_display AS TEXT) = '1'
     </select>
 
     <insert id="bannerUpload" parameterType="com.cloudia.backend.CM_90_1040.model.BannerInfo">

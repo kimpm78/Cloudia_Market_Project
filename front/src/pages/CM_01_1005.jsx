@@ -113,7 +113,7 @@ export default function CM_01_1005() {
   return (
     <div className="container mt-2">
       <div className="d-flex justify-content-between align-items-end pb-4 mb-4 border-bottom">
-        <h3 className="fw-bolder m-0">購入履歴</h3>
+        <h2 className="fw-bolder mt-3">購入履歴</h2>
       </div>
       <h2 className="fw-bold fs-5 mt-3 mb-4">注文履歴検索</h2>
 

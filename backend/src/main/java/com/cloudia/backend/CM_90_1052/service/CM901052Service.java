@@ -9,36 +9,36 @@ import com.cloudia.backend.CM_90_1052.model.ReturnsDto;
 
 public interface CM901052Service {
     /**
-     * 환불/교환 리스트 조회
+     * 返金/交換リスト取得
      * 
-     * @return 환불/교환 리스트
+     * @return 返金/交換リスト
      */
     List<ReturnsDto> getRefund();
 
     /**
-     * 환불/교환 리스트 조회
+     * 返金/交換リスト取得
      * 
-     * @return 환불/교환 리스트
+     * @return 返金/交換リスト
      */
     List<ReturnsDto> getPeriod(RefundSearchRequestDto searchDto);
 
     /**
-     * 환불 상품 리스트
+     * 返金商品リスト
      * 
-     * @param requestNo    요청 번호
-     * @param refundNumber 사원 번호
-     * @param orderNumber  주문 번호
-     * @return 환불 상품 리스트
+     * @param requestNo    リクエスト番号
+     * @param refundNumber 社員番号
+     * @param orderNumber  注文番号
+     * @return 返金商品リスト
      */
     List<OrderDetailDto> getOrderDetail(String requestNo,
             String refundNumber,
             String orderNumber);
 
     /**
-     * 환불 진행 처리
+     * 返金処理の実行
      * 
-     * @param requestNo 환불 정보
-     * @return 환불 진행 업데이트
+     * @param requestDto 返金情報
+     * @return 返金処理の更新
      */
     Integer updateRefund(RefundRequestDto requestDto, String userId);
 }

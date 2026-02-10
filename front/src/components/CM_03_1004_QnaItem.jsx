@@ -27,7 +27,7 @@ export default function QnaItem({ item, index, open, toggle }) {
             {secret ? (
               <>
                 <i className="bi bi-lock-fill me-1" />
-                비밀글 입니다.
+                非公開です。
               </>
             ) : (
               question
@@ -42,14 +42,14 @@ export default function QnaItem({ item, index, open, toggle }) {
       {open === index && (
         <div className="px-4 py-3" style={{ backgroundColor: '#f0f0f0' }}>
           {secret ? (
-            <p className="text-muted mb-0">비밀글 입니다.</p>
+            <p className="text-muted mb-0">非公開です。</p>
           ) : detail ? (
             <>
-              <p className="fw-bold">질문</p>
+              <p className="fw-bold">質問</p>
               <p>{detail}</p>
             </>
           ) : (
-            <p className="text-muted mb-0">비밀글 입니다.</p>
+            <p className="text-muted mb-0">非公開です。</p>
           )}
           {!secret && answer ? (
             <>

@@ -16,13 +16,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Attachments {
-    private Long boardId; // 게시판 아이디
-    private String fileName; // 파일명
-    private String filePath; // 파일 경로
-    private String contentType; // 파일 형식
-    private int codeValue; // 코드 값
-    private String createdBy; // 등록자
-    private LocalDateTime createdAt; // 등록일
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일
+    private Long boardId;            // 掲示板ID
+    private String fileName;         // ファイル名
+    private String filePath;         // ファイルパス
+    private String contentType;      // ファイル形式
+    private int codeValue;           // コード値
+    private String createdBy;        // 登録者
+    private LocalDateTime createdAt; // 登録日
+    private String updatedBy;        // 更新者
+    private LocalDateTime updatedAt; // 更新日
 }

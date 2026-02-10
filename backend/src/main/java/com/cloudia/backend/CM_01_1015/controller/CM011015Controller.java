@@ -1,5 +1,6 @@
 package com.cloudia.backend.CM_01_1015.controller;
 
+import com.cloudia.backend.CM_01_1015.constants.CM011015MessageConstant;
 import com.cloudia.backend.CM_01_1015.model.ReturnResponse;
 import com.cloudia.backend.CM_01_1015.model.ReturnRequest;
 import com.cloudia.backend.CM_01_1015.service.CM011015Service;
@@ -24,7 +25,7 @@ public class CM011015Controller {
     private final CM011015Service cm011015Service;
 
     /**
-     * 교환/반품 신청 내역 목록 조회
+     * 交換・返品申請履歴一覧取得
      */
     @GetMapping
     public ResponseEntity<ResponseModel<List<ReturnResponse>>> getHistory(
@@ -34,14 +35,14 @@ public class CM011015Controller {
             return ResponseEntity.status(401).build();
 
         String loginId = userDetails.getUsername();
-        log.info("교환/반품 내역 목록 조회 요청 - 사용자: {}", loginId);
+        log.info(CM011015MessageConstant.LOG_RETURN_HISTORY_REQUEST, loginId);
 
         ResponseModel<List<ReturnResponse>> response = cm011015Service.getReturnHistory(loginId);
         return ResponseEntity.ok(response);
     }
 
     /**
-     * 교환/반품 상세 내역 조회
+     * 交換・返品申請詳細取得
      */
     @GetMapping("/{returnId}")
     public ResponseEntity<ResponseModel<ReturnResponse>> getReturnDetail(
@@ -52,14 +53,14 @@ public class CM011015Controller {
             return ResponseEntity.status(401).build();
 
         String loginId = userDetails.getUsername();
-        log.info("교환/반품 상세 조회 요청 - ID: {}, 사용자: {}", returnId, loginId);
+        log.info(CM011015MessageConstant.LOG_RETURN_DETAIL_REQUEST, returnId, loginId);
 
         ResponseModel<ReturnResponse> response = cm011015Service.getReturnDetail(loginId, returnId);
         return ResponseEntity.ok(response);
     }
 
     /**
-     * 교환/반품 통합 신청 요청
+     * 交換・返品の統合申請リクエスト
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseModel<Object>> createReturnRequest(
@@ -68,17 +69,17 @@ public class CM011015Controller {
 
         if (userDetails == null) {
             return ResponseEntity.status(401).body(
-                    ResponseModel.builder().result(false).message("로그인이 필요합니다.").build());
+                    ResponseModel.builder().result(false).message("ログインが必要です。").build());
         }
 
         String loginId = userDetails.getUsername();
-        log.info("신규 교환/반품 신청 접수 - 사용자: {}, 제목: {}", loginId, request.getTitle());
+        log.info(CM011015MessageConstant.LOG_RETURN_CREATE_REQUEST, loginId, request.getTitle());
 
         return cm011015Service.createReturnRequest(loginId, request);
     }
 
     /**
-     * 상세 조회
+     * 詳細取得
      */
     @GetMapping("/order-products")
     public ResponseEntity<List<ReturnResponse.ProductInfo>> getOrderProducts(
@@ -89,13 +90,13 @@ public class CM011015Controller {
             return ResponseEntity.status(401).build();
 
         String loginId = userDetails.getUsername();
-        log.info("신청용 주문 상품 조회 요청 - 주문번호: {}, 사용자: {}", orderNo, loginId);
+        log.info(CM011015MessageConstant.LOG_ORDER_PRODUCTS_REQUEST, orderNo, loginId);
 
         return cm011015Service.getOrderProducts(loginId, orderNo);
     }
 
     /**
-     * 교환/반품 신청 가능한 구매 확정 주문 목록 조회
+     * 交換・返品申請可能な購入確定注文一覧取得
      */
     @GetMapping("/returnable")
     public ResponseEntity<ResponseModel<List<Map<String, Object>>>> getReturnableOrders(
@@ -105,7 +106,7 @@ public class CM011015Controller {
             return ResponseEntity.status(401).build();
 
         String loginId = userDetails.getUsername();
-        log.info("신청 가능한 주문 목록 조회 요청 - 사용자: {}", loginId);
+        log.info(CM011015MessageConstant.LOG_RETURNABLE_ORDERS_REQUEST, loginId);
 
         ResponseModel<List<Map<String, Object>>> response = cm011015Service.getReturnableOrderList(loginId);
         return ResponseEntity.ok(response);

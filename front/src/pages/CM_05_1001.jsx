@@ -23,15 +23,15 @@ export default function CM_05_1001() {
     location.pathname.startsWith('/admin');
 
   const backTo = fromAdmin ? '/admin/menu/notice' : '/notice';
-  const [open1001, setOpen1001] = useState(false); // 확인 팝업
-  const [open1002, setOpen1002] = useState(false); // 로딩 팝업
-  const [open1003, setOpen1003] = useState(false); // 에러 팝업
-  const [open1004, setOpen1004] = useState(false); // 알림 팝업
+  const [open1001, setOpen1001] = useState(false); // 確認ポップアップ
+  const [open1002, setOpen1002] = useState(false); // ローディングポップアップ
+  const [open1003, setOpen1003] = useState(false); // エラーポップアップ
+  const [open1004, setOpen1004] = useState(false); // アラートポップアップ
   const [notice, setNotice] = useState(null);
   const [prevNext, setPrevNext] = useState({ prev: null, next: null });
   const formatAuthor = (roleId, userId) => {
-    if (Number(roleId) === 1) return '관리자';
-    if (Number(roleId) === 2) return '매니저';
+    if (Number(roleId) === 1) return '管理者';
+    if (Number(roleId) === 2) return 'マネージャー';
     const raw = String(userId ?? '').trim();
     if (!raw) return '-';
     return `user${raw}`;
@@ -50,7 +50,7 @@ export default function CM_05_1001() {
         }
       })
       .catch((err) => {
-        console.error('공지사항 상세 로드 실패:', err?.response?.data?.message || err.message);
+        console.error('お知らせ詳細ロード失敗:', err?.response?.data?.message || err.message);
       });
   }, [id]);
 
@@ -59,7 +59,7 @@ export default function CM_05_1001() {
     axiosInstance
       .post(`${import.meta.env.VITE_API_BASE_URL}/guest/notice/${id}/view`)
       .catch((err) => {
-        console.error('공지사항 조회수 증가 실패:', err?.response?.data?.message || err.message);
+        console.error('お知らせ閲覧数増加失敗:', err?.response?.data?.message || err.message);
       });
   }, [id]);
 
@@ -68,16 +68,16 @@ export default function CM_05_1001() {
   if (!notice) {
     return (
       <div className="container-fluid px-5 py-5">
-        <h2 className="fw-bold mb-4 border-bottom pb-3">공지 사항</h2>
+        <h2 className="fw-bold mb-4 border-bottom pb-3">お知らせ</h2>
         <div className="text-center py-5 text-danger">{CMMessage.MSG_EMPTY_012}</div>
       </div>
     );
   }
 
   return (
-    <>
-      <h1>공지사항</h1>
-      <div className="container-fluid px-3 px-md-5 py-4">
+    <div className="container-fluid px-3 px-md-5">
+      <h1 className='m-0 notice-title'>お知らせ</h1>
+      <div className="container-fluid px-3 py-4">
         <div className="border-top border-bottom py-3 px-2 d-flex justify-content-between fs-6 fs-sm-5">
           <div className="flex-grow-1">
             {(() => {
@@ -95,13 +95,13 @@ export default function CM_05_1001() {
             <div className="d-flex d-sm-none justify-content-end text-muted small mt-2">
               <span className="me-2">{formatAuthor(notice.roleId, notice.userId)}</span>
               <span className="me-2">/ {formatYearMonthDot(notice.publishedAt)}</span>
-              <span> 조회: {notice.viewCount}</span>
+              <span> 閲覧数: {notice.viewCount}</span>
             </div>
           </div>
           <div className="d-none d-sm-flex small text-muted align-self-center">
             <span className="me-3">{formatAuthor(notice.roleId, notice.userId)}</span>
             <span className="me-3">{formatYearMonthDot(notice.publishedAt)}</span>
-            <span>조회: {notice.viewCount}</span>
+            <span>閲覧数: {notice.viewCount}</span>
           </div>
         </div>
         <div className="p-3" style={{ whiteSpace: 'pre-line' }}>
@@ -110,7 +110,7 @@ export default function CM_05_1001() {
         <div className="border-top fs-5">
           <div className="d-flex text-muted small border-bottom py-2">
             <span className="d-flex align-items-center gap-1">
-              이전글<i className="bi bi-caret-up-fill"></i>
+              以前の記事<i className="bi bi-caret-up-fill"></i>
             </span>
             {prevNotice && prevNotice.isDisplay === 1 ? (
               <span
@@ -125,12 +125,12 @@ export default function CM_05_1001() {
                 {prevNotice.title}
               </span>
             ) : (
-              <span className="fs-6 ms-3 text-muted">이전글 내용은 없습니다.</span>
+              <span className="fs-6 ms-3 text-muted">前の記事の内容はありません。</span>
             )}
           </div>
           <div className="d-flex small py-2">
             <span className="d-flex align-items-center gap-1">
-              다음글<i className="bi bi-caret-down-fill"></i>
+              次の記事<i className="bi bi-caret-down-fill"></i>
             </span>
             {nextNotice && nextNotice.isDisplay === 1 ? (
               <span
@@ -145,7 +145,7 @@ export default function CM_05_1001() {
                 {nextNotice.title}
               </span>
             ) : (
-              <span className="fs-6 ms-3 text-muted">다음글 내용은 없습니다.</span>
+              <span className="fs-6 ms-3 text-muted">次の記事の内容はありません。</span>
             )}
           </div>
         </div>
@@ -157,18 +157,18 @@ export default function CM_05_1001() {
                 className="btn btn-primary px-5"
                 onClick={() => navigate(`/admin/menu/notice/edit/${notice.noticeId}`)}
               >
-                편집
+                編集
               </button>
               <button className="btn btn-secondary px-5" onClick={() => navigate(backTo)}>
-                목록
+                一覧
               </button>
               <button className="btn btn-danger px-5" onClick={() => setOpen1001(true)}>
-                삭제
+                削除
               </button>
             </div>
           ) : (
             <button className="btn btn-secondary px-5" onClick={() => navigate('/notice')}>
-              목록
+              一覧
             </button>
           )}
         </div>
@@ -183,7 +183,7 @@ export default function CM_05_1001() {
             return;
           }
           setOpen1001(false);
-          setOpen1002(true); // 로딩 시작
+          setOpen1002(true); // ローディング開始
 
           axiosInstance
             .delete(`/guest/notice/${notice.noticeId}`, {
@@ -192,12 +192,12 @@ export default function CM_05_1001() {
             .then(() => {
               setTimeout(() => {
                 setOpen1002(false);
-                setOpen1004(true); // 알림 팝업
+                setOpen1004(true); // アラートポップアップ表示
               }, 1000);
             })
             .catch((err) => {
               setOpen1002(false);
-              setOpen1003(true); // 에러 팝업
+              setOpen1003(true); // エラーポップアップ表示
             });
         }}
         Message={CMMessage.MSG_CON_003}
@@ -221,6 +221,6 @@ export default function CM_05_1001() {
         }}
         Message={CMMessage.MSG_INF_005}
       />
-    </>
+    </div>
   );
 }

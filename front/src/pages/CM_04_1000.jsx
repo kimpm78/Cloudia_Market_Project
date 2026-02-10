@@ -23,22 +23,22 @@ import CM_Pagination from '../components/CM_99_1013_pagination.jsx';
 import CMMessage from '../constants/CMMessage';
 import '@styles/CM_04_1000.css';
 
-// 이미지 URL 안전 병합 함수
+// 画像URLを安全に結合する関数
 const buildImageUrl = (rawUrl) => {
   const base = (import.meta.env.VITE_API_BASE_IMAGE_URL || '').replace(/\/$/, '');
   if (!rawUrl) return '';
-  // 절대 URL이면 그대로 사용
+  // 絶対URLならそのまま使用
   if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
     return rawUrl;
   }
   if (rawUrl.startsWith('/images/') && base.endsWith('/images')) {
     return base.replace(/\/images$/, '') + rawUrl;
   }
-  // rawUrl 이 / 로 시작하면 그대로 base + rawUrl
+  // rawUrl が / で始まる場合は base + rawUrl
   if (rawUrl.startsWith('/')) {
     return base + rawUrl;
   }
-  // 그 외
+  // それ以外
   return `${base}/${rawUrl}`;
 };
 
@@ -66,7 +66,7 @@ export default function CM_04_1000() {
     fetchReviews()
       .then((list) => setAllReviews(list))
       .catch((err) => {
-        console.error('리뷰 로드 실패:', err?.response?.data?.message || err.message);
+        console.error('レビューの読み込みに失敗しました:', err?.response?.data?.message || err.message);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -88,10 +88,10 @@ export default function CM_04_1000() {
   const filtered = useMemo(() => {
     const keyword = activeKeyword.toLowerCase();
     return mergedReviews.filter((r) => {
-      if (searchType === 2) return r.title.toLowerCase().includes(keyword); // 제목
-      if (searchType === 3) return r.content.toLowerCase().includes(keyword); // 내용
-      if (searchType === 4) return (r.createdBy ?? '').toLowerCase().includes(keyword); // 작성자
-      return r.title.toLowerCase().includes(keyword) || r.content.toLowerCase().includes(keyword); // 제목+내용
+      if (searchType === 2) return r.title.toLowerCase().includes(keyword); // タイトル
+      if (searchType === 3) return r.content.toLowerCase().includes(keyword); // 内容
+      if (searchType === 4) return (r.createdBy ?? '').toLowerCase().includes(keyword); // 作成者
+      return r.title.toLowerCase().includes(keyword) || r.content.toLowerCase().includes(keyword); // タイトル+内容
     });
   }, [mergedReviews, activeKeyword, searchType]);
 
@@ -127,7 +127,7 @@ export default function CM_04_1000() {
         return (
           <img
             src={imageUrl}
-            alt="썸네일"
+            alt="サムネイル"
             style={{
               ...imageStyle,
               objectFit: 'cover',
@@ -144,7 +144,7 @@ export default function CM_04_1000() {
     };
 
     const reviewColumn = {
-      headerName: '리뷰',
+      headerName: 'レビュー',
       flex: 1,
       suppressMovable: true,
       cellRenderer: (params) => (
@@ -162,15 +162,15 @@ export default function CM_04_1000() {
         >
           <div className="fw-bold lh-sm">
             {params.data.reviewType === 0
-              ? '[리뷰] '
+              ? '[レビュー] '
               : params.data.reviewType === 1
-                ? '[후기] '
+                ? '[口コミ] '
                 : ''}
             {params.data.title}
           </div>
           <div className="text-secondary small">{params.data.createdBy}</div>
           <div className="text-secondary small">
-            조회수 {(params.data?.viewCount ?? 0).toLocaleString()}
+            閲覧数 {(params.data?.viewCount ?? 0).toLocaleString()}
           </div>
         </Link>
       ),
@@ -201,9 +201,9 @@ export default function CM_04_1000() {
               <div className="text-secondary small">{formatYearMonthDot(params.data.createdAt)}</div>
               <div className="fw-bold lh-sm">
                 {params.data.reviewType === 0
-                  ? '[리뷰] '
+                  ? '[レビュー] '
                   : params.data.reviewType === 1
-                    ? '[후기] '
+                    ? '[口コミ] '
                     : ''}
                 {params.data.title}
               </div>
@@ -218,7 +218,7 @@ export default function CM_04_1000() {
       imageColumn,
       reviewColumn,
       {
-        headerName: '작성일',
+        headerName: '作成日',
         field: 'createdAt',
         width: 100,
         suppressMovable: true,
@@ -245,7 +245,7 @@ export default function CM_04_1000() {
     <>
       <div className="container-fluid px-5 review-list-container">
         <div className="d-flex justify-content-between align-items-end my-5 review-list-header">
-          <h1 className="m-0">리뷰/후기</h1>
+          <h1 className="m-0">レビュー/口コミ</h1>
           <button
             className="btn btn-primary review-write-button"
             onClick={() => {
@@ -256,7 +256,7 @@ export default function CM_04_1000() {
               navigate('/review/write');
             }}
           >
-            작성 하기
+            作成する
           </button>
         </div>
         <div className="ag-theme-alpine custom-grid w-100">

@@ -116,7 +116,7 @@ public class JwtTokenProvider {
                 .userId(claims.get(KEY_USER_ID, Integer.class))
                 .memberNumber(claims.get(KEY_MEMBER_NO, String.class))
                 .roleId(claims.get(KEY_ROLE_ID, Integer.class))
-                .permissionLevel(claims.get(KEY_PERMISSION, Integer.class))
+                .permissionLevel(claims.get(KEY_PERMISSION, String.class))
                 .authorities(new ArrayList<>(authorities))
                 .password("")
                 .build();

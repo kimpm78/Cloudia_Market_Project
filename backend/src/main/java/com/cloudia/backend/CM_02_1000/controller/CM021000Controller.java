@@ -3,10 +3,10 @@ package com.cloudia.backend.CM_02_1000.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_02_1000.model.HeaderMenu;
 import com.cloudia.backend.CM_02_1000.service.CM021000Service;
 import com.cloudia.backend.CM_02_1000.model.BannerInfo;
-import com.cloudia.backend.CM_02_1000.model.ResponseModel;
 import com.cloudia.backend.CM_02_1000.constants.CM021000MessageConstant;
 
 
@@ -21,16 +21,15 @@ import org.springframework.http.ResponseEntity;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/guest")
-@CrossOrigin(origins = "*") // 개발 단계에서만 * 허용
 public class CM021000Controller {
 
-    // Service 정의
+    // Service 定義
     @Autowired
     CM021000Service CM021000Service;
 
     /*
-     * 헤더에서 사용할 메뉴 + 장바구니 정보 통합 API
-     * @return HeaderInfo DTO (menus, cart)
+     * ヘッダーで使用するメニュー取得API
+     * @return HeaderMenu リスト
      */
     @GetMapping("/menus")
     public ResponseEntity<List<HeaderMenu>> getHeaderMenusOnly() {
@@ -41,8 +40,8 @@ public class CM021000Controller {
     }
 
     /**
-     * 헤더에 표시할 아이콘 메뉴 (ex. 로그인, 마이페이지, 장바구니)
-     * @return menu_code_value = 3 인 메뉴 리스트
+     * ヘッダーに表示するアイコンメニュー（例：ログイン、マイページ、カート）
+     * @return menu_code_value = 3 のメニューリスト
      */
     @GetMapping("/menus/icons")
     public ResponseEntity<List<HeaderMenu>> getHeaderIcons(
@@ -53,13 +52,13 @@ public class CM021000Controller {
 
         boolean isAdminOrManager = roleId != null && roleId <= 2;
         boolean hasAdminMenu = icons.stream().anyMatch(
-            menu -> "/admin".equals(menu.getUrl()) || "관리자 페이지".equals(menu.getMenuName())
+            menu -> "/admin".equals(menu.getUrl()) || "管理者ページ".equals(menu.getMenuName())
         );
 
         if (isAdminOrManager && !hasAdminMenu) {
             icons.add(HeaderMenu.builder()
                 .menuId("ADMIN")
-                .menuName("관리자 페이지")
+                .menuName("管理者ページ")
                 .url("/admin")
                 .sortOrder(999)
                 .icon("bi-gear")
@@ -72,9 +71,9 @@ public class CM021000Controller {
 
 
     /**
-     * 헤더용 장바구니 아이템 카운트 (배지 표시용)
-     * @param userId 사용자 ID
-     * @return 장바구니 담긴 상품 개수
+     * ヘッダー用カート商品件数（バッジ表示用）
+     * @param userId ユーザーID
+     * @return カート内の商品件数
      */
     @GetMapping("/menus/cart/count")
     public ResponseEntity<Integer> getHeaderCartCount(@RequestParam("userId") Long userId) {
@@ -85,9 +84,9 @@ public class CM021000Controller {
     }
 
     /**
-     * 배너 전체 리스트 조회
+     * バナー一覧取得
      * 
-     * @return 배너 전체 리스트
+     * @return バナー一覧
      */
     @GetMapping("/menu/banner/findAll")
     public ResponseEntity<ResponseModel<List<BannerInfo>>> getFindAllBanner() {

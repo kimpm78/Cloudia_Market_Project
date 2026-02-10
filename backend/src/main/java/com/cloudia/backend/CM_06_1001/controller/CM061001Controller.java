@@ -27,7 +27,7 @@ public class CM061001Controller {
     private final CM011001UserMapper cm011001UserMapper;
 
     /**
-     * 로그인 사용자 정보 조회
+     * ログインユーザー情報の取得
      */
     private User getLoginUser(Authentication authentication) {
         if (authentication == null || authentication.getName() == null) {
@@ -43,9 +43,9 @@ public class CM061001Controller {
     }
 
     /**
-     * 주문 생성 (로그인 필수)
+     * 注文作成（ログイン必須）
      *
-     * @param request 주문 생성 요청
+     * @param request 注文作成リクエスト
      */
     @PostMapping("/order/create")
     public ResponseEntity<ResponseModel<OrderSummary>> createOrder(
@@ -80,7 +80,7 @@ public class CM061001Controller {
     }
 
     /**
-     * 주문 완료 처리 (PG 승인 후)
+     * 注文完了処理（PG承認後）
      */
     @PostMapping("/order/complete")
     public ResponseEntity<ResponseModel<Void>> completeOrder(
@@ -109,7 +109,7 @@ public class CM061001Controller {
     }
 
     /**
-     * 주문 조회 (본인 주문만 가능)
+     * 注文取得（本人の注文のみ可）
      */
     @GetMapping("/orders/{orderId}")
     public ResponseEntity<ResponseModel<OrderSummary>> getOrderSummary(
@@ -141,12 +141,12 @@ public class CM061001Controller {
     }
 
     /**
-     * 공통 응답 모델 생성
-     * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    응답 메시지
-     * @return ResponseModel 객체
+     * 共通レスポンスモデル生成
+     *
+     * @param resultList 結果データ
+     * @param result     処理結果
+     * @param message    応答メッセージ
+     * @return ResponseModel オブジェクト
      */
     private <T> ResponseModel<T> buildResponse(T data, boolean result, String msg) {
         return ResponseModel.<T>builder()

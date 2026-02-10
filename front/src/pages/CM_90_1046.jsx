@@ -121,7 +121,7 @@ export default function CM_90_1046() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (form.title.trim().length === 0) newErrors.title = CMMessage.MSG_ERR_002('타이틀 명');
+    if (form.title.trim().length === 0) newErrors.title = CMMessage.MSG_ERR_002('タイトル');
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -130,57 +130,57 @@ export default function CM_90_1046() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">공지사항 수정</h5>
+        <h5 className="border-bottom pb-2 mb-3">お知らせ修正</h5>
         <form onSubmit={handleRegisterClick}>
-          {/* 제목 */}
+          {/* タイトル */}
           <InputField
             id="title"
-            label="제목"
+            label="タイトル"
             type="text"
             value={form.title}
             onChange={(value) => updateForm('title', value)}
             error={errors.title}
           />
 
-          {/* 분류 */}
+          {/* 分類 */}
           <RadioGroup
             name="codeValue"
-            label="분류"
+            label="分類"
             options={CATEGORIES}
             value={form.codeValue}
             onChange={(value) => updateForm('codeValue', value)}
           />
 
-          {/* 사용 여부 */}
+          {/* 表示設定 */}
           <RadioGroup
             name="isDisplay"
-            label="사용 여부"
+            label="表示設定"
             options={DISPLAY_OPTIONS}
             value={form.isDisplay}
             onChange={(value) => updateForm('isDisplay', value)}
           />
 
-          {/* 내용 */}
+          {/* 内容 */}
           <TextAreaField
             id="content"
-            label="내용"
+            label="内容"
             rows="15"
             value={form.content}
             onChange={(value) => updateForm('content', value)}
             error={errors.content}
           />
 
-          {/* 버튼 */}
+          {/* ボタン */}
           <div className="d-flex justify-content-center gap-2">
             <button type="submit" className="btn btn-primary btn-fixed-width">
-              업데이트
+              更新
             </button>
             <Link to={`/notice/${noticeId}`} className="btn btn-secondary btn-fixed-width">
-              뒤로가기
+              戻る
             </Link>
           </div>
         </form>
-        {/* 알림 팝업 */}
+        {/* 通知ポップアップ */}
         <CM_99_1004
           isOpen={open1004}
           onClose={() => {

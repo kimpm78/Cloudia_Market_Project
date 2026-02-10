@@ -9,27 +9,27 @@ import com.cloudia.backend.CM_01_1001.model.User;
 public interface CM011010Mapper {
 
     /**
-     * 사용자 ID로 사용자 정보를 조회
+     * ユーザーIDでユーザー情報を取得
      *
-     * @param userId 조회할 사용자의 ID
-     * @return User 객체
+     * @param userId 取得対象のユーザーID
+     * @return User オブジェクト
      */
     User findByUserId(Integer userId);
 
     /**
-     * 사용자를 비활성(탈퇴) 상태로 변경하고 탈퇴 사유를 저장
+     * ユーザーを非アクティブ（退会）状態に変更し、退会理由を保存
      *
-     * @param userId     비활성화할 사용자의 ID
-     * @param reasonText 탈퇴 사유
+     * @param userId 非アクティブ化するユーザーID
+     * @param reasonText 退会理由
      */
     void deactivateUser(@Param("userId") Integer userId, @Param("reasonText") String reasonText);
 
     /**
-     * 회원의 진행 중인 주문 또는 예약 상품 건수를 조회
-     * 탈퇴 가능 여부를 판단하기 위해 사용됨 (0건이어야 탈퇴 가능)
+     * 会員の進行中の注文または予約商品の件数を取得
+     * 退会可否を判定するために使用（0件である必要あり）
      *
-     * @param memberNumber 회원 번호
-     * @return 진행 중인 주문 건수
+     * @param memberNumber 会員番号
+     * @return 進行中の注文件数
      */
     int countActiveOrders(@Param("memberNumber") String memberNumber);
 }

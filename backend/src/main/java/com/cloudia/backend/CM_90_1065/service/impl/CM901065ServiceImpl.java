@@ -26,14 +26,14 @@ public class CM901065ServiceImpl implements CM901065Service {
     private final DateCalculator dateCalculator;
 
     /**
-     * 상품 코드 조회
+     * 商品コード取得
      * 
-     * @return 상품코드 리스트
+     * @return 商品コード一覧
      */
     @Override
     @Transactional(readOnly = true)
     public List<ProductCodeDto> getProductCode() {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "상품 코드 등록" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "商品コード登録" });
 
         List<ProductCodeDto> responseList = cm901065Mapper.getProductCode();
 
@@ -42,22 +42,22 @@ public class CM901065ServiceImpl implements CM901065Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "상품 코드 등록", String.valueOf(responseList.size()) });
+                new String[] { "商品コード登録", String.valueOf(responseList.size()) });
 
         return responseList;
     }
 
     /**
-     * 상품 코드 조회
+     * 商品コード検索
      * 
-     * @param searchTerm 키워드
-     * @param searchType 타입 (1:상품 코드, 2:상품명)
-     * @return 유저 리스트
+     * @param searchTerm キーワード
+     * @param searchType 種別（1:商品コード、2:商品名）
+     * @return 商品コード一覧
      */
     @Override
     @Transactional(readOnly = true)
     public List<ProductCodeDto> findByProductCode(String searchTerm, int searchType) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "상품 코드 등록" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "商品コード登録" });
 
         List<ProductCodeDto> responseList = cm901065Mapper.findByProductCode(searchTerm, searchType);
 
@@ -66,35 +66,35 @@ public class CM901065ServiceImpl implements CM901065Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "상품 코드 등록", String.valueOf(responseList.size()) });
+                new String[] { "商品コード登録", String.valueOf(responseList.size()) });
 
         return responseList;
     }
 
     /**
-     * 상품 코드 등록
+     * 商品コード登録
      * 
-     * @param entity 상품 코드 정보
+     * @param entity 商品コード情報
      */
     @Override
     @Transactional
     public Integer insCode(ProductCodeDto entity, String memberNumber) {
-        LogHelper.log(LogMessage.COMMON_INSERT_START, new String[] { "상품 코드 등록" });
+        LogHelper.log(LogMessage.COMMON_INSERT_START, new String[] { "商品コード登録" });
 
         if (null == entity.getProductCode() || null == entity.getProductName()) {
-            LogHelper.log(LogMessage.COMMON_INSERT_FAIL, new String[] { "상품 코드 등록" });
+            LogHelper.log(LogMessage.COMMON_INSERT_FAIL, new String[] { "商品コード登録" });
             throw new InvalidRequestException(ErrorCode.VALIDATION_FIELD_REQUIRED);
         }
 
         ProductCodeDto responseList = cm901065Mapper.findByOneCode(entity.getProductCode(), 1, null);
         if (responseList != null) {
-            LogHelper.log(LogMessage.COMMON_INSERT_FAIL, new String[] { "상품 코드 등록" });
+            LogHelper.log(LogMessage.COMMON_INSERT_FAIL, new String[] { "商品コード登録" });
             throw new InvalidRequestException(ErrorCode.MSG_PRODUCT_REGISTERED);
         }
 
         responseList = cm901065Mapper.findByOneCode(entity.getProductName().trim(), 2, entity.getProductCategory());
         if (responseList != null) {
-            LogHelper.log(LogMessage.COMMON_INSERT_FAIL, new String[] { "상품 코드 등록" });
+            LogHelper.log(LogMessage.COMMON_INSERT_FAIL, new String[] { "商品コード登録" });
             throw new InvalidRequestException(ErrorCode.MSG_PRODUCT_REGISTERED);
         }
 
@@ -111,17 +111,17 @@ public class CM901065ServiceImpl implements CM901065Service {
     }
 
     /**
-     * 상품 코드 삭제
+     * 商品コード削除
      * 
-     * @param res 상품 코드 정보
+     * @param entity 商品コード情報
      */
     @Override
     @Transactional
     public Integer uptCode(List<ProductCodeDto> entity, String memberNumber) {
-        LogHelper.log(LogMessage.COMMON_DELETE_START, new String[] { "상품 코드 등록" });
+        LogHelper.log(LogMessage.COMMON_DELETE_START, new String[] { "商品コード登録" });
 
         if (entity.size() == 0) {
-            LogHelper.log(LogMessage.COMMON_UPDATE_EMPTY, new String[] { "상품 코드 등록" });
+            LogHelper.log(LogMessage.COMMON_UPDATE_EMPTY, new String[] { "商品コード登録" });
             throw new InvalidRequestException(ErrorCode.VALIDATION_FIELD_REQUIRED);
         }
 
@@ -130,19 +130,19 @@ public class CM901065ServiceImpl implements CM901065Service {
             ProductCodeDto responseList = cm901065Mapper.findByOneCode(code.getProductCode().trim(), 1,
                     null);
             if (responseList == null) {
-                LogHelper.log(LogMessage.COMMON_UPDATE_FAIL, new String[] { "상품 코드 등록" });
+                LogHelper.log(LogMessage.COMMON_UPDATE_FAIL, new String[] { "商品コード登録" });
                 throw new InvalidRequestException(ErrorCode.UPDATE_FAILED);
             }
 
             ProductCodeDto response = cm901065Mapper.findByOneProduct(code.getProductCode().trim());
             if (response != null) {
-                LogHelper.log(LogMessage.COMMON_UPDATE_FAIL, new String[] { "상품 코드 등록" });
+                LogHelper.log(LogMessage.COMMON_UPDATE_FAIL, new String[] { "商品コード登録" });
                 throw new InvalidRequestException(ErrorCode.MSG_PRODUCT_REGISTERED);
             }
 
             response = cm901065Mapper.findByOneStock(code.getProductCode().trim());
             if (response != null) {
-                LogHelper.log(LogMessage.COMMON_UPDATE_FAIL, new String[] { "상품 코드 등록" });
+                LogHelper.log(LogMessage.COMMON_UPDATE_FAIL, new String[] { "商品コード登録" });
                 throw new InvalidRequestException(ErrorCode.MSG_STOCK_EXISTS);
             }
 

@@ -9,8 +9,8 @@ import lombok.Setter;
 public class SignUpRequestModel {
 
     @Valid
-    private User user;
+    private User user;       //ユーザー情報
 
     @Valid
-    private Address address;
+    private Address address; //住所情報
 }

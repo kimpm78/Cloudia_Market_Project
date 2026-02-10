@@ -15,9 +15,9 @@ import java.util.List;
 public interface CM031001Mapper {
 
     /**
-     * 장바구니 관련 리스트 조회
-     * 
-     * @return 장바구니 관련 전체 리스트
+     * カート関連一覧取得
+     *
+     * @return カート関連の全件一覧
      */
     List<CartItem> findActiveCartItemsByUserId(Long userId);
     CartItem findCartItem(@Param("userId") Long userId, @Param("productId") String productId);
@@ -25,18 +25,18 @@ public interface CM031001Mapper {
     void insertCartItem(@Param("userId") Long userId, @Param("productId") String productId, @Param("quantity") int quantity);
 
     /**
-     * 신상품 리스트 조회 (reservationDeadline이 없는 상품만)
+     * 新商品一覧取得（reservationDeadline がない商品のみ）
      *
-     * @param categories 선택된 카테고리 리스트
-     * @return 신상품 리스트
+     * @param categories 選択されたカテゴリ一覧
+     * @return 新商品一覧
      */
     List<ProductInfo> selectNewProductList(@Param("categories") List<String> categories);
 
     /**
-     * 예약 상품 리스트 조회 (reservationDeadline이 있는 상품만)
+     * 予約商品一覧取得（reservationDeadline がある商品のみ）
      *
-     * @param categories 선택된 카테고리 리스트
-     * @return 예약 상품 리스트
+     * @param categories 選択されたカテゴリ一覧
+     * @return 予約商品一覧
      */
     List<ProductInfo> selectReservationProductList(@Param("categories") List<String> categories);
 
@@ -45,17 +45,17 @@ public interface CM031001Mapper {
     ProductDetails selectProductDetails(@Param("productId") Long productId);
 
     /**
-     * 전체 카테고리 그룹 리스트 조회
+     * カテゴリーグループ全件一覧取得
      */
     List<Categories> findAllCategoryGroupCode();
 
     /**
-     * 예약 상품용 카테고리 그룹만 조회
+     * 予約商品用のカテゴリーグループのみ取得
      */
     List<Categories> findReservationCategoryGroup();
 
     /**
-     * 선택된 카테고리 그룹의 하위 카테고리 정보 조회
+     * 選択されたカテゴリーグループ配下のカテゴリ情報を取得
      */
     List<CategoryDetails> findCategory(@Param("categoryGroupCodes") List<String> categoryGroupCode);
 }

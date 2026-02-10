@@ -2,6 +2,7 @@ import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import CM_99_1005 from './commonPopup/CM_99_1005';
 import axiosInstance from '../services/axiosInstance';
 import logo from '../images/logo.png';
 import '../styles/CM_02_1000_header.css';
@@ -9,7 +10,7 @@ import '../styles/CM_02_1000_header.css';
 const CART_UPDATED_EVENT = 'cart:updated';
 const CART_TTL_MINUTES = 30;
 
-const CM_02_1000_header = () => {
+const CM_02_1000_Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
   const [headerMenu, setHeaderMenu] = useState([]);
@@ -22,11 +23,12 @@ const CM_02_1000_header = () => {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastHiding, setToastHiding] = useState(false);
   const [toastKey, setToastKey] = useState(0);
+  const [open1005, setOpen1005] = useState(false);
   const timerRef = useRef(null);
   const cartExpiredRef = useRef(false);
   const lastRemainingRef = useRef(null);
   const updateCartNotice = (time) => {
-    setCartNotice(`장바구니 안에 상품이 들어있습니다. 카트의 유지 시간은 ${time}분 남았습니다`);
+    setCartNotice(`カートに商品が入っています。カートの保持時間はあと${time}分です。`);
   };
 
   const resolveRemainingMinutes = () => {
@@ -59,7 +61,7 @@ const CM_02_1000_header = () => {
         window.dispatchEvent(new CustomEvent(CART_UPDATED_EVENT, { detail }));
       }
     } catch (err) {
-      console.error('장바구니 만료 처리 실패:', err?.response?.data || err.message);
+      console.error('カートの期限切れ処理失敗:', err?.response?.data || err.message);
     }
   };
 
@@ -120,11 +122,12 @@ const CM_02_1000_header = () => {
   const navigate = useNavigate();
 
   const iconMap = {
-    로그인: 'bi-box-arrow-in-right',
-    마이페이지: 'bi-person-circle',
-    장바구니: 'bi-cart4',
-    '관리 페이지': 'bi-gear',
-    로그아웃: 'bi-box-arrow-left',
+    ログイン: 'bi-box-arrow-in-right',
+    マイページ: 'bi-person-circle',
+    カート: 'bi-cart4',
+    管理ページ: 'bi-gear',
+    管理者ページ: 'bi-gear',
+    ログアウト: 'bi-box-arrow-left',
   };
 
   useLayoutEffect(() => {
@@ -171,10 +174,10 @@ const CM_02_1000_header = () => {
         setLoading(false);
       })
       .catch((err) => {
-        console.error('헤더 메뉴 로드 실패:', err?.response?.data || err.message);
+        console.error('ヘッダーメニュー読み込み失敗:', err?.response?.data || err.message);
       });
   }, []);
-  // 아이콘
+  // アイコンメニューの取得とログイン状態に応じた調整
   useEffect(() => {
     const roleIdParam = isLoggedIn && typeof user?.roleId === 'number' ? user.roleId : undefined;
 
@@ -185,25 +188,25 @@ const CM_02_1000_header = () => {
 
         if (isLoggedIn) {
           menus = menus.map((item) =>
-            item.menuName === '로그인' ? { ...item, menuName: '로그아웃', url: '/' } : item
+            item.menuName === 'ログイン' ? { ...item, menuName: 'ログアウト', url: '/' } : item
           );
 
           const isAdminOrManager = typeof user?.roleId === 'number' && user.roleId <= 2;
           const hasAdminMenu = menus.some(
-            (item) => item.menuName === '관리자 페이지' || item.url === '/admin'
+            (item) => item.menuName === '管理者ページ' || item.url === '/admin'
           );
 
           if (isAdminOrManager && !hasAdminMenu) {
             menus.push({
               url: '/admin',
-              menuName: '관리자 페이지',
+              menuName: '管理者ページ',
               icon: 'bi-gear',
             });
           }
 
           if (!isAdminOrManager) {
             menus = menus.filter(
-              (item) => item.menuName !== '관리자 페이지' && item.url !== '/admin'
+              (item) => item.menuName !== '管理者ページ' && item.url !== '/admin'
             );
           }
         }
@@ -211,7 +214,7 @@ const CM_02_1000_header = () => {
         setIconMenus(menus);
       })
       .catch((err) => {
-        console.error('아이콘 메뉴 로드 실패:', err?.response?.data || err.message);
+        console.error('アイコンメニュー読み込み失敗:', err?.response?.data || err.message);
       });
   }, [isLoggedIn, user]);
 
@@ -247,7 +250,7 @@ const CM_02_1000_header = () => {
   const renderIcon = (iconClass, menuName) => (
     <div style={{ position: 'relative' }}>
       <i className={`bi ${iconClass}`} style={{ fontSize: '25px' }} />
-      {menuName === '장바구니' && cartCount > 0 && <span className="badge-cart">{cartCount}</span>}
+      {menuName === 'カート' && cartCount > 0 && <span className="badge-cart">{cartCount}</span>}
     </div>
   );
 
@@ -281,7 +284,7 @@ const CM_02_1000_header = () => {
   const renderIconMenuItem = ({ url, menuName, icon }) => {
     const iconClass = icon || iconMap[menuName] || 'bi-question-circle';
 
-    if (menuName === '로그아웃') {
+    if (menuName === 'ログアウト') {
       return (
         <button
           key={menuName}
@@ -305,9 +308,16 @@ const CM_02_1000_header = () => {
           'nav-link p-0 d-flex flex-column align-items-center text-center' +
           (isActive ? ' active' : '')
         }
-        onClick={() => {
+        onClick={(e) => {
           closeMobileMenu();
-          if (['로그인', '마이페이지', '장바구니', '관리자 페이지'].includes(menuName)) {
+
+          if (!isLoggedIn && (menuName === 'マイページ' || url === '/mypage')) {
+            e.preventDefault();
+            setOpen1005(true);
+            return;
+          }
+
+          if (['ログイン', 'マイページ', 'カート', '管理者ページ'].includes(menuName)) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }
         }}
@@ -367,7 +377,7 @@ const CM_02_1000_header = () => {
                 ))}
                 {(() => {
                   return headerMenu.length === 0 && !loading ? (
-                    <li className="nav-item text-muted">메뉴 항목이 없습니다.</li>
+                    <li className="nav-item text-muted">メニュー項目がありません。</li>
                   ) : null;
                 })()}
               </ul>
@@ -385,7 +395,7 @@ const CM_02_1000_header = () => {
           </span>
         </div>
       )}
-      {/* 모바일시용 고정헤더 */}
+      {/* モバイル用固定ヘッダー */}
       <div className="d-block d-lg-none">
         <ul className="navbar-nav d-flex flex-row gap-3 justify-content-center mt-4 mobile-footer-nav">
           {iconMenus.map(({ url, menuName, icon }) => (
@@ -395,7 +405,7 @@ const CM_02_1000_header = () => {
           ))}
         </ul>
       </div>
-      {/* 토스트 */}
+      {/* トースト */}
       {toastVisible && (
         <div
           key={toastKey}
@@ -421,8 +431,9 @@ const CM_02_1000_header = () => {
           </div>
         </div>
       )}
+      <CM_99_1005 isOpen={open1005} onClose={() => setOpen1005(false)} />
     </>
   );
 };
 
-export default CM_02_1000_header;
+export default CM_02_1000_Header;

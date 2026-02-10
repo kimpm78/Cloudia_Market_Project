@@ -21,11 +21,11 @@ export default function CM_07_1000() {
     e.preventDefault();
     const { name, email, inquiryType, title, content } = formData;
     if (!name || !email || !inquiryType || !title || !content) {
-      alert('모든 필드를 입력해 주세요.');
+      alert('すべての項目を入力してください。');
       return;
     }
-    console.log('제출된 문의:', formData);
-    alert('문의가 제출되었습니다.');
+    console.log('送信されたお問い合わせ:', formData);
+    alert('お問い合わせを送信しました。');
     setFormData({
       name: '',
       email: '',
@@ -38,29 +38,29 @@ export default function CM_07_1000() {
   return (
     <div className="container mt-4">
       <div className="contact-page">
-        <h1 className="ms-0">문의하기</h1>
-        <p>아래에서 해당되는 문제를 선택해 주세요</p>
+        <h1 className="ms-0">お問い合わせ</h1>
+        <p>以下から該当する内容を選択してください。</p>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <div className="form-text text-danger">* 표시된 항목은 필수 입력 항목입니다.</div>
+            <div className="form-text text-danger">* 印の項目は必須入力です。</div>
           </div>
           <div className="fw-semibold mb-3">
             <label htmlFor="fw-semibold email" className="form-label">
-              <span className="text-danger">*</span> 이메일 주소
+              <span className="text-danger">*</span> メールアドレス
             </label>
             <input
               type="email"
               id="email"
               name="email"
               className="form-control"
-              placeholder="이메일을 입력해 주세요"
+              placeholder="メールアドレスを入力してください"
               value={formData.email}
               onChange={handleChange}
             />
           </div>
           <div className="fw-semibold mb-3">
             <label htmlFor="inquiryType" className="form-label">
-              <span className="text-danger">*</span> 문의 유형
+              <span className="text-danger">*</span> お問い合わせ種別
             </label>
             <select
               id="inquiryType"
@@ -69,51 +69,51 @@ export default function CM_07_1000() {
               value={formData.inquiryType}
               onChange={handleChange}
             >
-              <option value="">문의 유형을 선택해 주세요</option>
-              <option value="1">상품・특전 내용</option>
-              <option value="2">상품 후의 상품불량(반품・교환)</option>
-              <option value="3">기타</option>
+              <option value="">お問い合わせ種別を選択してください</option>
+              <option value="1">商品・特典内容</option>
+              <option value="2">商品到着後の不良（返品・交換）</option>
+              <option value="3">その他</option>
             </select>
           </div>
           <div className="fw-semibold mb-3">
             <label htmlFor="title" className="form-label">
-              <span className="text-danger">*</span> 제목
+              <span className="text-danger">*</span> 件名
             </label>
             <input
               type="text"
               id="title"
               name="title"
               className="form-control"
-              placeholder="제목을 입력해 주세요"
+              placeholder="件名を入力してください"
               value={formData.title}
               onChange={handleChange}
             />
           </div>
           <div className="fw-semibold mb-3">
             <label htmlFor="content" className="form-label">
-              <span className="text-danger">*</span> 문의 내역
+              <span className="text-danger">*</span> お問い合わせ内容
             </label>
             <textarea
               id="content"
               name="content"
               className="form-control"
-              placeholder="문의 내용을 입력해 주세요"
+              placeholder="お問い合わせ内容を入力してください"
               value={formData.content}
               onChange={handleChange}
               rows="5"
             />
             <div className="form-text">
-              ※ 상품의 흠집, 더러움은 상품을 개봉한 후 닦아냄으로써, 해소하는 경우가 있습니다.
-              　상품 불량에 관하여 이미지를 첨부하실 때에는, 상품을 개봉한 상태의 사진을 첨부하실 수
-              있도록 협조 부탁드립니다.
+              ※ 商品の傷や汚れは、開封後に拭き取ることで解消する場合があります。
+              　商品不良に関して画像を添付される場合は、開封済みの状態の写真を添付いただけますよう
+              ご協力をお願いいたします。
             </div>
             <div className="form-text">
-              ※ 문의 내용을 상세히 입력해 주세요. 최대한 신속히 대응해 드리겠습니다.
+              ※ お問い合わせ内容はできるだけ詳しくご記入ください。可能な限り迅速に対応いたします。
             </div>
           </div>
           <div className="my-4">
             <button type="submit" className="btn btn-primary fw-semibold px-4">
-              제출하기
+              送信する
             </button>
           </div>
         </form>

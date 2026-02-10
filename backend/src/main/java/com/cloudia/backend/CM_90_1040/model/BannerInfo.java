@@ -22,21 +22,21 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BannerInfo {
-    private int bannerId; // 배너 아이디
-    @NotBlank(message = "배너명은 필수 입력값입니다.")
-    private String bannerName; // 배너 명
-    @NotBlank(message = "링크는 필수 입력값입니다.")
-    private String urlLink; // 배너 링크
-    private String imageLink; // 이미지 링크
-    @NotNull(message = "표시 여부는 필수 입력값입니다.")
-    private int isDisplay; // 표시 여부
-    @NotNull(message = "배너 순서는 필수 입력값입니다.")
-    @Min(value = 0, message = "배너 순서는 0 이상이어야 합니다.")
-    @Max(value = 8, message = "배너 순서는 8 이하이어야 합니다.")
-    private int displayOrder; // 표시 순서
-    private String createdBy; // 등록자
-    private LocalDateTime createdAt; // 등록일
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일
-    private MultipartFile imageFile; // 이미지 파일
+    private int bannerId;            // バナーID
+    @NotBlank(message = "バナー名は必須入力項目です。")
+    private String bannerName;       // バナー名
+    @NotBlank(message = "リンクは必須入力項目です。")
+    private String urlLink;          // バナーリンク
+    private String imageLink;        // 画像リンク
+    @NotNull(message = "表示有無は必須入力項目です。")
+    private int isDisplay;           // 表示有無
+    @NotNull(message = "表示順は必須入力項目です。")
+    @Min(value = 0, message = "表示順は0以上である必要があります。")
+    @Max(value = 8, message = "表示順は8以下である必要があります。")
+    private int displayOrder;        // 表示順
+    private String createdBy;        // 登録者
+    private LocalDateTime createdAt; // 登録日
+    private String updatedBy;        // 更新者
+    private LocalDateTime updatedAt; // 更新日
+    private MultipartFile imageFile; // 画像ファイル
 }

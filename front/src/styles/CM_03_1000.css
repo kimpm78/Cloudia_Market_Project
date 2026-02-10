@@ -2,7 +2,6 @@
   position: relative;
 }
 
-/* 상품 카드 이미지 (신상품, 예약 상품, 캐릭터, 장르 포함) */
 .product-card-img {
   width: 100%;
   object-fit: cover;

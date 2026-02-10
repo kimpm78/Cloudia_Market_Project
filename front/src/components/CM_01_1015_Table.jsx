@@ -7,39 +7,39 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 export default function CM_01_1015_Table({ returns, loading }) {
   const navigate = useNavigate();
 
-  // 컬럼 정의
+  // カラム定義
   const columnDefs = useMemo(
     () => [
       {
-        headerName: '번호',
+        headerName: '番号',
         valueGetter: 'node.rowIndex + 1',
         width: 70,
         cellStyle: { textAlign: 'center' },
       },
       {
-        headerName: '신청일자',
+        headerName: '申請日付',
         field: 'requestedAt',
         width: 120,
         cellStyle: { textAlign: 'center' },
       },
       {
-        headerName: '주문번호',
+        headerName: '注文番号',
         field: 'orderNo',
         flex: 1.2,
         cellStyle: { textAlign: 'center' },
       },
       {
-        headerName: '상품정보',
+        headerName: '商品情報',
         flex: 2,
         // products 배열의 첫 번째 요소에서 상품명 추출
         valueGetter: (params) => {
           const products = params.data.products;
-          return products && products.length > 0 ? products[0].productName : '상품 정보 없음';
+          return products && products.length > 0 ? products[0].productName : '商品情報なし';
         },
         cellStyle: { fontWeight: 'bold' },
       },
       {
-        headerName: '수량',
+        headerName: '数量',
         width: 80,
         cellStyle: { textAlign: 'center' },
         //products 배열의 첫 번째 요소에서 수량 추출
@@ -49,7 +49,7 @@ export default function CM_01_1015_Table({ returns, loading }) {
         },
       },
       {
-        headerName: '진행상태',
+        headerName: '進行状態',
         field: 'returnStatusName',
         width: 120,
         cellStyle: { textAlign: 'center' },
@@ -72,13 +72,13 @@ export default function CM_01_1015_Table({ returns, loading }) {
   };
 
   if (loading) {
-    return <div className="text-center p-5">데이터를 불러오는 중입니다...</div>;
+    return <div className="text-center p-5">データを読み込んでいます...</div>;
   }
 
   if (!returns || returns.length === 0) {
     return (
       <div className="text-center p-5 border rounded bg-light">
-        조회된 교환/반품 내역이 없습니다.
+        選択された交換・返品履歴がありません。
       </div>
     );
   }
@@ -97,7 +97,7 @@ export default function CM_01_1015_Table({ returns, loading }) {
         onRowClicked={onRowClicked}
         headerHeight={40}
         rowHeight={50}
-        overlayNoRowsTemplate="<span>내역이 없습니다.</span>"
+        overlayNoRowsTemplate="<span>選択された履歴がありません。</span>"
         pagination={false}
       />
     </div>

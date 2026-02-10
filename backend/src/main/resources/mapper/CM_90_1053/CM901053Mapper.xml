@@ -3,12 +3,12 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.cloudia.backend.CM_90_1053.mapper.StockStatusMapper">
+<mapper namespace="com.cloudia.backend.CM_90_1053.mapper.CM901053Mapper">
     <select id="findAllStockStatus" resultType="com.cloudia.backend.CM_90_1053.model.Stocks">
         <![CDATA[
         SELECT s.product_code AS productCode
              , pc.product_name AS productName
-             , pc.product_category AS productCategory 
+             , CAST(pc.product_category_code AS VARCHAR) AS productCategory
              , s.total_qty AS totalQty
              , s.cart_qty AS cartQty
              , s.defective_qty AS defectiveQty
@@ -25,7 +25,7 @@
             ON s.product_code = pc.product_code
           LEFT JOIN products p
             ON s.product_code = p.product_code
-           AND p.is_display = 1
+           AND p.is_display = '1'
          ORDER BY
                s.product_code
              , pc.product_name
@@ -36,7 +36,7 @@
         SELECT
             s.product_code AS productCode
         , pc.product_name AS productName
-        , pc.product_category AS productCategory
+        , CAST(pc.product_category_code AS VARCHAR) AS productCategory
         , s.total_qty AS totalQty
         , s.cart_qty AS cartQty
         , s.defective_qty AS defectiveQty
@@ -53,13 +53,13 @@
         ON s.product_code = pc.product_code
         LEFT JOIN products p
         ON s.product_code = p.product_code
-        AND p.is_display = 1
+        AND p.is_display = '1'
 
         <where>
-            <if test="searchType == 1">
+            <if test='searchType == "1"'>
                 AND s.product_code ILIKE CONCAT('%', #{searchTerm}, '%')
             </if>
-            <if test="searchType == 2">
+            <if test='searchType == "2"'>
                 AND pc.product_name ILIKE CONCAT('%', #{searchTerm}, '%')
             </if>
         </where>

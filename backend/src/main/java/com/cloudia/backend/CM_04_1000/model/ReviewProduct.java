@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewProduct {
-    private Long productId;      // 상품 PK
-    private String productCode;  // 상품 코드
-    private String productName;  // 상품명
-    private String thumbnailUrl; // 썸네일
+    private Long productId;      // 商品PK
+    private String productCode;  // 商品コード
+    private String productName;  // 商品名
+    private String thumbnailUrl; // サムネイル
 }

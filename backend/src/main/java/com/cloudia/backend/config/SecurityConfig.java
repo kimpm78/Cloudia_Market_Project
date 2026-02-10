@@ -80,6 +80,7 @@ public class SecurityConfig {
                                 "/api/guest/**",
                                 "/api/roles/**",
                                 "/api/pay/**",
+                                "/api/countries/**",
                                 "/api/common-codes/**")
                         .permitAll()
                         .requestMatchers("/api/user/**")

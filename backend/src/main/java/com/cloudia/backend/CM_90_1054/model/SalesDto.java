@@ -17,6 +17,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SalesDto {
-    private String month; // 합계 달
-    private BigDecimal totalAmount; // 합계 총액
+    private String month;           // 集計月
+    private BigDecimal totalAmount; // 合計金額
 }

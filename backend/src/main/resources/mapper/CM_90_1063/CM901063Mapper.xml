@@ -8,7 +8,7 @@
         SELECT product_code
               ,product_name
           FROM product_code
-         WHERE is_active = 1
+         WHERE is_display = '1'
       ORDER BY product_code ASC;
     </select>
     
@@ -18,14 +18,14 @@
               ,s.price
               ,s.total_qty
               ,s.available_qty
-              ,p.product_category AS productCategory
+              ,CAST(p.product_category_code AS VARCHAR) AS productCategory
               ,s.updated_by
               ,s.updated_at
           FROM product_code p
           LEFT JOIN stocks s
             ON s.product_code = p.product_code
          WHERE p.product_code = #{productCode}
-           AND p.is_active = 1
+           AND p.is_display = '1'
     </select>
 
     <select id="findAllStocks" resultType="com.cloudia.backend.CM_90_1063.model.StockInfo">
@@ -42,7 +42,7 @@
             ON stocks.stock_id = stock_details.stock_id
         LEFT JOIN product_code 
             ON stocks.product_code = product_code.product_code
-           AND product_code.is_active = 1
+           AND product_code.is_display = '1'
         ORDER BY stock_details.created_at DESC
     </select>
 
@@ -60,12 +60,12 @@
             ON stocks.stock_id = stock_details.stock_id
         LEFT JOIN product_code 
             ON stocks.product_code = product_code.product_code
-           AND product_code.is_active = 1
+           AND product_code.is_display = '1'
         <where>
-            <if test="searchType eq 1">
+            <if test='searchType == "1"'>
                 AND stocks.product_code LIKE CONCAT('%', #{searchTerm}, '%')
             </if>
-            <if test="searchType eq 2">
+            <if test='searchType == "2"'>
                 AND product_code.product_name ILIKE CONCAT('%', #{searchTerm}, '%')
             </if>
         </where>

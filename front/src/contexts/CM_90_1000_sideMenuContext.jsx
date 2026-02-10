@@ -19,17 +19,22 @@ export const MenuProvider = ({ children }) => {
   const fetchMenuData = async () => {
     try {
       setLoading(true);
-      const res = await axiosInstance.get(
-        `${import.meta.env.VITE_API_BASE_URL}/admin/menu/all`,
-        []
-      );
+      const res = await axiosInstance.get(`${import.meta.env.VITE_API_BASE_URL}/admin/menu/all`);
       if (res.status === 200) {
-        setMenuData(res.data);
+        const normalized = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.resultList)
+            ? res.data.resultList
+            : Array.isArray(res.data?.menus)
+              ? res.data.menus
+              : [];
+        setMenuData(normalized);
         setError(null);
       }
     } catch (err) {
       console.error('메뉴 데이터 불러오기 실패:', err);
       setError(err);
+      setMenuData([]);
     } finally {
       setLoading(false);
     }

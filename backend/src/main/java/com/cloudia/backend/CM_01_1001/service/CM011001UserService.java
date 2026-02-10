@@ -9,34 +9,34 @@ import com.cloudia.backend.CM_01_1001.model.SignUpRequestModel;
 public interface CM011001UserService {
 
     /**
-     * 새로운 사용자를 등록
+     * 新しいユーザーを登録
      * 
-     * @param request 사용자 등록 데이터
-     * @return 등록된 SignUpRequestModel 객체
+     * @param request ユーザー登録データ
+     * @return 登録された SignUpRequestModel オブジェクト
      */
     ResponseEntity<Map<String, Object>> signUp(SignUpRequestModel request);
 
     /**
-     * 로그인 ID의 사용 가능 여부를 확인
+     * ログイン IDの使用可能 여부を確認
      *
-     * @param loginId 중복 여부를 확인할 로그인 ID
+     * @param loginId 重複有無を確認するログインID
      * @return {@code ResponseEntity<Integer>}
      */
 
     ResponseEntity<Integer> checkLoginId(String loginId);
 
     /**
-     * * 이메일 확인
-     * * @param email 확인할 이메일 주소
+     * メールアドレスの確認
+     * @param email 確認するメールアドレス
      * 
-     * @return 사용 가능하면 true, 이미 존재하면 false
+     * @return 使用可能であれば true、既に存在すれば false
      */
     boolean isEmailAvailable(String email);
 
     /**
-     * 개인통관고유부호(PCCC)의 사용 가능 여부를 확인
+     * 個人通関固有符号（PCCC）の利用可否を確認
      *
-     * @param pccc 중복 여부를 확인할 PCCC 번호
+     * @param pccc 重複有無を確認するPCCC番号
      * @return {@code ResponseEntity<Integer>}
      */
     ResponseEntity<Integer> checkPccc(String pccc);

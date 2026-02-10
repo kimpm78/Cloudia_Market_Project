@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 @Builder
 public class CategoryGroupForCheckbox {
-    private String groupCode;
-    private String groupName;
-    private List<CategoryItem> categories;
+    private String groupCode;              // カテゴリーグループコード
+    private String groupName;              // カテゴリーグループ名
+    private List<CategoryItem> categories; // カテゴリー項目一覧
 }

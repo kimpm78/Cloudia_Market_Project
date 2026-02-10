@@ -5,38 +5,46 @@
 
 <mapper namespace="com.cloudia.backend.CM_04_1000.mapper.CM041000Mapper">
 
-    <!-- 리뷰 하드 삭제 -->
+    <!-- レビューの論理削除 -->
     <delete id="deleteReview" parameterType="map">
-        DELETE FROM reviews
+        UPDATE reviews
+        SET    is_display = '0'
+              ,updated_by  = #{updatedBy}
+              ,updated_at  = NOW()
         WHERE review_id = #{reviewId}
-          AND user_id   = #{userId}
+          AND member_number = (
+                SELECT u.member_number
+                FROM users u
+                WHERE u.user_id = CAST(#{userId} AS BIGINT)
+                LIMIT 1
+          )
     </delete>
 
-    <!-- 리뷰 내용 수정 -->
+    <!-- レビュー内容の修正 -->
     <update id="updateReviewContent" parameterType="map">
         UPDATE reviews
         SET    content    = #{content}
               ,updated_by = COALESCE(#{updatedBy}, updated_by)
               ,updated_at = NOW()
         WHERE  review_id  = #{reviewId}
-          AND  delete_flag = 0
+          AND  is_display = '1'
     </update>
 
-    <!-- 리뷰 메인 이미지 업데이트 -->
+    <!-- レビューのメイン画像更新 -->
     <update id="updateReviewImage" parameterType="map">
         UPDATE reviews
         SET    image_url  = #{imageUrl}
               ,updated_at = NOW()
         WHERE  review_id  = #{reviewId}
-          AND  delete_flag = 0
+          AND  is_display = '1'
     </update>
 
-    <!-- 리뷰 목록 조회 (productId가 없으면 전체 조회) -->
+    <!-- レビュー一覧取得（productIdがない場合は全件取得）-->
     <select id="selectReviews"
             parameterType="map"
             resultType="com.cloudia.backend.CM_04_1000.model.ReviewInfo">
         SELECT r.review_id  AS reviewId
-              ,r.user_id    AS userId
+              ,u.user_id    AS userId
               ,r.product_id AS productId
               ,r.review_type AS reviewType
               ,r.title      AS title
@@ -48,7 +56,9 @@
               ,r.updated_at AS updatedAt
               ,NULLIF(SUBSTRING(r.content FROM 1 FOR 100), '') AS summary
           FROM reviews r
-         WHERE r.delete_flag = 0
+          LEFT JOIN users u
+            ON u.member_number = r.member_number
+         WHERE r.is_display = '1'
         <if test="productId != null">
            AND r.product_id = #{productId}
         </if>
@@ -60,15 +70,14 @@
         </if>
     </select>
 
-    <!-- 리뷰 작성 -->
+    <!-- レビュー作成 -->
     <insert id="writeReview"
             parameterType="com.cloudia.backend.CM_04_1000.model.ReviewRequest"
             useGeneratedKeys="true"
             keyProperty="reviewId"
             keyColumn="review_id">
         INSERT INTO reviews (
-            user_id
-           ,member_number
+            member_number
            ,order_number
            ,product_id
            ,product_code
@@ -77,15 +86,14 @@
            ,image_url
            ,content
            ,view_count
-           ,delete_flag
+           ,is_display
            ,created_by
            ,created_at
            ,updated_by
            ,updated_at
         )
         VALUES (
-            #{userId}
-           ,#{memberNumber}
+            #{memberNumber}
            ,#{orderNumber}
            ,#{productId}
            ,#{productCode}
@@ -94,7 +102,7 @@
            ,#{imageUrl}
            ,#{content}
            ,0
-           ,0
+           ,'1'
            ,#{createdBy}
            ,NOW()
            ,#{createdBy}
@@ -103,12 +111,12 @@
         RETURNING review_id
     </insert>
 
-    <!-- 리뷰 상세 조회 -->
+    <!-- レビュー詳細取得 -->
     <select id="selectReviewById"
             parameterType="long"
             resultType="com.cloudia.backend.CM_04_1000.model.ReviewInfo">
         SELECT r.review_id   AS reviewId
-              ,r.user_id     AS userId
+              ,u.user_id     AS userId
               ,r.product_id  AS productId
               ,r.review_type AS reviewType
               ,r.title       AS title
@@ -121,16 +129,18 @@
               ,r.updated_at  AS updatedAt
               ,(
                     SELECT COUNT(1)
-                      FROM comments c
-                     WHERE CAST(c.post_id AS bigint) = r.review_id
-                       AND c.is_active = 1
+                      FROM review_comments rc
+                     WHERE rc.review_id = r.review_id
+                       AND rc.is_display = '1'
                ) AS commentCount
           FROM reviews r
+          LEFT JOIN users u
+            ON u.member_number = r.member_number
          WHERE r.review_id   = #{reviewId, jdbcType=BIGINT}
-           AND r.delete_flag = 0
+           AND r.is_display = '1'
     </select>
 
-    <!-- 주문과 연관된 상품 정보를 포함한 결과 매핑 -->
+    <!-- 注文に紐づく商品情報を含む結果マッピング -->
     <resultMap id="OrderWithProductsMap" type="com.cloudia.backend.CM_04_1000.model.OrderDetailResponse">
         <id     property="orderId"      column="orderId"/>
         <result property="memberNumber" column="memberNumber"/>
@@ -143,7 +153,7 @@
         </collection>
     </resultMap>
 
-    <!-- 주문과 상품 정보를 함께 조회 -->
+    <!-- 注文と商品情報をあわせて取得 -->
     <select id="selectOrdersWithProducts"
             resultMap="OrderWithProductsMap"
             parameterType="string">
@@ -153,18 +163,18 @@
               ,o.order_date    AS orderDate
               ,p.product_id    AS productId
               ,p.product_code  AS productCode
-              ,p.name          AS productName
+              ,p.title         AS productName
           FROM orders o
           JOIN order_details d
             ON o.member_number = d.member_number
            AND o.order_number  = d.order_number
           JOIN products p
-            ON p.product_code  = d.product_id
+            ON p.product_code  = d.product_code
          WHERE o.member_number = #{memberNumber}
          ORDER BY o.order_date ASC
     </select>
 
-    <!-- 리뷰 작성 전 구매 내역 확인 -->
+    <!-- レビュー作成前に購入履歴を確認 -->
     <select id="checkOrderProduct"
             parameterType="map"
             resultType="int">
@@ -174,13 +184,13 @@
             ON o.member_number = od.member_number
            AND o.order_number  = od.order_number
           JOIN products p
-            ON p.product_code  = od.product_id
+            ON p.product_code  = od.product_code
          WHERE o.member_number = #{memberNumber}
            AND o.order_number  = #{orderNumber}
            AND p.product_code  = #{productCode}
     </select>
 
-    <!-- 상품 코드로 상품 ID 조회 -->
+    <!-- 商品コードから商品IDを取得 -->
     <select id="findProductIdByCode"
             parameterType="string"
             resultType="long">
@@ -190,7 +200,7 @@
          LIMIT 1
     </select>
 
-    <!-- 리뷰 첨부파일 삽입 -->
+    <!-- レビュー添付ファイル挿入 -->
     <insert id="insertReviewAttachment"
             parameterType="com.cloudia.backend.CM_04_1000.model.Attachments"
             useGeneratedKeys="true"
@@ -224,7 +234,7 @@
         )
     </insert>
 
-    <!-- 이미지 ID로 리뷰 첨부파일 삭제 (논리 비표시) -->
+    <!-- 画像IDでレビュー添付ファイルを削除（論理的に非表示化） -->
     <delete id="deleteReviewAttachment" parameterType="map">
         UPDATE attachments
         SET    is_display = 0
@@ -233,21 +243,21 @@
           AND  attachment_id = #{imageId}
     </delete>
 
-    <!-- 리뷰 조회수 증가 -->
+    <!-- レビュー閲覧数増加 -->
     <update id="incrementViewCount" parameterType="long">
         UPDATE reviews
         SET    view_count = COALESCE(view_count, 0) + 1
               ,updated_at = NOW()
         WHERE  review_id   = #{reviewId, jdbcType=BIGINT}
-          AND  delete_flag = 0
+          AND  is_display = '1'
     </update>
 
-    <!-- 리뷰 전체 수정 -->
+    <!-- レビュー全体更新 -->
     <update id="updateReview" parameterType="map">
         UPDATE reviews
         SET    title         = COALESCE(#{review.title},        title)
               ,content       = COALESCE(#{review.content},      content)
-              ,review_type   = COALESCE(#{review.reviewType},   review_type)
+              ,review_type   = COALESCE(CAST(#{review.reviewType} AS VARCHAR), review_type)
               ,product_id    = COALESCE(#{review.productId},    product_id)
               ,product_code  = COALESCE(#{review.productCode},  product_code)
               ,member_number = COALESCE(#{review.memberNumber}, member_number)
@@ -255,8 +265,14 @@
               ,updated_by    = COALESCE(#{review.updatedBy},    updated_by)
               ,updated_at    = NOW()
         WHERE  review_id    = #{reviewId}
-          AND  delete_flag  = 0
-          AND  user_id      = COALESCE(#{review.userId, jdbcType=BIGINT}, user_id)
+          AND  is_display   = '1'
+          AND  member_number = COALESCE(
+                (SELECT u.member_number
+                 FROM users u
+                 WHERE u.user_id = CAST(#{review.userId, jdbcType=BIGINT} AS BIGINT)
+                 LIMIT 1),
+                member_number
+          )
     </update>
 
 </mapper>

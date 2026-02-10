@@ -17,7 +17,7 @@ import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import Image from '@tiptap/extension-image';
 
-export const getExtensions = (placeholderText = '내용을 입력해주세요.') => [
+export const getExtensions = (placeholderText = '内容を入力してください。') => [
   StarterKit.configure({
     heading: false,
     horizontalRule: false,

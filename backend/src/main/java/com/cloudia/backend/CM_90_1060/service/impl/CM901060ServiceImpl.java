@@ -34,10 +34,10 @@ import com.cloudia.backend.CM_90_1060.model.ProductDetails;
 import com.cloudia.backend.CM_90_1060.model.ProductUpt;
 import com.cloudia.backend.CM_90_1060.model.Products;
 import com.cloudia.backend.CM_90_1060.model.RequestModel;
-import com.cloudia.backend.CM_90_1060.model.ResponseModel;
 import com.cloudia.backend.CM_90_1060.model.ResponseProducts;
 import com.cloudia.backend.CM_90_1060.model.Stock;
 import com.cloudia.backend.CM_90_1060.service.CM901060Service;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.common.exception.AuthenticationException;
 import com.cloudia.backend.common.exception.ErrorCode;
 import com.cloudia.backend.common.log.LogHelper;
@@ -76,47 +76,47 @@ public class CM901060ServiceImpl implements CM901060Service {
     public ResponseEntity<ResponseModel<List<ResponseProducts>>> findAllProduct() {
         try {
             List<ResponseProducts> responseProducts = cm901060Mapper.findAllProduct();
-            log.info("조회된 카테고리 그룹 수: {}", responseProducts == null ? 0 : responseProducts.size());
+            log.info("取得したカテゴリグループ数: {}", responseProducts == null ? 0 : responseProducts.size());
 
-            return ResponseEntity.ok(createResponseModel(responseProducts, true, "카테고리 그룹 조회 성공"));
+            return ResponseEntity.ok(createResponseModel(responseProducts, true, "カテゴリグループの取得に成功しました"));
         } catch (DataAccessException dae) {
-            // DB 관련 예외
-            log.error("DB 접근 중 오류 발생: {}", dae.getMessage(), dae);
+            // DB関連例外
+            log.error("DBアクセス中にエラーが発生しました: {}", dae.getMessage(), dae);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(Collections.emptyList(), false, "데이터베이스 오류가 발생했습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "データベースエラーが発生しました。"));
 
         } catch (NullPointerException npe) {
-            // Null 처리 예외
-            log.error("NullPointerException 발생: {}", npe.getMessage(), npe);
+            // Null処理例外
+            log.error("NullPointerExceptionが発生しました: {}", npe.getMessage(), npe);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(createResponseModel(Collections.emptyList(), false, "필수 데이터가 누락되었습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "必須データが不足しています。"));
 
         } catch (Exception e) {
-            // 그 외 일반 예외
-            log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+            // その他の一般例外
+            log.error("予期しないエラーが発生しました: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(Collections.emptyList(), false, "서버 내부 오류가 발생했습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "サーバー内部エラーが発生しました。"));
         }
     }
 
     /**
-     * 특정 상품 리스트 조회
-     * 
-     * @param searchTerm 키워드
-     * @param searchType 타입 (1:상품 코드, 2:상품 명)
-     * @return 상품 리스트
+     * 特定商品の一覧を取得
+     *
+     * @param searchTerm 検索キーワード
+     * @param searchType 検索タイプ（1: 商品コード、2: 商品名）
+     * @return 商品一覧
      */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseModel<List<ResponseProducts>>> getFindProduct(String searchTerm, int searchType) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
-            log.warn("상품 검색 실패: 검색어가 비어있습니다.");
+            log.warn("商品検索失敗: 検索語が空です。");
             return ResponseEntity.badRequest()
-                    .body(createResponseModel(Collections.emptyList(), false, "검색어를 입력해주세요."));
+                    .body(createResponseModel(Collections.emptyList(), false, "検索語を入力してください。"));
         }
 
         String trimmedSearchTerm = searchTerm.trim();
-        log.info("상품 검색 시작, 검색어: {}", trimmedSearchTerm);
+        log.info("商品検索開始, 検索語: {}", trimmedSearchTerm);
 
         try {
             List<ResponseProducts> responseProducts = cm901060Mapper.findByProduct(trimmedSearchTerm, searchType);
@@ -124,46 +124,43 @@ public class CM901060ServiceImpl implements CM901060Service {
                 responseProducts = Collections.emptyList();
             }
 
-            return ResponseEntity.ok(createResponseModel(responseProducts, true, "카테고리 그룹 조회 성공"));
+            return ResponseEntity.ok(createResponseModel(responseProducts, true, "カテゴリグループの取得に成功しました"));
         } catch (DataAccessException dae) {
-            // DB 관련 예외
-            log.error("DB 접근 중 오류 발생: {}", dae.getMessage(), dae);
+            log.error("DBアクセス中にエラーが発生しました: {}", dae.getMessage(), dae);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(Collections.emptyList(), false, "데이터베이스 오류가 발생했습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "データベースエラーが発生しました。"));
 
         } catch (NullPointerException npe) {
-            // Null 처리 예외
-            log.error("NullPointerException 발생: {}", npe.getMessage(), npe);
+            log.error("NullPointerExceptionが発生しました: {}", npe.getMessage(), npe);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(createResponseModel(Collections.emptyList(), false, "필수 데이터가 누락되었습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "必須データが不足しています。"));
 
         } catch (Exception e) {
-            // 그 외 일반 예외
-            log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+            log.error("予期しないエラーが発生しました: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(Collections.emptyList(), false, "서버 내부 오류가 발생했습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "サーバー内部エラーが発生しました。"));
         }
     }
 
     /**
-     * 상품 삭제
-     * 
-     * @param productIds 삭제 아이디 리스트
-     * @return 삭제 여부
+     * 商品削除
+     *
+     * @param productIds 削除対象IDのリスト
+     * @return 削除結果
      */
     @Override
     @Transactional
     public ResponseEntity<ResponseModel<Integer>> delProduct(List<Integer> productIds, String userId) {
         if (productIds == null || productIds.isEmpty()) {
-            log.warn("상품 검색 실패: 검색어가 비어있습니다.");
+            log.warn("商品検索失敗: 検索語が空です。");
             return ResponseEntity.badRequest()
-                    .body(createResponseModel(0, false, "검색어를 입력해주세요."));
+                    .body(createResponseModel(0, false, "検索語を入力してください。"));
         }
         if (null == userId || userId.isBlank()) {
-            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "상품 조회" });
+            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "商品照会" });
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
-        log.info("상품 검색 시작, 검색어: {}");
+        log.info("商品検索開始, 検索語: {}");
         try {
             int result = 0;
             result += cm901060Mapper.delProduct(productIds);
@@ -188,116 +185,107 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 카테고리 그룹 코드 전체 리스트 조회
-     * 
-     * @return 카테고리 그룹 코드 전체 리스트
+     * カテゴリグループコードの全件リストを取得
+     *
+     * @return カテゴリグループコードの全件リスト
      */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseModel<List<Categories>>> findAllCategoryGroupCode() {
         try {
             List<Categories> categoryGroupCodeList = cm901060Mapper.findAllCategoryGroupCode();
-            log.info("조회된 카테고리 그룹 수: {}", categoryGroupCodeList == null ? 0 : categoryGroupCodeList.size());
+            log.info("取得したカテゴリグループ数: {}", categoryGroupCodeList == null ? 0 : categoryGroupCodeList.size());
 
-            return ResponseEntity.ok(createResponseModel(categoryGroupCodeList, true, "카테고리 그룹 조회 성공"));
+            return ResponseEntity.ok(createResponseModel(categoryGroupCodeList, true, "カテゴリグループの取得に成功しました"));
         } catch (DataAccessException dae) {
-            // DB 관련 예외
-            log.error("DB 접근 중 오류 발생: {}", dae.getMessage(), dae);
+            log.error("DBアクセス中にエラーが発生しました: {}", dae.getMessage(), dae);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(Collections.emptyList(), false, "데이터베이스 오류가 발생했습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "データベースエラーが発生しました。"));
 
         } catch (NullPointerException npe) {
-            // Null 처리 예외
-            log.error("NullPointerException 발생: {}", npe.getMessage(), npe);
+            log.error("NullPointerExceptionが発生しました: {}", npe.getMessage(), npe);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(createResponseModel(Collections.emptyList(), false, "필수 데이터가 누락되었습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "必須データが不足しています。"));
 
         } catch (Exception e) {
-            // 그 외 일반 예외
-            log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+            log.error("予期しないエラーが発生しました: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(Collections.emptyList(), false, "서버 내부 오류가 발생했습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "サーバー内部エラーが発生しました。"));
         }
     }
 
     /**
-     * 선택 된 카테고리 그룹의 하위 카테고리 정보 조회
-     * 
-     * @param categoryGroupCode 카테고리 그룹 코드드
-     * @return 하위 카테고리 정보
+     * 選択したカテゴリグループの下位カテゴリ情報を取得
+     *
+     * @param categoryGroupCode カテゴリグループコード
+     * @return 下位カテゴリ情報
      */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseModel<List<CategoryDetails>>> findCategory(List<String> categoryGroupCode) {
         try {
             List<CategoryDetails> CategoryDetailList = cm901060Mapper.findCategory(categoryGroupCode);
-            log.info("조회된 하위 카테고리 정보 수: {}", CategoryDetailList == null ? 0 : CategoryDetailList.size());
+            log.info("取得した下位カテゴリ情報数: {}", CategoryDetailList == null ? 0 : CategoryDetailList.size());
 
-            return ResponseEntity.ok(createResponseModel(CategoryDetailList, true, "하위 카테고리 정보 조회 성공"));
+            return ResponseEntity.ok(createResponseModel(CategoryDetailList, true, "下位カテゴリ情報の取得に成功しました"));
         } catch (DataAccessException dae) {
-            // DB 관련 예외
-            log.error("DB 접근 중 오류 발생: {}", dae.getMessage(), dae);
+            log.error("DBアクセス中にエラーが発生しました: {}", dae.getMessage(), dae);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(Collections.emptyList(), false, "데이터베이스 오류가 발생했습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "データベースエラーが発生しました。"));
 
         } catch (NullPointerException npe) {
-            // Null 처리 예외
-            log.error("NullPointerException 발생: {}", npe.getMessage(), npe);
+            log.error("NullPointerExceptionが発生しました: {}", npe.getMessage(), npe);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(createResponseModel(Collections.emptyList(), false, "필수 데이터가 누락되었습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "必須データが不足しています。"));
 
         } catch (Exception e) {
-            // 그 외 일반 예외
-            log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+            log.error("予期しないエラーが発生しました: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(Collections.emptyList(), false, "서버 내부 오류가 발생했습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "サーバー内部エラーが発生しました。"));
         }
     }
 
     /**
-     * 등록 가능한 재고 리스트 조회
-     * 
-     * @return 재고 리스트
+     * 登録可能な在庫リストを取得
+     *
+     * @return 在庫リスト
      */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseModel<List<Stock>>> findAllStockCode() {
         try {
             List<Stock> stockCodeList = cm901060Mapper.findAllStockCode();
-            log.info("조회된 재고 코드 수: {}", stockCodeList == null ? 0 : stockCodeList.size());
+            log.info("取得した在庫コード数: {}", stockCodeList == null ? 0 : stockCodeList.size());
 
-            return ResponseEntity.ok(createResponseModel(stockCodeList, true, "재고 코드 조회 성공"));
+            return ResponseEntity.ok(createResponseModel(stockCodeList, true, "在庫コードの取得に成功しました"));
         } catch (DataAccessException dae) {
-            // DB 관련 예외
-            log.error("DB 접근 중 오류 발생: {}", dae.getMessage(), dae);
+            log.error("DBアクセス中にエラーが発生しました: {}", dae.getMessage(), dae);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(Collections.emptyList(), false, "데이터베이스 오류가 발생했습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "データベースエラーが発生しました。"));
 
         } catch (NullPointerException npe) {
-            // Null 처리 예외
-            log.error("NullPointerException 발생: {}", npe.getMessage(), npe);
+            log.error("NullPointerExceptionが発生しました: {}", npe.getMessage(), npe);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(createResponseModel(Collections.emptyList(), false, "필수 데이터가 누락되었습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "必須データが不足しています。"));
 
         } catch (Exception e) {
-            // 그 외 일반 예외
-            log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+            log.error("予期しないエラーが発生しました: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(Collections.emptyList(), false, "서버 내부 오류가 발생했습니다."));
+                    .body(createResponseModel(Collections.emptyList(), false, "サーバー内部エラーが発生しました。"));
         }
     }
 
     /**
-     * 특정 상품 조회
-     * 
-     * @param productId 상품 코드
-     * @return 특정 상품 리스트
+     * 特定商品の取得
+     *
+     * @param productId 商品ID
+     * @return 特定商品情報
      */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseModel<ProductUpt>> findByProductCode(int productId) {
         try {
-            log.info("상품 검색 시작, 상품코드: {}", productId);
+            log.info("商品検索開始, 商品コード: {}", productId);
             ProductUpt responseProduct = cm901060Mapper.findByUpdProductById(productId);
             List<Attachments> apAttachments = cm901060Mapper.editorGet(Long.valueOf(productId));
             List<String> detailData = new ArrayList<>();
@@ -305,72 +293,69 @@ public class CM901060ServiceImpl implements CM901060Service {
                 detailData.add(data.getFilePath());
             }
             responseProduct.setDetailImages(detailData);
-            return ResponseEntity.ok(createResponseModel(responseProduct, true, "특정 상품 조회 성공"));
+            return ResponseEntity.ok(createResponseModel(responseProduct, true, "特定商品の取得に成功しました"));
         } catch (DataAccessException dae) {
-            // DB 관련 예외
-            log.error("DB 접근 중 오류 발생: {}", dae.getMessage(), dae);
+            log.error("DBアクセス中にエラーが発生しました: {}", dae.getMessage(), dae);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(null, false, "데이터베이스 오류가 발생했습니다."));
+                    .body(createResponseModel(null, false, "データベースエラーが発生しました。"));
 
         } catch (NullPointerException npe) {
-            // Null 처리 예외
-            log.error("NullPointerException 발생: {}", npe.getMessage(), npe);
+            log.error("NullPointerExceptionが発生しました: {}", npe.getMessage(), npe);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(createResponseModel(null, false, "필수 데이터가 누락되었습니다."));
+                    .body(createResponseModel(null, false, "必須データが不足しています。"));
 
         } catch (Exception e) {
-            // 그 외 일반 예외
-            log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+            log.error("予期しないエラーが発生しました: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(null, false, "서버 내부 오류가 발생했습니다."));
+                    .body(createResponseModel(null, false, "サーバー内部エラーが発生しました。"));
         }
     }
 
     /**
-     * 상품 등록
-     * 
-     * @param entity 등록 할 상품 정보
-     * @return 상품 여부
+     * 商品登録
+     *
+     * @param entity 登録する商品情報
+     * @return 登録結果
      */
     @Override
     @Transactional
     public ResponseEntity<ResponseModel<Integer>> productUpload(@ModelAttribute RequestModel entity, String userId) {
         log.info(CM901040MessageConstant.BANNER_UPLOAD_START, entity != null ? entity.getProductCode() : "null");
         if (null == userId || userId.isBlank()) {
-            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "상품 조회" });
+            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "商品照会" });
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
         try {
             if (entity == null) {
-                return ResponseEntity.ok(createResponseModel(null, false, "등록할 상품 정보가 존재하지 않습니다."));
+                return ResponseEntity.ok(createResponseModel(null, false, "登録する商品情報が存在しません。"));
             }
 
             int result = cm901060Mapper.findByProductByCode(entity.getProductCode());
 
             if (result > 0) {
-                return ResponseEntity.ok(createResponseModel(null, false, "이미 등록된 상품 코드입니다."));
+                return ResponseEntity.ok(createResponseModel(null, false, "既に登録されている商品コードです。"));
             }
             if (!entity.getExpectedDeliveryDate().isEmpty()
                     && !dateCalculator.isFutureMonth(entity.getExpectedDeliveryDate())) {
-                return ResponseEntity.ok(createResponseModel(null, false, "출고월은 과거 월로 할수없습니다."));
+                return ResponseEntity.ok(createResponseModel(null, false, "出荷月を過去の月に設定することはできません。"));
             }
             if (!entity.getReservationDeadline().isEmpty()
                     && !dateCalculator.isFutureDate(entity.getReservationDeadline())) {
-                return ResponseEntity.ok(createResponseModel(null, false, "예약날짜는 과거 날짜로 할수없습니다."));
+                return ResponseEntity.ok(createResponseModel(null, false, "予約日を過去の日付に設定することはできません。"));
             }
 
             String productFolder = null;
             productFolder = determineProductFolder(entity);
 
-            // 섬네일 저장
+            // サムネイル保存
             String savedThumbnailName = null;
             if (null != entity.getProductFile() && !entity.getProductFile().isEmpty()) {
                 savedThumbnailName = saveFile(entity.getProductFile(), "product/".concat(productFolder));
                 if (savedThumbnailName == null) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(createResponseModel(0, false, "정보가 없습니다"));
+                            .body(createResponseModel(0, false, "情報がありません"));
                 }
-                log.info("섬네일 저장 완료", savedThumbnailName);
+                log.info("サムネイル保存完了", savedThumbnailName);
             }
 
             List<String> savedDetailNames = new ArrayList<>();
@@ -380,29 +365,29 @@ public class CM901060ServiceImpl implements CM901060Service {
                     String savedDetailName = saveFile(data, "product/".concat(productFolder));
                     if (savedDetailName == null) {
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(createResponseModel(0, false, "정보가 없습니다"));
+                                .body(createResponseModel(0, false, "情報がありません"));
                     }
                     savedDetailNames.add("product/".concat(productFolder).concat("/").concat(savedDetailName));
-                    log.debug("상세이미지 저장 완료", savedDetailName);
+                    log.debug("詳細画像保存完了", savedDetailName);
                 }
             }
 
-            // 에디터 HTML 내용에서 이미지 처리
+            // エディタHTML内容での画像処理
             String processedProductNote = null;
             List<String> movedImagePaths = new ArrayList<>();
 
             if (null != entity.getProductnote() && !entity.getProductnote().isEmpty()) {
 
-                System.out.println("원본 ProductNote: " + entity.getProductnote());
+                System.out.println("元のProductNote: " + entity.getProductnote());
 
-                // HTML에서 임시 이미지 경로들 추출 및 처리
+                // HTMLから一時画像パスを抽出して処理
                 processedProductNote = processEditorImages(entity.getProductnote(), productFolder, movedImagePaths);
 
-                // 처리된 HTML 내용을 entity에 다시 설정
+                // 処理後のHTML内容をentityへ再設定
                 entity.setProductnote(processedProductNote);
 
-                System.out.println("처리된 ProductNote: " + processedProductNote);
-                log.debug("에디터 내용 처리 완료. 이동된 이미지 수: {}", movedImagePaths.size());
+                System.out.println("処理後のProductNote: " + processedProductNote);
+                log.debug("エディタ内容の処理完了。移動した画像数: {}", movedImagePaths.size());
 
             }
 
@@ -414,7 +399,7 @@ public class CM901060ServiceImpl implements CM901060Service {
 
             insertProductDetail(productId, productFolder, savedThumbnailName, entity.getProductnote(), userId);
 
-            return ResponseEntity.ok(createResponseModel(1, true, "상품 등록 성공"));
+            return ResponseEntity.ok(createResponseModel(1, true, "商品登録成功"));
         } catch (Exception e) {
             log.error(CM901040MessageConstant.BANNER_UPLOAD_UNEXPECTED_ERROR, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -424,45 +409,45 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 상품 수정
-     * 
-     * @param entity 수정 할 상품 정보
-     * @return 상품 수정 여부
+     * 商品更新
+     *
+     * @param entity 更新する商品情報
+     * @return 更新結果
      */
     @Override
     @Transactional
     public ResponseEntity<ResponseModel<Integer>> productUpdate(@ModelAttribute RequestModel entity, String userId) {
         log.info(CM901040MessageConstant.BANNER_UPLOAD_START, entity != null ? entity.getProductCode() : "null");
         if (null == userId || userId.isBlank()) {
-            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "상품 조회" });
+            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "商品照会" });
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
         try {
             if (entity == null) {
-                return ResponseEntity.ok(createResponseModel(null, false, "등록할 상품 정보가 존재하지 않습니다."));
+                return ResponseEntity.ok(createResponseModel(null, false, "登録する商品情報が存在しません。"));
             }
 
             if (!entity.getExpectedDeliveryDate().isEmpty()
                     && !dateCalculator.isFutureMonth(entity.getExpectedDeliveryDate())) {
-                return ResponseEntity.ok(createResponseModel(null, false, "출고월은 과거 월로 할수없습니다."));
+                return ResponseEntity.ok(createResponseModel(null, false, "出荷月を過去の月に設定することはできません。"));
             }
             if (!entity.getReservationDeadline().isEmpty()
                     && !dateCalculator.isFutureDate(entity.getReservationDeadline())) {
-                return ResponseEntity.ok(createResponseModel(null, false, "예약날짜는 과거 날짜로 할수없습니다."));
+                return ResponseEntity.ok(createResponseModel(null, false, "予約日を過去の日付に設定することはできません。"));
             }
 
             String productFolder = null;
             productFolder = determineProductFolder(entity);
 
-            // 섬네일 저장
+            // サムネイル保存
             String savedThumbnailName = null;
             if (entity.getProductFile() != null && !entity.getProductFile().isEmpty()) {
                 savedThumbnailName = saveFile(entity.getProductFile(), "product/".concat(productFolder));
                 if (savedThumbnailName == null) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(createResponseModel(0, false, "정보가 없습니다"));
+                            .body(createResponseModel(0, false, "情報がありません"));
                 }
-                log.debug("섬네일 저장 완료", savedThumbnailName);
+                log.debug("サムネイル保存完了", savedThumbnailName);
             }
 
             List<String> savedDetailNames = new ArrayList<>();
@@ -472,28 +457,28 @@ public class CM901060ServiceImpl implements CM901060Service {
                     String savedDetailName = saveFile(data, "product/".concat(productFolder));
                     if (savedDetailName == null) {
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(createResponseModel(0, false, "정보가 없습니다"));
+                                .body(createResponseModel(0, false, "情報がありません"));
                     }
                     savedDetailNames.add("product/".concat(productFolder).concat("/").concat(savedDetailName));
-                    log.debug("상세이미지 저장 완료", savedDetailName);
+                    log.debug("詳細画像保存完了", savedDetailName);
                 }
             }
-            // 에디터 HTML 내용에서 이미지 처리
+            // エディタHTML内容での画像処理
             String processedProductNote = null;
             List<String> movedImagePaths = new ArrayList<>();
 
             if (entity.getProductnote() != null && !entity.getProductnote().isEmpty()) {
 
-                System.out.println("원본 ProductNote: " + entity.getProductnote());
+                System.out.println("元のProductNote: " + entity.getProductnote());
 
-                // HTML에서 임시 이미지 경로들 추출 및 처리
+                // HTMLから一時画像パスを抽出して処理
                 processedProductNote = processEditorImages(entity.getProductnote(), productFolder, movedImagePaths);
 
-                // 처리된 HTML 내용을 entity에 다시 설정
+                // 処理後のHTML内容をentityへ再設定
                 entity.setProductnote(processedProductNote);
 
-                System.out.println("처리된 ProductNote: " + processedProductNote);
-                log.debug("에디터 내용 처리 완료. 이동된 이미지 수: {}", movedImagePaths.size());
+                System.out.println("処理後のProductNote: " + processedProductNote);
+                log.debug("エディタ内容の処理完了。移動した画像数: {}", movedImagePaths.size());
 
             }
 
@@ -512,7 +497,7 @@ public class CM901060ServiceImpl implements CM901060Service {
             updateProductDetail(productId, productFolder, savedThumbnailName,
                     entity.getProductnote(), userId);
 
-            return ResponseEntity.ok(createResponseModel(1, true, "상품 수정 성공"));
+            return ResponseEntity.ok(createResponseModel(1, true, "商品更新成功"));
         } catch (Exception e) {
             log.error(CM901040MessageConstant.BANNER_UPLOAD_UNEXPECTED_ERROR, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -522,37 +507,38 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 이미지 등록
-     * 
-     * @param file 등록 할 이미지 정보
-     * @return 등록 여부
+     * 画像アップロード
+     *
+     * @param file アップロードする画像ファイル
+     * @return アップロード結果
      */
     public ResponseEntity<ResponseModel<String>> imageUpload(MultipartFile file) {
-        // 임시 파일 저장
+        // 一時ファイル保存
         String savedFileName = "/tmp/";
         try {
             if (!file.isEmpty()) {
                 savedFileName = savedFileName.concat(saveFile(file, "tmp"));
             }
         } catch (Exception e) {
-            log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+            log.error("予期しないエラーが発生しました: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createResponseModel(null, false, "서버 내부 오류가 발생했습니다."));
+                    .body(createResponseModel(null, false, "サーバー内部エラーが発生しました。"));
         }
         return ResponseEntity
                 .ok(createResponseModel(savedFileName, true, CM901040MessageConstant.SUCCESS_BANNER_UPDATE));
     }
 
     /**
-     * 파일 저장
-     * 
-     * @param file 파일 정보
-     * @return 저장된 파일명
-     * @throws IOException       파일 저장 중 오류 발생 시
-     * @throws SecurityException 보안 검증 실패 시
+     * ファイル保存
+     *
+     * @param file ファイル情報
+     * @param path 保存先パス
+     * @return 保存されたファイル名
+     * @throws IOException       ファイル保存中にエラーが発生した場合
+     * @throws SecurityException セキュリティ検証に失敗した場合
      */
     private String saveFile(MultipartFile file, String path) throws IOException, SecurityException {
-        // 추가 보안 검증
+        // 追加のセキュリティ検証
         if (!isValidImageFile(file)) {
             throw new SecurityException(CM901040MessageConstant.FAIL_INVALID_FILE_TYPE);
         }
@@ -561,11 +547,11 @@ public class CM901060ServiceImpl implements CM901060Service {
             try {
                 String tmpUrl = "images/".concat(path);
                 String fileUrl = s3Service.uploadFile(file, tmpUrl);
-                log.debug("S3 업로드 완료: {}", fileUrl);
+                log.debug("S3アップロード完了: {}", fileUrl);
                 String fileName = Paths.get(fileUrl).getFileName().toString();
                 return fileName;
             } catch (IOException e) {
-                log.error("S3 업로드 실패", e);
+                log.error("S3アップロード失敗", e);
                 throw new IOException(CMMessageConstant.ERROR_FILE_SAVE_FAILED, e);
             }
         }
@@ -589,7 +575,7 @@ public class CM901060ServiceImpl implements CM901060Service {
             fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
         }
 
-        // 보안을 위해 SecureRandom 사용
+        // セキュリティのためSecureRandomを使用
         String timeStamp = dateCalculator.tokyoTime().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String uuid = generateSecureRandomString(8);
         String savedFileName = String.format("%s_%s%s", timeStamp, uuid, fileExtension);
@@ -602,7 +588,6 @@ public class CM901060ServiceImpl implements CM901060Service {
             return savedFileName;
         } catch (IOException e) {
             log.error(CM901040MessageConstant.FILE_SAVE_FAILED, savedFileName, e);
-            // 저장 실패 시 생성된 파일 삭제 시도
             try {
                 Files.deleteIfExists(filePath);
             } catch (IOException deleteException) {
@@ -613,10 +598,10 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 보안을 위한 랜덤 문자열 생성
-     * 
-     * @param length 생성할 문자열 길이
-     * @return 랜덤 문자열
+     * セキュリティのためのランダム文字列生成
+     *
+     * @param length 生成する文字列の長さ
+     * @return ランダム文字列
      */
     private String generateSecureRandomString(int length) {
         SecureRandom random = new SecureRandom();
@@ -631,10 +616,10 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 이미지 파일 형식 검증
-     * 
-     * @param file 파일
-     * @return 유효한 이미지 파일 여부
+     * 画像ファイル形式の検証
+     *
+     * @param file ファイル
+     * @return 有効な画像ファイルかどうか
      */
     private boolean isValidImageFile(MultipartFile file) {
         String originalFileName = file.getOriginalFilename();
@@ -652,31 +637,31 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 상품 폴더명 결정
-     * 
-     * @param entity 상품 정보
-     * @return 폴더명
+     * 商品フォルダ名の決定
+     *
+     * @param entity 商品情報
+     * @return フォルダ名
      */
     private String determineProductFolder(RequestModel entity) {
-        // 상품 코드 사용
+        // 商品コードを使用
         if (entity.getProductCode() != null && !entity.getProductCode().isEmpty()) {
             return entity.getProductCode();
         }
 
-        // 기본값: 현재 날짜 (년월)
+        // デフォルト: 現在日付（年月）
         return dateCalculator.tokyoTime().format(DateTimeFormatter.ofPattern("yyyyMM"));
     }
 
     /**
-     * 에디터 HTML 내용에서 임시 이미지들을 처리
-     * 
-     * @param htmlContent     원본 HTML 내용
-     * @param productFolder   상품 폴더명
-     * @param movedImagePaths 이동된 이미지 경로 리스트 (참조로 전달)
-     * @return 처리된 HTML 내용
+     * エディタHTML内の一時画像を処理
+     *
+     * @param htmlContent     元のHTML内容
+     * @param productFolder   商品フォルダ名
+     * @param movedImagePaths 移動された画像パス一覧（参照渡し）
+     * @return 処理後のHTML内容
      */
     private String processEditorImages(String htmlContent, String productFolder, List<String> movedImagePaths) {
-        // img 태그에서 tmp 경로를 찾는 정규표현식
+        // imgタグ内のtmpパスを検出する正規表現
         Pattern pattern = Pattern.compile("<img[^>]+src=[\"']([^\"']*tmp/[^\"']*)[\"'][^>]*>",
                 Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(htmlContent);
@@ -687,23 +672,23 @@ public class CM901060ServiceImpl implements CM901060Service {
             String fullImgTag = matcher.group(0); // 전체 img 태그
             String tmpImageUrl = matcher.group(1); // src 속성값
 
-            log.debug("발견된 임시 이미지: {}", tmpImageUrl);
+            log.debug("検出した一時画像: {}", tmpImageUrl);
 
-            // URL에서 파일명 추출
+            // URLからファイル名を抽出
             String fileName = extractFileNameFromUrl(tmpImageUrl);
             if ("s3".equals(uploadType) && s3Service != null && tmpImageUrl.contains(baseUrl)) {
-                // S3 파일 이동
+                // S3ファイルを移動
                 String newImageUrl = s3Service.moveFile(tmpImageUrl, "images/product/" + productFolder);
 
                 if (newImageUrl != null) {
-                    // img 태그의 src 속성 교체
+                    // imgタグのsrc属性を置換
                     String newImgTag = fullImgTag.replace(tmpImageUrl, newImageUrl);
                     matcher.appendReplacement(processedContent, Matcher.quoteReplacement(newImgTag));
 
                     movedImagePaths.add(newImageUrl);
-                    log.debug("S3 이미지 이동 완료: {} → {}", tmpImageUrl, newImageUrl);
+                    log.debug("S3画像移動完了: {} → {}", tmpImageUrl, newImageUrl);
                 } else {
-                    log.warn("S3 이미지 이동 실패: {}", tmpImageUrl);
+                    log.warn("S3画像移動失敗: {}", tmpImageUrl);
                     matcher.appendReplacement(processedContent, Matcher.quoteReplacement(fullImgTag));
                 }
             } else {
@@ -712,24 +697,24 @@ public class CM901060ServiceImpl implements CM901060Service {
                     String newImagePath = moveTmpImageToProduct("/tmp/" + fileName, productFolder);
 
                     if (newImagePath != null) {
-                        // 새로운 URL 생성 (기존 도메인 부분 유지)
+                        // 新しいURLを生成（既存ドメイン部分は維持）
                         String newImageUrl = tmpImageUrl.replace("/tmp/", "/product/" + productFolder + "/");
 
-                        // img 태그의 src 속성 교체
+                        // imgタグのsrc属性を置換
                         String newImgTag = fullImgTag.replace(tmpImageUrl, newImageUrl);
 
-                        // 교체된 내용으로 변경
+                        // 置換した内容で反映
                         matcher.appendReplacement(processedContent, Matcher.quoteReplacement(newImgTag));
 
                         movedImagePaths.add(newImagePath);
-                        log.debug("이미지 처리 완료: {} → {}", tmpImageUrl, newImageUrl);
+                        log.debug("画像処理完了: {} → {}", tmpImageUrl, newImageUrl);
                     } else {
-                        log.warn("이미지 이동 실패: {}", fileName);
-                        // 이동 실패시 원본 유지
+                        log.warn("画像移動失敗: {}", fileName);
+                        // 移動失敗時は元のまま
                         matcher.appendReplacement(processedContent, Matcher.quoteReplacement(fullImgTag));
                     }
                 } else {
-                    log.warn("파일명 추출 실패: {}", tmpImageUrl);
+                    log.warn("ファイル名の抽出に失敗しました: {}", tmpImageUrl);
                     matcher.appendReplacement(processedContent, Matcher.quoteReplacement(fullImgTag));
                 }
             }
@@ -740,11 +725,11 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * tmp 이미지를 product/{동적폴더} 경로로 이동
-     * 
-     * @param tmpImagePath  임시 이미지 경로
-     * @param productFolder 상품 폴더명
-     * @return 이동된 이미지의 새 경로, 실패시 null
+     * tmp画像を product/{動的フォルダ} 配下へ移動
+     *
+     * @param tmpImagePath  一時画像パス
+     * @param productFolder 商品フォルダ名
+     * @return 移動後の画像パス（失敗時はnull）
      */
     private String moveTmpImageToProduct(String tmpImagePath, String productFolder) {
         try {
@@ -761,30 +746,30 @@ public class CM901060ServiceImpl implements CM901060Service {
             Path targetPath = targetDir.resolve(fileName);
             if (!Files.exists(targetDir)) {
                 Files.createDirectories(targetDir);
-                log.debug("디렉토리 생성: {}", targetDir);
+                log.debug("ディレクトリ作成: {}", targetDir);
             }
 
             if (Files.exists(sourcePath)) {
                 Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 Files.delete(sourcePath);
 
-                log.debug("파일 이동 완료: {} -> {}", sourcePath, targetPath);
+                log.debug("ファイル移動完了: {} -> {}", sourcePath, targetPath);
                 return "product/" + productFolder + "/" + fileName;
             } else {
-                log.warn("소스 파일이 존재하지 않습니다: {}", sourcePath);
+                log.warn("ソースファイルが存在しません: {}", sourcePath);
                 return null;
             }
         } catch (IOException e) {
-            log.error("파일 이동 중 오류 발생: {}", tmpImagePath, e);
+            log.error("ファイル移動中にエラーが発生しました: {}", tmpImagePath, e);
             return null;
         }
     }
 
     /**
-     * URL에서 파일명 추출
-     * 
-     * @param imageUrl 이미지 URL
-     * @return 파일명, 실패시 null
+     * URLからファイル名を抽出
+     *
+     * @param imageUrl 画像URL
+     * @return ファイル名（失敗時はnull）
      */
     private String extractFileNameFromUrl(String imageUrl) {
         try {
@@ -804,19 +789,19 @@ public class CM901060ServiceImpl implements CM901060Service {
 
             return null;
         } catch (Exception e) {
-            log.warn("파일명 추출 중 오류: {}", imageUrl, e);
+            log.warn("ファイル名抽出中にエラーが発生しました: {}", imageUrl, e);
             return null;
         }
     }
 
     /**
-     * 상품 상세 등록
-     * 
-     * @param productId          상품 코드
-     * @param productFolder      섬네일 경로
-     * @param savedThumbnailName 섬네일 명
-     * @param description        상품 상세 내용
-     * @return 등록 결과
+     * 商品詳細登録
+     *
+     * @param productId          商品ID
+     * @param productFolder      サムネイル保存フォルダ
+     * @param savedThumbnailName サムネイルファイル名
+     * @param description        商品詳細内容
+     * @return 登録結果
      */
     private int insertProductDetail(long productId, String productFolder, String savedThumbnailName,
             String description, String userId) {
@@ -833,13 +818,13 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 상품 상세 수정
-     * 
-     * @param productId          상품 코드
-     * @param productFolder      섬네일 경로
-     * @param savedThumbnailName 섬네일 명
-     * @param description        상품 상세 내용
-     * @return 수정 결과
+     * 商品詳細更新
+     *
+     * @param productId          商品ID
+     * @param productFolder      サムネイル保存フォルダ
+     * @param savedThumbnailName サムネイルファイル名
+     * @param description        商品詳細内容
+     * @return 更新結果
      */
     private int updateProductDetail(long productId, String productFolder, String savedThumbnailName,
             String description, String userId) {
@@ -855,11 +840,11 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 상품 등록
-     * 
-     * @param productId 상품 코드
-     * @param entity    저장될 상품 정보
-     * @return 등록 결과
+     * 商品登録
+     *
+     * @param productId 商品ID
+     * @param entity    保存する商品情報
+     * @return 登録結果
      */
     private int insertProduct(long productId, @ModelAttribute RequestModel entity, String userId) {
         Products products = new Products();
@@ -887,11 +872,11 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 상품 수정
-     * 
-     * @param productId 상품 코드
-     * @param entity    수정될 상품 정보
-     * @return 수정 결과
+     * 商品更新
+     *
+     * @param productId 商品ID
+     * @param entity    更新する商品情報
+     * @return 更新結果
      */
     private int updateProduct(long productId, @ModelAttribute RequestModel entity, String userId) {
         Products products = new Products();
@@ -915,11 +900,11 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 에디터 이미지 삭제
-     * 
-     * @param productId           상품 코드
-     * @param deletedDetailImages 저장될 파일 경로
-     * @return 등록 결과
+     * エディタ画像の削除（DB更新）
+     *
+     * @param productId           商品ID
+     * @param deletedDetailImages 削除対象のファイルパス
+     * @return 更新結果
      */
     private int updateImages(long productId, List<String> deletedDetailImages, String userId) {
         int result = 0;
@@ -938,11 +923,11 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 에디터 이미지 경로 등록
-     * 
-     * @param productId       상품 코드
-     * @param movedImagePaths 저장될 파일 경로
-     * @return 등록 결과
+     * エディタ画像パスの登録
+     *
+     * @param productId       商品ID
+     * @param movedImagePaths 保存するファイルパス
+     * @return 登録結果
      */
     private int insertImages(long productId, List<String> movedImagePaths, Boolean flag, String userId) {
         int result = 0;
@@ -970,10 +955,10 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * 파일 경로에서 확장자 추출
-     * 
-     * @param filePath 파일 경로
-     * @return 확장자 (점 제외), 없으면 빈 문자열
+     * ファイルパスから拡張子を取得
+     *
+     * @param filePath ファイルパス
+     * @return 拡張子（ドット除外）。存在しない場合は空文字
      */
     private String getFileExtension(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
@@ -991,11 +976,11 @@ public class CM901060ServiceImpl implements CM901060Service {
     }
 
     /**
-     * ResponseModel 생성
-     * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    메시지
+     * ResponseModel生成
+     *
+     * @param resultList 結果データ
+     * @param result     処理結果
+     * @param message    メッセージ
      * @return ResponseModel
      */
     private <T> ResponseModel<T> createResponseModel(T resultList, boolean result, String message) {

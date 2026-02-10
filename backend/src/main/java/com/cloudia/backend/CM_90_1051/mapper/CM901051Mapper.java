@@ -12,48 +12,49 @@ import com.cloudia.backend.CM_90_1051.model.SearchRequestDto;
 @Mapper
 public interface CM901051Mapper {
     /**
-     * 주문 전체 리스트 조회
-     * 
-     * @return 주문 전체 리스트
+     * 注文一覧を取得
+     *
+     * @return 注文一覧
      */
     List<OrderDto> findByAllOrders();
 
     /**
-     * 특정 주문 전체 리스트 조회
-     * 
-     * @param 검색 데이터
-     * @return 특정 주문 리스트
+     * 注文一覧を検索して取得
+     *
+     * @param searchRequest 検索条件
+     * @return 注文一覧
      */
     List<OrderDto> getFindOrders(SearchRequestDto searchRequest);
 
     /**
-     * 특정 주문 전체 리스트 조회
-     * 
-     * @param 검색 데이터
-     * @return 특정 주문 리스트
+     * 注文情報を検索して取得
+     *
+     * @param searchRequest 検索条件
+     * @return 注文一覧
      */
     List<OrderDto> getFindOrder(SearchRequestDto searchRequest);
 
     /**
-     * 특정 주문 상세 리스트 조회
-     * 
-     * @param 검색 데이터
-     * @return 특정 주문 상세 리스트
+     * 注文詳細一覧を検索して取得
+     *
+     * @param searchRequest 検索条件
+     * @return 注文詳細一覧
      */
     List<OrderDetailDto> getFindOrderDetail(SearchRequestDto searchRequest);
 
     /**
-     * 정산 상태 업데이트
-     * 
-     * @param 검색 데이터
-     * @return 성공 여부
+     * 精算ステータスを更新
+     *
+     * @param entity 更新対象
+     * @return 更新件数
      */
     int uptStatus(OrderDto entity);
 
     /**
-     * 배송지 정보
-     * 
-     * @return 배송지 정보
+     * 配送先情報を取得
+     *
+     * @param searchRequest 検索条件
+     * @return 配送先情報
      */
     AddressDto getAddress(SearchRequestDto searchRequest);
 }

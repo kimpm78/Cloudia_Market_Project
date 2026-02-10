@@ -19,19 +19,19 @@ import lombok.ToString;
 @AllArgsConstructor
 public class RequestModel {
     private long productId;
-    private String categoryGroup;// 카테고리
-    private String productCode;// 상품 코드
-    private String productName;// 상품 명
-    private int productPrice;// 상품 가격
-    private int shippingFee;// 배송비
-    private String purchasePrice;// 사입가
-    private String expectedDeliveryDate;// 출고 예정일
-    private String reservationDeadline; // 예약 마감일
-    private MultipartFile productFile;// 상품 이미지
-    private MultipartFile[] detailImages; // 상세 이미지
-    private String productnote;// 상품 설명
-    private int purchaseLimit; // 구매 수량
-    private double weight; // 상품 무게
+    private String categoryGroup;           // カテゴリー
+    private String productCode;             // 商品コード
+    private String productName;             // 商品名
+    private int productPrice;               // 商品価格
+    private int shippingFee;                // 配送料
+    private String purchasePrice;           // 仕入価格
+    private String expectedDeliveryDate;    // 出荷予定日
+    private String reservationDeadline;     // 予約締切日
+    private MultipartFile productFile;      // 商品画像
+    private MultipartFile[] detailImages;   // 詳細画像
+    private String productnote;             // 商品説明
+    private int purchaseLimit;              // 購入数量
+    private double weight;                  // 商品重量
     private List<String> existingDetailImages;
     private List<String> deletedDetailImages;
 }

@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cloudia.backend.CM_90_1010.model.PreviousInfoDto;
-import com.cloudia.backend.CM_90_1010.model.StatusDto;
-import com.cloudia.backend.CM_90_1010.model.WeeklySalesDto;
+import com.cloudia.backend.CM_90_1010.model.PreviousInfo;
+import com.cloudia.backend.CM_90_1010.model.Status;
+import com.cloudia.backend.CM_90_1010.model.WeeklySales;
 import com.cloudia.backend.CM_90_1010.service.CM901010Service;
 import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.common.service.GoogleAnalyticsService;
@@ -33,42 +33,42 @@ public class CM901010Controller {
     private final DateCalculator dateCalculator;
 
     /**
-     * 전체 상태 조회
-     * 
-     * @return 전체 상태
+     * 全体ステータス取得
+     *
+     * @return 全体ステータス
      */
     @GetMapping("/status")
-    public ResponseEntity<ResponseModel<StatusDto>> getMethodName() {
-        StatusDto result = cm901010Service.getStatus();
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+    public ResponseEntity<ResponseModel<Status>> getMethodName() {
+        Status result = cm901010Service.getStatus();
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得に成功しました"));
     }
 
     /**
-     * 일주일 매출 조회
-     * 
-     * @return 일주일 매출 리스트
+     * 週間売上取得
+     *
+     * @return 週間売上リスト
      */
     @GetMapping("/weekly")
-    public ResponseEntity<ResponseModel<List<WeeklySalesDto>>> getWeeklySales() {
-        List<WeeklySalesDto> result = cm901010Service.getWeeklySales();
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+    public ResponseEntity<ResponseModel<List<WeeklySales>>> getWeeklySales() {
+        List<WeeklySales> result = cm901010Service.getWeeklySales();
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得に成功しました"));
     }
 
     /**
-     * 전날 정보 조회
-     * 
-     * @return 전날 정보
+     * 前日情報取得
+     *
+     * @return 前日情報
      */
     @GetMapping("/previous")
-    public ResponseEntity<ResponseModel<PreviousInfoDto>> getPreviousInfo() {
-        PreviousInfoDto result = cm901010Service.getPreviousInfo();
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+    public ResponseEntity<ResponseModel<PreviousInfo>> getPreviousInfo() {
+        PreviousInfo result = cm901010Service.getPreviousInfo();
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得に成功しました"));
     }
 
     /**
-     * 방문자(일별) 조회
-     * 
-     * @return 방문자(일별) 리스트
+     * 訪問者（日別）取得
+     *
+     * @return 訪問者（日別）リスト
      */
     @GetMapping("/weekly-visitors")
     public ResponseEntity<ResponseModel<Map<String, Object>>> getWeeklyVisitors(
@@ -83,13 +83,13 @@ public class CM901010Controller {
         }
 
         Map<String, Object> data = analyticsService.getVisitorsByDayOfWeek(startDate, endDate);
-        return ResponseEntity.ok(ResponseHelper.success(data, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(data, "取得に成功しました"));
     }
 
     /**
-     * 방문자(월별) 조회
-     * 
-     * @return 방문자(월별) 리스트
+     * 訪問者（月別）取得
+     *
+     * @return 訪問者（月別）リスト
      */
     @GetMapping("/monthly-visitors")
     public ResponseEntity<ResponseModel<Map<String, Object>>> getMonthlyVisitors(
@@ -104,6 +104,6 @@ public class CM901010Controller {
         }
 
         Map<String, Object> data = analyticsService.getVisitorsByMonth(startDate, endDate);
-        return ResponseEntity.ok(ResponseHelper.success(data, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(data, "取得に成功しました"));
     }
 }

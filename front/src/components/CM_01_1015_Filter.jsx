@@ -4,32 +4,32 @@ export default function CM_01_1015_Filter({
   handleSearch,
   statusOptions,
 }) {
-  // 연도 생성 (현재 연도 기준)
+  // 年度生成（現在の年基準）
   const currentYear = new Date().getFullYear();
   const years = [
-    { value: '', name: '전부' },
+    { value: '', name: 'すべて' },
     ...Array.from({ length: 5 }, (_, i) => {
       const year = currentYear - i;
-      return { value: String(year), name: `${year}년` };
+      return { value: String(year), name: `${year}年` };
     }),
   ];
 
-  // 월 생성 (1~12월)
+  // 月生成（1〜12月）
   const months = [
-    { value: '', name: '전부' },
+    { value: '', name: 'すべて' },
     ...Array.from({ length: 12 }, (_, i) => ({
       value: String(i + 1).padStart(2, '0'),
-      name: `${i + 1}월`,
+      name: `${i + 1}月`,
     })),
   ];
 
   return (
     <div className="bg-light p-4 rounded mb-4">
       <div className="row g-3 align-items-center">
-        {/* 1. 주문 연도 */}
+        {/* 1. 注文年 */}
         <div className="col-auto d-flex align-items-center">
           <label htmlFor="year" className="form-label me-2 mb-0 fw-bold">
-            주문 연도
+            注文年
           </label>
           <select
             id="year"
@@ -46,7 +46,7 @@ export default function CM_01_1015_Filter({
           </select>
         </div>
 
-        {/* 주문 월 */}
+        {/* 注文月 */}
         <div className="col-auto d-flex align-items-center">
           <select
             id="month"
@@ -63,10 +63,10 @@ export default function CM_01_1015_Filter({
           </select>
         </div>
 
-        {/* 진행 상태 (반품/교환) */}
+        {/* 進行状態（返品/交換） */}
         <div className="col-auto d-flex align-items-center ms-3">
           <label htmlFor="status" className="form-label me-2 mb-0 fw-bold">
-            진행 상태
+            進行状態
           </label>
           <select
             id="status"
@@ -84,26 +84,26 @@ export default function CM_01_1015_Filter({
           </select>
         </div>
 
-        {/* 상품명 검색 */}
+        {/* 商品名検索 */}
         <div className="col-auto d-flex align-items-center ms-3 flex-grow-1">
           <label htmlFor="keyword" className="form-label me-2 mb-0 fw-bold">
-            상품명
+            商品名
           </label>
           <input
             type="text"
             id="keyword"
             className="form-control"
-            placeholder="상품명 검색"
+            placeholder="商品名検索"
             value={filters.keyword}
             onChange={handleFilterChange}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
 
-        {/* 검색 버튼 */}
+        {/* 検索ボタン */}
         <div className="col-auto">
           <button className="btn btn-primary px-4" onClick={handleSearch}>
-            검색
+            検索
           </button>
         </div>
       </div>

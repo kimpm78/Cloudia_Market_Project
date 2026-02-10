@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "DeliveryCompleted_jp",
+    "SubjectPart": "【クラウディア マーケット】配送完了のお知らせ（自動送信）",
+    "TextPart": "＜本メールは返信できません。ご了承ください。＞\n\n{{name}} 様\nご注文商品の配送が完了しました。\n\n────────────────────\n■ 配送完了商品\n────────────────────\n{{orderItems}}\n\nご利用いただきありがとうございました。",
+    "HtmlPart": "<html><body style=\"font-family: Arial, sans-serif; color:#000; font-size:14px; line-height:1.7;\"><p>＜本メールは返信できません。ご了承ください。＞</p><p><strong>{{name}}</strong> 様<br>ご注文商品の配送が完了しました。</p><hr><h4>■ 配送完了商品</h4><p>{{orderItems}}</p><p>ご利用いただきありがとうございました。</p></body></html>"
+  }
+}

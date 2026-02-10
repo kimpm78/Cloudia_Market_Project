@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserAccount {
-    private String refundAccountBank; // 은행명
-    private String refundAccountNumber; // 계좌번호
-    private String refundAccountHolder; // 예금주
+    private String refundAccountBank;   // 銀行名
+    private String refundAccountNumber; // 口座番号
+    private String refundAccountHolder; // 口座名義
 }

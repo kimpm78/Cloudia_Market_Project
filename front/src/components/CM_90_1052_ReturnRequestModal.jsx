@@ -17,16 +17,16 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
 
   const handleSearch = useCallback(async () => {
     if (!requestNo.trim()) {
-      alert('요청번호를 입력해주세요.');
+      alert('依頼番号を入力してください。');
       return;
     }
 
     if (!refundNumber.trim()) {
-      alert('회원번호를 입력해주세요.');
+      alert('会員番号を入力してください。');
       return;
     }
     if (!orderNumber.trim()) {
-      alert('구매번호를 입력해주세요.');
+      alert('購入番号を入力してください。');
       return;
     }
 
@@ -53,8 +53,8 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
       });
       setQuantities(initialQuantities);
     } catch (error) {
-      console.error('상품 검색 오류:', error);
-      alert('상품 검색 중 오류가 발생했습니다.');
+      console.error('商品検索エラー:', error);
+      alert('商品検索中にエラーが発生しました。');
       setShippingList([]);
       setQuantities({});
     } finally {
@@ -76,7 +76,7 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
     }
   }, []);
 
-  // 상품 합계 금액 계산
+  // 商品合計金額の計算
   const calculateProductTotal = useCallback(() => {
     let total = 0;
     shippingList.forEach((item) => {
@@ -86,7 +86,7 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
     return total;
   }, [shippingList, quantities]);
 
-  // 최종 취소금액 계산 (상품 금액 + 배송비)
+  // 最終キャンセル金額の計算（商品金額 + 配送料）
   const calculateTotalAmount = useCallback(() => {
     const productTotal = calculateProductTotal();
     const shipping = parseInt(shippingAmount) || 0;
@@ -96,13 +96,13 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
   const columnDefs = useMemo(
     () => [
       {
-        headerName: '상품명',
+        headerName: '商品名',
         field: 'productName',
         flex: 2,
         minWidth: 200,
       },
       {
-        headerName: '수량',
+        headerName: '数量',
         field: 'productNumber',
         flex: 1,
         minWidth: 100,
@@ -130,17 +130,17 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
 
   const handleConfirm = useCallback(() => {
     if (!refundNumber.trim()) {
-      alert('회원 번호를 입력해주세요.');
+      alert('会員番号を入力してください。');
       return;
     }
 
     if (!orderNumber.trim()) {
-      alert('구매번호를 입력해주세요.');
+      alert('購入番号を入力してください。');
       return;
     }
 
     if (shippingList.length === 0) {
-      alert('상품을 검색해주세요.');
+      alert('商品を検索してください。');
       return;
     }
 
@@ -150,7 +150,7 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
     });
 
     if (selectedProducts.length === 0) {
-      alert('환불할 상품의 수량을 선택해주세요.');
+      alert('返金する商品の数量を選択してください。');
       return;
     }
 
@@ -228,7 +228,7 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
         <div className="modal-dialog modal-lg" role="document">
           <div className="modal-content border-0 shadow-lg">
             <div className="modal-header bg-primary text-white">
-              <h5 className="modal-title fw-bold">교환/환불 요청</h5>
+              <h5 className="modal-title fw-bold">交換／返金依頼</h5>
               <button
                 type="button"
                 className="btn-close btn-close-white"
@@ -238,47 +238,47 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
             </div>
 
             <div className="modal-body p-4" style={{ backgroundColor: '#f8f9fa' }}>
-              {/* 요청 번호 */}
+              {/* 依頼番号 */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">요청 번호</label>
+                <label className="form-label fw-semibold">依頼番号</label>
                 <input
                   type="text"
                   className="form-control"
                   value={requestNo}
                   onChange={(e) => setRequestNo(e.target.value)}
-                  placeholder="요청 번호를 입력하세요"
+                  placeholder="依頼番号を入力してください"
                 />
               </div>
-              {/* 회원 번호 */}
+              {/* 会員番号 */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">회원 번호</label>
+                <label className="form-label fw-semibold">会員番号</label>
                 <input
                   type="text"
                   className="form-control"
                   value={refundNumber}
                   onChange={(e) => setRefundNumber(e.target.value)}
-                  placeholder="회원 번호를 입력하세요"
+                  placeholder="会員番号を入力してください"
                 />
               </div>
 
-              {/* 구매번호 */}
+              {/* 購入番号 */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">구매번호</label>
+                <label className="form-label fw-semibold">購入番号</label>
                 <input
                   type="text"
                   className="form-control mb-2"
                   value={orderNumber}
                   onChange={(e) => setOrderNumber(e.target.value)}
-                  placeholder="구매번호를 입력하세요"
+                  placeholder="購入番号を入力してください"
                 />
                 <button className="btn btn-primary w-100" onClick={handleSearch} disabled={loading}>
-                  {loading ? '검색중...' : '검색'}
+                  {loading ? '検索中...' : '検索'}
                 </button>
               </div>
 
-              {/* 분류 */}
+              {/* 区分 */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">분류</label>
+                <label className="form-label fw-semibold">区分</label>
                 <div className="d-flex gap-3">
                   <div className="form-check">
                     <input
@@ -290,7 +290,7 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
                       onChange={() => handleRefundTypeChange('0')}
                     />
                     <label className="form-check-label" htmlFor="refundTypeRefund">
-                      환불
+                      返金
                     </label>
                   </div>
                   <div className="form-check">
@@ -303,16 +303,16 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
                       onChange={() => handleRefundTypeChange('1')}
                     />
                     <label className="form-check-label" htmlFor="refundTypeExchange">
-                      교환
+                      交換
                     </label>
                   </div>
                 </div>
               </div>
 
-              {/* 교환 부품 (교환 선택 시에만 표시) */}
+              {/* 交換部品（交換選択時のみ表示） */}
               {refundType === '1' && (
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">교환 부품</label>
+                  <label className="form-label fw-semibold">交換部品</label>
                   <div className="d-flex gap-3">
                     <div className="form-check">
                       <input
@@ -324,7 +324,7 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
                         onChange={() => setExchangeParts('0')}
                       />
                       <label className="form-check-label" htmlFor="exchangePartsFull">
-                        풀 패키지
+                        フルパッケージ
                       </label>
                     </div>
                     <div className="form-check">
@@ -337,7 +337,7 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
                         onChange={() => setExchangeParts('1')}
                       />
                       <label className="form-check-label" htmlFor="exchangePartsBody">
-                        본체
+                        本体
                       </label>
                     </div>
                     <div className="form-check">
@@ -350,16 +350,16 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
                         onChange={() => setExchangeParts('2')}
                       />
                       <label className="form-check-label" htmlFor="exchangePartsParts">
-                        파츠
+                        パーツ
                       </label>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* 상품 리스트 */}
+              {/* 商品リスト */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">상품 리스트</label>
+                <label className="form-label fw-semibold">商品リスト</label>
                 <div className="card border-0 shadow-sm">
                   <div className="card-body p-0">
                     <div style={{ height: '250px' }}>
@@ -371,7 +371,7 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
                         </div>
                       ) : shippingList.length === 0 ? (
                         <div className="d-flex justify-content-center align-items-center h-100 text-muted">
-                          구매번호를 검색해주세요
+                          購入番号を検索してください
                         </div>
                       ) : (
                         <CM_90_1011_grid
@@ -388,9 +388,9 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
                 </div>
               </div>
 
-              {/* 배송비 */}
+              {/* 配送料 */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">배송비</label>
+                <label className="form-label fw-semibold">配送料</label>
                 <div className="d-flex gap-3">
                   <div className="form-check">
                     <input
@@ -402,7 +402,7 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
                       onChange={() => setShippingFee('0')}
                     />
                     <label className="form-check-label" htmlFor="shippingFeeStore">
-                      무기와라 장터 부담
+                      クラウディアマーケット負担
                     </label>
                   </div>
                   <div className="form-check">
@@ -415,71 +415,71 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
                       onChange={() => setShippingFee('1')}
                     />
                     <label className="form-check-label" htmlFor="shippingFeeCustomer">
-                      구매 부담
+                      購入者負担
                     </label>
                   </div>
                 </div>
               </div>
 
-              {/* 배송금액 입력 */}
+              {/* 配送料金入力 */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">배송금액</label>
+                <label className="form-label fw-semibold">配送料金</label>
                 <input
                   type="number"
                   className="form-control"
                   value={shippingAmount}
                   onChange={(e) => setShippingAmount(e.target.value)}
-                  placeholder="배송금액을 입력하세요 (예: 3000)"
+                  placeholder="配送料金を入力してください（例：3000）"
                 />
               </div>
 
-              {/* 취소금액 자동 계산 */}
+              {/* キャンセル金額の自動計算 */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">취소금액</label>
+                <label className="form-label fw-semibold">キャンセル金額</label>
                 <div className="card bg-light">
                   <div className="card-body">
                     <div className="d-flex justify-content-between mb-2">
-                      <span className="text-muted">상품 합계:</span>
+                      <span className="text-muted">商品合計:</span>
                       <span className="fw-semibold">
-                        {calculateProductTotal().toLocaleString()} 원
+                        {calculateProductTotal().toLocaleString()} 円
                       </span>
                     </div>
                     <div className="d-flex justify-content-between mb-2">
-                      <span className="text-muted">배송비:</span>
+                      <span className="text-muted">配送料:</span>
                       <span className="fw-semibold">
-                        {(parseInt(shippingAmount) || 0).toLocaleString()} 원
+                        {(parseInt(shippingAmount) || 0).toLocaleString()} 円
                       </span>
                     </div>
                     <hr />
                     <div className="d-flex justify-content-between">
-                      <span className="fw-bold">총 취소금액:</span>
+                      <span className="fw-bold">キャンセル総額:</span>
                       <span className="text-primary fw-bold" style={{ fontSize: '20px' }}>
-                        {calculateTotalAmount().toLocaleString()} 원
+                        {calculateTotalAmount().toLocaleString()} 円
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* 메모 */}
+              {/* メモ */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">메모</label>
+                <label className="form-label fw-semibold">メモ</label>
                 <textarea
                   className="form-control"
                   rows="3"
                   value={memo}
                   onChange={(e) => setMemo(e.target.value)}
-                  placeholder="내용을 입력해주세요"
+                  placeholder="内容を入力してください"
                 />
               </div>
             </div>
 
             <div className="modal-footer bg-white border-top">
               <button className="btn btn-primary px-4" onClick={handleConfirm}>
-                환불 처리
+                返金処理
               </button>
               <button className="btn btn-secondary px-4" onClick={handleClose}>
-                닫기
+                閉じる
               </button>
             </div>
           </div>

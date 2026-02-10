@@ -49,10 +49,10 @@ export default function OrderPaymentResult() {
           return;
         }
         window.dispatchEvent(
-          new CustomEvent(CART_UPDATED_EVENT, { detail: { count, source: '주문 요청' } })
+          new CustomEvent(CART_UPDATED_EVENT, { detail: { count, source: '注文リクエスト' } })
         );
       } catch (error) {
-        console.warn('[주문 요청] cart count refresh failed', error);
+        console.warn('[注文リクエスト] cart count refresh failed', error);
       }
     };
 
@@ -76,7 +76,7 @@ export default function OrderPaymentResult() {
           setDisplayOrderNumber(orderNumber);
         }
       } catch (error) {
-        console.warn('[주문 결과] order number load failed', error);
+        console.warn('[注文結果] order number load failed', error);
       }
     };
 
@@ -89,13 +89,13 @@ export default function OrderPaymentResult() {
   if (!resolvedState || !resolvedState.paymentStatus) {
     return (
       <div className="container py-5">
-        <h2 className="fw-bold mb-4">잘못된 접근입니다.</h2>
+        <h2 className="fw-bold mb-4">不正なアクセスです。</h2>
         <div className="p-4 bg-light rounded">
-          <p>결제 결과 정보를 불러올 수 없습니다.</p>
+          <p>決済結果情報を取得できません。</p>
         </div>
         <div className="text-center mt-4">
           <button className="btn btn-primary" onClick={() => navigate('/')}>
-            메인 화면으로 이동
+            メイン画面へ移動
           </button>
         </div>
       </div>
@@ -109,14 +109,14 @@ export default function OrderPaymentResult() {
 
 	  const title =
 	    paymentStatus === 'success'
-	      ? '주문 완료'
+	      ? '注文完了'
 	      : paymentStatus === 'pending'
-	        ? '결제 대기 상태'
+	        ? '決済待ち'
 	        : paymentStatus === 'cancel'
-	          ? '결제가 취소되었습니다'
+	          ? '決済がキャンセルされました'
 	          : paymentStatus === 'error'
-	            ? '결제 오류'
-	            : '결제 실패';
+	            ? '決済エラー'
+	            : '決済失敗';
 
   return (
     <div className="container py-5">
@@ -132,38 +132,37 @@ export default function OrderPaymentResult() {
       <div className="p-4 rounded bg-light fs-6 lh-lg">
         {paymentStatus === 'success' && (
           <>
-            <p className="mb-1">주문해주셔서 감사합니다.</p>
+            <p className="mb-1">ご注文ありがとうございます。</p>
             <p className="mb-0">
-              주문 번호는 <strong className="text-primary">[{displayOrderNumber}]</strong> 입니다.&nbsp;
+              注文番号は <strong className="text-primary">[{displayOrderNumber}]</strong> です。&nbsp;
               {paymentMethod === 'BANK'
-                ? '송금할 계좌 이체 번호는 이메일로 보내드리겠습니다.'
-                : '주문 확인 내용은 이메일로 보내드리겠습니다.'}
+                ? 'お振込み先の口座情報はメールでご案内いたします。'
+                : 'ご注文内容の確認メールをお送りいたします。'}
             </p>
           </>
         )}
 
         {paymentStatus === 'pending' && (
           <>
-            <p className="mb-1">계좌이체 결제를 선택하셨습니다.</p>
+            <p className="mb-1">銀行振込でのお支払いを選択しました。</p>
             <p className="mb-0">
-              송금하실 계좌 정보는 이메일로 안내드렸습니다.
+              お振込み先の口座情報はメールでご案内しました。
               <br />
-              주문 번호: <strong className="text-primary">[{displayOrderNumber}]</strong>
+              注文番号: <strong className="text-primary">[{displayOrderNumber}]</strong>
             </p>
           </>
         )}
 
         {paymentStatus === 'cancel' && (
           <p className="mb-0">
-            사용자가 결제를 취소했습니다.
+            お客様が決済をキャンセルしました。
             {cancelReason ? ` (${cancelReason})` : ''}
           </p>
         )}
 
 	        {(paymentStatus === 'fail' || paymentStatus === 'error') && (
 	          <p className="text-danger mb-0">
-	            결제에 {paymentStatus === 'error' ? '오류가 발생했습니다' : '실패했습니다'}. 잠시 후 다시
-	            시도해주세요.
+	            決済に {paymentStatus === 'error' ? 'エラーが発生しました' : '失敗しました'}. しばらくしてから再度お試しください。
 	            {cancelReason ? ` (${cancelReason})` : ''}
 	          </p>
 	        )}
@@ -171,7 +170,7 @@ export default function OrderPaymentResult() {
 
       <div className="text-center mt-5">
         <Link to="/" className="btn btn-primary px-5 py-2">
-          메인 화면으로 이동
+          メイン画面へ移動
         </Link>
       </div>
     </div>

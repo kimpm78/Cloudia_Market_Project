@@ -104,57 +104,57 @@ export default function CM_90_1045() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">공지사항 등록</h5>
+        <h5 className="border-bottom pb-2 mb-3"> お知らせ 登録</h5>
         <form onSubmit={handleRegisterClick}>
-          {/* 제목 */}
+          {/* タイトル */}
           <InputField
             id="title"
-            label="제목"
+            label="タイトル"
             type="text"
             value={form.title}
             onChange={(value) => updateForm('title', value)}
             error={errors.title}
           />
 
-          {/* 분류 */}
+          {/* 分類 */}
           <RadioGroup
             name="codeValue"
-            label="분류"
+            label="分類"
             options={CATEGORIES}
             value={form.codeValue}
             onChange={(value) => updateForm('codeValue', value)}
           />
 
-          {/* 사용 여부 */}
+          {/* 使用 有無 */}
           <RadioGroup
             name="isDisplay"
-            label="사용 여부"
+            label="使用 有無"
             options={DISPLAY_OPTIONS}
             value={form.isDisplay}
             onChange={(value) => updateForm('isDisplay', value)}
           />
 
-          {/* 내용 */}
+          {/* 内容 */}
           <TextAreaField
             id="content"
-            label="내용"
+            label="内容"
             rows="15"
             value={form.content}
             onChange={(value) => updateForm('content', value)}
             error={errors.content}
           />
 
-          {/* 버튼 */}
+          {/* ボタン */}
           <div className="d-flex justify-content-center gap-2">
             <button type="submit" className="btn btn-primary btn-fixed-width">
-              등록
+              作成する
             </button>
             <Link to="/admin/menu/notice" className="btn btn-secondary btn-fixed-width">
-              뒤로 가기
+              戻る
             </Link>
           </div>
         </form>
-        {/* 알림 팝업 */}
+        {/* お知らせポップアップ */}
         <CM_99_1004
           isOpen={open1004}
           onClose={() => {

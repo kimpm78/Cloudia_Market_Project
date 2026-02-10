@@ -17,12 +17,11 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Menu {
-    private String menuId; // 메뉴 ID
-    private String menuName; // 메뉴명
-    private String url; // 이동 URL
-    private String parentId; // 상위 메뉴 ID
-    private Integer sortOrder; // 정렬 순서
-
+    private String menuId;                           // メニュー ID
+    private String menuName;                         // メニュー名
+    private String url;                              // 移動 URL
+    private String parentId;                         // 上位メニュー ID
+    private Integer sortOrder;                       // 並び順
     @Builder.Default
-    private List<Menu> children = new ArrayList<>(); // 자식 메뉴 리스트
+    private List<Menu> children = new ArrayList<>(); // 子メニューリスト
 }

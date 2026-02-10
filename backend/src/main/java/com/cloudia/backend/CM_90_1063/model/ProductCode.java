@@ -16,19 +16,19 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductCode {
-    @NotBlank(message = "상품 코드는 필수입니다.")
-    private String productCode; // 상품 코드
+    @NotBlank(message = "商品コードは必須です。")
+    private String productCode;     // 商品コード
 
-    @NotBlank(message = "상품명은 필수입니다.")
-    private String productName; // 상품명
+    @NotBlank(message = "商品名は必須です。")
+    private String productName;     // 商品名
 
-    @NotBlank(message = "가격은 필수입니다.")
-    @Pattern(regexp = "^\\d+$", message = "가격에 소수점은 안됩니다.")
-    private String productPrice; // 가격
+    @NotBlank(message = "価格は必須です。")
+    @Pattern(regexp = "^\\d+$", message = "価格に小数点は使用できません。")
+    private String productPrice;    // 価格
 
-    @NotBlank(message = "수량은 필수입니다.")
-    @Pattern(regexp = "^-?\\d+$", message = "수량은 정수여야 합니다. (음수 가능)")
-    private String quantity; // 수량
+    @NotBlank(message = "数量は必須です。")
+    @Pattern(regexp = "^-?\\d+$", message = "数量は整数である必要があります。（マイナス可）")
+    private String quantity;        // 数量
 
-    private String note; // 비고
+    private String note;            // 備考
 }

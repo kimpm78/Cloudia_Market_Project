@@ -28,3 +28,16 @@
   margin-bottom: 4px;
   padding-left: 6px;
 }
+
+.admin-sidebar-link {
+  color: #212529;
+  transition: color 0.15s ease;
+}
+
+.admin-sidebar-link:hover {
+  color: #0d6efd;
+}
+
+.admin-sidebar-link.active {
+  color: #0d6efd;
+}

@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 장바구니 DTO
+ * カートDTO
  */
 @Data
 @Builder
@@ -20,14 +20,14 @@ import java.time.LocalDateTime;
 public class CartItem implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long cartItemId; // 장바구니아이템ID
-    private Long userId; // 사용자ID
-    private String productId; // 상품ID
-    private Integer quantity; // 1 이상
-    private Integer isActive; // 1=유효, 0=삭제(소프트 삭제)
-    private LocalDateTime cartUpdatedAt; // 수정일시
-    private String createdBy; // 생성자
-    private LocalDateTime createdAt; // 생성일시
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일시
+    private Long cartItemId;            // カートID
+    private Long userId;                // ユーザーID
+    private String productId;           // 商品ID
+    private Integer quantity;           // 1以上
+    private Integer isActive;           // 1=有効、0=削除（論理削除）
+    private LocalDateTime cartUpdatedAt;// 更新日時
+    private String createdBy;           // 作成者
+    private LocalDateTime createdAt;    // 作成日時
+    private String updatedBy;           // 更新者
+    private LocalDateTime updatedAt;    // 更新日時
 }

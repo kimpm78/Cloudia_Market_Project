@@ -19,7 +19,7 @@
         ON    o.member_number = od.member_number
         AND   o.order_number = od.order_number
         LEFT JOIN stocks s
-        ON    od.product_id = s.product_code
+        ON    od.product_code = s.product_code
         LEFT JOIN product_code pc
         ON    s.product_code = pc.product_code
         LEFT JOIN users u
@@ -46,7 +46,7 @@
         ON    o.member_number = od.member_number
         AND   o.order_number = od.order_number
         LEFT JOIN stocks s
-        ON    od.product_id = s.product_code
+        ON    od.product_code = s.product_code
         LEFT JOIN product_code pc
         ON    s.product_code = pc.product_code
         LEFT JOIN users u

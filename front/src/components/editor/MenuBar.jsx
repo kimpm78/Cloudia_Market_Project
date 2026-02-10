@@ -9,12 +9,12 @@ const MenuBar = ({ field, onImageAdd }) => {
   const { editor } = useCurrentEditor();
   const [color, setColor] = useState('#958DF1');
 
-  // 테이블 그리드 선택기의 상태 및 참조(ref)
+  // テーブルグリッド選択の状態および参照(ref)
   const [showTableGrid, setShowTableGrid] = useState(false);
   const [tableSize, setTableSize] = useState({ rows: 0, cols: 0 });
   const gridRef = useRef(null);
 
-  // 미리 정의된 색상 팔레트
+  // 事前定義されたカラーパレット
   const presetColors = [
     '#000000',
     '#FF0000',
@@ -25,7 +25,7 @@ const MenuBar = ({ field, onImageAdd }) => {
     '#958DF1',
   ];
 
-  // 컬러 팔레트
+  // カラーパレット
   const [showColorPalette, setShowColorPalette] = useState(false);
   const paletteRef = useRef(null);
 
@@ -42,7 +42,7 @@ const MenuBar = ({ field, onImageAdd }) => {
     };
   }, []);
 
-  // 테이블 선택 그리드 영역 밖을 클릭하면 그리드를 닫음
+  // テーブル選択グリッド領域の外をクリックするとグリッドを閉じる
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (gridRef.current && !gridRef.current.contains(event.target)) {
@@ -55,7 +55,7 @@ const MenuBar = ({ field, onImageAdd }) => {
     };
   }, []);
 
-  // 링크
+  // リンク
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
@@ -154,7 +154,7 @@ const MenuBar = ({ field, onImageAdd }) => {
     { divider: true },
   ];
 
-  // 서식 옵션 그룹
+  // 書式オプショングループ
   const formattingOptions = [
     {
       label: 'Bold',
@@ -235,7 +235,7 @@ const MenuBar = ({ field, onImageAdd }) => {
       command: () => editor.chain().focus().toggleBlockquote().run(),
       isActive: () => editor.isActive('blockquote'),
     },
-    // 정렬 기능
+    // 整列機能
     {
       label: 'Align Left',
       icon: '<i class="bi bi-text-left"></i>',
@@ -341,7 +341,7 @@ const MenuBar = ({ field, onImageAdd }) => {
   return (
     <>
       <div className="control-group border rounded p-1 mb-1 bg-white d-flex align-items-start gap-2">
-        {/* 실행 취소/다시 실행 버튼 */}
+        {/* 元に戻す/やり直しボタン */}
         {undoRedo.map(({ label, command, isActive, disabled, icon, divider }, index) =>
           divider ? (
             <div key={`divider-undo-${index}`} className="vr mx-1"></div>
@@ -359,7 +359,7 @@ const MenuBar = ({ field, onImageAdd }) => {
             </div>
           )
         )}
-        {/* 헤딩 드롭다운 */}
+        {/* 見出しドロップダウン */}
         <div className="tooltip-wrapper dropdown">
           <button
             type="button"
@@ -477,7 +477,7 @@ const MenuBar = ({ field, onImageAdd }) => {
           )}
         </div>
 
-        {/* 정의된 순서대로 나머지 툴바 버튼을 렌더링 */}
+        {/* 定義された順序で残りのツールバーボタンをレンダリング */}
         {primaryOptions.map(({ label, command, isActive, disabled, icon, divider }, index) =>
           divider ? (
             <div key={`divider-${index}`} className="vr mx-1"></div>
@@ -572,7 +572,7 @@ const MenuBar = ({ field, onImageAdd }) => {
           </div>
         </div>
       )}
-      {/* 링크 삽입을 위한 모달 */}
+      {/* リンク挿入用モーダル */}
       {showLinkModal && (
         <div className="modal d-block" tabIndex="-1">
           <div className="modal-dialog">
@@ -595,7 +595,7 @@ const MenuBar = ({ field, onImageAdd }) => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">텍스트</label>
+                  <label className="form-label">テキスト</label>
                   <input
                     type="text"
                     className="form-control"
@@ -605,7 +605,7 @@ const MenuBar = ({ field, onImageAdd }) => {
                       setLinkText(e.target.value);
                       if (linkError) setLinkError('');
                     }}
-                    placeholder={linkTargetType === 'image' ? '이미지를 선택했습니다' : 'Click here'}
+                    placeholder={linkTargetType === 'image' ? '画像を選択しています' : 'Click here'}
                   />
                   {linkError && <div className="text-danger mt-1">{linkError}</div>}
                 </div>
@@ -629,11 +629,11 @@ const MenuBar = ({ field, onImageAdd }) => {
                   className="btn btn-primary"
                   onClick={() => {
                     if (!linkUrl) {
-                      setLinkError('URL도 입력해주세요');
+                      setLinkError('URLも入力してください');
                       return;
                     }
                     if (linkTargetType !== 'image' && !linkText.trim()) {
-                      setLinkError('텍스트를 입력해주세요');
+                      setLinkError('テキストを入力してください');
                       return;
                     }
                     const linkAttrs = {

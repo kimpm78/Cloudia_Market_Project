@@ -36,16 +36,17 @@ import CM_05_1000 from '../pages/CM_05_1000';
 import CM_05_1001 from '../pages/CM_05_1001';
 import CM_06_1000 from '../pages/CM_06_1000';
 import CM_06_1001 from '../pages/CM_06_1001';
+import CM_06_1002_CardInput from '../pages/CM_06_1002_CardInput';
 import CM_07_1000 from '../pages/CM_07_1000';
 import CM_company from '../pages/CM_Company';
 
 {
-  /* 결제 라우팅 */
+  /* 決済ルーティング */
 }
 import OrderPaymentResult from '../components/payment/OrderPaymentResult';
 
 {
-  /* 관리자 라우팅 */
+  /* 管理者ルーティング */
 }
 import CM_90_1000 from '../pages/CM_90_1000';
 import CM_90_1010 from '../pages/CM_90_1010';
@@ -73,7 +74,7 @@ import CM_90_1064 from '../pages/CM_90_1064';
 import CM_90_1065 from '../pages/CM_90_1065';
 
 {
-  /* 에러 페이지 */
+  /* エラーページ */
 }
 import Unauthorized from '../pages/errors/Unauthorized';
 import Forbidden from '../pages/errors/Forbidden';
@@ -81,17 +82,17 @@ import NotFound from '../pages/errors/NotFound';
 import ServerError from '../pages/errors/ServerError';
 
 {
-  /* 쿠키 페이지 */
+  /* Cookieページ */
 }
 import CM_CookiePage from '../pages/CM_CookiePage';
 
-// 약관 페이지 추가
+// 利用規約ページ追加
 import TermsPage from '../pages/CM_TermsPage';
 import GuestRoute from './GuestRoutes';
 
 const Routes = () => (
   <ReactRoutes>
-    {/* --- 게스트 접근 가능 페이지 (권한 4) --- */}
+    {/* --- ゲストアクセス可能ページ（権限4） --- */}
     <Route
       path="/login"
       element={
@@ -131,24 +132,24 @@ const Routes = () => (
     <Route path="/characters" element={<CM_03_1002 />} />
     <Route path="/genres" element={<CM_03_1003 />} />
     <Route path="/detail/:id" element={<CM_03_1004 />} />
-    {/* 리뷰/후기 & 상세 */}
+    {/* レビュー/口コミ & 詳細 */}
     <Route path="/review" element={<CM_04_1000 />} />
     <Route path="/review/:id" element={<CM_04_1001 />} />
-    {/* Q & A & 상세*/}
+    {/* Q & A &　詳細*/}
     <Route path="/qna" element={<CM_04_1003 />} />
     <Route path="/qna/:id" element={<CM_04_1004 />} />
-    {/* 공지사항 상세 기능 */}
+    {/* お知らせ 詳細 */}
     <Route path="/notice" element={<CM_05_1000 />} />
     <Route path="/notice/:id" element={<CM_05_1001 />} />
-    {/* 결제 기능 */}
+    {/* 決済 機能 */}
     <Route path="/order-payment/result" element={<OrderPaymentResult />} />
     <Route path="/company" element={<CM_company />} />
-    {/* 1:1 문의 */}
+    {/* 1:1 お問い合わせ */}
     <Route path="/contact" element={<CM_07_1000 />} />
-    {/* 장바구니 */}
+    {/* カート */}
     <Route path="/cart" element={<CM_06_1000 />} />
 
-    {/* --- 로그인 사용자 접근 가능 페이지 (권한 3 이상) --- */}
+    {/* --- ログインユーザーアクセス可能ページ（権限3以上） --- */}
     <Route
       path="/review/write"
       element={
@@ -181,8 +182,16 @@ const Routes = () => (
         </ProtectedRoute>
       }
     />
+    <Route
+      path="/order-payment/card-input"
+      element={
+        <ProtectedRoute requiredRole={3}>
+          <CM_06_1002_CardInput />
+        </ProtectedRoute>
+      }
+    />
 
-    {/* 메인 */}
+    {/* メイン */}
     <Route
       path="/mypage"
       element={
@@ -208,7 +217,7 @@ const Routes = () => (
       <Route path="account" element={<CM_01_1014 />} />
     </Route>
 
-    {/* --- 관리자/매니저 접근 가능 페이지 (권한 2 이상) --- */}
+    {/* --- 管理者/マネージャーアクセス可能ページ（権限2以上） --- */}
     <Route
       path="/admin"
       element={
@@ -218,13 +227,13 @@ const Routes = () => (
       }
     >
       <Route index element={<CM_90_1010 />} />
-      {/* 유저 관리 */}
+      {/* ユーザー管理 */}
       <Route path="users" element={<CM_90_1020 />} />
       <Route path="users/:memberId" element={<CM_90_1021 />} />
-      {/* 방문 데이터 */}
+      {/* 訪問データ */}
       <Route path="visits" element={<CM_90_1030 />} />
       <Route path="visits/analysis" element={<CM_90_1031 />} />
-      {/* 메뉴 관리 */}
+      {/* メニュー管理 */}
       <Route path="menu/banner" element={<CM_90_1040 />} />
       <Route path="menu/banner/register" element={<CM_90_1041 />} />
       <Route path="menu/banner/edit/:bannerId" element={<CM_90_1042 />} />
@@ -232,13 +241,13 @@ const Routes = () => (
       <Route path="menu/notice" element={<CM_90_1044 />} />
       <Route path="menu/notice/register" element={<CM_90_1045 />} />
       <Route path="menu/notice/edit/:noticeId" element={<CM_90_1046 />} />
-      {/* 정산 관리 */}
+      {/* 精算管理 */}
       <Route path="settlement/sales" element={<CM_90_1050 />} />
       <Route path="settlement/monthSales" element={<CM_90_1054 />} />
       <Route path="settlement/status" element={<CM_90_1051 />} />
       <Route path="settlement/refund" element={<CM_90_1052 />} />
       <Route path="settlement/stock_status" element={<CM_90_1053 />} />
-      {/* 상품 등록 */}
+      {/* 商品登録 */}
       <Route path="products" element={<CM_90_1060 />} />
       <Route path="products/register" element={<CM_90_1061 />} />
       <Route path="products/edit/:productId" element={<CM_90_1062 />} />
@@ -247,17 +256,17 @@ const Routes = () => (
       <Route path="products/code" element={<CM_90_1065 />} />
     </Route>
 
-    {/* 쿠키 & 약관 페이지 */}
+    {/* Cookie & 利用規約ページ */}
     <Route path="/cookie" element={<CM_CookiePage />} />
     <Route path="/terms" element={<TermsPage />} />
 
-    {/* 에러 페이지 */}
+    {/* エラーページ */}
     <Route path="/401" element={<Unauthorized />} />
     <Route path="/403" element={<Forbidden />} />
     <Route path="/404" element={<NotFound />} />
     <Route path="/500" element={<ServerError />} />
 
-    {/* 잘못된 경로 catch */}
+    {/* 不正なパスのcatch */}
     <Route path="*" element={<NotFound />} />
   </ReactRoutes>
 );

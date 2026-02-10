@@ -18,133 +18,133 @@ import com.cloudia.backend.CM_90_1060.model.Stock;
 public interface CM901060Mapper {
 
     /**
-     * 상품 전체 리스트 조회
+     * 商品一覧を取得
      * 
-     * @return 상품 전체 리스트
+     * @return 商品一覧
      */
     List<ResponseProducts> findAllProduct();
 
     /**
-     * 특정 상품 리스트 조회
+     * 条件に一致する商品一覧を取得
      * 
-     * @param searchTerm 키워드
-     * @param searchType 타입 (1:상품 코드, 2:상품 명)
-     * @return 상품 리스트
+     * @param searchTerm キーワード
+     * @param searchType 種別（1:商品コード、2:商品名）
+     * @return 商品一覧
      */
     List<ResponseProducts> findByProduct(@Param("searchTerm") String searchTerm, @Param("searchType") int searchType);
 
     /**
-     * 상품 삭제
+     * 商品を削除
      * 
-     * @param productIds 삭제 아이디 리스트
-     * @return 삭제 여부
+     * @param productIds 削除対象IDリスト
+     * @return 削除件数
      */
     Integer delProduct(@Param("productIds") List<Integer> productIds);
 
     /**
-     * 이미지 삭제
+     * 画像を削除
      * 
-     * @param productIds 삭제 아이디 리스트
-     * @return 삭제 여부
+     * @param productIds 削除対象IDリスト
+     * @return 削除件数
      */
     Integer delAttachMents(@Param("productIds") List<Integer> productIds);
 
     /**
-     * 카테고리 그룹 코드 전체 리스트 조회
+     * カテゴリグループコード一覧を取得
      * 
-     * @return 카테고리 그룹 코드 전체 리스트
+     * @return カテゴリグループコード一覧
      */
     List<Categories> findAllCategoryGroupCode();
 
     /**
-     * 선택 된 카테고리 그룹의 하위 카테고리 정보 조회
+     * 選択されたカテゴリグループの下位カテゴリ情報を取得
      * 
-     * @param categoryGroupCode 카테고리 그룹 코드드
-     * @return 하위 카테고리 정보
+     * @param categoryGroupCode カテゴリグループコード
+     * @return 下位カテゴリ情報
      */
     List<CategoryDetails> findCategory(@Param("categoryGroupCodes") List<String> categoryGroupCode);
 
     /**
-     * 등록 가능한 재고 리스트 조회
+     * 登録可能な在庫一覧を取得
      * 
-     * @return 재고 리스트
+     * @return 在庫一覧
      */
     List<Stock> findAllStockCode();
 
     /**
-     * 다음 product_id 값 조회
+     * 次のproduct_id値を取得
      * 
-     * @return 상품 아이디
+     * @return 商品ID
      */
     long getNextProductId();
 
     /**
-     * 에디터 이미지 등록
+     * エディタ画像を登録
      * 
-     * @param entity 등록 할 이미지 파일 정보
-     * @return 등록 여부
+     * @param entity 登録する画像ファイル情報
+     * @return 登録結果
      */
     int editorInsert(Attachments entity);
 
     /**
-     * 에디터 이미지 수정
+     * エディタ画像を更新
      * 
-     * @param entity 등록 할 이미지 파일 정보
-     * @return 등록 여부
+     * @param entity 更新する画像ファイル情報
+     * @return 更新結果
      */
     int editorUpdate(Attachments entity);
 
     /**
-     * 에디터 이미지 조회
+     * エディタ画像を取得
      * 
-     * @param productCode 코드
-     * @return 이미지
+     * @param productCode コード
+     * @return 画像一覧
      */
     List<Attachments> editorGet(@Param("productCode") Long productCode);
 
     /**
-     * 상품 등록
+     * 商品を登録
      * 
-     * @param entity 등록 할 상품 정보
-     * @return 등록 여부
+     * @param entity 登録する商品情報
+     * @return 登録結果
      */
     int productInsert(Products entity);
 
     /**
-     * 상품 수정
+     * 商品を更新
      * 
-     * @param entity 수정 할 상품 정보
-     * @return 수정 여부
+     * @param entity 更新する商品情報
+     * @return 更新結果
      */
     int productUpdate(Products entity);
 
     /**
-     * 상품 상세 등록
+     * 商品詳細を登録
      * 
-     * @param entity 저장될 상품 상세 정보
-     * @return 등록 결과
+     * @param entity 保存する商品詳細情報
+     * @return 登録結果
      */
     int insertProductDetail(ProductDetails entity);
 
     /**
-     * 상품 상세 수정
+     * 商品詳細を更新
      * 
-     * @param entity 수정될 상품 상세 정보
-     * @return 수정 결과
+     * @param entity 更新する商品詳細情報
+     * @return 更新結果
      */
     int updateProductDetail(ProductDetails entity);
 
     /**
-     * 등록 여부 조회
+     * 登録有無を取得
      * 
-     * @return 등록된 상품
+     * @return 登録済み商品
      */
     ProductUpt findByUpdProductById(@Param("productCode") int productCode);
 
     /**
-     * 등록 여부 조회
+     * 登録有無を取得
      * 
-     * @return 등록된 상품코드 카운트
+     * @return 登録済み商品コード件数
      */
     int findByProductByCode(@Param("productCode") String productCode);
 }

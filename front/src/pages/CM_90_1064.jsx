@@ -22,8 +22,8 @@ export default function CM_90_1064() {
   const [message, setMessage] = useState('');
   const [popupType, setPopupType] = useState('');
   const PRODUCT_CATEGORY_LABEL = {
-    1: '상시 판매',
-    2: '예약 판매',
+    1: '通常販売',
+    2: '予約販売',
   };
 
   useEffect(() => {
@@ -86,12 +86,12 @@ export default function CM_90_1064() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!form.productName) newErrors.productName = '상품을 선택하세요.';
+    if (!form.productName) newErrors.productName = '商品を選択してください。';
     if (form.productPrice === '' || isNaN(form.productPrice) || Number(form.productPrice) === 0) {
-      newErrors.productPrice = '사입가을 입력하세요.';
+      newErrors.productPrice = '仕入価格を入力してください。';
     }
     if (form.quantity === '' || isNaN(form.quantity) || Number(form.quantity) === 0) {
-      newErrors.quantity = '수량을 입력하세요.';
+      newErrors.quantity = '数量を入力してください。';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -120,22 +120,22 @@ export default function CM_90_1064() {
   return (
     <div className="d-flex">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">재고 등록</h5>
+        <h5 className="border-bottom pb-2 mb-3">在庫登録</h5>
         <form>
-          {/* 상품명 */}
+          {/* 商品名 */}
           <div className="mb-3">
             <label htmlFor="productName" className="form-label">
-              상품명
+              商品名
             </label>
             <Select
               id="productName"
               value={productCodeOptions.find((option) => option.value === form.productCode) || null}
               options={productCodeOptions}
               onChange={(selected) => handleProductCodeChange(selected?.value || '')}
-              placeholder="상품을 검색하거나 선택하세요"
+              placeholder="商品を検索または選択してください"
               isClearable
               isSearchable
-              noOptionsMessage={() => '검색 결과가 없습니다'}
+              noOptionsMessage={() => '検索結果がありません'}
               styles={{
                 control: (base) => ({
                   ...base,
@@ -157,10 +157,10 @@ export default function CM_90_1064() {
             {errors.productName && <div className="text-danger">{errors.productName}</div>}
           </div>
 
-          {/* 상품코드 */}
+          {/* 商品コード */}
           <div className="mb-3">
             <label htmlFor="productCode" className="form-label">
-              상품코드 (자동 입력)
+              商品コード（自動入力）
             </label>
             <input
               type="text"
@@ -172,10 +172,10 @@ export default function CM_90_1064() {
             />
           </div>
 
-          {/* 상품분류 */}
+          {/* 商品区分 */}
           <div className="mb-3">
             <label htmlFor="productCategory" className="form-label">
-              상품분류 (자동 입력)
+              商品区分（自動入力）
             </label>
             <input
               type="text"
@@ -187,10 +187,10 @@ export default function CM_90_1064() {
             />
           </div>
 
-          {/* 상품 사입가 */}
+          {/* 商品仕入価格 */}
           <div className="mb-3">
             <label htmlFor="productPrice" className="form-label">
-              상품 사입가
+              商品仕入価格
             </label>
             <input
               type="text"
@@ -202,10 +202,10 @@ export default function CM_90_1064() {
             {errors.productPrice && <div className="text-danger">{errors.productPrice}</div>}
           </div>
 
-          {/* 수량 */}
+          {/* 数量 */}
           <div className="mb-3">
             <label htmlFor="quantity" className="form-label">
-              수량
+              数量
             </label>
             <input
               type="text"
@@ -217,10 +217,10 @@ export default function CM_90_1064() {
             {errors.quantity && <div className="text-danger">{errors.quantity}</div>}
           </div>
 
-          {/* 비고 */}
+          {/* 備考 */}
           <div className="mb-3">
             <label htmlFor="note" className="form-label">
-              비고
+              備考
             </label>
             <input
               type="text"
@@ -231,22 +231,22 @@ export default function CM_90_1064() {
             />
           </div>
 
-          {/* 버튼 */}
+          {/* ボタン */}
           <div className="d-flex justify-content-center">
             <button
               type="button"
               className="btn btn-primary me-2 btn-fixed-width"
               onClick={handleRegisterClick}
             >
-              등록
+              登録
             </button>
             <Link to="/admin/products/stock" className="btn btn-secondary btn-fixed-width">
-              뒤로 가기
+              戻る
             </Link>
           </div>
         </form>
 
-        {/* 등록 확인 모달 */}
+        {/* 登録確認モーダル */}
         {showModal && (
           <div className="modal fade show custom-modal-overlay" onClick={handleModalClose}>
             <div
@@ -255,21 +255,21 @@ export default function CM_90_1064() {
             >
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">등록 확인</h5>
+                  <h5 className="modal-title">登録確認</h5>
                   <button
                     type="button"
                     className="btn-close"
                     onClick={handleModalClose}
-                    aria-label="닫기"
+                    aria-label="閉じる"
                   />
                 </div>
-                <div className="modal-body">정말로 등록하시겠습니까?</div>
+                <div className="modal-body">本当に登録しますか？</div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-primary" onClick={handleSubmit}>
-                    저장
+                    保存
                   </button>
                   <button type="button" className="btn btn-secondary" onClick={handleModalClose}>
-                    취소
+                    キャンセル
                   </button>
                 </div>
               </div>

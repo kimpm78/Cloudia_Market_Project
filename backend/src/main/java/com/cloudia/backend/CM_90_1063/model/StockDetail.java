@@ -16,11 +16,11 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StockDetail {
-    private int stockId; // 재고 ID
-    private int qty; // 수량
-    private String reason; // 비고
-    private String createdBy; // 등록자
-    private LocalDateTime createdAt; // 등록일
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일
+    private int stockId;                // 在庫ID
+    private int qty;                    // 数量
+    private String reason;              // 備考
+    private String createdBy;           // 登録者
+    private LocalDateTime createdAt;    // 登録日
+    private String updatedBy;           // 更新者
+    private LocalDateTime updatedAt;    // 更新日
 }

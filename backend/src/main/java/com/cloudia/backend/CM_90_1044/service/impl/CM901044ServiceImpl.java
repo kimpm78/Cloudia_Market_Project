@@ -16,10 +16,10 @@ import org.springframework.util.StringUtils;
 
 import com.cloudia.backend.CM_90_1044.constants.CM901044Constant;
 import com.cloudia.backend.CM_90_1044.constants.CM901044MessageConstant;
-import com.cloudia.backend.CM_90_1044.model.ResponseModel;
 import com.cloudia.backend.CM_90_1044.mapper.CM901044Mapper;
 import com.cloudia.backend.CM_90_1044.model.NoticeInfo;
 import com.cloudia.backend.CM_90_1044.service.CM901044Service;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.common.exception.AuthenticationException;
 import com.cloudia.backend.common.exception.ErrorCode;
 import com.cloudia.backend.common.log.LogHelper;
@@ -39,9 +39,9 @@ public class CM901044ServiceImpl implements CM901044Service {
     private final DateCalculator dateCalculator;
 
     /**
-     * 공지사항 전체 리스트 조회
-     * 
-     * @return 공지사항 전체 리스트
+     * お知らせ全件リスト取得
+     *
+     * @return お知らせ全件リスト
      */
     @Override
     @Transactional(readOnly = true)
@@ -70,11 +70,11 @@ public class CM901044ServiceImpl implements CM901044Service {
     }
 
     /**
-     * 특정 공지사항 리스트 조회
-     * 
-     * @param searchKeyword 키워드
-     * @param searchType    타입 (1:제목 + 내용, 2:제목, 3:내용)
-     * @return 공지사항 리스트
+     * お知らせ検索（条件指定）
+     *
+     * @param searchKeyword キーワード
+     * @param searchType    タイプ（1:タイトル+内容, 2:タイトル, 3:内容）
+     * @return お知らせリスト
      */
     @Override
     @Transactional(readOnly = true)
@@ -119,10 +119,10 @@ public class CM901044ServiceImpl implements CM901044Service {
     }
 
     /**
-     * 특정 공지사항 리스트 조회
-     * 
-     * @param noticeId 공지사항 아이디
-     * @return 공지사항 리스트
+     * お知らせID指定取得
+     *
+     * @param noticeId お知らせID
+     * @return お知らせリスト
      */
     @Override
     @Transactional(readOnly = true)
@@ -158,10 +158,10 @@ public class CM901044ServiceImpl implements CM901044Service {
     }
 
     /**
-     * 공지사항 등록
-     * 
-     * @param entity 등록 할 공지사항 정보
-     * @return 등록 여부
+     * お知らせ登録
+     *
+     * @param entity 登録するお知らせ情報
+     * @return 登録結果
      */
     @Override
     @Transactional
@@ -172,7 +172,7 @@ public class CM901044ServiceImpl implements CM901044Service {
                     .body(createResponseModel(0, false, CM901044MessageConstant.FAIL_NO_NOTICE_SELECTED));
         }
         if (null == userId || userId.isBlank()) {
-            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "공지사항 조회" });
+            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "お知らせ照会" });
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
         log.info(CM901044MessageConstant.NOTICE_UPLOAD_START, entity.getTitle());
@@ -207,10 +207,10 @@ public class CM901044ServiceImpl implements CM901044Service {
     }
 
     /**
-     * 공지사항 업데이트
-     * 
-     * @param entity 업데이트 할 공지사항 정보
-     * @return 업데이트 여부
+     * お知らせ更新
+     *
+     * @param entity 更新するお知らせ情報
+     * @return 更新結果
      */
     @Override
     @Transactional
@@ -221,7 +221,7 @@ public class CM901044ServiceImpl implements CM901044Service {
                     .body(createResponseModel(0, false, CM901044MessageConstant.FAIL_NO_NOTICE_SELECTED));
         }
         if (null == userId || userId.isBlank()) {
-            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "공지사항 조회" });
+            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "お知らせ照会" });
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
         log.info(CM901044MessageConstant.NOTICE_UPDATE_START, entity.getNoticeId(), entity.getTitle());
@@ -262,10 +262,10 @@ public class CM901044ServiceImpl implements CM901044Service {
     }
 
     /**
-     * 공지사항 등록 실행
-     * 
-     * @param entity 공지사항 정보
-     * @return 등록 결과
+     * お知らせ登録処理（実行）
+     *
+     * @param entity お知らせ情報
+     * @return 登録結果
      */
     private int insertNotice(NoticeInfo entity, String userId) {
         NoticeInfo noticeModel = createNoticeModel(entity, userId);
@@ -278,10 +278,10 @@ public class CM901044ServiceImpl implements CM901044Service {
     }
 
     /**
-     * 공지사항 업데이트 실행
-     * 
-     * @param entity 공지사항 정보
-     * @return 업데이트 결과
+     * お知らせ更新処理（実行）
+     *
+     * @param entity お知らせ情報
+     * @return 更新結果
      */
     private int updateNotice(NoticeInfo entity, String userId) {
         NoticeInfo noticeModel = createNoticeModel(entity, userId);
@@ -291,10 +291,10 @@ public class CM901044ServiceImpl implements CM901044Service {
     }
 
     /**
-     * 공지사항 모델 생성 (공통 로직)
-     * 
-     * @param entity 원본 엔티티
-     * @return NoticeInfo 모델
+     * お知らせモデル生成（共通ロジック）
+     *
+     * @param entity 元エンティティ
+     * @return NoticeInfo モデル
      */
     private NoticeInfo createNoticeModel(NoticeInfo entity, String userId) {
         NoticeInfo noticeModel = new NoticeInfo();
@@ -313,11 +313,11 @@ public class CM901044ServiceImpl implements CM901044Service {
     }
 
     /**
-     * ResponseModel 생성
-     * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    메시지
+     * ResponseModel 生成
+     *
+     * @param resultList 結果データ
+     * @param result     処理結果
+     * @param message    メッセージ
      * @return ResponseModel
      */
     private <T> ResponseModel<T> createResponseModel(T resultList, boolean result, String message) {

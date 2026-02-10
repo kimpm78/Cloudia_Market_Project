@@ -10,16 +10,16 @@ import com.cloudia.backend.CM_90_1031.model.genderDto;
 @Mapper
 public interface CM901031Mapper {
     /**
-     * 연령대 리스트 조회
+     * 年齢層一覧取得
      * 
-     * @return 연령대 리스트
+     * @return 年齢層一覧
      */
     List<ageDto> findByAllAges();
 
     /**
-     * 성별 리스트 조회
+     * 性別一覧取得
      * 
-     * @return 성별 리스트
+     * @return 性別一覧
      */
     List<genderDto> findByAllGenders();
 }

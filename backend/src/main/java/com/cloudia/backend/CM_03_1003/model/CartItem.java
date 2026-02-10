@@ -5,14 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 장바구니 항목 상세
+ * カート項目詳細
  */
 @Getter
 @Setter
 @AllArgsConstructor
 public class CartItem {
-    private String productId;   // 상품 ID
-    private String productName; // 상품 이름
-    private int quantity;       // 수량
-    private int price;          // 개당 가격 또는 총합
+    private String productId;   // 商品ID
+    private String productName; // 商品名
+    private int quantity;       // 数量
+    private int price;          // 単価または合計金額
 }

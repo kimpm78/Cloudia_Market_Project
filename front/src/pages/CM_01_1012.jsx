@@ -20,18 +20,18 @@ const ShippingInquiryFields = ({
 }) => (
   <div className="mb-3 w-100 d-flex gap-3 flex-column flex-md-row">
     <div className="w-100 w-md-50">
-      <label className="form-label">주문번호</label>
+      <label className="form-label">注文番号</label>
       <select
         className="form-select"
         value={selectedOrderNumber}
         onChange={onOrderChange}
         disabled={orderList.length === 0}
       >
-        <option value="">선택해주세요</option>
+        <option value="">選択してください</option>
         {orderList.map((order) => {
           const labelParts = [order.displayOrderNumber || order.orderNumber];
           if (order.displayOrderDate) {
-            labelParts.push(`구매일: ${order.displayOrderDate}`);
+            labelParts.push(`購入日: ${order.displayOrderDate}`);
           }
           return (
             <option key={order.orderId} value={order.orderNumber}>
@@ -43,14 +43,14 @@ const ShippingInquiryFields = ({
       {errors.order && <div className="text-danger small mt-1">{errors.order}</div>}
     </div>
     <div className="w-100 w-md-50">
-      <label className="form-label">상품</label>
+      <label className="form-label">商品</label>
       <select
         className="form-select"
         value={selectedProductCode}
         onChange={onProductChange}
         disabled={availableProducts.length === 0}
       >
-        <option value="">선택해주세요</option>
+        <option value="">選択してください</option>
         {availableProducts.map((product) => (
           <option key={product.productCode} value={product.productCode}>
             {product.productName}
@@ -71,14 +71,14 @@ const ProductInquiryFields = ({
 }) => (
   <div className="mb-3 w-100 d-flex gap-3 flex-column flex-md-row">
     <div className="w-100 w-md-50">
-      <label className="form-label">상품명</label>
+      <label className="form-label">商品名</label>
       <select
         className="form-select"
         value={selectedProductCode}
         onChange={onProductChange}
         disabled={productList.length === 0}
       >
-        <option value="">상품을 선택해주세요</option>
+        <option value="">商品を選択してください</option>
         {productList.map((product) => (
           <option key={product.productCode} value={product.productCode}>
             {product.productName}
@@ -90,12 +90,12 @@ const ProductInquiryFields = ({
       )}
     </div>
     <div className="w-100 w-md-50">
-      <label className="form-label">상품번호 (자동 입력)</label>
+      <label className="form-label">商品番号（自動入力）</label>
       <input
         type="text"
         className="form-control"
         value={productNumberText}
-        placeholder="상품 선택 시 자동 입력됩니다"
+        placeholder="商品を選択すると自動入力されます"
         readOnly
         disabled
       />
@@ -108,7 +108,7 @@ export default function CM_01_1012() {
   const { isLoggedIn, user } = useAuth();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [selectedTag, setSelectedTag] = useState('비공개');
+  const [selectedTag, setSelectedTag] = useState('非公開');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [openLoadingPopup, setOpenLoadingPopup] = useState(false);
@@ -125,13 +125,13 @@ export default function CM_01_1012() {
   const [selectedProductName, setSelectedProductName] = useState('');
   const [selectedProductId, setSelectedProductId] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [productList, setProductList] = useState([]); // 전체 상품 목록
-  const [productNameText, setProductNameText] = useState(''); // 선택된 상품명
-  const [productNumberText, setProductNumberText] = useState(''); // 선택된 상품코드 (자동입력)
+  const [productList, setProductList] = useState([]); // 商品一覧
+  const [productNameText, setProductNameText] = useState(''); // 選択された商品名
+  const [productNumberText, setProductNumberText] = useState(''); // 選択された商品コード (自動入力)
 
   const visibilityLabel = useMemo(() => {
-    if (selectedTag === '공개') return '공개';
-    if (selectedTag === '비공개') return '비공개';
+    if (selectedTag === '公開') return '公開';
+    if (selectedTag === '非公開') return '非公開';
     return '';
   }, [selectedTag]);
 
@@ -157,13 +157,13 @@ export default function CM_01_1012() {
           value: String(code.codeValue),
           name: code.codeValueName,
         }));
-        setInquiryCategories([{ value: '', name: '선택해주세요' }, ...formattedCategories]);
+        setInquiryCategories([{ value: '', name: '選択してください' }, ...formattedCategories]);
       } else {
-        setInquiryCategories([{ value: '', name: '선택해주세요' }]);
+        setInquiryCategories([{ value: '', name: '選択してください' }]);
       }
     } catch (err) {
-      console.error('문의 분류 목록 로딩 실패:', err);
-      setInquiryCategories([{ value: '', name: '선택해주세요' }]);
+      console.error('お問い合わせ分類一覧の読み込みに失敗しました:', err);
+      setInquiryCategories([{ value: '', name: '選択してください' }]);
     } finally {
       setLoadingCategories(false);
     }
@@ -185,7 +185,7 @@ export default function CM_01_1012() {
         setOrderList(Array.isArray(list) ? list : []);
       })
       .catch((err) => {
-        console.error('주문 정보 로드 실패:', err);
+        console.error('注文情報の読み込みに失敗しました:', err);
       });
   }, [isLoggedIn, user, selectedCategoryName]);
 
@@ -217,7 +217,7 @@ export default function CM_01_1012() {
   }, [selectedOrderNumber, orderList]);
 
   useEffect(() => {
-    if (selectedCategoryName !== '상품문의') {
+    if (selectedCategoryName !== '商品お問い合わせ') {
       setProductList([]);
       return;
     }
@@ -231,7 +231,7 @@ export default function CM_01_1012() {
         }
       })
       .catch((err) => {
-        console.error('상품 목록 로드 실패:', err);
+        console.error('商品一覧の読み込みに失敗しました:', err);
       });
   }, [selectedCategoryName]);
 
@@ -249,37 +249,37 @@ export default function CM_01_1012() {
     const selectedProduct = productList.find((p) => p.productCode === code);
 
     if (selectedProduct) {
-      setProductNumberText(code); // 상품번호 자동 입력
-      setProductNameText(selectedProduct.productName); // 상품명 저장
+      setProductNumberText(code); //商品コード 格納
+      setProductNameText(selectedProduct.productName); // 商品名 格納
       setErrors((prev) => ({ ...prev, productNameText: '' }));
     }
   };
 
   useEffect(() => {
-    if (selectedCategoryName === '기타문의') {
-      setSelectedTag('비공개');
+    if (selectedCategoryName === 'その他お問い合わせ') {
+      setSelectedTag('非公開');
     }
   }, [selectedCategoryName]);
 
   const validateForm = () => {
     const nextErrors = {};
-    if (!title.trim()) nextErrors.title = '＊제목을 입력해주세요.';
-    if (!selectedCategory) nextErrors.category = '＊문의 유형을 선택해주세요.';
-    if (!content.trim()) nextErrors.content = '＊내용을 입력해주세요.';
+    if (!title.trim()) nextErrors.title = '＊件名を入力してください。';
+    if (!selectedCategory) nextErrors.category = '＊お問い合わせ種別を選択してください。';
+    if (!content.trim()) nextErrors.content = '＊内容を入力してください。';
 
-    if (selectedCategoryName !== '기타문의' && !selectedTag) {
-      nextErrors.tag = '＊공개 여부를 선택해주세요.';
+    if (selectedCategoryName !== 'その他お問い合わせ' && !selectedTag) {
+      nextErrors.tag = '＊公開/非公開を選択してください。';
     }
 
     switch (selectedCategoryName) {
-      case '배송문의':
-        if (!selectedOrderNumber) nextErrors.order = '＊주문번호를 선택해주세요.';
-        if (!selectedProductCode) nextErrors.product = '＊상품을 선택해주세요.';
+      case '配送お問い合わせ':
+        if (!selectedOrderNumber) nextErrors.order = '＊注文番号を選択してください。';
+        if (!selectedProductCode) nextErrors.product = '＊商品を選択してください。';
         break;
-      case '상품문의':
-        if (!productNameText.trim()) nextErrors.productNameText = '＊상품을 선택해주세요.';
+      case '商品お問い合わせ':
+        if (!productNameText.trim()) nextErrors.productNameText = '＊商品を選択してください。';
         break;
-      case '기타문의':
+      case 'その他お問い合わせ':
       default:
         break;
     }
@@ -289,22 +289,22 @@ export default function CM_01_1012() {
   const buildPayloadContent = () => {
     const meta = [];
 
-    if (selectedCategoryName) meta.push(`[문의유형] ${selectedCategoryName}`);
+    if (selectedCategoryName) meta.push(`[お問い合わせ種別] ${selectedCategoryName}`);
 
     switch (selectedCategoryName) {
-      case '배송문의': {
+      case '配送お問い合わせ': {
         const displayOrderNo = selectedOrder?.displayOrderNumber || selectedOrderNumber;
-        if (displayOrderNo) meta.push(`[주문번호] ${displayOrderNo}`);
-        if (selectedProductName) meta.push(`[상품] ${selectedProductName}`);
-        if (selectedProductCode) meta.push(`[상품코드] ${selectedProductCode}`);
-        if (selectedProductId) meta.push(`[상품ID] ${selectedProductId}`);
+        if (displayOrderNo) meta.push(`[注文番号] ${displayOrderNo}`);
+        if (selectedProductName) meta.push(`[商品] ${selectedProductName}`);
+        if (selectedProductCode) meta.push(`[商品コード] ${selectedProductCode}`);
+        if (selectedProductId) meta.push(`[商品ID] ${selectedProductId}`);
         break;
       }
-      case '상품문의':
-        if (productNameText) meta.push(`[상품명] ${productNameText.trim()}`);
-        if (productNumberText) meta.push(`[상품번호] ${productNumberText.trim()}`);
+      case '商品お問い合わせ':
+        if (productNameText) meta.push(`[商品名] ${productNameText.trim()}`);
+        if (productNumberText) meta.push(`[商品番号] ${productNumberText.trim()}`);
         break;
-      case '기타문의':
+      case 'その他お問い合わせ':
       default:
         break;
     }
@@ -317,7 +317,7 @@ export default function CM_01_1012() {
     e.preventDefault();
 
     if (!isLoggedIn || !numericUserId) {
-      setPopupMessage('로그인이 필요합니다.');
+      setPopupMessage('ログインが必要です。');
       setOpenErrorPopup(true);
       return;
     }
@@ -343,7 +343,7 @@ export default function CM_01_1012() {
       };
 
       const result = await createInquiry(payload);
-      setPopupMessage('1:1 문의가 등록되었습니다.');
+      setPopupMessage('1:1お問い合わせを登録しました。');
       setOpenSuccessPopup(true);
       setTimeout(() => {
         setOpenSuccessPopup(false);
@@ -354,9 +354,9 @@ export default function CM_01_1012() {
         }
       }, 1200);
     } catch (err) {
-      console.error('1:1 문의 등록 실패:', err);
+      console.error('1:1お問い合わせの登録に失敗しました:', err);
       setPopupMessage(
-        err?.response?.data?.message || err?.message || '1:1 문의 등록에 실패했습니다.'
+        err?.response?.data?.message || err?.message || '1:1お問い合わせの登録に失敗しました。'
       );
       setOpenErrorPopup(true);
     } finally {
@@ -367,7 +367,7 @@ export default function CM_01_1012() {
 
   const renderDynamicFields = () => {
     switch (selectedCategoryName) {
-      case '배송문의':
+      case '配送お問い合わせ':
         return (
           <ShippingInquiryFields
             orderList={orderList}
@@ -390,7 +390,7 @@ export default function CM_01_1012() {
           />
         );
 
-      case '상품문의':
+      case '商品お問い合わせ':
         return (
           <ProductInquiryFields
             productList={productList}
@@ -401,7 +401,7 @@ export default function CM_01_1012() {
           />
         );
 
-      case '기타문의':
+      case 'その他お問い合わせ':
       default:
         return null;
     }
@@ -409,7 +409,7 @@ export default function CM_01_1012() {
 
   return (
     <>
-      <h1>1:1 문의 (작성하기)</h1>
+      <h1>1:1 お問い合わせ（作成）</h1>
       <div className="pt-0 px-5 pb-5">
         <CM_99_1002
           isOpen={openLoadingPopup}
@@ -430,7 +430,7 @@ export default function CM_01_1012() {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3 w-50">
-            <label className="form-label">제목</label>
+            <label className="form-label">件名</label>
             <div className="input-group">
               {visibilityLabel && <span className="input-group-text">{visibilityLabel}</span>}
               <input
@@ -440,14 +440,14 @@ export default function CM_01_1012() {
                   setTitle(e.target.value);
                   setErrors((prev) => ({ ...prev, title: '' }));
                 }}
-                placeholder="제목을 입력해주세요"
+                placeholder="件名を入力してください"
               />
             </div>
             {errors.title && <div className="text-danger small mt-1">{errors.title}</div>}
           </div>
 
           <div className="mb-3 w-50">
-            <label className="form-label">문의 유형</label>
+            <label className="form-label">お問い合わせ種別</label>
             <select
               className="form-select"
               value={selectedCategory}
@@ -468,9 +468,9 @@ export default function CM_01_1012() {
 
           {renderDynamicFields()}
 
-          {selectedCategoryName !== '기타문의' && (
+          {selectedCategoryName !== 'その他お問い合わせ' && (
             <div className="mb-3">
-              <label className="form-label">공개 여부</label>
+              <label className="form-label">公開/非公開</label>
               <div>
                 <div className="form-check form-check-inline">
                   <input
@@ -478,15 +478,15 @@ export default function CM_01_1012() {
                     type="radio"
                     name="visibility"
                     id="qna-public"
-                    value="공개"
-                    checked={selectedTag === '공개'}
+                    value="公開"
+                    checked={selectedTag === '公開'}
                     onChange={(e) => {
                       setSelectedTag(e.target.value);
                       setErrors((prev) => ({ ...prev, tag: '' }));
                     }}
                   />
                   <label className="form-check-label" htmlFor="qna-public">
-                    공개
+                    公開
                   </label>
                 </div>
                 <div className="form-check form-check-inline">
@@ -496,14 +496,14 @@ export default function CM_01_1012() {
                     name="visibility"
                     id="qna-private"
                     value="비공개"
-                    checked={selectedTag === '비공개'}
+                    checked={selectedTag === '非公開'}
                     onChange={(e) => {
                       setSelectedTag(e.target.value);
                       setErrors((prev) => ({ ...prev, tag: '' }));
                     }}
                   />
                   <label className="form-check-label" htmlFor="qna-private">
-                    비공개
+                    非公開
                   </label>
                 </div>
               </div>
@@ -512,7 +512,7 @@ export default function CM_01_1012() {
           )}
 
           <div className="mb-3">
-            <label className="form-label">내용</label>
+            <label className="form-label">内容</label>
             <textarea
               className="form-control"
               rows="10"
@@ -521,7 +521,7 @@ export default function CM_01_1012() {
                 setContent(e.target.value);
                 setErrors((prev) => ({ ...prev, content: '' }));
               }}
-              placeholder="궁금하신 내용을 입력해주세요."
+              placeholder="お問い合わせ内容を入力してください。"
             />
             {errors.content && <div className="text-danger small mt-1">{errors.content}</div>}
           </div>
@@ -533,10 +533,10 @@ export default function CM_01_1012() {
               onClick={() => navigate('/mypage/inquiries')}
               disabled={isLoading}
             >
-              목록으로
+              一覧へ
             </button>
             <button type="submit" className="btn btn-primary" disabled={isLoading}>
-              {isLoading ? '등록 중...' : '등록하기'}
+              {isLoading ? '登録中...' : '登録する'}
             </button>
           </div>
         </form>

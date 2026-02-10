@@ -1,9 +1,9 @@
-/* Basic editor styles */
+/* 基本エディタスタイル */
 .tiptap {
   :first-child {
     margin-top: 0;
   }
-  /* List styles */
+  /* リストスタイル */
   ul,
   ol {
     padding: 0 1rem;
@@ -14,7 +14,7 @@
       margin-bottom: 0.25em;
     }
   }
-  /* Task list specific styles */
+  /* タスクリスト専用スタイル */
   ul[data-type='taskList'] {
     list-style: none;
     margin-left: 0;
@@ -43,7 +43,7 @@
       margin: 0;
     }
   }
-  /* Heading styles */
+  /* 見出しスタイル */
   h1,
   h2,
   h3,
@@ -94,7 +94,7 @@
     font-size: 16px;
   }
 
-  /* Code and preformatted text styles */
+  /* コード／整形済みテキストのスタイル */
   code {
     background-color: rgba(88, 5, 255, 0.05);
     border-radius: 0.4rem;
@@ -137,7 +137,7 @@
       background-color 0.2s ease,
       color 0.2s ease;
   }
-  /* 마우스 오버 시 강조 */
+  /* ホバー時に強調 */
   blockquote:hover {
     background-color: #f0f0f0;
     color: #333;
@@ -150,7 +150,7 @@
     margin: 2rem 0;
   }
 
-  /* Placeholder (at the top) */
+  /* プレースホルダー（先頭） */
   p.is-editor-empty:first-child::before {
     color: #adb5bd;
     content: attr(data-placeholder);
@@ -175,7 +175,7 @@
   .ProseMirror-selectednode img {
     outline: 3px solid #0d6efd;
   }
-  /* tiptap table styles */
+  /* tiptap テーブルスタイル */
   table {
     border-collapse: collapse;
     margin: 0;
@@ -230,7 +230,7 @@
     cursor: ew-resize;
     cursor: col-resize;
   }
-  /* Link styles */
+  /* リンクスタイル */
   a {
     color: #6a00f5;
     cursor: pointer;
@@ -240,7 +240,7 @@
     }
   }
 }
-/* 스크롤 바 */
+/* スクロールバー */
 .tiptap::-webkit-scrollbar {
   width: 8px;
 }
@@ -251,13 +251,13 @@
   background-color: #ccc;
   border-radius: 5px;
 }
-/* 에디트 내용 입력 텍스트 바 */
+/* エディタ本文入力エリア */
 .tiptap-wrapper {
   min-height: 600px;
   max-height: 80vh;
   overflow-y: auto;
 }
-/* 에디트 메뉴 바 */
+/* エディタメニューバー */
 .tooltip-wrapper {
   position: relative;
   display: inline-block;
@@ -270,7 +270,7 @@
 .control-group > * {
   flex: 0 0 auto;
 }
-/* 메뉴 말풍선 툴팁 */
+/* メニューの吹き出しツールチップ */
 .custom-tooltip {
   position: absolute;
   bottom: 100%;
@@ -302,7 +302,7 @@
   opacity: 1;
 }
 
-/* 모바일: 0 ~ 767px */
+/* モバイル: 0〜767px */
 @media screen and (max-width: 767px) {
   .tiptap table {
     display: block;

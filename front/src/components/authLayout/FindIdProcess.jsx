@@ -28,9 +28,9 @@ export default function FindIdProcess({ onIdFound }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!email) {
-      errors.email = '이메일을 입력해주세요.';
+      errors.email = 'メールアドレスを入力してください。';
     } else if (!emailRegex.test(email)) {
-      errors.email = '유효한 이메일 형식이 아닙니다.';
+      errors.email = '有効なメールアドレス形式ではありません。';
     }
     return errors;
   };
@@ -64,8 +64,8 @@ export default function FindIdProcess({ onIdFound }) {
 
   return (
     <>
-      <h4 className="fw-bold mb-3">아이디 찾기</h4>
-      <p className="text-muted mb-4">가입 시 입력한 이메일 주소를 입력해주세요.</p>
+      <h4 className="fw-bold mb-3">IDを探す</h4>
+      <p className="text-muted mb-4">登録時に入力したメールアドレスを入力してください。</p>
 
       {apiError && <div className="alert alert-danger p-2">{apiError}</div>}
 
@@ -73,7 +73,7 @@ export default function FindIdProcess({ onIdFound }) {
         <input
           type="email"
           className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-          placeholder="이메일 주소"
+          placeholder="メールアドレス"
           value={email}
           onChange={handleEmailChange}
         />
@@ -81,11 +81,11 @@ export default function FindIdProcess({ onIdFound }) {
       </div>
       <div className="d-grid mt-4">
         <button className="btn btn-primary" onClick={handleRequest} disabled={loading}>
-          {loading ? '요청 중...' : '인증번호 받기'}
+          {loading ? '送信中...' : '認証コードを受け取る'}
         </button>
       </div>
 
-      {/* VerificationPopup 컴포넌트를 렌더링하고 상태와 함수를 props로 전달 */}
+      {/* VerificationModal を表示し、状態と関数を props として渡す */}
       <VerificationModal
         show={isModalOpen}
         onClose={() => setIsModalOpen(false)}

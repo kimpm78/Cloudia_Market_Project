@@ -18,7 +18,7 @@ import com.cloudia.backend.CM_03_1003.model.CategoryDetails;
 import com.cloudia.backend.CM_03_1003.model.CategoryGroupForCheckbox;
 import com.cloudia.backend.CM_03_1003.model.CategoryItem;
 import com.cloudia.backend.CM_03_1003.model.ProductInfo;
-import com.cloudia.backend.CM_03_1003.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_03_1003.service.CM031003Service;
 import com.cloudia.backend.constants.CMMessageConstant;
 
@@ -31,8 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 public class CM031003ServiceImpl implements CM031003Service {
 
     private final CM031003Mapper cm031003Mapper;
-
-
 
     @Override
     @Transactional(readOnly = true)

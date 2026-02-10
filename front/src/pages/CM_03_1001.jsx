@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import axiosInstance from '../services/axiosInstance';
-import { Link } from 'react-router-dom';
 
 import noImage from '../images/common/CM-NoImage.png';
 import CM_99_1011_filterSidebar from '../components/CM_99_1011_filterSidebar';
@@ -10,12 +9,14 @@ import useCartMeta from '../hooks/useCartMeta';
 import useProductPage from '../hooks/useProductPage';
 import { hasReservationClosed } from '../utils/productStatus';
 import { isReservationProduct } from '../utils/productPageFilters';
+import ProductCardBasic from '../components/CM_03_1000_ProductCardBasic';
+import { normalizeImageUrl } from '../utils/htmlContent';
 
 const PRODUCT_STATUS_MAP = {
-  1: '판매중',
+  1: '販売中',
   2: 'SOLD OUT',
-  3: '예약중',
-  4: '예약 마감',
+  3: '予約中',
+  4: '予約終了',
 };
 
 const normalizeStatusCode = (value) => {
@@ -107,20 +108,6 @@ export default function CM_03_1001({
       }
     }
     return 0;
-  };
-
-  const buildStatusBadge = (status) => {
-    if (!status) return null;
-    if (status.code === '4') {
-      return { text: PRODUCT_STATUS_MAP['4'], className: 'bg-secondary text-white' };
-    }
-    if (status.code === '3') {
-      return { text: PRODUCT_STATUS_MAP['3'], className: 'bg-primary text-white' };
-    }
-    if (status.code === '2') {
-      return { text: PRODUCT_STATUS_MAP['2'], className: 'bg-warning text-dark' };
-    }
-    return null;
   };
 
   const detectSoldOut = (item) => {
@@ -271,7 +258,7 @@ export default function CM_03_1001({
     });
   };
 
-  const categoryGroupLabels = ['예약 상품'];
+  const categoryGroupLabels = ['予約商品'];
   const {
     currentPage,
     totalPages,
@@ -293,24 +280,24 @@ export default function CM_03_1001({
   });
 
   if (error) {
-    return <div className="text-center mt-5">{CMMessage.MSG_ERR_005('상품')}</div>;
+    return <div className="text-center mt-5">{CMMessage.MSG_ERR_005('商品')}</div>;
   }
 
   return (
     <>
-      <h1 ref={topRef}>예약상품</h1>
+      <h1 className="m-5" ref={topRef}>予約商品</h1>
       <div className="container-fluid my-4">
         <div className="row justify-content-center">
           {showFilter && (
             <div className="col-12 col-md-3 mb-3 mb-md-0">
               <CM_99_1011_filterSidebar
-                pageName="예약 상품"
+                pageName="予約商品"
                 selectedFilters={selectedFilters}
                 onFilterChange={handleFilterChange}
                 onReset={handleReset}
                 keyword={keyword}
                 onKeywordChange={handleKeywordChange}
-                categoryLabel="출시월"
+                categoryLabel="発売月"
               />
             </div>
           )}
@@ -319,9 +306,7 @@ export default function CM_03_1001({
               keyword.trim().length > 0 ? (
                 <div className="text-center mt-5">
                   <h5 style={{ color: 'red' }}>{CMMessage.MSG_EMPTY_001}</h5>
-                  <p className="text-muted">
-                    {CMMessage.MSG_EMPTY_002}
-                  </p>
+                  <p className="text-muted">{CMMessage.MSG_EMPTY_002}</p>
                 </div>
               ) : (
                 <div className="text-center mt-5">
@@ -331,98 +316,23 @@ export default function CM_03_1001({
               )
             ) : (
               <div className="row row-cols-2 row-cols-md-5 g-4">
-                {paginatedItems.map((item, i) => {
-                  const itemId =
-                    item.productId ??
-                    item.product_id ??
-                    item.id ??
-                    item.productCode ??
-                    item.product_code;
+                {paginatedItems.map((item) => {
                   const status = getProductStatus(item);
-                  const { soldOut, reservationClosed } = status;
-                  const badge = buildStatusBadge(status);
-                  const overlayText =
-                    status?.label ??
-                    (reservationClosed ? PRODUCT_STATUS_MAP['4'] : PRODUCT_STATUS_MAP['2']);
-                  const cardContent = (
-                    <div className="card h-100 text-start rounded overflow-hidden border-0 d-flex flex-column">
-                      <div className="position-relative">
-                        <img
-                          src={getImageUrl(item.thumbnailUrl || item.image)}
-                          onError={(e) => (e.currentTarget.src = noImage)}
-                          className="product-card-img rounded-0"
-                          alt="상품 이미지"
-                        />
-                        {soldOut && (
-                          <div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-light bg-opacity-75 rounded">
-                            <div
-                              className={`fw-bold fs-4 text-dark mb-3 ${
-                                reservationClosed ? '' : 'fst-italic text-uppercase'
-                              }`}
-                            >
-                              {overlayText}
-                            </div>
-                          </div>
-                        )}
-                        {badge && (
-                          <div
-                            className={`position-absolute bottom-0 w-100 text-center py-2 item-text ${badge.className}`}
-                            style={{ fontWeight: 600 }}
-                          >
-                            {badge.text}
-                          </div>
-                        )}
-                      </div>
-                      <div className="card-body pt-2 p-0 d-flex flex-column">
-                        {item.categoryGroupName && (
-                          <div className="mb-1 text-muted small" style={{ fontSize: '12px' }}>
-                            {item.categoryGroupName}
-                          </div>
-                        )}
-                        <p className="mb-1 text-primary small fw-bold" style={{ fontSize: '12px' }}>
-                          [예약구매] <span className="text-danger">*조기 품절 될 수 있습니다.</span>
-                        </p>
-                        <div className="fw-bold text-secondary" style={{ fontSize: '15px' }}>
-                          {item.name}
-                        </div>
-                        <div className="mt-auto">
-                          <div className="fw-bold mt-2 item-price-text fs-5">
-                            {(item.productPrice ?? item.price)?.toLocaleString()}원
-                          </div>
-                          {item.productnote && (
-                            <div
-                              className="product-note"
-                              dangerouslySetInnerHTML={{
-                                __html: normalizeImageUrl(item.productnote),
-                              }}
-                            />
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                  // 상세 진입은 상태와 무관하게 허용(품절/예약마감도 상세는 확인 가능)
-                  const disableLink =
-                    itemId === undefined || itemId === null || `${itemId}`.trim() === '';
+                  const itemId = item.productId ?? item.id ?? item.productCode;
+                  const noteHtml = item.productnote
+                    ? { __html: normalizeImageUrl(item.productnote) }
+                    : null;
+
                   return (
-                    <div className="col d-flex" key={itemId}>
-                      {disableLink ? (
-                        <div
-                          className="text-decoration-none text-dark h-100 d-flex"
-                          style={{ cursor: 'not-allowed', pointerEvents: 'none' }}
-                          aria-disabled="true"
-                        >
-                          <div className="w-100 h-100 d-flex flex-column">{cardContent}</div>
-                        </div>
-                      ) : (
-                        <Link
-                          to={`/detail/${itemId}`}
-                          className="text-decoration-none text-dark h-100 d-flex"
-                        >
-                          <div className="w-100 h-100 d-flex flex-column">{cardContent}</div>
-                        </Link>
-                      )}
-                    </div>
+                    <ProductCardBasic
+                      key={itemId}
+                      item={item}
+                      imageUrl={getImageUrl(item.thumbnailUrl || item.image)}
+                      soldOut={status.soldOut}
+                      statusCode={status.code}
+                      reservationClosed={status.reservationClosed}
+                      noteHtml={noteHtml}
+                    />
                   );
                 })}
               </div>

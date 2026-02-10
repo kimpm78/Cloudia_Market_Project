@@ -6,11 +6,11 @@
         </encoder>
     </appender>
 
-    <!-- 파일에 로그를 출력하기 위한 appender 설정 -->
+    <!-- ファイルへログを出力するための appender 設定 -->
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- <file>./logFile.txt</file> 로그 파일 경로 및 파일명 지정 -->
+        <!-- <file>./logFile.txt</file> ログファイルのパスとファイル名を指定 -->
         <encoder>
-            <!-- 로그 출력 패턴 설정 -->
+            <!-- ログ出力パターンの設定 -->
             <Pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative] [%thread] %-5level %logger{36} - %msg%n</Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">

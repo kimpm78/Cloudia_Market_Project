@@ -16,14 +16,14 @@ import lombok.ToString;
 @Builder
 @ToString
 public class ResultDto {
-    private String memberNumber; // 사원 번호
-    private String loginId; // 로그인ID
-    private String productName; // 상품명
-    private Integer totalAmount; // 정산 금액
-    private Integer unitPrice; // 개당 금액
-    private Integer shippingCost; // 배송비
-    private Integer discountAmount; // 할인금액
-    private Integer price; // 사입가
-    private LocalDateTime orderDate; // 주문일
-    private Integer quantity; // 구매 수량
+    private String memberNumber;     // 社員番号
+    private String loginId;          // ログインID
+    private String productName;      // 商品名
+    private Integer totalAmount;     // 精算金額
+    private Integer unitPrice;       // 単価
+    private Integer shippingCost;    // 配送料
+    private Integer discountAmount;  // 割引金額
+    private Integer price;           // 仕入価格
+    private LocalDateTime orderDate; // 注文日
+    private Integer quantity;        // 購入数量
 }

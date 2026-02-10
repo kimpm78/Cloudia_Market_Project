@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cloudia.backend.CM_90_1031.constants.CM901031MessageConstant;
 import com.cloudia.backend.CM_90_1031.mapper.CM901031Mapper;
-import com.cloudia.backend.CM_90_1031.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_90_1031.model.ageDto;
 import com.cloudia.backend.CM_90_1031.model.genderDto;
 import com.cloudia.backend.CM_90_1031.service.CM901031Service;
@@ -28,9 +28,9 @@ public class CM901031ServiceImpl implements CM901031Service {
 
     private final CM901031Mapper cm901031Mapper;
     /**
-     * 연령대 리스트 조회
+     * 年齢層一覧取得
      * 
-     * @return 연령대 리스트
+     * @return 年齢層一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -49,19 +49,19 @@ public class CM901031ServiceImpl implements CM901031Service {
             return ResponseEntity
                     .ok(createResponseModel(responseUserList, true, CM901031MessageConstant.SUCCESS_USER_FIND));
         } catch (DataAccessException dae) {
-            // DB 관련 예외
+            // DB関連例外
             log.error(CM901031MessageConstant.USER_FIND_ALL_DB_ERROR, dae.getMessage(), dae);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(createResponseModel(Collections.emptyList(), false, CMMessageConstant.ERROR_DATABASE));
 
         } catch (NullPointerException npe) {
-            // Null 처리 예외
+            // Null処理例外
             log.error(CM901031MessageConstant.USER_FIND_ALL_NULL_ERROR, npe.getMessage(), npe);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(createResponseModel(Collections.emptyList(), false, CMMessageConstant.ERROR_NULL));
 
         } catch (Exception e) {
-            // 그 외 일반 예외
+            // その他の一般例外
             log.error(CM901031MessageConstant.USER_FIND_ALL_UNEXPECTED_ERROR, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(createResponseModel(Collections.emptyList(), false,
@@ -70,9 +70,9 @@ public class CM901031ServiceImpl implements CM901031Service {
     }
 
     /**
-     * 연령대 리스트 조회
+     * 性別一覧取得
      * 
-     * @return 연령대 리스트
+     * @return 性別一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -91,19 +91,19 @@ public class CM901031ServiceImpl implements CM901031Service {
             return ResponseEntity
                     .ok(createResponseModel(responseUserList, true, CM901031MessageConstant.SUCCESS_USER_FIND));
         } catch (DataAccessException dae) {
-            // DB 관련 예외
+            // DB関連例外
             log.error(CM901031MessageConstant.USER_FIND_ALL_DB_ERROR, dae.getMessage(), dae);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(createResponseModel(Collections.emptyList(), false, CMMessageConstant.ERROR_DATABASE));
 
         } catch (NullPointerException npe) {
-            // Null 처리 예외
+            // Null処理例外
             log.error(CM901031MessageConstant.USER_FIND_ALL_NULL_ERROR, npe.getMessage(), npe);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(createResponseModel(Collections.emptyList(), false, CMMessageConstant.ERROR_NULL));
 
         } catch (Exception e) {
-            // 그 외 일반 예외
+            // その他の一般例外
             log.error(CM901031MessageConstant.USER_FIND_ALL_UNEXPECTED_ERROR, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(createResponseModel(Collections.emptyList(), false,
@@ -112,11 +112,11 @@ public class CM901031ServiceImpl implements CM901031Service {
     }
 
     /**
-     * ResponseModel 생성
+     * ResponseModel生成
      * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    메시지
+     * @param resultList 結果データ
+     * @param result     処理結果
+     * @param message    メッセージ
      * @return ResponseModel
      */
     private <T> ResponseModel<T> createResponseModel(T resultList, boolean result, String message) {

@@ -1,7 +1,7 @@
 export default function CM_CookiePage() {
   return (
     <>
-      <h1>クッキーポリシー</h1>
+      <h1 className="m-5">クッキーポリシー</h1>
       <div className="container my-5" style={{ fontSize: '18px' }}>
         <p>
           当ウェブサイトでは、ユーザー体験の向上およびパーソナライズされたサービス提供のためにクッキーを使用します。

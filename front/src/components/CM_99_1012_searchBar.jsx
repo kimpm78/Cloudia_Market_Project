@@ -33,7 +33,7 @@ export default function CM_99_1012_searchBar({
         }}
       />
       <button className="btn btn-primary cm-search-button" onClick={onSearch}>
-        검색
+        検索
       </button>
     </div>
   );

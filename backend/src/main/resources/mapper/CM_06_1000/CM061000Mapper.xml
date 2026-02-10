@@ -5,19 +5,24 @@
 
 <mapper namespace="com.cloudia.backend.CM_06_1000.mapper.CM061000Mapper">
 
-    <!-- TTL(장바구니 예약 유효 시간) -->
+    <!-- TTL（カート予約の有効時間） -->
     <sql id="CartReservationTtlClause">
-        ci.is_active = 1
+        ci.is_display = '1'
         AND ci.cart_updated_at >= (NOW() - INTERVAL '30 minutes')
     </sql>
 
-    <!-- CartItem 엔티티 컬럼 매핑 -->
+    <!-- CartItemエンティティのカラムマッピング -->
     <sql id="CartItemColumns">
         cart_item_id    AS cartItemId,
-        user_id         AS userId,
-        product_id      AS productId,
+        (
+            SELECT u.user_id
+            FROM users u
+            WHERE u.member_number = cart_items.member_number
+            LIMIT 1
+        )               AS userId,
+        product_code    AS productId,
         quantity        AS quantity,
-        is_active       AS isActive,
+        CASE WHEN is_display = '1' THEN 1 ELSE 0 END AS isActive,
         cart_updated_at AS cartUpdatedAt,
         created_by      AS createdBy,
         created_at      AS createdAt,
@@ -25,17 +30,17 @@
         updated_at      AS updatedAt
     </sql>
 
-    <!-- 장바구니 + 상품 + 이미지 + 재고(예약 반영) 조회 베이스 -->
+    <!-- カート + 商品 + 画像 + 在庫（予約反映）取得ベース -->
     <sql id="CartItemBaseSelect">
         SELECT ci.cart_item_id  AS cartItemId
-              ,COALESCE(p.product_code, ci.product_id) AS productId
-              ,p.name             AS productName
+              ,COALESCE(p.product_code, ci.product_code) AS productId
+              ,p.title            AS productName
               ,p.price            AS productPrice
               ,pd.thumbnail_url   AS imageLink
               ,ci.quantity        AS quantity
               ,(p.price * ci.quantity) AS lineTotal
-              ,p.delivery_price   AS shippingFee
-              ,p.purchaseLimit    AS purchaseLimit
+              ,0                  AS shippingFee
+              ,p.purchaselimit    AS purchaseLimit
               ,GREATEST(
                     0,
                     COALESCE(s.available_qty, 0) + COALESCE(ci.quantity, 0)
@@ -49,12 +54,11 @@
         LEFT JOIN LATERAL (
             SELECT p.product_id
                   ,p.product_code
-                  ,p.name
+                  ,p.title
                   ,p.price
-                  ,p.delivery_price
-                  ,p.purchaseLimit
+                  ,p.purchaselimit
             FROM   products p
-            WHERE  p.product_code = ci.product_id
+            WHERE  p.product_code = ci.product_code
             ORDER BY 
                    p.updated_at DESC NULLS LAST
                   ,p.product_id DESC
@@ -83,10 +87,10 @@
             ) ranked
             WHERE rn = 1
         ) s
-        ON    s.product_code = COALESCE(p.product_code, ci.product_id)
+        ON    s.product_code = COALESCE(p.product_code, ci.product_code)
     </sql>
 
-    <!-- 최신 재고 행 잠금(동시 장바구니 담기 경쟁조건 방지) -->
+    <!-- 最新在庫行ロック（同時カート投入の競合防止） -->
     <select id="lockLatestStockRow" parameterType="string" resultType="long">
         SELECT s.stock_id
         FROM   stocks s
@@ -96,7 +100,7 @@
         FOR UPDATE
     </select>
 
-    <!-- 사용자 기준 최대 담기 가능 수량(가용재고 + 내예약) -->
+    <!-- ユーザー基準の最大投入可能数量（有効在庫 + 自分の予約分） -->
     <select id="findMaxPurchasableQuantity" resultType="java.lang.Integer">
         SELECT GREATEST(
             0,
@@ -115,13 +119,18 @@
         LEFT JOIN (
             SELECT SUM(ci.quantity) AS my_qty
             FROM   cart_items ci
-            WHERE  ci.user_id = CAST(#{userId} AS BIGINT)
-              AND  ci.product_id = #{productId}
+            WHERE  ci.member_number = (
+                      SELECT u.member_number
+                      FROM users u
+                      WHERE u.user_id = CAST(#{userId} AS BIGINT)
+                      LIMIT 1
+                   )
+              AND  ci.product_code = #{productId}
               AND  <include refid="CartReservationTtlClause" />
         ) my ON TRUE
     </select>
 
-    <!-- 장바구니 목록 조회 -->
+    <!-- カート一覧取得 -->
     <select id="findCartByUser" resultType="com.cloudia.backend.CM_06_1000.model.CartItemResponse">
         SELECT cartItemId
               ,productId
@@ -135,18 +144,23 @@
               ,purchaseLimit
         FROM (
             <include refid="CartItemBaseSelect" />
-            WHERE ci.user_id   = CAST(#{userId} AS BIGINT)
-            AND   ci.is_active = 1
+            WHERE ci.member_number = (
+                      SELECT u.member_number
+                      FROM users u
+                      WHERE u.user_id = CAST(#{userId} AS BIGINT)
+                      LIMIT 1
+                  )
+            AND   ci.is_display = '1'
         ) dedup
         WHERE rn = 1
         ORDER BY 
                cartUpdatedAt DESC
     </select>
 
-    <!-- 장바구니 담기 검증용: 현재 장바구니 상품 메타 조회 -->
+    <!-- カート投入検証用：現在のカート商品メタ取得 -->
     <select id="findActiveCartProductMetas" resultType="com.cloudia.backend.CM_06_1000.model.CartProductMeta">
         SELECT DISTINCT
-            ci.product_id AS productId,
+            ci.product_code AS productId,
             CASE
                 WHEN COALESCE(p.release_date, p.reservation_deadline) IS NULL THEN NULL
                 ELSE LEFT(CAST(COALESCE(p.release_date, p.reservation_deadline) AS VARCHAR), 7)
@@ -157,18 +171,23 @@
                 WHEN p.reservation_deadline IS NULL THEN FALSE
                 ELSE TRUE
             END AS reservation,
-            p.purchaseLimit AS purchaseLimit
+            p.purchaselimit AS purchaseLimit
         FROM cart_items ci
         LEFT JOIN products p
           ON (
-            CAST(p.product_id AS VARCHAR) = ci.product_id
-            OR p.product_code = ci.product_id
+            CAST(p.product_id AS VARCHAR) = ci.product_code
+            OR p.product_code = ci.product_code
           )
-        WHERE ci.user_id = CAST(#{userId} AS BIGINT)
+        WHERE ci.member_number = (
+                SELECT u.member_number
+                FROM users u
+                WHERE u.user_id = CAST(#{userId} AS BIGINT)
+                LIMIT 1
+            )
           AND <include refid="CartReservationTtlClause" />
     </select>
 
-    <!-- 장바구니 담기 검증용: 대상 상품 메타 조회 -->
+    <!-- カート投入検証用：対象商品メタ取得 -->
     <select id="findProductCartMeta" resultType="com.cloudia.backend.CM_06_1000.model.CartProductMeta">
         SELECT
             COALESCE(p.product_code, CAST(p.product_id AS VARCHAR)) AS productId,
@@ -182,7 +201,7 @@
                 WHEN p.reservation_deadline IS NULL THEN FALSE
                 ELSE TRUE
             END AS reservation,
-            p.purchaseLimit AS purchaseLimit
+            p.purchaselimit AS purchaseLimit
         FROM products p
         WHERE p.product_code = #{productId}
            OR CAST(p.product_id AS VARCHAR) = #{productId}
@@ -190,35 +209,45 @@
         LIMIT 1
     </select>
 
-    <!-- 동일 상품 존재 여부 (활성) -->
+    <!-- 同一商品の存在有無（有効） -->
     <select id="findActiveCartItem" parameterType="map" resultType="com.cloudia.backend.CM_06_1000.model.CartItem">
         SELECT
             <include refid="CartItemColumns" />
         FROM   cart_items
-        WHERE  user_id    = CAST(#{userId} AS BIGINT)
-        AND    product_id = CAST(#{productId} AS VARCHAR)
-        AND    is_active  = 1
+        WHERE  member_number = (
+                  SELECT u.member_number
+                  FROM users u
+                  WHERE u.user_id = CAST(#{userId} AS BIGINT)
+                  LIMIT 1
+               )
+        AND    product_code = CAST(#{productId} AS VARCHAR)
+        AND    is_display   = '1'
         LIMIT 1
     </select>
 
-    <!-- 신규 추가 -->
+    <!-- 新規追加 -->
     <insert id="insertCartItem" parameterType="com.cloudia.backend.CM_06_1000.model.CartItem" useGeneratedKeys="true" keyProperty="cartItemId" keyColumn="cart_item_id">
         INSERT INTO cart_items (
-               user_id
-              ,product_id
+               member_number
+              ,product_code
               ,quantity
               ,cart_updated_at
-              ,is_active
+              ,is_display
               ,created_by
               ,created_at
               ,updated_by
               ,updated_at
         ) VALUES (
-               #{userId, jdbcType=BIGINT}
+               (
+                   SELECT u.member_number
+                   FROM users u
+                   WHERE u.user_id = CAST(#{userId, jdbcType=BIGINT} AS BIGINT)
+                   LIMIT 1
+               )
               ,#{productId, jdbcType=VARCHAR}
               ,#{quantity}
               ,NOW()
-              ,1
+              ,'1'
               ,#{createdBy}
               ,NOW()
               ,#{updatedBy}
@@ -226,7 +255,7 @@
         )
     </insert>
 
-    <!-- 수량 가산 -->
+    <!-- 数量加算 -->
     <update id="increaseQuantity" parameterType="map">
         UPDATE cart_items
         SET    quantity       = quantity + #{addQty}
@@ -234,10 +263,10 @@
               ,updated_by      = #{updatedBy}
               ,updated_at      = NOW()
         WHERE  cart_item_id   = #{cartItemId}
-        AND    is_active      = 1
+        AND    is_display     = '1'
     </update>
 
-    <!-- 수량 절대값 변경 -->
+    <!-- 数量の絶対値更新 -->
     <update id="updateQuantity" parameterType="map">
         UPDATE cart_items
         SET    quantity        = #{quantity}
@@ -245,10 +274,10 @@
               ,updated_by      = #{updatedBy}
               ,updated_at      = NOW()
         WHERE  cart_item_id    = #{cartItemId}
-        AND    is_active       = 1
+        AND    is_display      = '1'
     </update>
 
-    <!-- 장바구니 예약 수량 증가(재고 차감) -->
+    <!-- カート予約数量増加（在庫減算） -->
     <update id="increaseCartReservation" parameterType="map">
         UPDATE stocks
         SET    available_qty = available_qty - #{quantity},
@@ -264,7 +293,7 @@
         AND    available_qty >= #{quantity}
     </update>
 
-    <!-- 장바구니 예약 수량 감소(재고 복구) -->
+    <!-- カート予約数量減少（在庫復元） -->
     <update id="decreaseCartReservation" parameterType="map">
         UPDATE stocks
         SET    available_qty = available_qty + #{quantity},
@@ -279,87 +308,127 @@
         )
     </update>
 
-    <!-- 장바구니 소프트 삭제 -->
+    <!-- カートのソフト削除 -->
     <update id="softDelete" parameterType="map">
         UPDATE cart_items
-        SET    is_active = 0,
+        SET    is_display = '0',
                updated_at = NOW(),
                updated_by = #{updatedBy}
         WHERE  cart_item_id = #{cartItemId}
     </update>
 
-    <!-- 선택된 장바구니 항목 소프트 삭제 -->
+    <!-- 選択したカート項目のソフト削除 -->
     <update id="softDeleteSelected" parameterType="map">
         UPDATE cart_items
-        SET    is_active  = 0,
+        SET    is_display = '0',
                updated_at = NOW(),
                updated_by = #{updatedBy}
-        WHERE  user_id = CAST(#{userId} AS BIGINT)
+        WHERE  member_number = (
+                  SELECT u.member_number
+                  FROM users u
+                  WHERE u.user_id = CAST(#{userId} AS BIGINT)
+                  LIMIT 1
+               )
         AND    cart_item_id IN
           <foreach collection="cartItemIds" item="id" open="(" separator="," close=")">
               #{id}
           </foreach>
-        AND    is_active = 1
+        AND    is_display = '1'
     </update>
 
-    <!-- cart_item_id로 단일 항목 조회 -->
+    <!-- cart_item_idで単一項目取得 -->
     <select id="findCartItemById" parameterType="long" resultType="com.cloudia.backend.CM_06_1000.model.CartItem">
         SELECT
             <include refid="CartItemColumns" />
         FROM   cart_items
         WHERE  cart_item_id = #{cartItemId}
-        AND    is_active    = 1
+        AND    is_display   = '1'
         LIMIT 1
     </select>
 
-    <!-- 사용자 활성 장바구니 항목 조회 -->
+    <!-- ユーザーの有効カート項目取得 -->
     <select id="findActiveCartItemsByUser" parameterType="long" resultType="com.cloudia.backend.CM_06_1000.model.CartItem">
         SELECT
-            <include refid="CartItemColumns" />
-        FROM   cart_items
-        WHERE  user_id   = CAST(#{userId} AS BIGINT)
-        AND    is_active = 1
+            ci.cart_item_id AS cartItemId,
+            CAST(#{userId} AS BIGINT) AS userId,
+            ci.product_code AS productId,
+            ci.quantity AS quantity,
+            CASE WHEN ci.is_display = '1' THEN 1 ELSE 0 END AS isActive,
+            ci.cart_updated_at AS cartUpdatedAt,
+            ci.created_by AS createdBy,
+            ci.created_at AS createdAt,
+            ci.updated_by AS updatedBy,
+            ci.updated_at AS updatedAt
+        FROM cart_items ci
+        WHERE ci.member_number = (
+            SELECT u.member_number
+            FROM users u
+            WHERE u.user_id = CAST(#{userId} AS BIGINT)
+            LIMIT 1
+        )
+        AND ci.is_display = '1'
     </select>
 
-    <!-- 선택된 장바구니 항목 조회 -->
+    <!-- 選択したカート項目取得 -->
     <select id="findActiveCartItemsByIds" parameterType="map" resultType="com.cloudia.backend.CM_06_1000.model.CartItem">
         SELECT
             <include refid="CartItemColumns" />
         FROM   cart_items
-        WHERE  user_id   = CAST(#{userId} AS BIGINT)
-        AND    is_active = 1
+        WHERE  member_number = (
+                  SELECT u.member_number
+                  FROM users u
+                  WHERE u.user_id = CAST(#{userId} AS BIGINT)
+                  LIMIT 1
+               )
+        AND    is_display = '1'
         AND    cart_item_id IN
           <foreach collection="cartItemIds" item="id" open="(" separator="," close=")">
               #{id}
           </foreach>
     </select>
 
-    <!-- 사용자 장바구니 최초 생성 시각 (TTL 기준) -->
+    <!-- ユーザーのカート初回作成日時（TTL基準） -->
     <select id="findCartCreatedAt" parameterType="long" resultType="java.time.LocalDateTime">
-        SELECT MIN(created_at)
-        FROM   cart_items
-        WHERE  user_id   = CAST(#{userId} AS BIGINT)
-        AND    is_active = 1
+        SELECT MIN(ci.created_at)
+        FROM cart_items ci
+        WHERE ci.member_number = (
+            SELECT u.member_number
+            FROM users u
+            WHERE u.user_id = CAST(#{userId} AS BIGINT)
+            LIMIT 1
+        )
+        AND ci.is_display = '1'
     </select>
 
-    <!-- 최근 업데이트 일시가 필요할 경우를 대비한 쿼리 -->
+    <!-- 直近更新日時が必要な場合に備えたクエリ -->
     <select id="findLastUpdatedAt" parameterType="long" resultType="java.time.LocalDateTime">
-        SELECT MAX(cart_updated_at)
-        FROM   cart_items
-        WHERE  user_id   = CAST(#{userId} AS BIGINT)
-        AND    is_active = 1
+        SELECT MAX(ci.cart_updated_at)
+        FROM cart_items ci
+        WHERE ci.member_number = (
+            SELECT u.member_number
+            FROM users u
+            WHERE u.user_id = CAST(#{userId} AS BIGINT)
+            LIMIT 1
+        )
+        AND ci.is_display = '1'
     </select>
 
-    <!-- 장바구니 만료 처리 -->
+    <!-- カート期限切れ処理 -->
     <update id="expireCartByUser" parameterType="map">
         UPDATE cart_items
-        SET    is_active = 0,
+        SET    is_display = '0',
                updated_at = NOW(),
                updated_by = #{updatedBy}
-        WHERE  user_id = CAST(#{userId} AS BIGINT)
+        WHERE member_number = (
+            SELECT u.member_number
+            FROM users u
+            WHERE u.user_id = CAST(#{userId} AS BIGINT)
+            LIMIT 1
+        )
+        AND is_display = '1'
     </update>
 
-    <!-- 주문 준비용 선택 항목 조회 -->
+    <!-- 注文準備用の選択項目取得 -->
     <select id="findSelectedForOrder" resultType="com.cloudia.backend.CM_06_1000.model.CartItemResponse">
         SELECT cartItemId
               ,productId
@@ -373,8 +442,13 @@
               ,purchaseLimit
         FROM (
             <include refid="CartItemBaseSelect" />
-            WHERE ci.user_id   = CAST(#{userId} AS BIGINT)
-            AND   ci.is_active = 1
+            WHERE ci.member_number = (
+                      SELECT u.member_number
+                      FROM users u
+                      WHERE u.user_id = CAST(#{userId} AS BIGINT)
+                      LIMIT 1
+                  )
+            AND   ci.is_display = '1'
             AND   ci.cart_item_id IN
               <foreach collection="cartItemIds" item="id" open="(" separator="," close=")">
                   #{id}
@@ -385,7 +459,7 @@
                cartUpdatedAt DESC
     </select>
 
-    <!-- 12) 상품 식별자 표준화 -->
+    <!-- 商品識別子の標準化 -->
     <select id="findCanonicalProductId" parameterType="string" resultType="string">
         SELECT COALESCE(p.product_code, CAST(p.product_id AS VARCHAR)) AS canonical_id
         FROM   products p

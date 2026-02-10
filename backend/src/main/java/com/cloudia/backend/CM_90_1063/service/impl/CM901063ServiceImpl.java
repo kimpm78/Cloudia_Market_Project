@@ -26,41 +26,40 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class CM901063ServiceImpl implements CM901063Service {
-    // Mapper 정의
     private final CM901063Mapper cm901063Mapper;
     private final DateCalculator dateCalculator;
 
     /**
-     * 상품 코드 전체 리스트 조회
+     * 商品コード一覧を取得
      * 
-     * @return 상품 코드 전체 리스트
+     * @return 商品コード一覧
      */
     @Override
     @Transactional(readOnly = true)
     public List<ProductCode> findAllProductCode() {
         List<ProductCode> productCodeList = cm901063Mapper.findAllProductCode();
-        log.info("조회된 상품 코드 수: {}", productCodeList == null ? 0 : productCodeList.size());
+        log.info("取得した商品コード数: {}", productCodeList == null ? 0 : productCodeList.size());
 
         return productCodeList;
     }
 
     /**
-     * 재고 입/출고 등록
+     * 在庫入出庫の登録
      *
-     * @param entity 등록 할 재고 정보 엔티티
+     * @param entity 登録する在庫情報エンティティ
      * 
-     * @return 등록 성공 여부
+     * @return 登録成功可否
      **/
     @Override
     @Transactional
     public Integer stockUpsert(ProductCode entity, String userId) {
         if (null == userId || userId.isBlank()) {
-            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "재고 조회" });
+            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "在庫照会" });
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
 
         if (entity == null) {
-            log.info("재고 데이터가 없습니다.");
+            log.info("在庫データがありません。");
             return 0;
         }
 
@@ -69,9 +68,9 @@ public class CM901063ServiceImpl implements CM901063Service {
 
         if (productOpt.isPresent() && productOpt.get().getProductCode() == null) {
             if (Integer.parseInt(entity.getQuantity()) < 0) {
-                throw new IllegalArgumentException("재고 수량은 음수가 될 수 없습니다.");
+                throw new IllegalArgumentException("在庫数量は負の値にできません。");
             }
-            log.info("[신규 등록] 상품코드: {}", entity.getProductCode());
+            log.info("[新規登録] 商品コード: {}", entity.getProductCode());
 
             result = insertStock(entity, userId);
 
@@ -81,7 +80,7 @@ public class CM901063ServiceImpl implements CM901063Service {
 
             return result;
         } else {
-            log.info("[업데이트] 상품코드: {}", entity.getProductCode());
+            log.info("[更新] 商品コード: {}", entity.getProductCode());
 
             result = updateStock(productOpt, entity, userId);
             result = insertStockDetail(entity, productOpt.get().getStockId(), userId);
@@ -92,10 +91,10 @@ public class CM901063ServiceImpl implements CM901063Service {
     }
 
     /**
-     * 재고 등록
+     * 在庫登録
      * 
-     * @param entity 재고 정보
-     * @return 등록 여부
+     * @param entity 在庫情報
+     * @return 登録可否
      */
     private int insertStock(ProductCode entity, String userId) {
         Stock stockModel = new Stock();
@@ -114,11 +113,11 @@ public class CM901063ServiceImpl implements CM901063Service {
     }
 
     /**
-     * 재고 업데이트
+     * 在庫更新
      * 
-     * @param productOpt 업데이트 재고 정보
-     * @param entity     재고 정보
-     * @return 업데이트 여부
+     * @param productOpt 更新対象の在庫情報
+     * @param entity     在庫情報
+     * @return 更新可否
      */
     private int updateStock(Optional<Stock> productOpt, ProductCode entity, String userId) {
         Stock stockModel = new Stock();
@@ -127,11 +126,11 @@ public class CM901063ServiceImpl implements CM901063Service {
         BigDecimal availableQty = BigDecimal.valueOf(productOpt.get().getAvailableQty())
                 .add(BigDecimal.valueOf(Integer.parseInt(entity.getQuantity())));
 
-        log.info("총 재고 수량 : totalQty : {}", totalQty);
-        log.info("총 가용 재고 수량 : availableQty : {}", availableQty);
+        log.info("総在庫数量（totalQty）: {}", totalQty);
+        log.info("総利用可能在庫数量（availableQty）: {}", availableQty);
 
         if (totalQty.intValue() < 0 || availableQty.intValue() < 0) {
-            throw new IllegalArgumentException("재고 수량은 음수가 될 수 없습니다.");
+            throw new IllegalArgumentException("在庫数量は負の値にできません。");
         }
 
         stockModel.setProductCode(entity.getProductCode().trim());
@@ -145,11 +144,11 @@ public class CM901063ServiceImpl implements CM901063Service {
     }
 
     /**
-     * 재고 상세 등록
+     * 在庫詳細登録
      * 
-     * @param entity  재고 정보
-     * @param stockId 재고 아이디
-     * @return 등록 여부
+     * @param entity  在庫情報
+     * @param stockId 在庫ID
+     * @return 登録可否
      */
     private int insertStockDetail(ProductCode entity, int stockId, String userId) {
         StockDetail stockDetail = new StockDetail();
@@ -165,37 +164,37 @@ public class CM901063ServiceImpl implements CM901063Service {
     }
 
     /**
-     * 입/출고 일람 전체 조회
+     * 入出庫一覧を全件取得
      * 
-     * @return 입/출고 일람 전체 리스트
+     * @return 入出庫一覧
      */
     @Override
     public List<StockInfo> findAllStocks() {
         List<StockInfo> productCodeList = cm901063Mapper.findAllStocks();
-        log.info("조회된 상품 코드 수: {}", productCodeList.size());
+        log.info("取得した商品コード数: {}", productCodeList.size());
         return productCodeList;
     }
 
     /**
-     * 선택 된 상품 코드 / 상품명의 상품 가격 정보 조회
+     * 指定した商品コード／商品名で商品価格情報を取得
      * 
-     * @param searchType 검색 타입 (1: 상품 코드 2: 상품 명)
-     * @param searchTerm 검색어
-     * @return 상품 정보
+     * @param searchType 検索種別（1: 商品コード 2: 商品名）
+     * @param searchTerm 検索キーワード
+     * @return 商品情報
      */
     @Override
     public List<StockInfo> findByStocks(String searchType, String searchTerm) {
 
         List<StockInfo> productCodeList = cm901063Mapper.findByStocks(searchType, searchTerm);
-        log.info("조회된 상품 코드 수: {}", productCodeList.size());
+        log.info("取得した商品コード数: {}", productCodeList.size());
         return productCodeList;
     }
 
     /**
-     * 특정 상품 코드 가격 조회
+     * 指定した商品コードの価格情報を取得
      * 
-     * @param searchCode 검색 상품 코드
-     * @return 상품 코드 리스트
+     * @param searchCode 検索する商品コード
+     * @return 商品コード情報
      */
     @Override
     public Optional<Stock> getStockByCode(String searchCode) {

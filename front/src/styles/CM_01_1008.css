@@ -10,9 +10,10 @@
 .address-grid-cards .ag-cell {
   border-right: 1px solid #dee2e6;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding: 0.75rem;
   line-height: 1.5;
+  overflow: visible;
 }
 .address-grid-cards .ag-cell:last-child {
   border-right: none;
@@ -33,8 +34,9 @@
 .cell-content {
   width: 100%;
   height: 100%;
+  display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   font-size: 0.9rem;
 }
 .cell-content.actions {
@@ -68,4 +70,49 @@
   border: 1px solid #dee2e6;
   border-radius: 0.25rem;
   margin-bottom: 1rem;
+}
+
+.address-grid-cards .badge {
+  line-height: 1.35;
+  padding: 0.38rem 0.55rem;
+  white-space: nowrap;
+}
+
+.address-guide-text {
+  font-size: 0.98rem;
+  line-height: 1.75;
+  color: #495057;
+}
+
+.address-guide-panel {
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 1rem 1.1rem;
+}
+
+.address-guide-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #0d6efd;
+  background: #e7f1ff;
+  border: 1px solid #cfe2ff;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  margin-bottom: 0.55rem;
+}
+
+.address-guide-title {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.address-guide-note {
+  font-size: 0.9rem;
+  color: #b02a37;
 }

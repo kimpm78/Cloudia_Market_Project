@@ -36,15 +36,15 @@ export default function CookieSettingsModal({ show, onClose, onSave }) {
       <div className="modal-dialog" role="document">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">쿠키 설정</h5>
+            <h5 className="modal-title">クッキー設定</h5>
             <button type="button" className="btn-close" onClick={onClose}></button>
           </div>
           <div className="modal-body">
-            <p>서비스 제공을 위해 쿠키를 사용합니다. 설정을 선택하세요.</p>
+            <p>サービス提供のためにクッキーを使用しています。設定を選択してください。</p>
             <hr />
             <div>
-              <strong>▪︎ 필수 쿠키</strong> - 항상 활성화
-              <div className="text-secondary">사이트 기능 작동에 필수적인 쿠키입니다.</div>
+              <strong>▪︎ 必須クッキー</strong> - 常に有効
+              <div className="text-secondary">サイトの機能を動作させるために必須のクッキーです。</div>
             </div>
             <div className="form-check form-switch mt-3">
               <input
@@ -55,7 +55,7 @@ export default function CookieSettingsModal({ show, onClose, onSave }) {
                 onChange={(e) => setPerformance(e.target.checked)}
               />
               <label className="form-check-label" htmlFor="performance-cookie">
-                성능 쿠키
+                パフォーマンスクッキー
               </label>
             </div>
             <div className="form-check form-switch mt-2">
@@ -67,16 +67,16 @@ export default function CookieSettingsModal({ show, onClose, onSave }) {
                 onChange={(e) => setTargeting(e.target.checked)}
               />
               <label className="form-check-label" htmlFor="targeting-cookie">
-                타겟팅 쿠키
+                ターゲティングクッキー
               </label>
             </div>
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
-              취소
+              キャンセル
             </button>
             <button type="button" className="btn btn-primary" onClick={handleSave}>
-              선택 내용 저장
+              選択内容を保存
             </button>
           </div>
         </div>

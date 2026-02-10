@@ -9,7 +9,7 @@ export default function CM_03_1004_ReviewSection({ reviews = [], reviewRef }) {
   return (
     <div id="review-section" className="product-review-section mb-5">
       <h5 className="fw-bold mb-3" ref={reviewRef}>
-        리뷰/후기
+        レビュー/口コミ
       </h5>
       <div className="d-flex flex-column gap-3">
         {items.length > 0 ? (
@@ -40,7 +40,7 @@ export default function CM_03_1004_ReviewSection({ reviews = [], reviewRef }) {
             </Link>
           ))
         ) : (
-          <p className="text-muted">리뷰/후기 내용이 없습니다.</p>
+          <p className="text-muted">レビュー/口コミ内容がありません。</p>
         )}
       </div>
     </div>

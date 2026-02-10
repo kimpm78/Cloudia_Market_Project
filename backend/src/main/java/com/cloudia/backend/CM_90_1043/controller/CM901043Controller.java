@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_90_1043.model.CategorySaveRequest;
-import com.cloudia.backend.CM_90_1043.model.ResponseModel;
 import com.cloudia.backend.CM_90_1043.service.CM901043Service;
 import com.cloudia.backend.config.jwt.JwtTokenProvider;
 
@@ -27,7 +27,7 @@ public class CM901043Controller {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 카테고리 조회
+     * カテゴリ照会
      */
     @GetMapping("/findByAllCategory")
     public ResponseEntity<ResponseModel<Map<String, Object>>> findByAllCategory() {
@@ -35,7 +35,7 @@ public class CM901043Controller {
     }
 
     /**
-     * 카테고리 변경사항 저장 (추가/수정/삭제)
+     * カテゴリ変更内容の保存（追加/更新/削除）
      */
     @PostMapping("/save")
     public ResponseEntity<ResponseModel<String>> saveCategory(@RequestBody CategorySaveRequest requests,

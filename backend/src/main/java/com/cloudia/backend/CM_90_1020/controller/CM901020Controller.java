@@ -27,47 +27,47 @@ public class CM901020Controller {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 유저 전체 리스트 조회
+     * ユーザー全件一覧を取得
      * 
-     * @return 유저 전체 리스트
+     * @return ユーザー全件一覧
      */
     @GetMapping("/findAll")
     public ResponseEntity<ResponseModel<List<UsersDto>>> getFindAllUser() {
         List<UsersDto> users = cm901020Service.findByAllUsers();
-        return ResponseEntity.ok(ResponseHelper.success(users, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(users, "取得に成功しました"));
     }
 
     /**
-     * 유저 조회
+     * ユーザー検索
      * 
-     * @param searchTerm 키워드
-     * @param searchType 타입 (1:사원 번호, 2:ID)
-     * @return 유저 리스트
+     * @param searchTerm キーワード
+     * @param searchType タイプ（1:社員番号、2:ID）
+     * @return ユーザー一覧
      */
     @GetMapping("/findUsers")
     public ResponseEntity<ResponseModel<List<UsersDto>>> getFindUsers(@RequestParam String searchTerm,
             @RequestParam int searchType) {
         List<UsersDto> users = cm901020Service.getFindUsers(searchTerm, searchType);
-        return ResponseEntity.ok(ResponseHelper.success(users, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(users, "取得に成功しました"));
     }
 
     /**
-     * 특정 유저 조회
+     * 特定ユーザーを取得
      * 
-     * @param memberId 사원 번호
-     * @return 유저 리스트
+     * @param memberId 社員番号
+     * @return ユーザー情報
      */
     @GetMapping("/findUser")
     public ResponseEntity<ResponseModel<UsersDto>> getFindUser(@RequestParam String memberId) {
         UsersDto user = cm901020Service.getFindUser(memberId);
-        return ResponseEntity.ok(ResponseHelper.success(user, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(user, "取得に成功しました"));
     }
 
     /**
-     * 유저 업데이트
+     * ユーザー更新
      * 
-     * @param userInfo 유저 정보
-     * @return 성공 여부
+     * @param userInfo ユーザー情報
+     * @return 更新結果
      */
     @PostMapping("/update")
     public ResponseEntity<ResponseModel<Integer>> postUserUpdate(@RequestBody UsersDto entity,
@@ -76,6 +76,6 @@ public class CM901020Controller {
                 .getUserIdFromToken(jwtTokenProvider.resolveToken(request))
                 .toString();
         Integer result = cm901020Service.postUserUpdate(entity, userId);
-        return ResponseEntity.ok(ResponseHelper.success(result, "업데이트 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "更新に成功しました"));
     }
 }

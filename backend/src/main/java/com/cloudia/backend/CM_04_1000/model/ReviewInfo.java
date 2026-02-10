@@ -8,32 +8,31 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 리뷰 + 상세/목록 조회에 사용하는 응답
+ * レビュー＋詳細／一覧取得に使用するレスポンス
  */
 @Getter
 @Setter
 public class ReviewInfo {
-    private Long reviewId;        // 리뷰 ID
-    private Long userId;          // 작성자 ID
-    private Long productId;       // 상품 ID
-    private String productName;   // 상품 이름 추가
-    private Long orderId;         // 주문 ID
-    private String orderNumber;   // 주문번호 (예: '00001')
+    private Long reviewId;                              // レビューID
+    private Long userId;                                // 作成者ID
+    private Long productId;                             // 商品ID
+    private String productName;                         // 商品名
+    private Long orderId;                               // 注文ID
+    private String orderNumber;                         // 注文番号（例: '00001'）
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime orderDate;     // 주문일자 (YYYY-MM-DD)
-    private String productCode; // 주문상세 코드 (예: A10001)
-    
-    private Integer reviewType; // 0 = 리뷰, 1 = 후기
-    private String title;         // 리뷰 제목
-    private String imageUrl;      // 첨부 이미지
-    private String content;       // 리뷰 내용
-    private Integer viewCount = 0;    // 조회수
-    private String createdBy;     // 등록자
+    private LocalDateTime orderDate;                    // 注文日（YYYY-MM-DD）
+    private String productCode;                         // 注文詳細コード
+    private Integer reviewType;                         // 0=レビュー、1=口コミ
+    private String title;                               // レビュータイトル
+    private String imageUrl;                            // 添付画像
+    private String content;                             // レビュー内容
+    private Integer viewCount = 0;                      // 閲覧数
+    private String createdBy;                           // 登録者
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;     // 등록일
-    private String updatedBy;     // 수정자
+    private LocalDateTime createdAt;                    // 登録日
+    private String updatedBy;                           // 更新者
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;     // 수정일
+    private LocalDateTime updatedAt;                    // 更新日
 
-    private java.util.List<ReviewCommentInfo> comments; // 댓글 목록
+    private java.util.List<ReviewCommentInfo> comments; // コメント一覧
 }

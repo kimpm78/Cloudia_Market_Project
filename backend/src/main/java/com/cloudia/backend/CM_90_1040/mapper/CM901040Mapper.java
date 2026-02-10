@@ -10,70 +10,70 @@ import com.cloudia.backend.CM_90_1040.model.BannerInfo;
 @Mapper
 public interface CM901040Mapper {
     /**
-     * 배너 전체 리스트 조회
+     * バナー全件一覧取得
      * 
-     * @return 배너 전체 리스트
+     * @return バナー全件一覧
      */
     List<BannerInfo> findByAllBanner();
 
     /**
-     * 특정 배너 리스트 조회
+     * 特定バナー一覧取得
      * 
-     * @param searchTerm 배너명
-     * @return 배너 리스트
+     * @param searchTerm バナー名
+     * @return バナー一覧
      */
     List<BannerInfo> findByBanner(@Param("searchTerm") String searchTerm);
 
     /**
-     * 업데이트 배너 리스트 조회
+     * 更新対象バナー取得
      * 
-     * @param bannerId 배너 아이디
-     * @return 배너 리스트
+     * @param bannerId バナーID
+     * @return バナー情報
      */
     BannerInfo findByBannerById(@Param("bannerId") int bannerId);
 
     /**
-     * 배너 삭제
+     * バナー削除
      * 
-     * @param entity 배너 삭제 항목 리스트
-     * @return 삭제 여부
+     * @param bannerId バナーID
+     * @return 削除結果
      */
     int bannerDel(@Param("bannerId") int bannerId);
 
     /**
-     * 사용중인 배너 리스트 조회
+     * 有効バナー件数取得
      * 
-     * @return 사용중인 배너 리스트 카운트
+     * @return 有効バナー件数
      */
     int findByUsedAllBanner();
 
     /**
-     * 사용중인 배너 리스트 조회
+     * 表示順の重複件数取得
      * 
-     * @return 사용중인 배너 리스트 카운트
+     * @return 重複件数
      */
     int countByDisplayOrder(@Param("displayOrderId") int displayOrderId);
 
     /**
-     * 배너 등록
+     * バナー登録
      * 
-     * @param entity 등록 할 배너 정보
-     * @return 등록 여부
+     * @param entity 登録するバナー情報
+     * @return 登録結果
      */
     int bannerUpload(BannerInfo entity);
 
     /**
-     * 배너 업데이트
+     * バナー更新
      * 
-     * @param entity 업데이트 할 배너 정보
-     * @return 업데이트 여부
+     * @param entity 更新するバナー情報
+     * @return 更新結果
      */
     int bannerUpdate(BannerInfo entity);
 
     /**
-     * 사용 가능한 디스플레이 번호 리스트 조회
+     * 使用可能な表示順一覧取得
      * 
-     * @return 디스플레이 번호 리스트
+     * @return 表示順一覧
      */
     List<Integer> getFindDisplayOrder();
 

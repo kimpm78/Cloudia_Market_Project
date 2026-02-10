@@ -29,53 +29,53 @@ public class CM901065Controller {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 상품 코드 전체 리스트 조회
+     * 商品コード全件一覧取得
      * 
-     * @return 상품 코드 전체 리스트
+     * @return 商品コード全件一覧
      */
     @GetMapping("/productCode/getCode")
     public ResponseEntity<ResponseModel<List<ProductCodeDto>>> getCode() {
         List<ProductCodeDto> result = cm901065Service.getProductCode();
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得成功"));
     }
 
     /**
-     * 상품 코드 조회
+     * 商品コード検索
      * 
-     * @param searchTerm 키워드
-     * @param searchType 타입 (1:상품 코드, 2:상품명)
-     * @return 상품 코드 리스트
+     * @param searchTerm キーワード
+     * @param searchType 種別（1:商品コード、2:商品名）
+     * @return 商品コード一覧
      */
     @GetMapping("/productCode/getFindCode")
     public ResponseEntity<ResponseModel<List<ProductCodeDto>>> getFindCode(@RequestParam String searchTerm,
             @RequestParam int searchType) {
         List<ProductCodeDto> result = cm901065Service.findByProductCode(searchTerm, searchType);
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得成功"));
     }
 
     /**
-     * 상품 코드 등록
+     * 商品コード登録
      * 
-     * @param res 상품 코드 정보
+     * @param entity 商品コード情報
      */
     @PostMapping("/productCode/insCode")
     public ResponseEntity<ResponseModel<Integer>> insCode(@RequestBody ProductCodeDto entity,
             HttpServletRequest request) {
         String memberNumber = jwtTokenProvider.getMemberNoFromToken(jwtTokenProvider.resolveToken(request));
         Integer result = cm901065Service.insCode(entity, memberNumber);
-        return ResponseEntity.ok(ResponseHelper.success(result, "업데이트 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "更新成功"));
     }
 
     /**
-     * 상품 코드 삭제
+     * 商品コード削除
      * 
-     * @param res 상품 코드 정보
+     * @param entity 商品コード情報
      */
     @PostMapping("/productCode/uptCode")
     public ResponseEntity<ResponseModel<Integer>> uptCode(@RequestBody List<ProductCodeDto> entity,
             HttpServletRequest request) {
         String memberNumber = jwtTokenProvider.getMemberNoFromToken(jwtTokenProvider.resolveToken(request));
         Integer result = cm901065Service.uptCode(entity, memberNumber);
-        return ResponseEntity.ok(ResponseHelper.success(result, "업데이트 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "更新成功"));
     }
 }

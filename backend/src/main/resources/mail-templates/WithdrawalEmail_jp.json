@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "WithdrawalEmail_jp",
+    "SubjectPart": "【クラウディア マーケット】退会手続き完了のお知らせ（自動送信）",
+    "TextPart": "＜本メールは返信できません。ご了承ください。＞\n\n{{userName}} 様\n退会手続きが完了しました。\n\nログインID：{{loginId}}\nホームページ：{{homePageUrl}}\n\nこれまでご利用いただきありがとうございました。",
+    "HtmlPart": "<html><body style=\"font-family: Arial, sans-serif; color:#000; font-size:14px; line-height:1.7;\"><p>＜本メールは返信できません。ご了承ください。＞</p><p><strong>{{userName}}</strong> 様<br>退会手続きが完了しました。</p><p>ログインID：{{loginId}}<br>ホームページ：<a href=\"{{homePageUrl}}\">{{homePageUrl}}</a></p><p>これまでご利用いただきありがとうございました。</p></body></html>"
+  }
+}

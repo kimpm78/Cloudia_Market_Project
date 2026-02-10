@@ -4,7 +4,7 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.cloudia.backend.CM_90_1010.mapper.CM901010Mapper">
-    <select id="getStatus" resultType="com.cloudia.backend.CM_90_1010.model.StatusDto">
+    <select id="getStatus" resultType="com.cloudia.backend.CM_90_1010.model.Status">
         SELECT ono.new_order
              , opp.payment_pending
              , opc.purchase_confirmed
@@ -86,7 +86,7 @@
                     AND updated_at <![CDATA[<=]]> #{EndDate}::date ) ic
     </select>
 
-    <select id="getWeeklySales" resultType="com.cloudia.backend.CM_90_1010.model.WeeklySalesDto">
+    <select id="getWeeklySales" resultType="com.cloudia.backend.CM_90_1010.model.WeeklySales">
         WITH days AS (
             SELECT generate_series(0, 6) AS day_num
         )
@@ -113,7 +113,7 @@
         ORDER BY d.day_num
     </select>
 
-    <select id="getPreviousInfo" resultType="com.cloudia.backend.CM_90_1010.model.PreviousInfoDto">
+    <select id="getPreviousInfo" resultType="com.cloudia.backend.CM_90_1010.model.PreviousInfo">
         SELECT pns.previous_net_sales
              , sa.settlement_amount
              , ra.refund_amount

@@ -12,27 +12,27 @@ import lombok.Data;
 @Data
 public class QnaCreateRequest {
 
-    @NotBlank(message = "memberNumber는 필수입니다.")
-    @Size(max = 8, message = "memberNumber는 8자 이하여야 합니다.")
+    @NotBlank(message = "memberNumberは必須です。")
+    @Size(max = 8, message = "memberNumberは8文字以内で入力してください。")
     private String memberNumber;
 
     private Long userId;
 
-    @NotBlank(message = "제목을 입력해주세요.")
-    @Size(max = 255, message = "제목은 255자 이하여야 합니다.")
+    @NotBlank(message = "タイトルを入力してください。")
+    @Size(max = 255, message = "タイトルは255文字以内で入力してください。")
     private String title;
 
-    @NotBlank(message = "내용을 입력해주세요.")
+    @NotBlank(message = "内容を入力してください。")
     private String content;
 
-    @NotNull(message = "공개 여부는 필수입니다.")
-    @Min(value = 0, message = "공개 여부는 0 또는 1이어야 합니다.")
+    @NotNull(message = "公開/非公開は必須です。")
+    @Min(value = 0, message = "公開/非公開は0または1である必要があります。")
     private Integer isPrivate;
 
-    @Size(max = 10, message = "작성자는 10자 이하여야 합니다.")
+    @Size(max = 10, message = "作成者は10文字以内で入力してください。")
     private String createdBy;
 
-    @Size(max = 10, message = "수정자는 10자 이하여야 합니다.")
+    @Size(max = 10, message = "更新者は10文字以内で入力してください。")
     private String updatedBy;
 
     private String inquiriesCodeType;
@@ -41,13 +41,13 @@ public class QnaCreateRequest {
 
     private Long orderId;
 
-    @Size(max = 50, message = "주문번호는 50자 이하로 입력해주세요.")
+    @Size(max = 50, message = "注文番号は50文字以内で入力してください。")
     private String orderNumber;
 
-    @Size(max = 10, message = "상품ID는 10자 이하로 입력해주세요.")
+    @Size(max = 10, message = "商品IDは10文字以内で入力してください。")
     private String productId;
 
-    @Size(max = 150, message = "상품명은 150자 이하로 입력해주세요.")
+    @Size(max = 150, message = "商品名は150文字以内で入力してください。")
     private String productName;
 
     @JsonProperty(access = Access.READ_ONLY)

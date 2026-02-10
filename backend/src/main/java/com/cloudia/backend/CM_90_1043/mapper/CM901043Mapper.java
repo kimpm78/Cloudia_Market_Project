@@ -12,56 +12,56 @@ import com.cloudia.backend.CM_90_1043.model.ProductDTO;
 @Mapper
 public interface CM901043Mapper {
     /**
-     * 카테고리 그룹 전체 리스트 조회
+     * カテゴリグループ全件一覧取得
      * 
-     * @return 카테고리 그룹 전체 리스트
+     * @return カテゴリグループ一覧
      */
     List<CategoryGroupDTO> selectCategoryGroups();
 
     /**
-     * 카테고리 자식 전체 리스트 조회
+     * 子カテゴリ全件一覧取得
      * 
-     * @return 카테고리 자식 전체 리스트
+     * @return 子カテゴリ一覧
      */
     List<CategoryDetailDTO> selectCategoryDetails();
 
     /**
-     * 그룹 생성
+     * グループ作成
      */
     int insertGroup(CategoryGroupDTO group);
 
     /**
-     * 그룹 삭제
+     * グループ削除
      */
     int deleteGroup(String categoryGroupCode);
 
     /**
-     * 카테고리 생성
+     * カテゴリ作成
      */
     int insertCategory(CategoryDetailDTO category);
 
     /**
-     * 카테고리 수정
+     * カテゴリ更新
      */
     int updateCategory(CategoryDetailDTO category);
 
     /**
-     * 카테고리 삭제
+     * カテゴリ削除
      */
     int deleteCategory(CategoryDetailDTO category);
 
     /**
-     * 카테고리 테이블의 최신 수정 시간 조회
+     * カテゴリテーブルの最終更新日時取得
      */
     LocalDateTime selectMaxUpdatedAt();
 
     /**
-     * 특정 그룹의 다음 카테고리 코드 조회
+     * 指定グループの次カテゴリコード取得
      */
     String selectNextCategoryCode(String categoryGroupCode);
 
     /**
-     * 상품 카테고리 조회
+     * 商品カテゴリ照会
      */
     List<ProductDTO> selectByGroupAndCode(CategoryDetailDTO category);
 }

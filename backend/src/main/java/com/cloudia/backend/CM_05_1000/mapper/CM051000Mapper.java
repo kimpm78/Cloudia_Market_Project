@@ -11,82 +11,83 @@ import com.cloudia.backend.CM_05_1000.model.NoticeInfo;
 public interface CM051000Mapper {
 
     /**
-     * 공지사항 전체 조회
+     * お知らせ全件取得
      *
-     * @return 전체 공지사항 목록
+     * @return お知らせ全件一覧
      */
     List<NoticeInfo> findByAllNotice();
 
     /**
-     * 공지사항 검색
+     * お知らせ検索
      *
-     * @param searchKeyword 검색 키워드
-     * @param searchType    검색 유형 (1: 제목+내용, 2: 제목, 3: 내용)
-     * @return 검색된 공지사항 목록
+     * @param searchKeyword 検索キーワード
+     * @param searchType    検索タイプ（1: タイトル+本文、2: タイトル、3: 本文）
+     * @return 検索結果のお知らせ一覧
      */
     List<NoticeInfo> findByNotice(@Param("searchKeyword") String searchKeyword,
-    @Param("searchType") int searchType);
+                                  @Param("searchType") int searchType);
 
     /**
-     * 공지사항 상세 조회
+     * お知らせ詳細取得
      *
-     * @param noticeId 공지사항 아이디
-     * @return 해당 공지사항 정보
+     * @param noticeId お知らせID
+     * @return 対象のお知らせ情報
      */
     List<NoticeInfo> findIdNotice(@Param("noticeId") int noticeId);
 
     /**
-     * 공지사항 단건 조회
+     * お知らせ単件取得
      *
-     * @param noticeId 공지사항 ID
-     * @return 해당 공지사항 정보
+     * @param noticeId お知らせID
+     * @return 対象のお知らせ情報
      */
     NoticeInfo findIdNoticeOne(@Param("noticeId") int noticeId);
 
     /**
-     * 이전 공지사항 조회 (현재 ID보다 작은 ID 중 가장 큰 값)
+     * 前のお知らせ取得（現在IDより小さいIDのうち最大のもの）
      *
-     * @param noticeId 기준 공지사항 ID
-     * @return 이전 공지사항
+     * @param noticeId 基準となるお知らせID
+     * @return 前のお知らせ
      */
     NoticeInfo findPrevNotice(@Param("noticeId") int noticeId);
 
     /**
-     * 다음 공지사항 조회 (현재 ID보다 큰 ID 중 가장 작은 값)
+     * 次のお知らせ取得（現在IDより大きいIDのうち最小のもの）
      *
-     * @param noticeId 기준 공지사항 ID
-     * @return 다음 공지사항
+     * @param noticeId 基準となるお知らせID
+     * @return 次のお知らせ
      */
     NoticeInfo findNextNotice(@Param("noticeId") int noticeId);
 
     /**
-     * 공지사항 조회수 증가
+     * お知らせ閲覧数の増加
      *
-     * @param noticeId 공지사항 ID
-     * @return 업데이트된 행 수
+     * @param noticeId お知らせID
+     * @return 更新件数
      */
     int incrementViewCount(@Param("noticeId") int noticeId);
 
     /**
-     * 공지사항 등록
+     * お知らせ登録
      *
-     * @param entity 등록할 공지사항 정보
-     * @return 등록 성공 시 1, 실패 시 0
+     * @param entity 登録するお知らせ情報
+     * @return 登録成功: 1、失敗: 0
      */
     int noticeUpload(NoticeInfo entity);
 
     /**
-     * 공지사항 수정
+     * お知らせ更新
      *
-     * @param entity 수정할 공지사항 정보
-     * @return 수정 성공 시 1, 실패 시 0
+     * @param entity 更新するお知らせ情報
+     * @return 更新成功: 1、失敗: 0
      */
     int noticeUpdate(NoticeInfo entity);
+
     /**
-     * 공지사항 삭제
+     * お知らせ削除
      *
-     * @param noticeId 삭제할 공지사항 ID
-     * @return 삭제 성공 시 1, 실패 시 0
+     * @param noticeId 削除するお知らせID
+     * @return 削除成功: 1、失敗: 0
      */
     int deleteNotice(@Param("noticeId") Long noticeId);
 }

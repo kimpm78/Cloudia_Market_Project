@@ -41,14 +41,14 @@ public class CM901051ServiceImpl implements CM901051Service {
     private final DateCalculator dateCalculator;
 
     /**
-     * 주문 전체 리스트 조회
+     * 注文全件リスト取得
      * 
-     * @return 주문 전체 리스트
+     * @return 注文全件リスト
      */
     @Override
     @Transactional(readOnly = true)
     public List<OrderDto> findByAllOrders() {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "정산 상태 확인" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "精算ステータス確認" });
 
         List<OrderDto> responseList = cm901051Mapper.findByAllOrders();
 
@@ -57,21 +57,21 @@ public class CM901051ServiceImpl implements CM901051Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "정산 상태 확인", String.valueOf(responseList.size()) });
+                new String[] { "精算ステータス確認", String.valueOf(responseList.size()) });
 
         return responseList;
     }
 
     /**
-     * 특정 주문 전체 리스트 조회
+     * 条件付き注文リスト取得
      * 
-     * @param searchRequest 검색 조건
-     * @return 특정 주문 리스트
+     * @param searchRequest 検索条件
+     * @return 条件付き注文リスト
      */
     @Override
     @Transactional(readOnly = true)
     public List<OrderDto> getFindOrders(SearchRequestDto searchRequest) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "정산 상태 확인" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "精算ステータス確認" });
 
         List<OrderDto> responseList = cm901051Mapper.getFindOrder(searchRequest);
 
@@ -80,21 +80,21 @@ public class CM901051ServiceImpl implements CM901051Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "정산 상태 확인", String.valueOf(responseList.size()) });
+                new String[] { "精算ステータス確認", String.valueOf(responseList.size()) });
 
         return responseList;
     }
 
     /**
-     * 특정 주문 상세 리스트 조회
+     * 条件付き注文詳細リスト取得
      * 
-     * @param searchRequest 검색 조건
-     * @return 특정 주문 상세 리스트
+     * @param searchRequest 検索条件
+     * @return 条件付き注文詳細リスト
      */
     @Override
     @Transactional(readOnly = true)
     public List<OrderDetailDto> getFindOrderDetail(SearchRequestDto searchRequest) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "정산 상태 확인" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "精算ステータス確認" });
 
         List<OrderDetailDto> responseList = cm901051Mapper.getFindOrderDetail(searchRequest);
 
@@ -103,21 +103,21 @@ public class CM901051ServiceImpl implements CM901051Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "정산 상태 확인", String.valueOf(responseList.size()) });
+                new String[] { "精算ステータス確認", String.valueOf(responseList.size()) });
 
         return responseList;
 
     }
 
     /**
-     * 배송지 정보
+     * 配送先情報
      * 
-     * @return 배송지 정보
+     * @return 配送先情報
      */
     @Override
     @Transactional(readOnly = true)
     public AddressDto getAddress(SearchRequestDto searchRequest) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "정산 상태 확인" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "精算ステータス確認" });
 
         AddressDto responseList = cm901051Mapper.getAddress(searchRequest);
 
@@ -125,20 +125,20 @@ public class CM901051ServiceImpl implements CM901051Service {
     }
 
     /**
-     * 정산 상태 업데이트
+     * 精算ステータス更新
      * 
-     * @param searchRequest 업데이트 요청 데이터
-     * @return 성공 여부
+     * @param searchRequest 更新リクエストデータ
+     * @return 成功可否
      */
     @Override
     @Transactional
     public Integer uptStatus(SearchRequestDto searchRequest, String userId) {
         if (searchRequest == null) {
-            LogHelper.log(LogMessage.COMMON_UPDATE_EMPTY, new String[] { "정산 상태 확인" });
+            LogHelper.log(LogMessage.COMMON_UPDATE_EMPTY, new String[] { "精算ステータス確認" });
             throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE);
         }
         if (null == userId || userId.isBlank()) {
-            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "정산 상태 확인" });
+            LogHelper.log(LogMessage.AUTH_TOKEN_INVALID, new String[] { "精算ステータス確認" });
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
 
@@ -160,22 +160,22 @@ public class CM901051ServiceImpl implements CM901051Service {
         if (result > 0 && CM901051Constant.ORDER_STATUS_REMITTANCE_PENDING != searchRequest.getOrderStatusValue()) {
             ResponseEntity<ResponseModel<Integer>> emailResult = processEmailByStatus(searchRequest, entity);
             if (emailResult != null) {
-                LogHelper.log(LogMessage.COMMON_UPDATE_EMPTY, new String[] { "정산 상태 확인" });
+                LogHelper.log(LogMessage.COMMON_UPDATE_EMPTY, new String[] { "精算ステータス確認" });
                 throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE);
             }
         }
 
-        LogHelper.log(LogMessage.COMMON_UPDATE_SUCCESS, new String[] { "유저 목록", entity.getMemberNumber() });
+        LogHelper.log(LogMessage.COMMON_UPDATE_SUCCESS, new String[] { "ユーザー一覧", entity.getMemberNumber() });
 
         return result;
     }
 
     /**
-     * 주문 상태에 따른 이메일 발송 처리
+     * 注文ステータスに応じたメール送信処理
      * 
-     * @param searchRequest 검색 요청 데이터
-     * @param entity        주문 엔티티
-     * @return 에러 발생 시 에러 응답, 정상 처리 시 null
+     * @param searchRequest 検索リクエストデータ
+     * @param entity        注文エンティティ
+     * @return エラー時はエラーレスポンス、正常時はnull
      */
     private ResponseEntity<ResponseModel<Integer>> processEmailByStatus(SearchRequestDto searchRequest,
             OrderDto entity) {
@@ -251,11 +251,11 @@ public class CM901051ServiceImpl implements CM901051Service {
     }
 
     /**
-     * 이메일 발송 처리 (상태값: 구매 확정)
+     * メール送信処理（ステータス：購入確定）
      * 
-     * @param searchRequest 검색 요청 데이터
-     * @param entity        주문 엔티티
-     * @return 에러 발생 시 에러 응답, 정상 처리 시 null
+     * @param searchRequest 検索リクエストデータ
+     * @param entity        注文エンティティ
+     * @return エラー時はエラーレスポンス、正常時はnull
      */
     private ResponseEntity<ResponseModel<Integer>> sendOrderConfirmation(SearchRequestDto searchRequest,
             EmailDto emailInfo) {
@@ -265,11 +265,11 @@ public class CM901051ServiceImpl implements CM901051Service {
     }
 
     /**
-     * 이메일 발송 처리 (상태값: 배송 준비중)
+     * メール送信処理（ステータス：発送準備中）
      * 
-     * @param searchRequest 검색 요청 데이터
-     * @param entity        주문 엔티티
-     * @return 에러 발생 시 에러 응답, 정상 처리 시 null
+     * @param searchRequest 検索リクエストデータ
+     * @param entity        注文エンティティ
+     * @return エラー時はエラーレスポンス、正常時はnull
      */
     private ResponseEntity<ResponseModel<Integer>> sendShippingPreparing(SearchRequestDto searchRequest,
             EmailDto emailInfo) {
@@ -280,11 +280,11 @@ public class CM901051ServiceImpl implements CM901051Service {
     }
 
     /**
-     * 이메일 발송 처리 (상태값: 배송중)
+     * メール送信処理（ステータス：配送中）
      * 
-     * @param searchRequest 검색 요청 데이터
-     * @param entity        주문 엔티티
-     * @return 에러 발생 시 에러 응답, 정상 처리 시 null
+     * @param searchRequest 検索リクエストデータ
+     * @param entity        注文エンティティ
+     * @return エラー時はエラーレスポンス、正常時はnull
      */
     private ResponseEntity<ResponseModel<Integer>> sendShippingInProgress(SearchRequestDto searchRequest,
             EmailDto emailInfo) {
@@ -298,11 +298,11 @@ public class CM901051ServiceImpl implements CM901051Service {
     }
 
     /**
-     * 이메일 발송 처리 (상태값: 배송 완료(수동))
+     * メール送信処理（ステータス：配送完了（手動））
      * 
-     * @param searchRequest 검색 요청 데이터
-     * @param entity        주문 엔티티
-     * @return 에러 발생 시 에러 응답, 정상 처리 시 null
+     * @param searchRequest 検索リクエストデータ
+     * @param entity        注文エンティティ
+     * @return エラー時はエラーレスポンス、正常時はnull
      */
     private ResponseEntity<ResponseModel<Integer>> sendShippingCompleted(SearchRequestDto searchRequest,
             EmailDto emailInfo) {
@@ -312,11 +312,11 @@ public class CM901051ServiceImpl implements CM901051Service {
     }
 
     /**
-     * 이메일 발송 처리 (상태값: 구매 취소)
+     * メール送信処理（ステータス：購入キャンセル）
      * 
-     * @param searchRequest 검색 요청 데이터
-     * @param entity        주문 엔티티
-     * @return 에러 발생 시 에러 응답, 정상 처리 시 null
+     * @param searchRequest 検索リクエストデータ
+     * @param entity        注文エンティティ
+     * @return エラー時はエラーレスポンス、正常時はnull
      */
     private ResponseEntity<ResponseModel<Integer>> sendCancel(SearchRequestDto searchRequest,
             EmailDto emailInfo) {
@@ -326,11 +326,11 @@ public class CM901051ServiceImpl implements CM901051Service {
     }
 
     /**
-     * 주문 정보 검증 후 이메일 발송
+     * 注文情報を検証してからメール送信
      * 
-     * @param searchRequest 검색 요청 데이터
-     * @param emailSender   이메일 발송 로직
-     * @return 에러 발생 시 에러 응답, 정상 처리 시 null
+     * @param searchRequest 検索リクエストデータ
+     * @param emailSender   メール送信ロジック
+     * @return エラー時はエラーレスポンス、正常時はnull
      */
     private ResponseEntity<ResponseModel<Integer>> sendEmailWithOrderValidation(SearchRequestDto searchRequest,
             Runnable emailSender) {
@@ -378,12 +378,12 @@ public class CM901051ServiceImpl implements CM901051Service {
     }
 
     /**
-     * 공통 응답 모델 생성
+     * 共通レスポンスモデル生成
      * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    응답 메시지
-     * @return ResponseModel 객체
+     * @param resultList 結果データ
+     * @param result     処理結果
+     * @param message    レスポンスメッセージ
+     * @return ResponseModel オブジェクト
      */
     private <T> ResponseModel<T> createResponseModel(T resultList, boolean result, String message) {
         return ResponseModel.<T>builder()

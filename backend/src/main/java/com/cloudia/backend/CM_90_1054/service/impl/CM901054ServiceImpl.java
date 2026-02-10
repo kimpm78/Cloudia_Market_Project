@@ -21,16 +21,16 @@ public class CM901054ServiceImpl implements CM901054Service {
 
     private final CM901054Mapper cm901054Mapper;
     /**
-     * 기간별 월 매출 조회
+     * 期間別の月別売上取得
      * 
-     * @param startMonth 시작 월
-     * @param endMonth   끝 월
-     * @return 기간별 월 매출 리스트
+     * @param startMonth 開始月
+     * @param endMonth   終了月
+     * @return 期間別の月別売上リスト
      */
     @Override
     @Transactional(readOnly = true)
     public List<SalesDto> getChart1(String startDate, String endDate) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "매출 정보(차트)" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "売上情報（チャート）" });
 
         List<SalesDto> responseList = cm901054Mapper.getChart1(startDate, endDate);
 
@@ -39,22 +39,22 @@ public class CM901054ServiceImpl implements CM901054Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "매출 정보(차트)", String.valueOf(responseList.size()) });
+                new String[] { "売上情報（チャート）", String.valueOf(responseList.size()) });
 
         return responseList;
     }
 
     /**
-     * 기간별 월 순수익 조회
+     * 期間別の月別純利益取得
      * 
-     * @param startMonth 시작 월
-     * @param endMonth   끝 월
-     * @return 기간별 월 순수익 리스트
+     * @param startMonth 開始月
+     * @param endMonth   終了月
+     * @return 期間別の月別純利益リスト
      */
     @Override
     @Transactional(readOnly = true)
     public List<SalesDto> getChart2(String startDate, String endDate) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "매출 정보(기간별)" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "売上情報（期間別）" });
 
         List<SalesDto> responseList = cm901054Mapper.getChart2(startDate, endDate);
 
@@ -63,7 +63,7 @@ public class CM901054ServiceImpl implements CM901054Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "매출 정보(기간별)", String.valueOf(responseList.size()) });
+                new String[] { "売上情報（期間別）", String.valueOf(responseList.size()) });
 
         return responseList;
     }

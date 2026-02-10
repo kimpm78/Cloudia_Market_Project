@@ -18,7 +18,7 @@ const CM_02_1000_footer = forwardRef((props, ref) => {
       <div className="container">
         <div className="row text-start mb-4">
           <div className="col-12 col-md-3 mb-3">
-            <h6 className="mb-3">クイックリンク</h6>
+            <h6 className="mb-3 fw-semibold">クイックリンク</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
                 <Link
@@ -60,7 +60,7 @@ const CM_02_1000_footer = forwardRef((props, ref) => {
           </div>
 
           <div className="col-12 col-md-3 mb-3">
-            <h6 className="mb-3">掲示板</h6>
+            <h6 className="mb-3 fw-semibold">掲示板</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
                 <Link
@@ -68,7 +68,7 @@ const CM_02_1000_footer = forwardRef((props, ref) => {
                   className="text-light text-decoration-none"
                   onClick={scrollToTop}
                 >
-                  ・レビュー／口コミ
+                  ・レビュー/口コミ
                 </Link>
               </li>
               <li className="mb-2">
@@ -89,7 +89,7 @@ const CM_02_1000_footer = forwardRef((props, ref) => {
           </div>
 
           <div className="col-12 col-md-3 mb-3">
-            <h6 className="mb-3">会社情報</h6>
+            <h6 className="mb-3 fw-semibold">会社情報</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
                 <Link
@@ -144,16 +144,16 @@ const CM_02_1000_footer = forwardRef((props, ref) => {
 
         <div className="row border-top pt-4">
           <div className="col-md-6 text-light small">
-            法人名（商号）：クラウディア・マーケット株式会社 ｜ 代表者：JINKYU LIM ｜
-            事業者登録番号：6467-03-256420
+            法人名（商号）：クラウディア マーケット株式会社 ｜ 代表者： 山田 太郎 ｜
+            法人番号：1234-56-789012
             <br />
-            住所：403 Tomintawa- 2-7-5 Shinonome, Kotoku Tokyo, Japan
+            住所：東京都 新宿区 西新宿 新宿センタービル 27階
             <br />
-            個人情報保護管理責任者：イム・ジンギュ
+            個人情報保護管理責任者：佐藤 花子
           </div>
           <div className="col-md-6 text-end text-light small footer-phone-number">
-            <div style={{ fontSize: '18px' }}>電話番号：080-1527-0716</div>
-            <div>電話受付：平日 09:00 ～ 18:00 ／ 昼休み 12:30 ～ 13:30</div>
+            <div style={{ fontSize: '18px' }}>電話番号：080-5555-1234</div>
+            <div>電話受付：平日 09:00 ～ 18:00 / 昼休み 12:30 ～ 13:30</div>
             <div>（土・日・祝日は休業）</div>
           </div>
         </div>

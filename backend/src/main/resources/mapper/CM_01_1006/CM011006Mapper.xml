@@ -12,7 +12,7 @@
         i.is_private AS isPrivate,
         i.inquiry_status_value AS statusValue,
         CASE WHEN i.inquiry_status_value = 2 THEN 'ANSWERED' ELSE 'PENDING' END AS statusCode,
-        COALESCE(cm_status.code_value_name, CASE WHEN i.inquiry_status_value = 2 THEN '답변 완료' ELSE '답변 대기' END) AS statusLabel,
+        COALESCE(cm_status.code_value_name, CASE WHEN i.inquiry_status_value = 2 THEN '回答完了' ELSE '回答待ち' END) AS statusLabel,
         cm_cat.code_value_name AS categoryName,
         i.created_at AS createdAt,
         i.updated_at AS updatedAt

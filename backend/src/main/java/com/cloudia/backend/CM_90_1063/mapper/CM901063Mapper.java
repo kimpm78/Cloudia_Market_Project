@@ -14,69 +14,67 @@ import com.cloudia.backend.CM_90_1063.model.StockInfo;
 @Mapper
 public interface CM901063Mapper {
     /**
-     * 상품 코드 전체 리스트 조회
+     * 商品コードの全件リストを取得
      * 
-     * @return 상품 코드 전체 리스트
+     * @return 商品コードの全件リスト
      */
     List<ProductCode> findAllProductCode();
 
     /**
-     * 재고 입/출고 등록
+     * 商品コードで在庫情報を取得
      *
-     * @param entity 등록 할 재고 정보 엔티티
+     * @param productCode 商品コード
      * 
-     * @return 등록 성공 여부
+     * @return 在庫情報（存在しない場合は空）
      **/
     Optional<Stock> findByProductCode(String productCode);
 
     /**
-     * 재고 입/출고 등록
+     * 在庫情報のUpsert
      *
-     * @param entity 등록 할 재고 정보 엔티티
+     * @param entity 登録／更新する在庫関連情報
      * 
-     * @return 등록 성공 여부
+     * @return 実行結果
      **/
     String stockUpsert(ProductCode entity);
 
     /**
-     * 재고 등록
+     * 在庫登録
      * 
-     * @param entity 재고 정보
-     * @return 등록 여부
+     * @param entity 在庫情報
+     * @return 登録件数
      */
     int insertStock(Stock entity);
 
     /**
-     * 재고 업데이트
+     * 在庫更新
      * 
-     * @param productOpt 업데이트 재고 정보
-     * @param entity     재고 정보
-     * @return 업데이트 여부
+     * @param entity 在庫情報
+     * @return 更新件数
      */
     int updateStock(Stock entity);
 
     /**
-     * 재고 상세 등록
+     * 在庫詳細登録
      * 
-     * @param entity  재고 정보
-     * @param stockId 재고 아이디
-     * @return 등록 여부
+     * @param entity 在庫詳細情報
+     * @return 登録件数
      */
     int insertStockDetail(StockDetail entity);
 
     /**
-     * 입/출고 일람 전체 조회
+     * 入出庫一覧の全件取得
      * 
-     * @return 입/출고 일람 전체 리스트
+     * @return 入出庫一覧の全件リスト
      */
     List<StockInfo> findAllStocks();
 
     /**
-     * 선택 된 상품 코드 / 상품명의 상품 가격 정보 조회
+     * 指定した商品コード／商品名で入出庫一覧を検索
      * 
-     * @param searchType 검색 타입 (1: 상품 코드 2: 상품 명)
-     * @param searchTerm 검색어
-     * @return 상품 정보
+     * @param searchType 検索タイプ（1: 商品コード、2: 商品名）
+     * @param searchTerm 検索キーワード
+     * @return 入出庫一覧
      */
     List<StockInfo> findByStocks(@Param("searchType") String searchType, @Param("searchTerm") String searchTerm);
 

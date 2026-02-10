@@ -16,13 +16,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDetailDTO {
-    private String categoryGroupCode; // 그룹 코드
-    private String categoryCode; // 카테고리 코드
-    private String categoryName; // 카테고리명
-    private Integer displayOrder; // 표시 순서
-    private Integer isActive; // 삭제 플래그
-    private String createdBy; // 생성자
-    private LocalDateTime createdAt; // 생성일시
-    private String updatedBy; // 수정자
-    private LocalDateTime updatedAt; // 수정일시
+    private String categoryGroupCode;   // グループコード
+    private String categoryCode;        // カテゴリコード
+    private String categoryName;        // カテゴリ名
+    private Integer displayOrder;       // 表示順
+    private Integer isActive;           // 削除フラグ
+    private String createdBy;           // 作成者
+    private LocalDateTime createdAt;    // 作成日時
+    private String updatedBy;           // 更新者
+    private LocalDateTime updatedAt;    // 更新日時
 }

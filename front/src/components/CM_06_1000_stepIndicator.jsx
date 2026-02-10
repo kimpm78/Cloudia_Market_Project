@@ -1,4 +1,4 @@
-const CM_06_1000_stepIndicator = ({ currentStep, status }) => {
+const CM_06_1000_StepIndicator = ({ currentStep, status }) => {
   const steps = ['商品情報', '注文・決済', '注文完了'];
 
   let finalStepLabel = '注文完了';
@@ -24,4 +24,4 @@ const CM_06_1000_stepIndicator = ({ currentStep, status }) => {
   );
 };
 
-export default CM_06_1000_stepIndicator;
+export default CM_06_1000_StepIndicator;

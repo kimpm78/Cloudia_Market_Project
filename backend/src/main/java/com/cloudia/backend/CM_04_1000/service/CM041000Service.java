@@ -6,125 +6,125 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudia.backend.CM_04_1000.model.OrderDetailResponse;
-import com.cloudia.backend.CM_04_1000.model.ResponseModel;
 import com.cloudia.backend.CM_04_1000.model.ReviewInfo;
 import com.cloudia.backend.CM_04_1000.model.ReviewRequest;
+import com.cloudia.backend.common.model.ResponseModel;
 
 public interface CM041000Service {
 
     /**
-     * 리뷰 단건 조회
+     * レビュー単件取得
      *
-     * @param reviewId 리뷰 ID
-     * @return 리뷰 정보 (없으면 null)
+     * @param reviewId レビューID
+     * @return レビュー情報（存在しない場合はnull）
      */
     ReviewInfo findReviewById(Long reviewId);
 
     /**
-     * 상품별 리뷰 목록 조회 (페이지네이션)
+     * 商品別レビュー一覧取得（ページネーション）
      *
-     * @param productId 상품 ID
-     * @param page 페이지 번호 (0부터 시작)
-     * @param size 페이지 크기
-     * @return 리뷰 리스트
+     * @param productId 商品ID
+     * @param page ページ番号（0から開始）
+     * @param size ページサイズ
+     * @return レビュー一覧
      */
     List<ReviewInfo> findReviewsByProduct(Long productId, Integer page, Integer size);
 
     /**
-     * 리뷰 전체 목록 조회
+     * レビュー全件取得
      *
-     * @return 리뷰 리스트
+     * @return レビュー一覧
      */
     List<ReviewInfo> findAllReviews();
 
     /**
-     * 리뷰 삭제 (소프트 삭제)
+     * レビュー削除（論理削除）
      *
-     * @param reviewId 리뷰 ID
-     * @param userId 로그인 사용자 ID
-     * @return 삭제 결과 (ResponseModel 포함, 삭제된 개수, 성공 여부, 메시지 포함)
+     * @param reviewId レビューID
+     * @param userId ログインユーザーID
+     * @return 削除結果（ResponseModel含む：削除件数、成功可否、メッセージ）
      */
     ResponseEntity<ResponseModel<Integer>> deleteReview(Long reviewId, Long userId);
 
     /**
-     * 리뷰 조회수 증가 (하루 1회 제한)
+     * レビュー閲覧数加算（1日1回制限）
      *
-     * @param reviewId 리뷰 ID
-     * @param userId 로그인 사용자 ID (비로그인 시 null)
-     * @param viewerKey 중복 체크용 식별자 (userId 또는 비로그인 IP 기반)
-     * @return 조회수가 증가했으면 true, 제한으로 건너뛰었으면 false
+     * @param reviewId レビューID
+     * @param userId ログインユーザーID（未ログイン時はnull）
+     * @param viewerKey 重複チェック用識別子（userId または未ログインIPベース）
+     * @return 閲覧数が増加した場合はtrue、制限によりスキップした場合はfalse
      */
     boolean increaseViewOncePerDay(Long reviewId, Long userId, String viewerKey);
 
     /**
-     * 특정 회원의 주문 + 상품 목록 조회
+     * 特定会員の注文＋商品一覧取得
      *
-     * @param memberNumber 회원 번호
-     * @return 주문 + 상품 목록 (주문 단위, products 리스트 포함)
+     * @param memberNumber 会員番号
+     * @return 注文＋商品一覧（注文単位、productsリスト含む）
      */
     List<OrderDetailResponse> findOrdersWithProducts(String memberNumber);
 
     /**
-     * 주문 내 상품이 실제 존재하는지 검증
+     * 注文内の商品存在チェック
      *
-     * @param memberNumber 회원 번호
-     * @param orderNumber 주문 번호
-     * @param productCode 상품 코드
-     * @return 존재하면 true, 없으면 false
+     * @param memberNumber 会員番号
+     * @param orderNumber 注文番号
+     * @param productCode 商品コード
+     * @return 存在する場合はtrue、存在しない場合はfalse
      */
     boolean checkOrderProduct(String memberNumber, String orderNumber, String productCode);
 
     /**
-     * 리뷰 등록 (MultipartFile 포함)
+     * レビュー登録（MultipartFile含む）
      *
-     * @param entity 리뷰 요청 정보
-     * @param file 업로드할 이미지
-     * @return 등록 결과 (ResponseModel 포함, 생성된 리뷰 ID, 성공 여부, 메시지 포함)
+     * @param entity レビューリクエスト情報
+     * @param file アップロード画像
+     * @return 登録結果（ResponseModel含む：生成されたレビューID、成功可否、メッセージ）
      */
     ResponseEntity<ResponseModel<Long>> createReviewWithImage(ReviewRequest entity, MultipartFile file);
 
     /**
-     * 리뷰 수정 (MultipartFile 포함)
+     * レビュー更新（MultipartFile含む）
      *
-     * @param entity 리뷰 요청 정보
-     * @param file 업로드할 이미지
-     * @return 수정 성공 여부 (true: 성공, false: 실패)
+     * @param entity レビューリクエスト情報
+     * @param file アップロード画像
+     * @return 更新成功可否（true: 成功、false: 失敗）
      */
     ResponseEntity<ResponseModel<Boolean>> updateReviewWithImage(ReviewRequest entity, MultipartFile file);
 
     /**
-     * 리뷰 본문 에디터 이미지 업로드 (임시/수정 공용)
+     * レビュー本文エディター画像アップロード（仮／更新共用）
      *
-     * @param reviewId 리뷰 ID (null 또는 0이면 임시 업로드)
-     * @param file 업로드할 이미지
-     * @return 업로드된 이미지 URL 포함 ResponseModel
+     * @param reviewId レビューID（null または 0 の場合は仮アップロード）
+     * @param file アップロード画像
+     * @return アップロード画像URLを含むResponseModel
      */
     ResponseEntity<ResponseModel<String>> uploadReviewEditorImage(Long reviewId, MultipartFile file);
 
     /**
-     * 리뷰 메인 이미지 업로드 (썸네일)
+     * レビューメイン画像アップロード（サムネイル）
      *
-     * @param reviewId 리뷰 ID
-     * @param file 업로드할 메인 이미지
-     * @return 업로드된 이미지 URL
+     * @param reviewId レビューID
+     * @param file アップロードするメイン画像
+     * @return アップロードされた画像URL
      */
     ResponseEntity<ResponseModel<String>> uploadReviewMainImage(Long reviewId, MultipartFile file);
 
     /**
-     * 리뷰 에디터 이미지 삭제 (imageId 기반)
+     * レビューエディター画像削除（imageIdベース）
      *
-     * @param reviewId 리뷰 ID
-     * @param imageId 리뷰 이미지 PK
-     * @return 삭제 성공 여부
+     * @param reviewId レビューID
+     * @param imageId レビュー画像PK
+     * @return 削除成功可否
      */
     boolean deleteReviewEditorImage(Long reviewId, Long imageId);
 
     /**
-     * 리뷰 이미지 삭제 (imageId 기반)
+     * レビュー画像削除（imageIdベース）
      *
-     * @param reviewId 리뷰 ID
-     * @param imageId 리뷰 이미지 PK
-     * @return 삭제 성공 여부
+     * @param reviewId レビューID
+     * @param imageId レビュー画像PK
+     * @return 削除成功可否
      */
     boolean deleteReviewImage(Long reviewId, Long imageId);
 }

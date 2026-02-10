@@ -30,12 +30,12 @@ public class CM901052ServiceImpl implements CM901052Service {
     private final DateCalculator dateCalculator;
 
     /**
-     * 환불/교환 리스트 조회
+     * 返金/交換リスト取得
      * 
-     * @return 환불/교환 리스트
+     * @return 返金/交換リスト取得
      */
     public List<ReturnsDto> getRefund() {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "교환/환불 조회" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "交換/返金 조회" });
         List<ReturnsDto> result = cm901052Mapper.getRefunds();
 
         if (result == null) {
@@ -43,20 +43,20 @@ public class CM901052ServiceImpl implements CM901052Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "교환/환불 조회", String.valueOf(result.size()) });
+                new String[] { "交換/返金 조회", String.valueOf(result.size()) });
 
         return result;
     }
 
     /**
-     * 환불/교환 리스트 조회
+     * 返金/交換リスト取得
      * 
-     * @return 환불/교환 리스트
+     * @return 返金/交換リスト取得
      */
     @Override
     @Transactional(readOnly = true)
     public List<ReturnsDto> getPeriod(RefundSearchRequestDto searchDto) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "교환/환불 조회" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "交換/返金 조회" });
         List<ReturnsDto> result = cm901052Mapper.getPeriod(searchDto);
 
         if (result == null) {
@@ -64,29 +64,29 @@ public class CM901052ServiceImpl implements CM901052Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "교환/환불 조회", String.valueOf(result.size()) });
+                new String[] { "交換/返金 조회", String.valueOf(result.size()) });
 
         return result;
     }
 
     /**
-     * 환불/환불 상품 리스트
+     * 返金/交換 商品リスト
      * 
-     * @param requestNo    요청 번호
-     * @param refundNumber 사원 번호
-     * @param orderNumber  주문 번호
-     * @return 환불/환불 상품 리스트
+     * @param requestNo    リクエスト番号
+     * @param refundNumber 社員番号
+     * @param orderNumber  注文番号
+     * @return 返金/交換 商品リスト
      */
     @Override
     @Transactional(readOnly = true)
     public List<OrderDetailDto> getOrderDetail(String requestNo,
             String refundNumber,
             String orderNumber) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "교환/환불 조회" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "交換/返金 조회" });
         int refundCount = cm901052Mapper.getRefundCount(requestNo, refundNumber);
 
         if (refundCount == 0) {
-            LogHelper.log(LogMessage.COMMON_SELECT_EMPTY, new String[] { "교환/환불 조회" });
+            LogHelper.log(LogMessage.COMMON_SELECT_EMPTY, new String[] { "交換/返金 조회" });
             throw new InvalidRequestException(ErrorCode.VALIDATION_SEARCH_TERM_EMPTY);
         }
 
@@ -97,17 +97,17 @@ public class CM901052ServiceImpl implements CM901052Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "교환/환불 조회", String.valueOf(result.size()) });
+                new String[] { "交換/返金 조회", String.valueOf(result.size()) });
 
         return result;
     }
 
     /**
-     * 환불 진행 처리
+     * 返金処理の実行
      * 
-     * @param requestNo 환불 정보
-     * @param userId    업데이트자
-     * @return 환불 진행 업데이트
+     * @param requestNo 返金情報
+     * @param userId    更新者
+     * @return 返金処理の更新
      */
     @Override
     @Transactional
@@ -118,11 +118,11 @@ public class CM901052ServiceImpl implements CM901052Service {
     }
 
     /**
-     * 환불 업데이트
+     * 返金更新
      * 
-     * @param requestNo 환불 정보
-     * @param userId    업데이트자
-     * @return 환불 진행 업데이트
+     * @param requestNo 返金情報
+     * @param userId    更新者
+     * @return 返金処理の更新
      */
     private Integer refund(RefundRequestDto requestDto, String userId) {
         ReturnsDto returnsDto = new ReturnsDto();
@@ -131,12 +131,12 @@ public class CM901052ServiceImpl implements CM901052Service {
         returnsDto.setReason(requestDto.getMemo());
         returnsDto.setTotalAmount(requestDto.getTotalAmount());
         returnsDto.setRefundAmount(requestDto.getProductTotalAmount());
-        if (requestDto.getRefundType() == "0") {
+        if ("0".equals(requestDto.getRefundType())) {
             returnsDto.setReturnStatusValue(2);
         } else {
             returnsDto.setReturnStatusValue(4);
         }
-        if (requestDto.getShippingFee() == "0") {
+        if ("0".equals(requestDto.getShippingFee())) {
             returnsDto.setShippingFeeSellerAmount(requestDto.getShippingAmount());
         } else {
             returnsDto.setShippingFeeCustomerAmount(requestDto.getShippingAmount());
@@ -148,11 +148,11 @@ public class CM901052ServiceImpl implements CM901052Service {
     }
 
     /**
-     * 환불 상세 생성
+     * 返金明細の作成
      * 
-     * @param requestNo 환불 정보
-     * @param userId    업데이트자
-     * @return 환불 진행 생성
+     * @param requestNo 返金情報
+     * @param userId    更新者
+     * @return 返金処理の作成
      */
     private Integer refundDetail(RefundRequestDto requestDto, String userId) {
         int result = 0;
@@ -163,7 +163,7 @@ public class CM901052ServiceImpl implements CM901052Service {
             detailsDto.setReturnId(refundInfo.getReturnId());
             detailsDto.setUnitPrice(item.getUnitPrice());
             detailsDto.setQuantity(item.getQuantity());
-            detailsDto.setProductCode(item.getProductName());
+            detailsDto.setProductCode(item.getProductNumber());
             detailsDto.setCreatedBy(userId);
             detailsDto.setCreatedAt(dateCalculator.tokyoTime());
             detailsDto.setUpdatedBy(userId);

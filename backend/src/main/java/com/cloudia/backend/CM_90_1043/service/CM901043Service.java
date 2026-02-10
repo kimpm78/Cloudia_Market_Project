@@ -4,19 +4,19 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 
+import com.cloudia.backend.common.model.ResponseModel;
 import com.cloudia.backend.CM_90_1043.model.CategorySaveRequest;
-import com.cloudia.backend.CM_90_1043.model.ResponseModel;
 
 public interface CM901043Service {
     /**
-     * 카테고리 전체 리스트 조회
+     * カテゴリ全件一覧取得
      * 
-     * @return 카테고리 전체 리스트
+     * @return カテゴリ全件一覧
      */
     ResponseEntity<ResponseModel<Map<String, Object>>> findByAllCategory();
 
     /**
-     * 카테고리 변경사항 저장 (추가/수정/삭제)
+     * カテゴリ変更内容の保存（追加/更新/削除）
      */
     ResponseEntity<ResponseModel<String>> saveChanges(CategorySaveRequest request, String userId);
 }

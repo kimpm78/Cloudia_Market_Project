@@ -38,7 +38,7 @@ const ProductCellRenderer = (params) => {
     <div className="d-flex align-items-center py-2 h-100">
       <img
         src={buildImageUrl(params.data.imageUrl)}
-        alt="상품"
+        alt="商品"
         style={{ width: '80px', height: '80px', objectFit: 'contain' }}
         className="me-3 border bg-white rounded"
         onError={(e) => {
@@ -68,12 +68,12 @@ export default function CM_01_1011() {
     const totalQty = paymentRowData.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
     const pName =
       orderDetail?.orderItemCount > 1
-        ? `${orderDetail.productName} 외 ${orderDetail.orderItemCount - 1}건`
+        ? `${orderDetail.productName} 他 ${orderDetail.orderItemCount - 1}点`
         : orderDetail?.productName || '';
     return { itemsSum, shipping, totalPrice, totalQty, pName };
   }, [paymentRowData, orderDetail]);
 
-  // --- [API 호출] ---
+  // --- [API呼び出し] ---
   const fetchOrderDetail = useCallback(async () => {
     if (!id) return;
     setLoading(true);
@@ -89,7 +89,7 @@ export default function CM_01_1011() {
         setDeliveryRowData(res.shippingInfo ? [res.shippingInfo] : []);
       }
     } catch (err) {
-      console.error('조회 실패:', err);
+      console.error('取得に失敗しました:', err);
     } finally {
       setLoading(false);
     }
@@ -99,7 +99,7 @@ export default function CM_01_1011() {
     fetchOrderDetail();
   }, [fetchOrderDetail]);
 
-  // 입금 정보 계산
+  // 振込情報設定
   useEffect(() => {
     if (
       orderDetail?.orderStatusValue === ORDER_STATUS_CODE.TRANSFER_CHECKING &&
@@ -107,59 +107,66 @@ export default function CM_01_1011() {
     ) {
       setDepositRowData([
         {
-          amount: `${calc.itemsSum.toLocaleString()}원`,
-          accountNumber: '[국민은행] 795301-04-074236',
-          accountHolder: '무기와라 장터',
-          dueDate: '주문 후 72시간 이내',
+          amount: `${calc.itemsSum.toLocaleString()}円`,
+          accountNumber: '[三井住友銀行] 436-074236',
+          accountHolder: 'クラウディアーケット',
+          dueDate: '注文後72時間以内',
         },
       ]);
     }
   }, [orderDetail, paymentRowData, calc.itemsSum]);
 
-  // --- [그리드 컬럼 정의] ---
   const paymentColumnDefs = [
-    { headerName: '상품명', field: 'product', flex: 2, cellRenderer: ProductCellRenderer },
-    { headerName: '수량', field: 'quantity', width: 80, cellStyle: { textAlign: 'center' } },
-    { headerName: '소비세', field: 'tax', width: 120, cellStyle: { textAlign: 'right' } },
+    { headerName: '商品名', field: 'product', flex: 2, cellRenderer: ProductCellRenderer },
+    { headerName: '数量', field: 'quantity', width: 80, cellStyle: { textAlign: 'center' } },
     {
-      headerName: '소계',
+      headerName: '小計',
       field: 'total',
       width: 180,
       cellStyle: { textAlign: 'right' },
       cellClassRules: {
         'text-danger fw-bold fs-5': (p) =>
-          p.node.rowPinned === 'bottom' && p.data.product === '주문 합계 금액',
+          p.node.rowPinned === 'bottom' && p.data.product === '注文合計金額',
       },
     },
   ];
 
+  const paymentDefaultColDef = useMemo(
+    () => ({
+      suppressMovable: true,
+      sortable: false,
+      resizable: false,
+    }),
+    []
+  );
+
   const deliveryColumnDefs = [
-    { headerName: '배송 주소', field: 'address', flex: 2 },
-    { headerName: '받는 분', field: 'receiver', width: 120 },
-    { headerName: '전화번호', field: 'phone', width: 150 },
+    { headerName: '配送先住所', field: 'address', flex: 2 },
+    { headerName: '受取人', field: 'receiver', width: 120 },
+    { headerName: '電話番号', field: 'phone', width: 150 },
     {
-      headerName: '배송 조회',
+      headerName: '配送追跡',
       field: 'tracking',
       width: 120,
       cellRenderer: (p) =>
-        p.value && p.value !== '미등록' ? (
+        p.value && p.value !== '未登録' ? (
           <a
             className="btn btn-sm btn-outline-primary py-0"
             href={`https://www.post.japanpost.jp/receive/tracking/result.php?code=${p.value}`}
             target="_blank"
             rel="noreferrer"
           >
-            조회
+            照会
           </a>
         ) : (
-          <span className="text-muted">미등록</span>
+          <span className="text-muted">未登録</span>
         ),
     },
   ];
 
   const pinnedBottomRowData = [
-    { product: '배송료', total: `${calc.shipping.toLocaleString()}원` },
-    { product: '주문 합계 금액', total: `${calc.totalPrice.toLocaleString()}원` },
+    { product: '送料', total: `${calc.shipping.toLocaleString()}円` },
+    { product: '注文合計金額', total: `${calc.totalPrice.toLocaleString()}円` },
   ];
 
   const toggleModal = (name, isOpen) => setModals((prev) => ({ ...prev, [name]: isOpen }));
@@ -175,8 +182,8 @@ export default function CM_01_1011() {
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-end pb-3 mb-4 border-bottom">
-        <h3 className="fw-bolder m-0">구매 상세 내역</h3>
-        <span className="badge bg-light text-dark border">주문번호: {orderDetail.orderNo}</span>
+        <h3 className="fw-bolder m-0">購入詳細</h3>
+        <span className="badge bg-light text-dark border">注文番号: {orderDetail.orderNo}</span>
       </div>
 
       <CM_01_1011_OrderSummary
@@ -186,15 +193,16 @@ export default function CM_01_1011() {
         displayProductName={calc.pName}
       />
 
-      {/* 결제 내역 */}
+      {/* 注文商品情報 */}
       <section className="mb-5">
         <h5 className="fw-bold mb-3">
-          <i className="bi bi-cart-check me-2"></i>주문 상품 정보
+          <i className="bi bi-cart-check me-2"></i>注文商品情報
         </h5>
         <div className="ag-theme-alpine w-100 overflow-hidden">
           <AgGridReact
             rowData={paymentRowData}
             columnDefs={paymentColumnDefs}
+            defaultColDef={paymentDefaultColDef}
             pinnedBottomRowData={pinnedBottomRowData}
             domLayout="autoHeight"
             getRowHeight={(p) => (p.node.rowPinned === 'bottom' ? 45 : 100)}
@@ -203,20 +211,20 @@ export default function CM_01_1011() {
         </div>
       </section>
 
-      {/* 입금 안내 */}
+      {/* お振込のご案内 */}
       {orderDetail?.orderStatusValue === ORDER_STATUS_CODE.TRANSFER_CHECKING && (
         <section className="mb-5">
           <h5 className="fw-bold mb-3 text-primary">
-            <i className="bi bi-bank me-2"></i>입금 안내
+            <i className="bi bi-bank me-2"></i>お振込のご案内
           </h5>
           <div className="ag-theme-alpine w-100 overflow-hidden" style={{ height: '97px' }}>
             <AgGridReact
               rowData={depositRowData}
               columnDefs={[
-                { headerName: '입금액', field: 'amount', width: 150 },
-                { headerName: '계좌번호', field: 'accountNumber', flex: 1 },
-                { headerName: '예금주', field: 'accountHolder', width: 120 },
-                { headerName: '입금기한', field: 'dueDate', width: 180 },
+                { headerName: '振込金額', field: 'amount', width: 150 },
+                { headerName: '口座番号', field: 'accountNumber', flex: 1 },
+                { headerName: '口座名義', field: 'accountHolder', width: 120 },
+                { headerName: '振込期限', field: 'dueDate', width: 180 },
               ]}
               headerHeight={45}
               rowHeight={50}
@@ -226,10 +234,10 @@ export default function CM_01_1011() {
         </section>
       )}
 
-      {/* 배송 정보 */}
+      {/* 配送情報 */}
       <section className="mb-5">
         <h5 className="fw-bold mb-3">
-          <i className="bi bi-truck me-2"></i>배송 정보
+          <i className="bi bi-truck me-2"></i>配送情報
         </h5>
         <div
           className="ag-theme-alpine w-100 overflow-hidden"
@@ -240,7 +248,7 @@ export default function CM_01_1011() {
             columnDefs={deliveryColumnDefs}
             headerHeight={45}
             rowHeight={50}
-            overlayNoRowsTemplate="<span>등록된 배송 정보가 없습니다.</span>"
+            overlayNoRowsTemplate="<span>登録された配送情報がありません。</span>"
             theme="legacy"
           />
         </div>
@@ -256,7 +264,7 @@ export default function CM_01_1011() {
         onAddressChange={() => toggleModal('address', true)}
       />
 
-      {/* 모달 컴포넌트들 */}
+      {/* モーダルコンポーネント */}
       <CM_01_1011_RefundModal
         isOpen={modals.refund}
         onClose={() => toggleModal('refund', false)}
@@ -273,14 +281,14 @@ export default function CM_01_1011() {
       <CM_99_1001
         isOpen={modals.confirm}
         onClose={() => toggleModal('confirm', false)}
-        Message="주문을 취소하시겠습니까?"
+        Message="注文をキャンセルしますか？"
         onConfirm={async () => {
           try {
             await postRequest(`/user/mypage/purchases/${id}/cancel`, {});
-            openResultPopup('취소되었습니다.');
+            openResultPopup('キャンセルしました。');
             fetchOrderDetail();
           } catch {
-            openResultPopup('실패했습니다.');
+            openResultPopup('失敗しました。');
           }
           toggleModal('confirm', false);
         }}

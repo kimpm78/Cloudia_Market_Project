@@ -30,10 +30,10 @@ export default function CM_01_1011_ActionButtons({ order, onCancel, onAddressCha
             className={`${btnClass} btn-outline-primary`}
             onClick={onAddressChange}
           >
-            배송지 변경
+            配送先を変更
           </button>
           <button type="button" className={`${btnClass} btn-danger`} onClick={onCancel}>
-            주문 취소
+            注文をキャンセル
           </button>
         </div>
       );
@@ -51,7 +51,7 @@ export default function CM_01_1011_ActionButtons({ order, onCancel, onAddressCha
               className={`${btnClass} btn-outline-primary`}
               onClick={onAddressChange}
             >
-              배송지 변경
+              配送先を変更
             </button>
           )}
           {isExpired ? (
@@ -59,13 +59,13 @@ export default function CM_01_1011_ActionButtons({ order, onCancel, onAddressCha
               type="button"
               className={`${btnClass} btn-secondary`}
               disabled
-              title="결제 후 72시간이 경과하여 취소가 불가능합니다."
+              title="決済後72時間が経過したため、キャンセルできません。"
             >
-              취소 기간 만료
+              キャンセル期限切れ
             </button>
           ) : (
             <button type="button" className={`${btnClass} btn-danger`} onClick={onCancel}>
-              주문 취소
+              注文をキャンセル
             </button>
           )}
         </div>
@@ -79,7 +79,7 @@ export default function CM_01_1011_ActionButtons({ order, onCancel, onAddressCha
           className={`${btnClass} btn-primary`}
           onClick={() => navigate('/review/write')}
         >
-          리뷰 작성하기
+          レビューを書く
         </button>
       );
     }
@@ -95,7 +95,7 @@ export default function CM_01_1011_ActionButtons({ order, onCancel, onAddressCha
         className="btn btn-link text-secondary text-decoration-none small"
         onClick={() => navigate('/mypage/purchases')}
       >
-        <i className="bi bi-list-ul me-1"></i> 구매 내역 목록으로 돌아가기
+        <i className="bi bi-list-ul me-1"></i> 購入履歴一覧に戻る
       </button>
     </div>
   );

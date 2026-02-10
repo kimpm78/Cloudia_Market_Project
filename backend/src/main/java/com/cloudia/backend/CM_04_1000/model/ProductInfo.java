@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductInfo {
-    private String orderNumber;  // 주문 번호 (reviews와 연결하기 위해 추가)
-    private String productCode;  // order_details.product_id (상품코드)
-    private Long productId;      // products.product_id (PK)
-    private String productName;  // products.name
+    private String orderNumber;  // 注文番号
+    private String productCode;  // 商品コード
+    private Long productId;      // 商品PK
+    private String productName;  // 商品名
 }

@@ -19,14 +19,9 @@ import com.cloudia.backend.CM_02_1000.model.Cart;
 import com.cloudia.backend.CM_02_1000.service.CM021000Service;
 import com.cloudia.backend.constants.CMMessageConstant;
 import com.cloudia.backend.CM_02_1000.model.BannerInfo;
-import com.cloudia.backend.CM_02_1000.model.ResponseModel;
+import com.cloudia.backend.common.model.ResponseModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-/**
- * 헤더 메뉴 정보를 제공하는 서비스 구현 클래스입니다.
- * DB에서 is_header = true 조건의 메뉴 목록을 조회합니다.
- */
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +31,9 @@ public class CM021000ServiceImpl implements CM021000Service {
     private final CM021000Mapper cm021000Mapper;
 
     /**
-     * 헤더 메뉴 목록 조회
+     * ヘッダーメニュー一覧取得
      * 
-     * @return List<HeaderMenu> 헤더 메뉴 리스트
+     * @return List<HeaderMenu> ヘッダーメニュー一覧
      */
 
     @Override
@@ -60,9 +55,9 @@ public class CM021000ServiceImpl implements CM021000Service {
         }
     }
     /**
-     * 아이콘 목록 조회
+     * アイコンメニュー一覧取得
      * 
-     * @return List<HeaderMenu> 헤더 메뉴 리스트
+     * @return List<HeaderMenu> アイコンメニュー一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -84,10 +79,10 @@ public class CM021000ServiceImpl implements CM021000Service {
     }
 
     /**
-     * 헤더 배지 표시용 장바구니 아이템 개수 조회
+     * ヘッダーのバッジ表示用カート商品件数取得
      *
-     * @param userId 사용자 ID
-     * @return 담긴 상품 개수 (NULL 방지 0 기본)
+     * @param userId ユーザーID
+     * @return カート内の商品件数（NULL防止：デフォルト0）
      */
     @Override
     @Transactional(readOnly = true)
@@ -114,23 +109,23 @@ public class CM021000ServiceImpl implements CM021000Service {
             Integer total = cm021000Mapper.selectCartTotalAmount(userId);
             return total == null ? 0 : total;
         } catch (DataAccessException dae) {
-            log.error("장바구니 총액 조회 중 DB 오류: {}", dae.getMessage(), dae);
+            log.error("カート合計金額取得中にDBエラーが発生: {}", dae.getMessage(), dae);
             return 0;
         } catch (Exception e) {
-            log.error("장바구니 총액 조회 중 예상치 못한 오류: {}", e.getMessage(), e);
+            log.error("カート合計金額取得中に予期しないエラーが発生: {}", e.getMessage(), e);
             return 0;
         }
     }
 
     /**
-     * 장바구니 조회
+     * カート取得
      * 
-     * @return Cart 사용자 장바구니 정보
+     * @return Cart ユーザーのカート情報
      */
     @Override
     @Transactional(readOnly = true)
     public Cart getCart() {
-        Long userId = getCurrentUserId(); // 실제 로그인 사용자 ID를 가져오는 방식으로 교체 예정
+        Long userId = getCurrentUserId(); // 実際のログインユーザーID取得方式に置き換え予定
         if (userId == null) {
             log.warn(CM021000MessageConstant.CART_LOGIN_REQUIRED);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, CM021000MessageConstant.CART_LOGIN_REQUIRED);
@@ -146,19 +141,17 @@ public class CM021000ServiceImpl implements CM021000Service {
     }
 
     /**
-     * 현재 로그인한 사용자 ID를 반환합니다.
-     * 추후 Spring Security 또는 세션 기반 사용자 인증에서 연동 예정입니다.
+     * 現在ログインしているユーザーIDを返却
      *
-     * @return Long 사용자 ID (로그인되어 있지 않으면 null)
+     * @return Long ユーザーID（未ログインの場合はnull）
      */
     private Long getCurrentUserId() {
-        // TODO: 로그인된 사용자 ID를 인증 시스템과 연동하여 반환
         return null;
     }
     /**
-     * 배너 전체 리스트 조회
+     * バナー一覧取得
      * 
-     * @return 배너 전체 리스트
+     * @return バナー一覧
      */
     @Override
     @Transactional(readOnly = true)
@@ -188,11 +181,11 @@ public class CM021000ServiceImpl implements CM021000Service {
     }
 
     /**
-     * ResponseModel 생성
+     * ResponseModel 生成
      * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    메시지
+     * @param resultList 結果データ
+     * @param result     処理結果
+     * @param message    メッセージ
      * @return ResponseModel
      */
     private <T> ResponseModel<T> createResponseModel(T resultList, boolean result, String message) {

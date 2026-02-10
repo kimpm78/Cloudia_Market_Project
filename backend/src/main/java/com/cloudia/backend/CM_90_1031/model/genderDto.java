@@ -14,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class genderDto {
-    private String genderGroup; // 성별 그룹
-    private Integer userCount; // 그룹별 카운트
-    private Double avgAmountPerUser; // 그룹별 평균 단가
+    private String genderGroup;      // 性別グループ
+    private Integer userCount;       // グループ別件数
+    private Double avgAmountPerUser; // グループ別平均単価
 }

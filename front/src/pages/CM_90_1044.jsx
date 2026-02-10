@@ -29,28 +29,28 @@ export default function CM_90_1044() {
       },
     },
     {
-      headerName: '제목',
+      headerName: 'タイトル',
       field: 'title',
       flex: 1,
       width: 200,
       suppressMovable: true,
     },
     {
-      headerName: '작성자',
+      headerName: '作成者',
       field: 'userId',
       width: 120,
       suppressMovable: true,
       sortable: false,
     },
     {
-      headerName: '작성일',
+      headerName: '作成日',
       field: 'publishedAt',
       width: 140,
       suppressMovable: true,
       sortable: false,
     },
     {
-      headerName: '조회수',
+      headerName: '閲覧数',
       field: 'viewCount',
       width: 140,
       suppressMovable: true,
@@ -58,7 +58,7 @@ export default function CM_90_1044() {
       valueFormatter: (params) => Number(params.value).toLocaleString(),
     },
     {
-      headerName: '상태',
+      headerName: '状態',
       field: 'isDisplay',
       width: 80,
       cellRenderer: (params) => {
@@ -107,11 +107,11 @@ export default function CM_90_1044() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h5 className="border-bottom pb-2 mb-3">공지사항 관리</h5>
+        <h2 className="border-bottom pb-2 mb-3">お知らせ 管理</h2>
         <div className="row mb-3">
           <div className="ms-auto d-flex justify-content-end">
             <Link to="/admin/menu/notice/register" className="btn btn-primary btn-min-width">
-              작성하기
+              作成する
             </Link>
           </div>
         </div>
@@ -149,7 +149,7 @@ export default function CM_90_1044() {
             }}
           />
           <button className="btn btn-primary" onClick={handleSearch}>
-            검색
+            検索
           </button>
         </div>
       </div>

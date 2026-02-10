@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { axiosPublic } from '../services/axiosInstance';
 
 /**
- * 이메일 인증과 관련된 모든 상태와 로직을 관리하는 커스텀 훅
+ * メール認証に関する状態とロジックを管理するカスタムフック
  */
 export const useEmailVerification = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +13,6 @@ export const useEmailVerification = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // 모달이 열려있고, 인증이 완료되지 않았을 때만 타이머를 동작
   useEffect(() => {
     let countdown;
     if (isModalOpen && timer > 0 && !isVerified) {
@@ -22,7 +21,7 @@ export const useEmailVerification = () => {
     return () => clearInterval(countdown);
   }, [isModalOpen, timer, isVerified]);
 
-  // 인증 코드 발송을 요청하는 함수
+  // 認証コード送信をリクエストする関数
   const handleRequestCode = useCallback(async (url, payload) => {
     setLoading(true);
     setError('');
@@ -34,7 +33,7 @@ export const useEmailVerification = () => {
       setIsVerified(false);
       setVerificationCode('');
     } catch (err) {
-      const errorMessage = err.response?.data?.message || '인증번호 요청에 실패했습니다.';
+      const errorMessage = err.response?.data?.message || '認証コードのリクエストに失敗しました。';
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -44,7 +43,7 @@ export const useEmailVerification = () => {
 
   const handleVerifyCode = useCallback(async (url, payload, validator) => {
     if (!payload.code) {
-      setError('인증번호를 입력해주세요.');
+      setError('認証コードを入力してください。');
       return;
     }
     setLoading(true);
@@ -64,10 +63,10 @@ export const useEmailVerification = () => {
         setIsVerified(true);
         setIsModalOpen(false);
       } else {
-        throw new Error(response.data?.message || '인증 응답이 올바르지 않습니다.');
+        throw new Error(response.data?.message || '認証レスポンスが正しくありません。');
       }
     } catch (err) {
-      const msg = err.response?.data?.message || err.message || '인증에 실패했습니다.';
+      const msg = err.response?.data?.message || err.message || '認証に失敗しました。';
       setError(msg);
     } finally {
       setLoading(false);

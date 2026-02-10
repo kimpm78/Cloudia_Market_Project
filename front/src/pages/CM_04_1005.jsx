@@ -10,10 +10,10 @@ import { createQna } from '../services/QnaService.js';
 import CMMessage from '../constants/CMMessage';
 
 const CATEGORY_OPTIONS = [
-  { value: '', label: '선택해주세요' },
-  { value: '1', label: '배송문의' },
-  { value: '2', label: '상품문의' },
-  { value: '3', label: '기타문의' },
+  { value: '', label: '選択してください' },
+  { value: '1', label: '配送お問い合わせ' },
+  { value: '2', label: '商品お問い合わせ' },
+  { value: '3', label: 'その他お問い合わせ' },
 ];
 
 export default function CM_04_1005() {
@@ -39,8 +39,8 @@ export default function CM_04_1005() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('');
   const visibilityLabel = useMemo(() => {
-    if (selectedTag === '공개') return '공개';
-    if (selectedTag === '비공개') return '비공개';
+    if (selectedTag === '公開') return '公開';
+    if (selectedTag === '非公開') return '非公開';
     return '';
   }, [selectedTag]);
 
@@ -50,6 +50,13 @@ export default function CM_04_1005() {
     const parsed = Number(raw);
     return Number.isFinite(parsed) ? parsed : null;
   }, [user?.userId, user?.id]);
+  const isAdminOrManager = user?.roleId === 1 || user?.roleId === 2;
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    if (!isAdminOrManager) return;
+    navigate('/qna', { replace: true });
+  }, [isLoggedIn, isAdminOrManager, navigate]);
 
   useEffect(() => {
     if (!isLoggedIn || !user?.memberNumber) {
@@ -68,7 +75,7 @@ export default function CM_04_1005() {
         setOrderList(safeList);
       })
       .catch((err) => {
-        console.error('주문 정보 로드 실패:', err);
+        console.error('注文情報の読み込みに失敗しました:', err);
       });
   }, [isLoggedIn, user]);
 
@@ -116,6 +123,12 @@ export default function CM_04_1005() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isAdminOrManager) {
+      setPopupMessage('管理者/マネージャーはQ&Aを作成できません。');
+      setOpenErrorPopup(true);
+      return;
+    }
+
     if (!isLoggedIn || !numericUserId) {
       setPopupMessage(CMMessage.MSG_ERR_023);
       setOpenErrorPopup(true);
@@ -140,7 +153,7 @@ export default function CM_04_1005() {
         memberNumber: user?.memberNumber || '',
         title: title.trim(),
         content: buildPayloadContent(),
-        isPrivate: selectedTag === '비공개' ? 1 : 0,
+        isPrivate: selectedTag === '非公開' ? 1 : 0,
         inquiriesCodeType: '012',
         inquiriesCodeValue: selectedCategory ? Number(selectedCategory) : null,
         orderNumber: selectedOrder?.orderNumber || '',
@@ -160,8 +173,8 @@ export default function CM_04_1005() {
         }
       }, 1200);
     } catch (err) {
-      console.error('Q&A 등록 실패:', err);
-      setPopupMessage(err?.message || CMMessage.MSG_ERR_007('Q&A 등록'));
+      console.error('Q&Aの登録に失敗しました:', err);
+      setPopupMessage(err?.message || CMMessage.MSG_ERR_007('Q&A 登録'));
       setOpenErrorPopup(true);
     } finally {
       setIsLoading(false);
@@ -171,7 +184,7 @@ export default function CM_04_1005() {
 
   return (
     <>
-      <h1>Q & A (작성하기)</h1>
+      <h1 className='m-5'>Q & A 作成する</h1>
       <div className="pt-0 px-5 pb-5">
         <CM_99_1002
           isOpen={openLoadingPopup}
@@ -192,7 +205,7 @@ export default function CM_04_1005() {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3 w-50">
-            <label className="form-label">제목</label>
+            <label className="form-label">タイトル</label>
             <div className="input-group">
               {visibilityLabel && <span className="input-group-text">{visibilityLabel}</span>}
               <input
@@ -202,14 +215,14 @@ export default function CM_04_1005() {
                   setTitle(e.target.value);
                   setErrors((prev) => ({ ...prev, title: '' }));
                 }}
-                placeholder="제목을 입력해주세요"
+                placeholder="件名を入力してください"
               />
             </div>
             {errors.title && <div className="text-danger small mt-1">{errors.title}</div>}
           </div>
 
           <div className="mb-3 w-50">
-            <label className="form-label">문의 유형</label>
+            <label className="form-label">お問い合わせ種別</label>
             <select
               className="form-select"
               value={selectedCategory}
@@ -225,7 +238,7 @@ export default function CM_04_1005() {
 
           <div className="mb-3 w-100 d-flex gap-3 flex-column flex-md-row">
             <div className="w-100 w-md-50">
-              <label className="form-label">주문번호 (선택)</label>
+              <label className="form-label">注文番号（任意）</label>
               <select
                 className="form-select"
                 value={selectedOrderNumber}
@@ -235,11 +248,13 @@ export default function CM_04_1005() {
                 }}
                 disabled={orderList.length === 0}
               >
-                <option value="">선택해주세요</option>
+                <option value="">
+                  {orderList.length === 0 ? '注文履歴がありません' : '選択してください'}
+                </option>
                 {orderList.map((order) => {
                   const labelParts = [order.displayOrderNumber || order.orderNumber];
                   if (order.displayOrderDate) {
-                    labelParts.push(`구매일: ${order.displayOrderDate}`);
+                    labelParts.push(`購入日: ${order.displayOrderDate}`);
                   }
                   return (
                     <option key={order.orderId} value={order.orderNumber}>
@@ -248,9 +263,12 @@ export default function CM_04_1005() {
                   );
                 })}
               </select>
+              {orderList.length === 0 && (
+                <div className="text-muted small mt-1">注文履歴がありません。</div>
+              )}
             </div>
             <div className="w-100 w-md-50">
-              <label className="form-label">상품 (선택)</label>
+              <label className="form-label">商品（任意）</label>
               <select
                 className="form-select"
                 value={selectedProductCode}
@@ -264,7 +282,7 @@ export default function CM_04_1005() {
                 }}
                 disabled={availableProducts.length === 0}
               >
-                <option value="">선택해주세요</option>
+                <option value="">選択してください</option>
                 {availableProducts.map((product) => (
                   <option key={product.productCode} value={product.productCode}>
                     {product.productName}
@@ -277,21 +295,21 @@ export default function CM_04_1005() {
           {(selectedOrder || selectedProductCode) && (
             <div className="alert alert-secondary small">
               <div>
-                <strong>선택한 주문</strong> :{' '}
+                <strong>選択した注文</strong> :{' '}
                 {selectedOrder
                   ? `${selectedOrder.displayOrderNumber || selectedOrder.orderNumber}${
                       selectedOrder.displayOrderDate ? ` / ${selectedOrder.displayOrderDate}` : ''
                     }`
-                  : '선택하지 않음'}
+                  : '未選択'}
               </div>
               <div>
-                <strong>선택한 상품</strong> : {selectedProductName || selectedProductCode || '선택하지 않음'}
+                <strong>選択した商品</strong> : {selectedProductName || selectedProductCode || '未選択'}
               </div>
             </div>
           )}
 
           <div className="mb-3">
-            <label className="form-label">공개 여부</label>
+            <label className="form-label">公開 / 非公開</label>
             <div>
               <div className="form-check form-check-inline">
                 <input
@@ -299,15 +317,15 @@ export default function CM_04_1005() {
                   type="radio"
                   name="visibility"
                   id="qna-public"
-                  value="공개"
-                  checked={selectedTag === '공개'}
+                  value="公開"
+                  checked={selectedTag === '公開'}
                   onChange={(e) => {
                     setSelectedTag(e.target.value);
                     setErrors((prev) => ({ ...prev, tag: '' }));
                   }}
                 />
                 <label className="form-check-label" htmlFor="qna-public">
-                  공개
+                  公開
                 </label>
               </div>
               <div className="form-check form-check-inline">
@@ -316,15 +334,15 @@ export default function CM_04_1005() {
                   type="radio"
                   name="visibility"
                   id="qna-private"
-                  value="비공개"
-                  checked={selectedTag === '비공개'}
+                  value="非公開"
+                  checked={selectedTag === '非公開'}
                   onChange={(e) => {
                     setSelectedTag(e.target.value);
                     setErrors((prev) => ({ ...prev, tag: '' }));
                   }}
                 />
                 <label className="form-check-label" htmlFor="qna-private">
-                  비공개
+                  非公開
                 </label>
               </div>
             </div>
@@ -332,7 +350,7 @@ export default function CM_04_1005() {
           </div>
 
           <div className="mb-3">
-            <label className="form-label">내용</label>
+            <label className="form-label">内容</label>
             <textarea
               className="form-control"
               rows="10"
@@ -341,7 +359,7 @@ export default function CM_04_1005() {
                 setContent(e.target.value);
                 setErrors((prev) => ({ ...prev, content: '' }));
               }}
-              placeholder="궁금하신 내용을 입력해주세요."
+              placeholder="お問い合わせ内容を入力してください。"
             />
             {errors.content && <div className="text-danger small mt-1">{errors.content}</div>}
           </div>
@@ -352,7 +370,7 @@ export default function CM_04_1005() {
               className="btn btn-primary btn-lg w-100 w-md-50"
               disabled={isLoading}
             >
-              {isLoading ? '작성 중...' : '작성 완료'}
+              {isLoading ? '作成中...' : '作成完了'}
             </button>
             <button
               type="button"
@@ -360,7 +378,7 @@ export default function CM_04_1005() {
               onClick={() => navigate(-1)}
               disabled={isLoading}
             >
-              뒤로 가기
+              戻る
             </button>
           </div>
         </form>

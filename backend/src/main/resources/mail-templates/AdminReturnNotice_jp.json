@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "AdminReturnNotice_jp",
+    "SubjectPart": "【クラウディア マーケット】返品・交換申請通知（管理者向け）",
+    "TextPart": "管理者各位\n\n返品・交換申請が受付されました。\n\n────────────────────\n■ 申請情報\n────────────────────\n件名：{{title}}\n種別：{{type}}\n申請番号：{{returnNumber}}\n注文番号：{{orderNumber}}\n会員番号：{{memberNumber}}\n商品コード：{{productCode}}\n\n────────────────────\n■ 申請内容\n────────────────────\n{{content}}",
+    "HtmlPart": "<html><body style=\"font-family: Arial, sans-serif; color:#000; font-size:14px; line-height:1.7;\"><p>管理者各位</p><p>返品・交換申請が受付されました。</p><hr><h4>■ 申請情報</h4><p>件名：{{title}}<br>種別：{{type}}<br>申請番号：{{returnNumber}}<br>注文番号：{{orderNumber}}<br>会員番号：{{memberNumber}}<br>商品コード：{{productCode}}</p><hr><h4>■ 申請内容</h4><pre style=\"white-space:pre-wrap; font-family:Consolas, monospace; background:#f7f7f7; padding:12px; border:1px solid #ddd;\">{{content}}</pre></body></html>"
+  }
+}

@@ -87,25 +87,25 @@ public class CM011001UserServiceImpl implements CM011001UserService {
                 String pccc = user.getPccc();
                 pccc = pccc.trim().toUpperCase();
                 if (userMapper.countByPccc(pccc) > 0) {
-                    return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "이미 등록된 개인통관고유부호입니다."));
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "既に登録されている個人通関固有符号（PCCC）です。"));
                 }
                 user.setPccc(pccc);
             } else {
                 user.setPccc(null);
             }
 
-            // 비밀번호 암호화
+            // パスワードのハッシュ化
             String encodedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encodedPassword);
 
-            // 주소 정보를 User 객체에 설정
+            // 住所情報設定
             user.setPostalCode(address.getPostalCode());
             user.setAddressMain(address.getAddressMain());
             user.setAddressDetail1(address.getAddressDetail1());
             user.setAddressDetail2(address.getAddressDetail2());
             user.setAddressDetail3(address.getAddressDetail3());
 
-            // 코드 마스터 및 역할(Role) 정보 설정
+            // コードマスタおよびロール(Role)情報設定
             CodeMaster genderCode = codeMasterService.getCodeByValue("010", user.getGenderValue());
             user.setGenderType(genderCode.getCodeType());
             user.setGenderValue(genderCode.getCodeValue());
@@ -115,20 +115,26 @@ public class CM011001UserServiceImpl implements CM011001UserService {
             user.setUserStatusValue(userStatusCode.getCodeValue());
 
             Role userRole = roleMapper.findByRoleType(RoleType.USER);
+            if (userRole == null || userRole.getRoleId() == null) {
+                log.error("会員登録失敗: permissions テーブルに ROLE_USER が設定されていません。roleType={}", RoleType.USER);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("message", "会員権限の設定が見つかりません。管理者にお問い合わせください。"));
+            }
             user.setRoleId(userRole.getRoleId());
 
             String loginId = user.getLoginId();
-            user.setCreatedBy(loginId);
+            String auditUser = fitVarchar(loginId, 10);
+            user.setCreatedBy(auditUser);
             user.setCreatedAt(now);
-            user.setUpdatedBy(loginId);
+            user.setUpdatedBy(auditUser);
             user.setUpdatedAt(now);
 
-            // users 테이블에 사용자 정보 저장
+            // users テーブルにユーザー情報を保存
             String memberNumber = userMapper.getNextMemberNumber();
             user.setMemberNumber(memberNumber);
             userMapper.insertUser(user);
 
-            // DB에서 방금 생성된 User 정보를 다시 가져와 member_number 확인
+            // DBで先ほど作成されたユーザー情報を再取得し、member_number を確認する
             if (user.getUserId() == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(Map.of("message", CM011001MessageConstant.FAIL_KEY_GENERATION));
@@ -140,7 +146,7 @@ public class CM011001UserServiceImpl implements CM011001UserService {
                         .body(Map.of("message", CM011001MessageConstant.FAIL_USER_NOT_FOUND));
             }
 
-            // 비밀번호 이력 저장
+            // パスワード履歴の保存
             PasswordHistory passwordHistory = new PasswordHistory();
             passwordHistory.setMemberNumber(createdUser.getMemberNumber());
             passwordHistory.setPassword(encodedPassword);
@@ -164,7 +170,7 @@ public class CM011001UserServiceImpl implements CM011001UserService {
                         "homePageUrl", appHomepageUrl);
 
                 emailService.sendTemplateEmail(
-                        "WelcomeEmail_kr",
+                        "WelcomeEmail_jp",
                         createdUser.getEmail(),
                         templateData);
 
@@ -212,5 +218,15 @@ public class CM011001UserServiceImpl implements CM011001UserService {
         }
         int count = userMapper.countByPccc(pccc.trim().toUpperCase());
         return ResponseEntity.ok(count);
+    }
+
+    private String fitVarchar(String value, int maxLength) {
+        if (value == null) {
+            return null;
+        }
+        if (value.length() <= maxLength) {
+            return value;
+        }
+        return value.substring(0, maxLength);
     }
 }

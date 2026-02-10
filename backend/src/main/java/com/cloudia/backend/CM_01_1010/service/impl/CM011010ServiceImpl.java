@@ -16,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -60,7 +59,7 @@ public class CM011010ServiceImpl implements
                 combinedReason = String.join(", ", request.getReasons());
             }
 
-            // 사용자 계정을 비활성화
+            // ユーザーアカウントを非アクティブ化
             cm011010Mapper.deactivateUser(request.getUserId(), combinedReason);
             log.info(CM011010MessageConstant.INFO_DEACTIVATED, request.getUserId());
 
@@ -70,9 +69,9 @@ public class CM011010ServiceImpl implements
                 emailDto.setName(user.getName());
                 emailDto.setLoginId(user.getLoginId());
                 emailService.sendWithdrawalNotification(emailDto);
-                log.info("회원 탈퇴 알림 이메일 발송 완료: {}", user.getEmail());
+                log.info("退会通知メールの送信完了: {}", user.getEmail());
             } catch (Exception e) {
-                log.warn("회원 탈퇴 이메일 발송 실패: {}", e.getMessage());
+                log.warn("退会メールの送信失敗: {}", e.getMessage());
             }
 
             log.info(CM011010MessageConstant.UNSUBSCRIBE_END, request.getUserId());

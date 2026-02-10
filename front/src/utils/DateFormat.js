@@ -4,10 +4,10 @@ export function formatDate(dateString) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  return `${year}/${month}/${day}`; // YYYY/MM/DD 통일
+  return `${year}/${month}/${day}`; // YYYY/MM/DD に統一
 }
 
-// YYYY/MM/DD HH:mm 형식으로 변환
+// YYYY/MM/DD HH:mm 形式に変換
 export function formatDateTime(dateInput, options = {}) {
   if (!dateInput) return '';
   const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
@@ -21,7 +21,7 @@ export function formatDateTime(dateInput, options = {}) {
   return `${year}${separator}${month}${separator}${day} ${hours}:${minutes}`;
 }
 
-// YYYY.MM.DD 형식으로 변환 (상세페이지 등에서 사용)
+// YYYY.MM.DD 形式に変換（詳細ページなどで使用）
 export function formatYearMonthDot(value) {
   if (!value) return '';
   const raw = String(value).trim();

@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 주문/결제 과정에서 사용하는 배송지 정보
+ * 注文／決済処理で使用する配送先情報
  */
 @Data
 @Builder
@@ -17,15 +17,15 @@ import lombok.NoArgsConstructor;
 public class ShippingInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long addressId; // 주소 ID (orders.shipping_address_id 등)
-    private String addressNickname; // 주소 별칭 (예: 자택, 직장 등)
-    private String recipientName; // 수령인 이름
-    private String recipientPhone; // 수령인 연락처
-    private String postalCode; // 우편번호
-    private String addressMain; // 기본 주소
-    private String addressDetail1; // 상세 주소1
-    private String addressDetail2; // 상세 주소2
-    private String addressDetail3; // 상세 주소3
-    private String memo; // 배송 메모 (필요시 적용가능)
-    private Boolean isDefault; // 기본 배송지 여부
+    private Long addressId;         // 住所ID（PK）
+    private String addressNickname; // 住所の別名（例：自宅、職場など）
+    private String recipientName;   // 受取人氏名
+    private String recipientPhone;  // 受取人連絡先
+    private String postalCode;      // 郵便番号
+    private String addressMain;     // 基本住所
+    private String addressDetail1;  // 詳細住所1
+    private String addressDetail2;  // 詳細住所2
+    private String addressDetail3;  // 詳細住所3
+    private String memo;            // 配送メモ（必要に応じて使用）
+    private Boolean isDefault;      // デフォルト配送先かどうか
 }
