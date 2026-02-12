@@ -118,7 +118,8 @@ export default function CM_04_1001() {
     if (container && review?.content) {
       const images = container.querySelectorAll('img');
       images.forEach((img) => {
-        img.classList.add('w-100');
+        img.classList.remove('w-100');
+        img.style.maxWidth = '100%';
         img.style.height = 'auto';
       });
     }
@@ -447,7 +448,7 @@ export default function CM_04_1001() {
           <div className="d-none d-sm-flex small text-muted align-self-center">
             <span className="me-2">{review.createdBy}</span>
             <span className="me-2">{formatYearMonthDot(review.createdAt)}</span>
-            <span>조회: {review.viewCount}</span>
+      <span>閲覧数: {review.viewCount}</span>
           </div>
         </div>
         <hr className="mt-1 mb-0" />
@@ -458,14 +459,14 @@ export default function CM_04_1001() {
         style={{ width: '100%' }}
       />
       <hr className="my-3" />
-      <h6 className="border-bottom pb-3 mb-3">コメント | {getTotalCommentCount(comments)}個</h6>
+      <h6 className="border-bottom pb-3 mb-3 fw-semibold">コメント | {getTotalCommentCount(comments)}個</h6>
       {Array.isArray(comments) && comments.length > 0 ? (
         comments.map((c) => renderComment(c))
       ) : (
         <div className="text-center text-muted my-4">登録されたコメントはありません。</div>
       )}
 
-      <h6 className="mt-5">コメント</h6>
+      <h6 className="mt-5 fw-semibold">コメント</h6>
       <textarea
         className="form-control mb-3"
         rows="5"

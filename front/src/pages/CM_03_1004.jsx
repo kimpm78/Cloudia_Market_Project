@@ -717,8 +717,7 @@ export default function CM_03_1004() {
       <section className="product-subsection w-100 px-3">
         {/* 商品詳細 */}
         <div id="detail-section" className="product-description-section mb-5">
-          <h5 className="fw-bold mb-3" ref={detailRef}>
-          </h5>{' '}
+          <h5 className="fw-bold mb-3" ref={detailRef}></h5>{' '}
           {product?.description ? (
             <div
               ref={descRef}
@@ -761,12 +760,12 @@ export default function CM_03_1004() {
               <i className="bi bi-chevron-down"></i>
             </summary>
             <div className="p-3">
-              <p>ご注文確認後、土日祝を除く営業日 기준で平均1〜5日ほどかかります。</p>
+              <p>ご注文確認後、土日祝を除く営業日で通常1〜5日ほどで発送いたします。</p>
               <ul>
-                <li>予約商品は入荷後に発送されます。</li>
-                <li>離島・山間部は追加の配送日数が必要になる場合があります。</li>
+                <li>予約商品は入荷後に発送いたします。</li>
+                <li>離島・山間部はお届けまでに追加の日数がかかる場合があります。</li>
                 <li>
-                  年末年始や連休、繁忙期など配送会社の物量が集中する時期は、通常より遅れる場合があります。
+                  年末年始・連休・繁忙期など、配送会社の取扱量が増える時期は通常より遅れる場合があります。
                 </li>
               </ul>
             </div>

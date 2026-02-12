@@ -5,44 +5,44 @@ import java.util.Objects;
 import com.cloudia.backend.common.model.ResponseModel;
 
 /**
- * ResponseModel 생성 헬퍼 클래스
+ * ResponseModel生成ヘルパークラス
  */
 public class ResponseHelper {
     private ResponseHelper() {
-        // 인스턴스 생성 방지
+        // インスタンス生成防止
     }
 
     /**
-     * 성공 응답 생성
+     * 成功レスポンス生成
      */
     public static <T> ResponseModel<T> success(T data, String message) {
         return ResponseModel.<T>builder()
                 .resultList(data)
                 .result(true)
-                .message(Objects.requireNonNull(message, "메시지는 필수입니다"))
+                .message(Objects.requireNonNull(message, "メッセージは必須です"))
                 .build();
     }
 
     /**
-     * 성공 응답 생성 (기본 메시지)
+     * 成功レスポンス生成（デフォルトメッセージ）
      */
     public static <T> ResponseModel<T> success(T data) {
-        return success(data, "처리되었습니다");
+        return success(data, "処理しました");
     }
 
     /**
-     * 실패 응답 생성
+     * 失敗レスポンス生成
      */
     public static <T> ResponseModel<T> fail(T data, String message) {
         return ResponseModel.<T>builder()
                 .resultList(data)
                 .result(false)
-                .message(Objects.requireNonNull(message, "메시지는 필수입니다"))
+                .message(Objects.requireNonNull(message, "メッセージは必須です"))
                 .build();
     }
 
     /**
-     * 실패 응답 생성 (데이터 없음)
+     * 失敗レスポンス生成（データなし）
      */
     public static <T> ResponseModel<T> fail(String message) {
         return fail(null, message);

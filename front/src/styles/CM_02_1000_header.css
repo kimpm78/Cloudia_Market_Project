@@ -63,7 +63,7 @@
   }
 }
 
-/* 모바일 및 태블릿: 0 ~ 1023px */
+/* TB: 0 ~ 1023px */
 @media screen and (max-width: 1023px) {
   .cart-notice-banner {
     font-size: 12px;

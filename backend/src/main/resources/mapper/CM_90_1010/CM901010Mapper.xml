@@ -23,19 +23,13 @@
              , ic.answer_completed
         FROM   ( SELECT count(*) AS new_order
                    FROM orders
-                  WHERE order_status_value in (1,2) 
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) ono,
+                  WHERE order_status_value in (1,2) ) ono,
                ( SELECT count(*) AS payment_pending
                    FROM orders
-                  WHERE order_status_value = 1 
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) opp,
+                  WHERE order_status_value = 1 ) opp,
                ( SELECT count(*) AS purchase_confirmed
                    FROM orders
-                  WHERE order_status_value = 2 
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) opc,
+                  WHERE order_status_value = 2 ) opc,
                ( SELECT count(*) AS exchange_requested
                    FROM returns
                   WHERE return_status_value = 1 ) rexp,
@@ -44,9 +38,7 @@
                   WHERE return_status_value = 2 ) reip,
                ( SELECT count(*) AS exchange_completed
                    FROM returns
-                  WHERE return_status_value = 3 
-                    AND completed_at <![CDATA[>=]]> #{startDate}::date
-                    AND completed_at <![CDATA[<=]]> #{EndDate}::date ) rec,
+                  WHERE return_status_value = 3 ) rec,
                ( SELECT count(*) AS refund_requested
                    FROM returns
                   WHERE return_status_value = 4 ) rr,
@@ -55,35 +47,25 @@
                   WHERE return_status_value = 5 ) rrip,
                ( SELECT count(*) AS refund_completed
                    FROM returns
-                  WHERE return_status_value = 6 
-                    AND completed_at <![CDATA[>=]]> #{startDate}::date
-                    AND completed_at <![CDATA[<=]]> #{EndDate}::date ) rrc,
+                  WHERE return_status_value = 6 ) rrc,
                ( SELECT count(*) AS preparing_shipment
                    FROM orders
                   WHERE order_status_value = 3 ) ps,
                ( SELECT count(*) AS in_transit
                    FROM orders
-                  WHERE order_status_value = 4
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) it,
+                  WHERE order_status_value = 4 ) it,
                ( SELECT count(*) AS delivered
                    FROM orders
-                  WHERE order_status_value = 5
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) d,
+                  WHERE order_status_value = 5 ) d,
                ( SELECT count(*) AS cancel_requested
                    FROM orders
-                  WHERE order_status_value in (6,7) 
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<=]]> #{EndDate}::date ) ocr,
+                  WHERE order_status_value in (6,7) ) ocr,
                ( SELECT count(*) AS answer_pending
                    FROM inquiries
                   WHERE inquiry_status_value = 1 ) ip,
                ( SELECT count(*) AS answer_completed
                    FROM inquiries
-                  WHERE inquiry_status_value = 2
-                    AND updated_at <![CDATA[>=]]> #{startDate}::date
-                    AND updated_at <![CDATA[<=]]> #{EndDate}::date ) ic
+                  WHERE inquiry_status_value = 2 ) ic
     </select>
 
     <select id="getWeeklySales" resultType="com.cloudia.backend.CM_90_1010.model.WeeklySales">
@@ -104,10 +86,10 @@
         FROM   days d
         LEFT JOIN 
                orders o 
-        ON     EXTRACT(DOW FROM o.order_date) = d.day_num
+        ON     EXTRACT(DOW FROM COALESCE(o.order_date, o.created_at)) = d.day_num
         AND    o.order_status_value in (3,4,5)
-        AND    o.order_date <![CDATA[>=]]> #{startDate}::date
-        AND    o.order_date <![CDATA[<=]]> #{EndDate}::date
+        AND    COALESCE(o.order_date, o.created_at) <![CDATA[>=]]> #{startDate}::date
+        AND    COALESCE(o.order_date, o.created_at) <![CDATA[<=]]> #{endDate}::date
         GROUP BY d.day_num
             , day_of_week
         ORDER BY d.day_num
@@ -124,37 +106,37 @@
         FROM   ( SELECT sum(total_amount) AS previous_net_sales
                    FROM orders
                   WHERE order_status_value in (3,4,5) 
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<]]> #{EndDate}::date ) pns,
+                    AND COALESCE(order_date, created_at) <![CDATA[>=]]> #{startDate}::date
+                    AND COALESCE(order_date, created_at) <![CDATA[<]]> #{endDate}::date ) pns,
                 ( SELECT sum(total_amount) AS settlement_amount
                    FROM orders
                   WHERE order_status_value in (3,4,5) 
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<]]> #{EndDate}::date ) sa,
+                    AND COALESCE(order_date, created_at) <![CDATA[>=]]> #{startDate}::date
+                    AND COALESCE(order_date, created_at) <![CDATA[<]]> #{endDate}::date ) sa,
                 ( SELECT sum(total_amount) AS refund_amount
                    FROM returns
                   WHERE return_status_value = 3
                     AND completed_at <![CDATA[>=]]> #{startDate}::date
-                    AND completed_at <![CDATA[<]]> #{EndDate}::date ) ra,
+                    AND completed_at <![CDATA[<]]> #{endDate}::date ) ra,
                 ( SELECT count(*) AS order_count
                    FROM orders
                   WHERE order_status_value in (1,2) 
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<]]> #{EndDate}::date ) oc,
+                    AND COALESCE(order_date, created_at) <![CDATA[>=]]> #{startDate}::date
+                    AND COALESCE(order_date, created_at) <![CDATA[<]]> #{endDate}::date ) oc,
                 ( SELECT count(*) AS refund_count
                    FROM returns
                   WHERE return_status_value = 3
                     AND completed_at <![CDATA[>=]]> #{startDate}::date
-                    AND completed_at <![CDATA[<]]> #{EndDate}::date ) rc,
+                    AND completed_at <![CDATA[<]]> #{endDate}::date ) rc,
                ( SELECT count(*) AS shipment_processed_count
                    FROM orders
                   WHERE order_status_value = 4
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<]]> #{EndDate}::date ) spc,
+                    AND COALESCE(order_date, created_at) <![CDATA[>=]]> #{startDate}::date
+                    AND COALESCE(order_date, created_at) <![CDATA[<]]> #{endDate}::date ) spc,
                ( SELECT count(*) AS delivered_count
                    FROM orders
                   WHERE order_status_value = 5
-                    AND order_date <![CDATA[>=]]> #{startDate}::date
-                    AND order_date <![CDATA[<]]> #{EndDate}::date ) dc
+                    AND COALESCE(order_date, created_at) <![CDATA[>=]]> #{startDate}::date
+                    AND COALESCE(order_date, created_at) <![CDATA[<]]> #{endDate}::date ) dc
     </select>
 </mapper>

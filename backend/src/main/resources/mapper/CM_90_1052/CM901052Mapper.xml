@@ -27,7 +27,9 @@
     <select id="getRefunds" resultType="com.cloudia.backend.CM_90_1052.model.ReturnsDto">
         SELECT return_id AS return_id
              , order_number AS order_no
+             , order_number AS order_number
              , member_number AS customer_id
+             , member_number AS member_number
              , return_status_value
              , requested_at
              , completed_at
@@ -39,14 +41,16 @@
              , shipping_fee_seller_amount
              , refund_amount
           FROM returns
-         WHERE return_status_value IN (2,3,4,5)
-           AND is_display = '1'
+         WHERE return_status_value IN (1,2,3,4,5)
+           AND COALESCE(CAST(is_display AS TEXT), '1') = '1'
     </select>
 
     <select id="getPeriod" resultType="com.cloudia.backend.CM_90_1052.model.ReturnsDto">
         SELECT return_id AS return_id
              , order_number AS order_no
+             , order_number AS order_number
              , member_number AS customer_id
+             , member_number AS member_number
              , return_status_value
              , requested_at
              , completed_at
@@ -58,8 +62,8 @@
              , shipping_fee_seller_amount
              , refund_amount
           FROM returns
-         WHERE return_status_value IN (2,3,4,5)
-           AND is_display = '1'
+         WHERE return_status_value IN (1,2,3,4,5)
+           AND COALESCE(CAST(is_display AS TEXT), '1') = '1'
            AND requested_at::date <![CDATA[>=]]> #{dateFrom}::date
            AND requested_at::date <![CDATA[<=]]> #{dateTo}::date
     </select>

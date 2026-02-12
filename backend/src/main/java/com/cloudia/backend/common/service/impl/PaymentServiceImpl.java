@@ -362,10 +362,10 @@ public class PaymentServiceImpl implements PaymentService {
             return "";
         }
         if ("BANK".equalsIgnoreCase(paymentMethod)) {
-            return "계좌이체";
+            return "銀行振込";
         }
         if ("CARD".equalsIgnoreCase(paymentMethod)) {
-            return "신용카드";
+            return "クレジットカード";
         }
         return paymentMethod;
     }
@@ -378,16 +378,16 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     /**
-     * CANCEL — PG 취소 + DB 업데이트
+     * キャンセル — PGキャンセル + DB更新
      * 
-     * @param request PG 취소 요청 객체
-     * @return PG 취소 결과와 관련 정보
+     * @param request PGキャンセルリクエストオブジェクト
+     * @return PGキャンセル結果および関連情報
      */
     @Override
     @Transactional
     public ResponseModel<Map<String, Object>> cancel(PGCancelRequest request) {
         try {
-            log.info("[결제 취소] 시작: orderId={}, tid={}", request.getOrderId(), request.getTid());
+            log.info("[決済キャンセル] 開始： orderId={}, tid={}", request.getOrderId(), request.getTid());
 
             PGProvider provider = providerRegistry.getProvider(request.getPgType());
             PGResult result = provider.cancel(request);
@@ -422,17 +422,17 @@ public class PaymentServiceImpl implements PaymentService {
 
             return ResponseModel.<Map<String, Object>>builder()
                     .result(false)
-                    .message("PG 취소 중 오류 발생: " + e.getMessage())
+                    .message("PGキャンセル中のエラー発生: " + e.getMessage())
                     .resultList(null)
                     .build();
         }
     }
 
     /**
-     * FAIL — 내부 실패 처리(사용자 닫힘/PG 실패 리다이렉트 등)
+     * FAIL — 内部失敗処理（ユーザー閉じる／PG失敗リダイレクトなど）
      * 
-     * @param request 실패 처리 요청 객체
-     * @return 처리 결과
+     * @param request 失敗 処理 リクエスト オブジェクト
+     * @return 処理結果
      */
     @Override
     @Transactional

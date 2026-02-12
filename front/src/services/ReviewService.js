@@ -1,17 +1,17 @@
 import axiosInstance from '../services/axiosInstance';
 
-// 리뷰 목록 조회
+// レビュー一覧取得
 export const fetchReviews = async () => {
   try {
     const res = await axiosInstance.get(`${import.meta.env.VITE_API_BASE_URL}/guest/reviews`);
     return res.data?.resultList || [];
   } catch (error) {
-    console.error('리뷰 목록 조회 중 오류 발생:', error);
+    console.error('レビュー一覧取得中にエラーが発生しました:', error);
     return [];
   }
 };
 
-// 리뷰 상세 조회
+// レビュー詳細取得
 export const fetchReviewDetail = async (reviewId) => {
   try {
     const res = await axiosInstance.get(
@@ -19,12 +19,12 @@ export const fetchReviewDetail = async (reviewId) => {
     );
     return res.data || null;
   } catch (error) {
-    console.error(`리뷰 상세 조회 중 오류 발생 (ID: ${reviewId}):`, error);
+    console.error(`レビュー詳細取得中にエラーが発生しました (ID: ${reviewId}):`, error);
     return null;
   }
 };
 
-// 리뷰 작성 (본문 + 메인 이미지)
+// レビュー作成（本文 + メイン画像）
 export const createReview = async (body) => {
   try {
     const formData =
@@ -37,7 +37,7 @@ export const createReview = async (body) => {
             return acc;
           }, new FormData());
 
-    // Content-Type 수동 지정 제거 (axios가 boundary 포함해서 자동 설정)
+    // Content-Type の手動指定を削除（axios が boundary を含めて自動設定）
     const res = await axiosInstance.post(
       `${import.meta.env.VITE_API_BASE_URL}/guest/reviews/upload`,
       formData
@@ -45,19 +45,19 @@ export const createReview = async (body) => {
 
     if (res.data?.result) {
       return {
-        reviewId: res.data.resultList ?? null, // 서버는 resultList에 reviewId 반환
+        reviewId: res.data.resultList ?? null,
         message: res.data.message,
       };
     }
 
-    throw new Error(res.data?.message || '리뷰 저장에 실패했습니다.');
+    throw new Error(res.data?.message || 'レビューの保存に失敗しました。');
   } catch (error) {
-    console.error('리뷰 작성 중 오류 발생:', error);
+    console.error('レビュー作成中にエラーが発生しました:', error);
     throw error;
   }
 };
 
-// 리뷰 수정 (본문 + 이미지)
+// レビュー更新（本文 + 画像）
 export const updateReview = async (reviewId, body) => {
   try {
     const formData = new FormData();
@@ -69,7 +69,7 @@ export const updateReview = async (reviewId, body) => {
       }
     }
 
-    // 여기서도 Content-Type 수동 지정 제거
+    // ここでも Content-Type の手動指定は不要
     const res = await axiosInstance.post(
       `${import.meta.env.VITE_API_BASE_URL}/guest/reviews/update`,
       formData
@@ -77,12 +77,12 @@ export const updateReview = async (reviewId, body) => {
 
     return res.data || null;
   } catch (error) {
-    console.error(`리뷰 수정 중 오류 발생 (ID: ${reviewId}):`, error);
+    console.error(`レビュー更新中にエラーが発生しました (ID: ${reviewId}):`, error);
     return null;
   }
 };
 
-// 리뷰 삭제
+// レビュー削除
 export const deleteReview = async (reviewId) => {
   try {
     const res = await axiosInstance.delete(
@@ -90,12 +90,12 @@ export const deleteReview = async (reviewId) => {
     );
     return res.data;
   } catch (err) {
-    console.error(`리뷰 삭제 중 오류 발생 (ID: ${reviewId}):`, err);
+    console.error(`レビュー削除中にエラーが発生しました (ID: ${reviewId}):`, err);
     throw err;
   }
 };
 
-// 주문 + 상품 목록 조회
+// 注文 + 商品一覧取得
 export const fetchOrdersWithProducts = async (memberNumber) => {
   try {
     const formatOrderNumber = (value) => {
@@ -130,12 +130,12 @@ export const fetchOrdersWithProducts = async (memberNumber) => {
       products: order.products || [],
     }));
   } catch (error) {
-    console.error('주문 및 상품 목록 조회 중 오류 발생:', error);
+    console.error('注文および商品一覧取得中にエラーが発生しました:', error);
     return [];
   }
 };
 
-// 조회수 증가 (하루 1회)
+// 閲覧数を増加（1日1回）
 export const increaseReviewView = async (reviewId) => {
   try {
     const res = await axiosInstance.post(
@@ -143,50 +143,50 @@ export const increaseReviewView = async (reviewId) => {
     );
     return res.data || null;
   } catch (error) {
-    console.error(`리뷰 조회수 증가 중 오류 발생 (ID: ${reviewId}):`, error);
+    console.error(`レビュー閲覧数増加中にエラーが発生しました (ID: ${reviewId}):`, error);
     return null;
   }
 };
 
-// 에디터 이미지 업로드
+// エディター画像アップロード
 export const uploadReviewEditorImage = async (file) => {
   try {
     if (!file) {
-      console.error('에디터 이미지 업로드 중 오류 발생: file이 없습니다.');
+      console.error('エディター画像アップロード中にエラーが発生しました: file がありません。');
       return null;
     }
 
     const formData = new FormData();
-    formData.append('file', file); // 백엔드 @RequestParam("file") 과 동일 키
+    formData.append('file', file); // バックエンド @RequestParam("file") と同じキー
 
-    // Content-Type 직접 지정 X
+    // Content-Type を直接指定しない
     const res = await axiosInstance.post(
       `${import.meta.env.VITE_API_BASE_URL}/guest/reviews/image/upload`,
       formData
     );
 
-    // 서버는 ResponseModel<String> 이라서 resultList(또는 result) 사용
+    // サーバーは ResponseModel<String> のため resultList（または result）を使用
     return res.data?.resultList ?? res.data?.result ?? null;
   } catch (error) {
-    console.error('에디터 이미지 업로드 중 오류 발생:', error);
+    console.error('エディター画像アップロード中にエラーが発生しました:', error);
     return null;
   }
 };
 
-// 메인 이미지 업로드 POST /guest/reviews/{reviewId}/image
+// メイン画像アップロード POST /guest/reviews/{reviewId}/image
 export const uploadReviewMainImage = async (reviewId, file) => {
   try {
     if (!reviewId || !file) {
       console.error(
-        `메인 이미지 업로드 중 오류 발생: reviewId 또는 file이 없습니다. (reviewId: ${reviewId})`
+        `メイン画像アップロード中にエラーが発生しました: reviewId または file がありません。 (reviewId: ${reviewId})`
       );
       return null;
     }
 
     const formData = new FormData();
-    formData.append('file', file); // 백엔드 @RequestParam("file") 와 매칭
+    formData.append('file', file); // バックエンド @RequestParam("file") と一致
 
-    // Content-Type 직접 지정 X
+    // Content-Type を直接指定しない
     const res = await axiosInstance.post(
       `${import.meta.env.VITE_API_BASE_URL}/guest/reviews/${reviewId}/image`,
       formData
@@ -194,12 +194,12 @@ export const uploadReviewMainImage = async (reviewId, file) => {
 
     return res.data?.resultList ?? res.data?.result ?? null;
   } catch (error) {
-    console.error(`메인 이미지 업로드 중 오류 발생 (리뷰 ID: ${reviewId}):`, error);
+    console.error(`メイン画像アップロード中にエラーが発生しました (レビューID: ${reviewId}):`, error);
     return null;
   }
 };
 
-// 리뷰 이미지 삭제 (main/editor 공통)
+// レビュー画像削除（main/editor 共通）
 export const deleteReviewImage = async (reviewId, imageId) => {
   try {
     const res = await axiosInstance.delete(
@@ -208,29 +208,29 @@ export const deleteReviewImage = async (reviewId, imageId) => {
     return res.data || null;
   } catch (error) {
     console.error(
-      `리뷰 이미지 삭제 중 오류 발생 (리뷰 ID: ${reviewId}, 이미지 ID: ${imageId}):`,
+      `レビュー画像削除中にエラーが発生しました (レビューID: ${reviewId}, 画像ID: ${imageId}):`,
       error
     );
     return null;
   }
 };
 
-// 이미지 URL 안전 병합 함수 (env.local=/images 유지 가능)
+// 画像URLの安全な結合関数（env.local=/images を維持可能）
 export const buildImageUrl = (rawUrl) => {
   const base = import.meta.env.VITE_API_BASE_IMAGE_URL || '';
 
   if (!rawUrl) return '';
 
-  // 둘 다 /images 인 경우 중복 제거
+  // 両方が /images の場合は重複を除去
   if (rawUrl.startsWith('/images/') && base.endsWith('/images')) {
     return base.replace(/\/images$/, '') + rawUrl;
   }
 
-  // rawUrl 이 / 로 시작하면 그냥 base + rawUrl
+  // rawUrl が / で始まる場合は base + rawUrl
   if (rawUrl.startsWith('/')) {
     return base + rawUrl;
   }
 
-  // 일반 조합
+  // 通常の結合
   return `${base}/${rawUrl}`;
 };

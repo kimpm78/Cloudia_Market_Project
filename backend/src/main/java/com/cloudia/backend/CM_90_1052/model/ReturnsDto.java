@@ -19,7 +19,9 @@ import lombok.ToString;
 public class ReturnsDto {
     private int returnId;                   // 返品ID
     private String orderNo;                 // 要求番号
+    private String orderNumber;             // 購入番号
     private String customerId;              // 社員番号
+    private String memberNumber;            // 会員番号
     private LocalDateTime completedAt;      // 交換/返金完了日
     private String reason;                  // メモ
     private int totalAmount;                // 合計返金額

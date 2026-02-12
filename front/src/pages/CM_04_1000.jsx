@@ -102,10 +102,21 @@ export default function CM_04_1000() {
   );
 
   const columnDefs = useMemo(() => {
-    const imageWidth = isMobile ? 160 : 200;
+    const imageWidth = isMobile ? 160 : 220;
     const imageStyle = {
-      width: isMobile ? '140px' : '180px',
-      height: isMobile ? '100px' : '100px',
+      width: '100%',
+      height: '100%',
+    };
+    const frameStyle = {
+      width: isMobile ? '140px' : '190px',
+      height: isMobile ? '96px' : '108px',
+      borderRadius: '6px',
+      overflow: 'hidden',
+      backgroundColor: '#f8f9fa',
+      border: '1px solid #eceff1',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     };
 
     const imageColumn = {
@@ -125,20 +136,23 @@ export default function CM_04_1000() {
         const imageUrl = rawUrl ? buildImageUrl(rawUrl) : noImage;
 
         return (
-          <img
-            src={imageUrl}
-            alt="サムネイル"
-            style={{
-              ...imageStyle,
-              objectFit: 'cover',
-              boxSizing: 'border-box',
-              display: 'block',
-            }}
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = noImage;
-            }}
-          />
+          <div style={frameStyle}>
+            <img
+              src={imageUrl}
+              alt="サムネイル"
+              style={{
+                ...imageStyle,
+                objectFit: 'contain',
+                objectPosition: 'center',
+                boxSizing: 'border-box',
+                display: 'block',
+              }}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = noImage;
+              }}
+            />
+          </div>
         );
       },
     };

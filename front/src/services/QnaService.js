@@ -4,7 +4,7 @@ const buildError = (response) => {
   if (response?.message) {
     return new Error(response.message);
   }
-  return new Error('요청 처리 중 오류가 발생했습니다.');
+  return new Error('リクエスト処理中にエラーが発生しました。');
 };
 
 export const fetchQnaList = async ({ page = 1, size = 25, searchType = 1, keyword = '', signal } = {}) => {
@@ -21,7 +21,7 @@ export const fetchQnaList = async ({ page = 1, size = 25, searchType = 1, keywor
 };
 
 export const fetchQnaDetail = async (qnaId, { signal } = {}) => {
-  if (!qnaId) throw new Error('qnaId가 필요합니다.');
+  if (!qnaId) throw new Error('qnaId が必要です。');
   const config = signal ? { signal } : undefined;
   const { data } = await axiosInstance.get(`/guest/qna/${qnaId}`, config);
   if (!data?.result) {
@@ -39,7 +39,7 @@ export const createQna = async (payload) => {
 };
 
 export const answerQna = async (qnaId, answerContent) => {
-  if (!qnaId) throw new Error('qnaId가 필요합니다.');
+  if (!qnaId) throw new Error('qnaId が必要です。');
   const { data } = await axiosInstance.post(`/admin/qna/${qnaId}/answer`, {
     answerContent,
   });
@@ -60,7 +60,7 @@ export const fetchRecentQna = async ({ size = 5, productId } = {}) => {
 };
 
 export const deleteQna = async (qnaId) => {
-  if (!qnaId) throw new Error('qnaId가 필요합니다.');
+  if (!qnaId) throw new Error('qnaId が必要です。');
   const { data } = await axiosInstance.delete(`/user/qna/${qnaId}`);
   if (!data?.result) {
     throw buildError(data);

@@ -470,7 +470,7 @@ export default function CM_90_1021() {
   const nationalityOptions = useMemo(() => {
     return countries.map((country) => ({
       value: country.name.en,
-      label: country.name.kr,
+      label: country.name.jp || country.name.en,
     }));
   }, [countries]);
 
@@ -564,7 +564,7 @@ export default function CM_90_1021() {
   return (
     <div className="d-flex flex-grow-1">
       <div className="content-wrapper p-3">
-        <h2 className="border-bottom pb-2 mb-3">{memberId} 照会／修正</h2>
+        <h2 className="border-bottom pb-2 mb-3">{memberId} 照会/修正</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="row">

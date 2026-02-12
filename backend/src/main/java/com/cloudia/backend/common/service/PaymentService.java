@@ -10,59 +10,59 @@ import com.cloudia.backend.common.model.pg.PGReadyRequest;
 import java.util.Map;
 
 /**
- * 결제 서비스 (PG 연동 공통 처리)
- * 각 PGProvider(쿠키페이 등)의 구현체는 PGProviderRegistry를 통해 선택됨
+ * 決済サービス（PG連携の共通処理）
+ * 各PGProvider（CookiePay 等）の実装は PGProviderRegistry により選択される
  */
 public interface PaymentService {
 
     /**
-     * PG 결제요청 (결제창 진입)
+     * PG決済リクエスト（決済画面へ遷移）
      *
-     * @param request PG 결제 준비 요청정보
-     * @return ResponseModel (PG ready 결과 + redirect/form 구성 데이터)
+     * @param request PG決済準備リクエスト情報
+     * @return ResponseModel（PG ready 結果 + redirect/form 構成データ）
      */
     ResponseModel<Map<String, Object>> ready(PGReadyRequest request);
 
 
     /**
-     * 결제 승인/검증 단계
+     * 決済承認／検証ステップ
      *
-     * @param request PG 승인 요청 정보
-     * @return ResponseModel (결제 승인 결과)
+     * @param request PG承認リクエスト情報
+     * @return ResponseModel（決済承認結果）
      */
     ResponseModel<Map<String, Object>> approve(PGApproveRequest request);
 
 
     /**
-     * 결제 취소 처리
+     * 決済キャンセル処理
      *
-     * @param request 취소 요청 정보
-     * @return ResponseModel (취소 결과)
+     * @param request キャンセルリクエスト情報
+     * @return ResponseModel（キャンセル結果）
      */
     ResponseModel<Map<String, Object>> cancel(PGCancelRequest request);
 
     /**
-     * 결제 실패(또는 사용자 닫힘) 처리
+     * 決済失敗（またはユーザーが画面を閉じた場合）の処理
      *
-     * @param request 실패 처리 요청 정보
-     * @return ResponseModel (실패 처리 결과)
+     * @param request 失敗処理リクエスト情報
+     * @return ResponseModel（失敗処理結果）
      */
     ResponseModel<Map<String, Object>> fail(PGFailRequest request);
 
 
     /**
-     * PG CALLBACK(RETURN URL) 처리
+     * PG CALLBACK（RETURN URL）処理
      *
-     * @param queryParams PG에서 전달되는 파라미터 (encData, orderNo 등)
-     * @return ResponseModel (callback 처리 결과 반환)
+     * @param queryParams PGから渡されるパラメータ（encData, orderNo など）
+     * @return ResponseModel（callback 処理結果）
      */
     ResponseModel<Map<String, Object>> callback(Map<String, String> queryParams);
 
     /**
-     * PG ENC_DATA 복호화
+     * PG ENC_DATA の復号
      *
-     * @param request 복호화 요청 정보
-     * @return ResponseModel (복호화 결과)
+     * @param request 復号リクエスト情報
+     * @return ResponseModel（復号結果）
      */
     ResponseModel<Map<String, Object>> decrypt(PGDecryptRequest request);
 }

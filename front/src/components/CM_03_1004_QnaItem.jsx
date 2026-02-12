@@ -3,6 +3,18 @@ export default function QnaItem({ item, index, open, toggle }) {
 
   const { status, question, name, date, detail, answer, answerDate, secret } = item;
 
+  // 表示用ステータス（既存データが韓国語の場合も考慮）
+  const statusLabelMap = {
+    '답변 완료': '回答済み',
+    '답변 대기': '回答待ち',
+  };
+  const displayStatus = statusLabelMap[status] ?? status;
+  const isAnswered = status === '답변 완료' || status === '回答済み' || status === '回答完了';
+
+  // 作成者名（既存データが韓国語の場合も考慮）
+  const isPrivateName = name === '비공개' || name === '非公開';
+  const displayName = isPrivateName ? '投稿者非公開' : name;
+
   return (
     <div className="py-1">
       <div
@@ -20,8 +32,8 @@ export default function QnaItem({ item, index, open, toggle }) {
         style={{ cursor: 'pointer', background: '#f9f9f9' }}
       >
         <div className="d-flex gap-3">
-          <span className={`fw-bold ${status === '답변 완료' ? 'text-success' : 'text-primary'}`}>
-            {status}
+          <span className={`fw-bold ${isAnswered ? 'text-success' : 'text-primary'}`}>
+            {displayStatus}
           </span>
           <span>
             {secret ? (
@@ -35,7 +47,7 @@ export default function QnaItem({ item, index, open, toggle }) {
           </span>
         </div>
         <div className="d-flex gap-3 small text-muted">
-          <span>{name === '비공개' ? '작성자 비공개' : name}</span>
+          <span>{displayName}</span>
           <span>{date}</span>
         </div>
       </div>
@@ -54,14 +66,14 @@ export default function QnaItem({ item, index, open, toggle }) {
           {!secret && answer ? (
             <>
               <hr className="my-3" />
-              <p className="fw-bold mt-3">답변</p>
+              <p className="fw-bold mt-3">回答</p>
               <pre className="text-primary mb-0 fs-6" style={{ whiteSpace: 'pre-wrap' }}>
                 {answer}
               </pre>
               <p className="text-end small mt-2">{answerDate}</p>
             </>
           ) : !secret ? (
-            <p className="text-muted">답변이 아직 등록되지 않았습니다.</p>
+            <p className="text-muted">回答はまだ登録されていません。</p>
           ) : null}
         </div>
       )}

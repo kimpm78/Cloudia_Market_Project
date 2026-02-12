@@ -29,9 +29,9 @@ public class DateCalculator {
     private final UtilMapper utilMapper;
 
     /**
-     * 일본 현재 시간 취득
+     * 日本の現在日時を取得
      *
-     * @return yyyy/MM/dd hh:mm:ss 도쿄 시간
+     * @return yyyy/MM/dd hh:mm:ss（東京時間）
      */
     public LocalDateTime tokyoTime() {
         LocalDateTime tokyoTime = LocalDateTime.now(ZoneId.of("Asia/Tokyo"));
@@ -40,9 +40,9 @@ public class DateCalculator {
     }
 
     /**
-     * 일본 현재 시간 취득
+     * 日本の現在日付を取得
      *
-     * @return yyyy-MM-dd 도쿄 시간
+     * @return yyyy-MM-dd（東京時間）
      */
     public String DateString() {
         String dateStr = tokyoTime().format(DateTimeFormatter.ofPattern(DATE_FORMAT));
@@ -51,37 +51,46 @@ public class DateCalculator {
     }
 
     /**
-     * 영업일 N일 후 (시작일 포함)
+     * 営業日でN日後（開始日を含む）
      * 
-     * @param inputDate 시작 날짜 (yyyy-MM-dd)
-     * @param days      영업일 수
-     * @return N 영업일째 날짜 (yyyy-MM-dd)
+     * @param inputDate 開始日（yyyy-MM-dd）
+     * @param days      営業日数
+     * @return N営業日目の日付（yyyy-MM-dd）
      */
     public String calculateBusinessDay(String inputDate, int days) {
+        if (days <= 0) {
+            return inputDate;
+        }
+
+        LocalDate current = LocalDate.parse(inputDate, DateTimeFormatter.ofPattern(DATE_FORMAT));
         int count = 0;
-        String currentDate = inputDate;
+        int safety = 0;
+        final int maxLoop = 3660; // 異常データ時の無限ループ防止（約10年分）
 
         while (count < days) {
-            // 토/일 또는 공휴일 체크
-            if (!checkWeekend(currentDate) && !checkHoliday(currentDate)) {
+            if (!checkWeekend(current) && !checkHoliday(current)) {
                 count++;
                 if (count == days) {
                     break;
                 }
             }
-            // 다음날
-            currentDate = nextDay(currentDate, 1);
+            current = current.plusDays(1);
+            safety++;
+            if (safety > maxLoop) {
+                throw new IllegalStateException("営業日計算のループ上限を超過しました。 inputDate=" + inputDate
+                        + ", days=" + days + ", current=" + current);
+            }
         }
 
-        return currentDate;
+        return current.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
     }
 
     /**
-     * N일 전후
+     * N日前／N日後
      * 
-     * @param inputDate
-     * @param days
-     * @return
+     * @param inputDate 基準日（yyyy-MM-dd）
+     * @param days      加算日数（負数: 過去、正数: 未来）
+     * @return 計算後の日付（yyyy-MM-dd）
      */
     public String nextDay(String inputDate, int days) {
         Calendar calendar = convartToCalendar(inputDate);
@@ -92,14 +101,28 @@ public class DateCalculator {
     }
 
     /**
-     * 공휴일 체크
+     * 祝日チェック
      * 
-     * @param inputDate yyyy-MM-dd 형식
-     * @return true: 공휴일, false: 평일
+     * @param inputDate yyyy-MM-dd 形式
+     * @return true: 祝日, false: 平日
      */
     private boolean checkHoliday(String inputDate) {
         try {
             LocalDate date = LocalDate.parse(inputDate, DateTimeFormatter.ofPattern(DATE_FORMAT));
+            return checkHoliday(date);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 祝日チェック（LocalDate）
+     *
+     * @param date 日付
+     * @return true: 祝日, false: 平日
+     */
+    private boolean checkHoliday(LocalDate date) {
+        try {
             return utilMapper.isHoliday(date, COUNTRY_CODE);
         } catch (Exception e) {
             return false;
@@ -107,10 +130,10 @@ public class DateCalculator {
     }
 
     /**
-     * 토일 체크
+     * 土日チェック
      *
-     * @param string 날짜
-     * @return 체크결과
+     * @param inputDate 日付
+     * @return チェック結果
      */
     private boolean checkWeekend(String inputDate) {
         Calendar calendar = convartToCalendar(inputDate);
@@ -123,9 +146,20 @@ public class DateCalculator {
     }
 
     /**
-     * 현재 주의 시작일(일요일) 취득
+     * 土日チェック（LocalDate）
      *
-     * @return 이번 주 일요일
+     * @param date 日付
+     * @return true: 土日, false: 平日
+     */
+    private boolean checkWeekend(LocalDate date) {
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
+    }
+
+    /**
+     * 今週の開始日（日曜日）を取得
+     *
+     * @return 今週の日曜日
      */
     public LocalDate getCurrentWeekStartDate() {
         LocalDate starDate = convertToLocalDate(tokyoTime());
@@ -133,9 +167,9 @@ public class DateCalculator {
     }
 
     /**
-     * 현재 주의 종료일(토요일) 취득
+     * 今週の終了日（土曜日）を取得
      *
-     * @return 이번 주 토요일
+     * @return 今週の土曜日
      */
     public LocalDate getCurrentWeekEndDate() {
         LocalDate endDate = convertToLocalDate(tokyoTime());
@@ -143,10 +177,10 @@ public class DateCalculator {
     }
 
     /**
-     * 해당 주의 시작일(일요일) 취득
+     * 指定週の開始日（日曜日）を取得
      *
-     * @param date 기준 날짜
-     * @return 해당 주의 일요일
+     * @param date 基準日
+     * @return 指定週の日曜日
      */
     public LocalDate getWeekStartDate(LocalDate date) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
@@ -155,10 +189,10 @@ public class DateCalculator {
     }
 
     /**
-     * 해당 주의 종료일(토요일) 취득
+     * 指定週の終了日（土曜日）を取得
      *
-     * @param date 기준 날짜
-     * @return 해당 주의 토요일
+     * @param date 基準日
+     * @return 指定週の土曜日
      */
     public LocalDate getWeekEndDate(LocalDate date) {
         LocalDate weekStart = getWeekStartDate(date);
@@ -166,27 +200,27 @@ public class DateCalculator {
     }
 
     /**
-     * 올해 1월 1일 취득
+     * 今年の1月1日を取得
      *
-     * @return 올해 1월 1일
+     * @return 今年の1月1日
      */
     public LocalDate getStartOfYear() {
         return convertToLocalDate(tokyoTime()).withMonth(1).withDayOfMonth(1);
     }
 
     /**
-     * 올해 12월 31일 취득
+     * 今年の12月31日を取得
      *
-     * @return 올해 12월 31일
+     * @return 今年の12月31日
      */
     public LocalDate getEndOfYear() {
         return convertToLocalDate(tokyoTime()).withMonth(12).withDayOfMonth(31);
     }
 
     /**
-     * 포맷 변환(LocalDate)
+     * 形式変換（LocalDate）
      * 
-     * @param inputDate 변환할 날짜시간
+     * @param inputDate 変換対象の日時
      * @return LocalDate
      */
     public LocalDate convertToLocalDate(LocalDateTime inputDate) {
@@ -194,10 +228,10 @@ public class DateCalculator {
     }
 
     /**
-     * 포맷 변환(String)
+     * 形式変換（String）
      *
-     * @param inputDate 변환할 날짜
-     * @return yyyy-MM-dd 형식의 문자열
+     * @param inputDate 変換対象の日付
+     * @return yyyy-MM-dd 形式の文字列
      */
     public String convertToYYYYMMDD(LocalDate inputDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
@@ -205,10 +239,10 @@ public class DateCalculator {
     }
 
     /**
-     * 포맷 변환(Calendar)
+     * 形式変換（Calendar）
      * 
-     * @param string 날짜
-     * @return 캘린더
+     * @param inputDate 日付
+     * @return Calendar
      */
     private Calendar convartToCalendar(String inputDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
@@ -224,10 +258,10 @@ public class DateCalculator {
     }
 
     /**
-     * 포맷 변환(String)
+     * 形式変換（String）
      * 
-     * @param calendar 캘린더
-     * @return yyyy-MM-dd 형식의 문자열
+     * @param calendar Calendar
+     * @return yyyy-MM-dd 形式の文字列
      */
     private String convartToString(Calendar calendar) {
         DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -236,10 +270,10 @@ public class DateCalculator {
     }
 
     /**
-     * 포맷 변환(String)
+     * 形式変換（String）
      * 
-     * @param inputDate 변환할 날짜시간
-     * @return yyyy-MM-dd 형식의 문자열
+     * @param inputDate 変換対象の日時
+     * @return yyyy-MM-dd 形式の文字列
      */
     public String convertToYYYYMMDD(LocalDateTime inputDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
@@ -247,17 +281,17 @@ public class DateCalculator {
     }
 
     /**
-     * 포맷 변환(String)
+     * 形式変換（String）
      * 
-     * @param inputDate 변환할 날짜시간
-     * @param days      영업일 수
+     * @param inputDate 変換対象の日時
+     * @param days      営業日数
      * @return yy/MM/dd(E)
      */
     public String convertToYYMMDD(LocalDateTime inputDate, int days) {
-        LocalDateTime targetDate = inputDate;
+        LocalDateTime targetDate = inputDate != null ? inputDate : tokyoTime();
 
         if (days != 0) {
-            String formattedDate = calculateBusinessDay(convertToYYYYMMDD(inputDate), days);
+            String formattedDate = calculateBusinessDay(convertToYYYYMMDD(targetDate), days);
             targetDate = LocalDate.parse(formattedDate).atStartOfDay();
         }
 
@@ -266,10 +300,10 @@ public class DateCalculator {
     }
 
     /**
-     * 입력 날짜가 현재 날짜 이후인지 확인
+     * 入力日付が現在日付以降かを判定
      * 
-     * @param inputDate 비교할 날짜 (yyyy-MM-dd 형식)
-     * @return 현재 날짜보다 미래면 true, 과거면 false
+     * @param inputDate 比較対象の日付（yyyy-MM-dd）
+     * @return 当日以降なら true、過去なら false
      */
     public boolean isFutureDate(String inputDate) {
         LocalDate input = LocalDate.parse(inputDate, DateTimeFormatter.ofPattern(DATE_FORMAT));
@@ -279,10 +313,10 @@ public class DateCalculator {
     }
 
     /**
-     * 입력 월이 현재 월 이후인지 확인
+     * 入力月が当月以降かを判定
      * 
-     * @param inputMonth 비교할 월 (yyyy-MM 형식)
-     * @return 현재 월보다 미래면 true, 과거면 false
+     * @param inputMonth 比較対象の月（yyyy-MM）
+     * @return 当月以降なら true、過去なら false
      */
     public boolean isFutureMonth(String inputMonth) {
         YearMonth input = YearMonth.parse(inputMonth, DateTimeFormatter.ofPattern(DATE_FORMAT_YYMM));

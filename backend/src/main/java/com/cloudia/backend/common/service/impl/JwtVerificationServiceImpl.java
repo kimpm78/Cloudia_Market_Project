@@ -53,12 +53,12 @@ public class JwtVerificationServiceImpl implements JwtVerificationService {
             String identifier = claims.get("identifier", String.class);
             String keyFromToken = claims.get("key", String.class);
 
-            // JWT에 포함된 키와 파라미터로 받은 키가 일치하는지 확인
+            // JWTに含まれるキーとパラメータで受け取ったキーが一致するか確認
             if (key == null || !key.equals(keyFromToken)) {
                 return null;
             }
 
-            // Redis에 저장된 키와 일치하는지 확인
+            // Redisに保存されたキーと一致するか確認
             String redisKey = KEY_PREFIX + identifier;
             String storedKey = redisTemplate.opsForValue().get(redisKey);
 
@@ -69,7 +69,7 @@ public class JwtVerificationServiceImpl implements JwtVerificationService {
 
             return null;
         } catch (Exception e) {
-            // JWT 파싱 실패 또는 유효하지 않은 토큰
+            // JWTのパース失敗、または無効なトークン
             return null;
         }
     }

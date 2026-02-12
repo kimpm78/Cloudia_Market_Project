@@ -47,7 +47,7 @@ export default function CM_01_1005_OrderHistoryTable({ orders, loading }) {
         width: isMobile ? 130 : 180,
         cellRenderer: (params) => (
           <div style={{ lineHeight: '1.4', paddingTop: '4px' }}>
-            <div className="text-dark small">{params.data.orderDate}</div>
+            <div className="text-dark small">{params.data.orderDate || '-'}</div>
             <div className="text-primary fw-bold text-truncate">{params.value}</div>
           </div>
         ),

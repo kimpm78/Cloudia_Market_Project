@@ -1,4 +1,4 @@
-/* 모바일: 0 ~ 767px */
+/* SP: 0 ~ 767px */
 @media (max-width: 767px) {
   .cm-searchbar {
     flex-wrap: nowrap;

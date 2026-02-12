@@ -64,25 +64,26 @@ export default function CM_90_1054() {
     try {
       open('loading');
 
-      // 첫 번째 차트 데이터
       const response1 = await axiosInstance.get('/admin/settlement/month-sales/chart1', {
         params: { startMonth, endMonth },
       });
 
-      // 두 번째 차트 데이터
       const response2 = await axiosInstance.get('/admin/settlement/month-sales/chart2', {
         params: { startMonth, endMonth },
       });
 
+      const chart1List = Array.isArray(response1?.data?.resultList) ? response1.data.resultList : [];
+      const chart2List = Array.isArray(response2?.data?.resultList) ? response2.data.resultList : [];
+
       setChartData1(
-        response1.data.resultList.map((item) => ({
+        chart1List.map((item) => ({
           label: item.month,
           value: item.totalAmount,
         }))
       );
 
       setChartData2(
-        response2.data.resultList.map((item) => ({
+        chart2List.map((item) => ({
           label: item.month,
           value: item.totalAmount,
         }))
@@ -100,7 +101,7 @@ export default function CM_90_1054() {
     if (startMonth && endMonth) {
       fetchData();
     }
-  }, []);
+  }, [startMonth, endMonth, fetchData]);
 
   // 1つ目のチャートデータ
   const chart1Data = useMemo(

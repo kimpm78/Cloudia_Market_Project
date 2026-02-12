@@ -1,9 +1,13 @@
 package com.cloudia.backend.CM_90_1051.service.impl;
 
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -131,7 +135,6 @@ public class CM901051ServiceImpl implements CM901051Service {
      * @return 成功可否
      */
     @Override
-    @Transactional
     public Integer uptStatus(SearchRequestDto searchRequest, String userId) {
         if (searchRequest == null) {
             LogHelper.log(LogMessage.COMMON_UPDATE_EMPTY, new String[] { "精算ステータス確認" });
@@ -158,16 +161,28 @@ public class CM901051ServiceImpl implements CM901051Service {
         int result = cm901051Mapper.uptStatus(entity);
 
         if (result > 0 && CM901051Constant.ORDER_STATUS_REMITTANCE_PENDING != searchRequest.getOrderStatusValue()) {
-            ResponseEntity<ResponseModel<Integer>> emailResult = processEmailByStatus(searchRequest, entity);
-            if (emailResult != null) {
-                LogHelper.log(LogMessage.COMMON_UPDATE_EMPTY, new String[] { "精算ステータス確認" });
-                throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE);
-            }
+            triggerEmailAsync(searchRequest, entity);
         }
 
         LogHelper.log(LogMessage.COMMON_UPDATE_SUCCESS, new String[] { "ユーザー一覧", entity.getMemberNumber() });
 
         return result;
+    }
+
+    private void triggerEmailAsync(SearchRequestDto searchRequest, OrderDto entity) {
+        CompletableFuture.runAsync(() -> {
+            ResponseEntity<ResponseModel<Integer>> emailResult = processEmailByStatus(searchRequest, entity);
+            if (emailResult != null) {
+                log.warn("メール送信失敗（注文ステータス更新は完了） - 注文番号: {}, メッセージ: {}",
+                        searchRequest.getOrderNumber(),
+                        emailResult.getBody() != null ? emailResult.getBody().getMessage() : "unknown");
+            }
+        }).exceptionally(ex -> {
+            log.warn("メール非同期送信中に予期しないエラー - 注文番号: {}, メッセージ: {}",
+                    searchRequest != null ? searchRequest.getOrderNumber() : "-",
+                    ex != null ? ex.getMessage() : "unknown");
+            return null;
+        });
     }
 
     /**
@@ -183,18 +198,41 @@ public class CM901051ServiceImpl implements CM901051Service {
         try {
             List<OrderDto> orders = cm901051Mapper.getFindOrders(searchRequest);
             List<OrderDetailDto> responseList = cm901051Mapper.getFindOrderDetail(searchRequest);
+            if (orders == null || orders.isEmpty() || orders.get(0) == null) {
+                log.warn("メール送信対象の注文情報が存在しません。注文番号: {}, 会員番号: {}",
+                        searchRequest != null ? searchRequest.getOrderNumber() : "-",
+                        searchRequest != null ? searchRequest.getMemberNumber() : "-");
+                return null;
+            }
+            if (responseList == null) {
+                responseList = Collections.emptyList();
+            }
+
+            OrderDto order = orders.get(0);
+            LocalDateTime orderDate = order.getOrderDate();
+            if (orderDate == null) {
+                orderDate = dateCalculator.tokyoTime();
+                log.warn("注文日がnullのため現在日時を使用します - 注文番号: {}", order.getOrderNumber());
+            }
+            if (order.getEmail() == null || order.getEmail().isBlank()) {
+                log.warn("顧客メールアドレスが存在しないためメール送信をスキップします。注文番号: {}",
+                        order.getOrderNumber());
+                return null;
+            }
+
+            ensureLocalCardTid(order, entity != null ? entity.getUpdatedBy() : null);
 
             EmailDto emailInfo = new EmailDto();
 
-            emailInfo.setOrderDate(dateCalculator.convertToYYMMDD(orders.get(0).getOrderDate(), 0));
-            emailInfo.setOrderNumber(orders.get(0).getOrderNumber());
-            emailInfo.setPaymentAmount(new DecimalFormat("#,###").format(orders.get(0).getTotalAmount()));
-            emailInfo.setSendEmail(orders.get(0).getEmail());
-            emailInfo.setName(orders.get(0).getName());
+            emailInfo.setOrderDate(dateCalculator.convertToYYMMDD(orderDate, 0));
+            emailInfo.setOrderNumber(order.getOrderNumber());
+            emailInfo.setPaymentAmount(formatAmount(order.getTotalAmount()));
+            emailInfo.setSendEmail(order.getEmail());
+            emailInfo.setName(order.getName());
 
-            if (CM901051Constant.PAYMENT_METHOD_BANK_TRANSFER == orders.get(0).getPaymentValue()) {
+            if (CM901051Constant.PAYMENT_METHOD_BANK_TRANSFER == order.getPaymentValue()) {
                 emailInfo.setPaymentMethod(CM901051Constant.PAYMENT_METHOD_BANK_TRANSFER_STRING);
-            } else if (CM901051Constant.PAYMENT_METHOD_CREDIT_CARD == orders.get(0).getPaymentValue()) {
+            } else if (CM901051Constant.PAYMENT_METHOD_CREDIT_CARD == order.getPaymentValue()) {
                 emailInfo.setPaymentMethod(CM901051Constant.PAYMENT_METHOD_CREDIT_CARD_STRING);
             }
 
@@ -237,7 +275,7 @@ public class CM901051ServiceImpl implements CM901051Service {
                             CM901051MessageConstant.EMAIL_SEND_FAILED_INPUT.replace("{}", iae.getMessage())));
         } catch (RuntimeException re) {
             log.error(CM901051MessageConstant.EMAIL_SEND_SYSTEM_ERROR, searchRequest.getOrderNumber(),
-                    re.getMessage());
+                    re.getMessage(), re);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(createResponseModel(0, false, CM901051MessageConstant.EMAIL_SEND_FAILED_SYSTEM));
 
@@ -248,6 +286,64 @@ public class CM901051ServiceImpl implements CM901051Service {
                     .body(createResponseModel(0, false, CM901051MessageConstant.EMAIL_SEND_FAILED_GENERAL));
         }
         return null;
+    }
+
+    private String formatAmount(Number amount) {
+        if (amount == null) {
+            return "0";
+        }
+        return new DecimalFormat("#,###").format(amount.longValue());
+    }
+
+    private void ensureLocalCardTid(OrderDto order, String updatedBy) {
+        if (order == null || order.getOrderId() == null) {
+            return;
+        }
+        if (order.getPaymentValue() == null
+                || CM901051Constant.PAYMENT_METHOD_CREDIT_CARD != order.getPaymentValue()) {
+            return;
+        }
+
+        try {
+            String currentTid = cm901051Mapper.findLatestTransactionIdByOrderId(order.getOrderId());
+            if (currentTid != null && !currentTid.isBlank()) {
+                return;
+            }
+
+            String mockTid = generateMockTid();
+            int updated = cm901051Mapper.updateLatestPaymentTransactionIdByOrderId(
+                    order.getOrderId(),
+                    mockTid,
+                    updatedBy);
+            if (updated > 0) {
+                log.info("ローカルカード決済の仮TIDを発行しました - 注文番号: {}, TID: {}",
+                        order.getOrderNumber(), mockTid);
+            } else {
+                int inserted = cm901051Mapper.insertLocalMockCardPaymentIfMissing(
+                        order.getOrderId(),
+                        mockTid,
+                        updatedBy);
+                if (inserted > 0) {
+                    log.info("ローカルカード決済モックを新規作成しました - 注文番号: {}, TID: {}",
+                            order.getOrderNumber(), mockTid);
+                } else {
+                    log.warn("ローカルカード決済TID更新対象がありません - 注文番号: {}", order.getOrderNumber());
+                }
+            }
+        } catch (Exception ex) {
+            log.warn("ローカルカード決済TID発行中にエラー - 注文番号: {}, メッセージ: {}",
+                    order.getOrderNumber(), ex.getMessage());
+        }
+    }
+
+    private String generateMockTid() {
+        final String prefix = dateCalculator.tokyoTime().format(DateTimeFormatter.ofPattern("yyMMddHHmmss"));
+        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder suffix = new StringBuilder(4);
+        for (int i = 0; i < 4; i++) {
+            suffix.append(chars.charAt(ThreadLocalRandom.current().nextInt(chars.length())));
+        }
+        return prefix + "GU00" + suffix;
     }
 
     /**
@@ -273,7 +369,8 @@ public class CM901051ServiceImpl implements CM901051Service {
      */
     private ResponseEntity<ResponseModel<Integer>> sendShippingPreparing(SearchRequestDto searchRequest,
             EmailDto emailInfo) {
-        emailInfo.setShippingDate(dateCalculator.convertToYYMMDD(dateCalculator.tokyoTime(), 3));
+        // 発送準備中メールは固定で3日後（暦日）を使用し、営業日計算ループ依存を避ける
+        emailInfo.setShippingDate(dateCalculator.convertToYYMMDD(dateCalculator.tokyoTime().plusDays(3), 0));
         return sendEmailWithOrderValidation(searchRequest, () -> {
             emailService.sendShippingPreparing(emailInfo);
         });
@@ -336,24 +433,8 @@ public class CM901051ServiceImpl implements CM901051Service {
             Runnable emailSender) {
         log.info(CM901051MessageConstant.EMAIL_VALIDATION);
         try {
-            List<OrderDto> orders = cm901051Mapper.getFindOrders(searchRequest);
-            if (orders != null && !orders.isEmpty()) {
-                OrderDto orderInfo = orders.get(0);
-
-                if (orderInfo == null) {
-                    log.error(CM901051MessageConstant.EMAIL_ORDER_INFO_QUERY_ERROR, searchRequest.getOrderNumber());
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body(createResponseModel(0, false,
-                                    CM901051MessageConstant.EMAIL_CUSTOMER_INFO_NOT_FOUND));
-                }
-
-                emailSender.run();
-                log.info(CM901051MessageConstant.EMAIL_SEND_SUCCESS, searchRequest.getOrderNumber());
-            } else {
-                log.error(CM901051MessageConstant.EMAIL_ORDER_QUERY_FAILED, searchRequest.getOrderNumber());
-                return ResponseEntity
-                        .ok(createResponseModel(null, false, CM901051MessageConstant.EMAIL_ORDER_INFO_NOT_FOUND));
-            }
+            emailSender.run();
+            log.info(CM901051MessageConstant.EMAIL_SEND_SUCCESS, searchRequest.getOrderNumber());
 
         } catch (IllegalArgumentException iae) {
             log.error(CM901051MessageConstant.EMAIL_SEND_INPUT_ERROR, searchRequest.getOrderNumber(),

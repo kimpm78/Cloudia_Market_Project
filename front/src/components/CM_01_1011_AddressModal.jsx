@@ -53,7 +53,11 @@ export default function CM_01_1011_AddressModal({
       onClose();
     } catch (error) {
       console.error('配送先の変更に失敗しました:', error);
-      alert('配送先の変更に失敗しました。');
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        '配送先の変更に失敗しました。';
+      alert(message);
     } finally {
       setLoading(false);
     }

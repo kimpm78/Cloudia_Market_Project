@@ -206,7 +206,7 @@ export default function CM_02_1000_board() {
                   <div className="review-img-wrapper me-3">
                     <img
                       className="review-img"
-                      src={buildImageUrl(review.imageUrl)}
+                      src={buildImageUrl(review.imageUrl) || noImage}
                       alt={`レビュー${idx}`}
                       onError={(e) => {
                         e.currentTarget.onerror = null;

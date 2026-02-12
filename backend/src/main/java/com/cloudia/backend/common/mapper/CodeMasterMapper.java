@@ -10,14 +10,14 @@ import com.cloudia.backend.common.model.CodeMaster;
 public interface CodeMasterMapper {
 
     /**
-     * 특정 이름을 가진 단일 코드를 조회
+     * 特定の名称を持つ単一コードを取得
      */
     CodeMaster findByCodeTypeAndName(
             @Param("codeType") String codeType,
             @Param("codeValue") int codeValue);
 
     /**
-     * 특정 codeType을 가진 코드 목록 전체를 조회
+     * 特定のcodeTypeを持つコード一覧を取得
      */
     List<CodeMaster> findByCodeType(@Param("codeType") String codeType);
 }

@@ -5,50 +5,72 @@
 
 <mapper namespace="com.cloudia.backend.CM_90_1050.mapper.CM901050Mapper">
     <select id="findByAllSales" resultType="com.cloudia.backend.CM_90_1050.model.ResultDto">
-        SELECT od.member_number
-              ,u.login_id
-              ,pc.product_name
-              ,od.unit_price
-              ,o.shipping_cost
-              ,o.discount_amount
-              ,s.price
-              ,o.order_date
-              ,od.quantity
+        SELECT od.member_number AS memberNumber
+              ,u.login_id AS loginId
+              ,pc.product_name AS productName
+              ,(
+                    COALESCE(od.unit_price, 0) * COALESCE(od.quantity, 0)
+                    + COALESCE(o.shipping_cost, 0)
+                    - COALESCE(s.price, 0) * COALESCE(od.quantity, 0)
+                    - COALESCE(o.discount_amount, 0)
+               ) AS totalAmount
+              ,od.unit_price AS unitPrice
+              ,COALESCE(o.shipping_cost, 0) AS shippingCost
+              ,COALESCE(o.discount_amount, 0) AS discountAmount
+              ,COALESCE(s.price, 0) AS price
+              ,COALESCE(o.order_date, o.created_at) AS orderDate
+              ,od.quantity AS quantity
         FROM  orders o
         LEFT JOIN order_details od
         ON    o.member_number = od.member_number
         AND   o.order_number = od.order_number
-        LEFT JOIN stocks s
-        ON    od.product_code = s.product_code
+        LEFT JOIN LATERAL (
+               SELECT st.price
+               FROM stocks st
+               WHERE st.product_code = od.product_code
+               ORDER BY st.updated_at DESC NULLS LAST
+               LIMIT 1
+        ) s ON TRUE
         LEFT JOIN product_code pc
-        ON    s.product_code = pc.product_code
+        ON    od.product_code = pc.product_code
         LEFT JOIN users u
         ON    o.member_number = u.member_number              
         ORDER BY 
                od.member_number
               ,od.order_number
-              ,order_detail_id DESC
+              ,od.order_detail_id DESC
     </select>
     <select id="getFindSales" 
             parameterType="com.cloudia.backend.CM_90_1050.model.SearchRequestDto" 
             resultType="com.cloudia.backend.CM_90_1050.model.ResultDto">
-        SELECT od.member_number
-              ,u.login_id
-              ,pc.product_name
-              ,od.unit_price
-              ,o.shipping_cost
-              ,o.discount_amount
-              ,s.price
-              ,o.order_date
-              ,od.quantity
+        SELECT od.member_number AS memberNumber
+              ,u.login_id AS loginId
+              ,pc.product_name AS productName
+              ,(
+                    COALESCE(od.unit_price, 0) * COALESCE(od.quantity, 0)
+                    + COALESCE(o.shipping_cost, 0)
+                    - COALESCE(s.price, 0) * COALESCE(od.quantity, 0)
+                    - COALESCE(o.discount_amount, 0)
+               ) AS totalAmount
+              ,od.unit_price AS unitPrice
+              ,COALESCE(o.shipping_cost, 0) AS shippingCost
+              ,COALESCE(o.discount_amount, 0) AS discountAmount
+              ,COALESCE(s.price, 0) AS price
+              ,COALESCE(o.order_date, o.created_at) AS orderDate
+              ,od.quantity AS quantity
         FROM  orders o
         LEFT JOIN order_details od
         ON    o.member_number = od.member_number
         AND   o.order_number = od.order_number
-        LEFT JOIN stocks s
-        ON    od.product_code = s.product_code
+        LEFT JOIN LATERAL (
+               SELECT st.price
+               FROM stocks st
+               WHERE st.product_code = od.product_code
+               ORDER BY st.updated_at DESC NULLS LAST
+               LIMIT 1
+        ) s ON TRUE
         LEFT JOIN product_code pc
-        ON    s.product_code = pc.product_code
+        ON    od.product_code = pc.product_code
         LEFT JOIN users u
         ON    o.member_number = u.member_number         
         WHERE 1=1
@@ -61,6 +83,6 @@
         ORDER BY 
                od.member_number
               ,od.order_number
-              ,order_detail_id DESC
+              ,od.order_detail_id DESC
     </select>
 </mapper>

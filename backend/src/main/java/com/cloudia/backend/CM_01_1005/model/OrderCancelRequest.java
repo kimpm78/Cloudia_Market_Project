@@ -17,7 +17,7 @@ public class OrderCancelRequest {
     private String orderNo;
     private String reason;
 
-    // 계좌이체 환불용 필드
+    // 銀行振込 返品用
     private String bankName;
     private String accountNumber;
     private String accountHolder;

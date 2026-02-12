@@ -35,11 +35,23 @@ const useModal = () => {
 };
 
 const useApiHandler = (navigate, openModal, closeModal) => {
+  const API_TIMEOUT_MS = 15000;
+
+  const withTimeout = (promise, timeoutMs = API_TIMEOUT_MS) =>
+    Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        window.setTimeout(() => {
+          reject(new Error('API_TIMEOUT'));
+        }, timeoutMs);
+      }),
+    ]);
+
   return useCallback(
     async (apiCall, showLoading = true) => {
       if (showLoading) openModal('loading');
       try {
-        return await apiCall();
+        return await withTimeout(apiCall());
       } catch (error) {
         openModal('error', CMMessage.MSG_ERR_001);
         throw error;
@@ -125,8 +137,6 @@ export default function CM_90_1051() {
         memberNumber: orderData.memberNumber,
         orderNumber: orderData.orderNumber,
         orderStatusValue: orderData.orderStatusValue,
-        dateFrom: orderData.orderDate,
-        dateTo: orderData.orderDate,
       };
       if (deliveryInfo) {
         searchRequestDto.carrier = deliveryInfo.carrier;

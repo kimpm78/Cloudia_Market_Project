@@ -32,7 +32,7 @@ public class CM901050Controller {
     @GetMapping("/findAll")
     public ResponseEntity<ResponseModel<List<ResultDto>>> findByAllSales() {
         List<ResultDto> result = cm901050Service.findByAllSales();
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "照会成功"));
     }
 
     /**
@@ -44,6 +44,6 @@ public class CM901050Controller {
     @GetMapping("/findSales")
     public ResponseEntity<ResponseModel<List<ResultDto>>> getFindSales(SearchRequestDto searchRequest) {
         List<ResultDto> result = cm901050Service.getFindSales(searchRequest);
-        return ResponseEntity.ok(ResponseHelper.success(result, "조회 성공"));
+        return ResponseEntity.ok(ResponseHelper.success(result, "照会成功"));
     }
 }

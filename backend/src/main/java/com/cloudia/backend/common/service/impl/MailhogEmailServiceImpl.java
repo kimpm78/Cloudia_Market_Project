@@ -1,5 +1,6 @@
 package com.cloudia.backend.common.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cloudia.backend.common.model.EmailDto;
 import com.cloudia.backend.common.service.EmailService;
@@ -14,8 +15,12 @@ import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +67,7 @@ public class MailhogEmailServiceImpl implements EmailService {
     @Override
     public String sendShippingPreparing(EmailDto emailInfo) {
         Map<String, String> templateData = new HashMap<>();
+        templateData.put("name", emailInfo.getName());
         templateData.put("orderNumber", emailInfo.getOrderNumber());
         templateData.put("shippingDate", emailInfo.getShippingDate());
         templateData.put("orderItems", emailInfo.getOrderItems());
@@ -155,17 +161,17 @@ public class MailhogEmailServiceImpl implements EmailService {
 
     @Override
     public void handleHardBounce(String email) {
-        log.warn("Hard Bounce 발생 - 이메일 주소 무효: {}", maskEmail(email));
+        log.warn("Hard Bounce 発生 - メールアドレス無効: {}", maskEmail(email));
     }
 
     @Override
     public void handleSoftBounce(String email) {
-        log.warn("Soft Bounce 발생 - 일시적 전송 실패: {}", maskEmail(email));
+        log.warn("Soft Bounce 発生 - 一時的な送信失敗: {}", maskEmail(email));
     }
 
     @Override
     public void handleComplaint(String email) {
-        log.warn("Complaint(스팸 신고) 발생 - 이메일: {}", maskEmail(email));
+        log.warn("Complaint（スパム報告）発生 - メール: {}", maskEmail(email));
     }
 
     @Override
@@ -199,6 +205,7 @@ public class MailhogEmailServiceImpl implements EmailService {
     private void sendMail(String to, String subject, String textBody, String htmlBody) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         boolean multipart = htmlBody != null && !htmlBody.isBlank();
+        log.info("メール本文形式: multipart={}, subject={}, to={}", multipart, subject, maskEmail(to));
         MimeMessageHelper helper = new MimeMessageHelper(message, multipart, StandardCharsets.UTF_8.name());
         helper.setFrom(fromEmail);
         helper.setTo(to);
@@ -213,46 +220,132 @@ public class MailhogEmailServiceImpl implements EmailService {
 
     private TemplateBody buildTemplateBody(String templateName, Map<String, String> templateData) throws Exception {
         String path = "mail-templates/" + templateName + ".json";
-        ClassPathResource resource = new ClassPathResource(path);
-
-        if (!resource.exists()) {
-            log.warn("메일 템플릿을 찾을 수 없습니다. path={}, templateName={}", path, templateName);
+        JsonNode templateNode = readTemplateNode(path);
+        if (templateNode == null) {
+            log.warn("メールテンプレートが見つかりません。 path={}, templateName={}", path, templateName);
             String dataJson = objectMapper.writeValueAsString(templateData);
             return new TemplateBody(templateName, "Template: " + templateName + "\n\n" + dataJson, null);
         }
 
-        try (InputStream is = resource.getInputStream()) {
-            SesTemplateWrapper wrapper = objectMapper.readValue(is, SesTemplateWrapper.class);
-            if (wrapper == null || wrapper.Template == null) {
-                log.warn("메일 템플릿 JSON 구조가 올바르지 않습니다. path={}, templateName={}", path, templateName);
-                String dataJson = objectMapper.writeValueAsString(templateData);
-                return new TemplateBody(templateName, "Template: " + templateName + "\n\n" + dataJson, null);
+        String subjectRaw = templateNode.path("SubjectPart").asText(templateName);
+        if (subjectRaw == null || subjectRaw.isBlank()) {
+            subjectRaw = templateName;
+        }
+        String textRaw = templateNode.path("TextPart").isMissingNode() || templateNode.path("TextPart").isNull()
+                ? ""
+                : templateNode.path("TextPart").asText("");
+        String htmlRaw = templateNode.path("HtmlPart").isMissingNode() || templateNode.path("HtmlPart").isNull()
+                ? null
+                : templateNode.path("HtmlPart").asText(null);
+
+        String subject = replacePlaceholders(subjectRaw, templateData);
+        String textBody = replacePlaceholders(textRaw, templateData);
+        String htmlBody = replacePlaceholders(htmlRaw, templateData);
+        return new TemplateBody(subject, textBody, htmlBody);
+    }
+
+    private JsonNode readTemplateNode(String path) {
+        JsonNode classPathNode = readTemplateFromClassPath(path);
+        if (classPathNode != null) {
+            return classPathNode;
+        }
+
+        JsonNode appPathNode = readTemplateFromFileSystem(Paths.get("/app", path));
+        if (appPathNode != null) {
+            return appPathNode;
+        }
+
+        JsonNode srcPathNode = readTemplateFromFileSystem(Paths.get("src/main/resources", path));
+        if (srcPathNode != null) {
+            return srcPathNode;
+        }
+
+        JsonNode backendSrcPathNode = readTemplateFromFileSystem(Paths.get("backend/src/main/resources", path));
+        if (backendSrcPathNode != null) {
+            return backendSrcPathNode;
+        }
+
+        return null;
+    }
+
+    private JsonNode readTemplateFromClassPath(String path) {
+        String[] candidates = {
+                path,
+                "/" + path,
+                "BOOT-INF/classes/" + path,
+                "/BOOT-INF/classes/" + path
+        };
+
+        for (String candidate : candidates) {
+            ClassPathResource resource = new ClassPathResource(candidate);
+            try (InputStream is = resource.getInputStream()) {
+                return parseTemplateNode(is, "classpath:" + candidate);
+            } catch (IOException ignored) {
+                // 다음 candidate 경로를 시도
             }
 
-            SesTemplate template = wrapper.Template;
-            String subject = replacePlaceholders(
-                template.SubjectPart == null || template.SubjectPart.isBlank() ? templateName : template.SubjectPart,
-                templateData
-            );
-            String textBody = replacePlaceholders(
-                template.TextPart == null ? "" : template.TextPart,
-                templateData
-            );
-            String htmlBody = replacePlaceholders(template.HtmlPart, templateData);
+            try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(candidate)) {
+                if (is != null) {
+                    return parseTemplateNode(is, "contextClassLoader:" + candidate);
+                }
+            } catch (IOException ignored) {
+                // 다음 candidate 경로를 시도
+            }
 
-            return new TemplateBody(subject, textBody, htmlBody);
+            try (InputStream is = MailhogEmailServiceImpl.class.getClassLoader().getResourceAsStream(candidate)) {
+                if (is != null) {
+                    return parseTemplateNode(is, "classLoader:" + candidate);
+                }
+            } catch (IOException ignored) {
+                // 다음 candidate 경로를 시도
+            }
         }
+
+        log.warn("クラスパステンプレート読み込み失敗。 path={}", path);
+        return null;
+    }
+
+    private JsonNode readTemplateFromFileSystem(Path filePath) {
+        if (!Files.exists(filePath)) {
+            return null;
+        }
+        try (InputStream is = Files.newInputStream(filePath)) {
+            return parseTemplateNode(is, "file:" + filePath);
+        } catch (IOException e) {
+            log.warn("ファイルテンプレート読み込み失敗。 path={}, error={}", filePath, e.getMessage());
+            return null;
+        }
+    }
+
+    private JsonNode parseTemplateNode(InputStream is, String source) throws IOException {
+        byte[] bytes = is.readAllBytes();
+        String json = new String(bytes, StandardCharsets.UTF_8);
+        if (json.startsWith("\uFEFF")) {
+            json = json.substring(1);
+        }
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode templateNode = root.path("Template");
+        if (templateNode.isMissingNode() || templateNode.isNull()) {
+            log.warn("テンプレートJSON構造が不正です。 source={}", source);
+            return null;
+        }
+        log.info("メールテンプレート読み込み成功。 source={}", source);
+        return templateNode;
     }
 
     private String replacePlaceholders(String raw, Map<String, String> templateData) {
         if (raw == null) {
             return null;
         }
+        if (templateData == null || templateData.isEmpty()) {
+            return raw;
+        }
         String rendered = raw;
         for (Map.Entry<String, String> entry : templateData.entrySet()) {
             String key = "{{" + entry.getKey() + "}}";
             rendered = rendered.replace(key, entry.getValue() == null ? "" : entry.getValue());
         }
+        rendered = rendered.replaceAll("\\{\\{[^}]+\\}\\}", "");
         return rendered;
     }
 
@@ -269,17 +362,6 @@ public class MailhogEmailServiceImpl implements EmailService {
 
     private String maskEmailList(List<String> emails) {
         return emails.stream().map(this::maskEmail).reduce((a, b) -> a + "," + b).orElse("");
-    }
-
-    private static class SesTemplateWrapper {
-        public SesTemplate Template;
-    }
-
-    private static class SesTemplate {
-        public String TemplateName;
-        public String SubjectPart;
-        public String TextPart;
-        public String HtmlPart;
     }
 
     private static class TemplateBody {

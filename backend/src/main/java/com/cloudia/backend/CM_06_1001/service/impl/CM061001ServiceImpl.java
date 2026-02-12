@@ -3,6 +3,8 @@ package com.cloudia.backend.CM_06_1001.service.impl;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.text.DecimalFormat;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -38,14 +40,14 @@ public class CM061001ServiceImpl implements CM061001Service {
     private final DateCalculator dateCalculator;
 
     /**
-     * 주문 생성
-     * @param request 주문 생성 요청 객체
-     * @return 생성된 주문 요약 정보
+     * 注文作成
+     * @param request 注文作成リクエストオブジェクト
+     * @return 生成された注文の概要情報
      */
     @Override
     @Transactional
     public OrderSummary createOrder(OrderCreate request) {
-        log.info("주문 생성: request={}", request);
+        log.info("注文生成: request={}", request);
 
         validateCreateOrderRequest(request);
 
@@ -57,18 +59,17 @@ public class CM061001ServiceImpl implements CM061001Service {
             throw new IllegalArgumentException(CM061001MessageConstant.CART_ITEMS_NOT_FOUND);
         }
 
-        // 주문번호는 회원별로 결제번호는 전역 7자리 채번
         final String orderNumber = cm061001Mapper.selectNextOrderNumberByMember(request.getMemberNumber());
         final String paymentOrderNumber = cm061001Mapper.selectNextOrderNumber();
         final int shippingCost = request.getShippingFee() != null ? request.getShippingFee() : 0;
-        // 총 금액은 장바구니 스냅샷 기반으로 계산 (클라이언트 값 신뢰하지 않음)
+        // 合計金額はカートスナップショットを基準に算出（クライアント値は信用しない）
         final int subtotal =
                 cartItems.stream()
                         .mapToInt(item -> item.getLineTotal() != null ? item.getLineTotal() : 0)
                         .sum();
         final int totalAmount = subtotal + shippingCost;
 
-        // 수령인/연락처: 배송정보가 없으면 최소한 memberNumber 를 이름으로 세팅
+        // 受取人/連絡先: 配送情報がない場合は最低限 memberNumber を氏名として設定
         final String recipientName =
                 shippingInfo != null && shippingInfo.getRecipientName() != null
                         ? shippingInfo.getRecipientName()
@@ -97,7 +98,7 @@ public class CM061001ServiceImpl implements CM061001Service {
             shippingAddressId = null;
         }
 
-        // 주문 정보 생성
+        // 注文情報の作成
         final OrderInfo order =
                 OrderInfo.builder()
                         .memberNumber(request.getMemberNumber())
@@ -151,7 +152,7 @@ public class CM061001ServiceImpl implements CM061001Service {
             cm061001Mapper.insertOrderItem(orderItem);
         }
 
-        // BANK(계좌이체) 결제 처리
+        // 銀行（口座振替）決済処理
         if (paymentValue == 1) {
             final PaymentInfo payment =
                     PaymentInfo.builder()
@@ -189,7 +190,7 @@ public class CM061001ServiceImpl implements CM061001Service {
                         userId);
             }
 
-            // 계좌이체 메일 발송 (메일 실패가 주문 생성/재고 처리 흐름을 막지 않도록 로그만 남김)
+            // 口座振替メール送信（メール失敗が注文作成や在庫処理の流れを妨げないようにログのみ残します）
             sendBankTransferGuideEmail(orderId, orderNumber, request.getMemberNumber(), recipientName);
         }
 
@@ -199,10 +200,10 @@ public class CM061001ServiceImpl implements CM061001Service {
     }
 
     /**
-     * 주문 요약 조회 + 본인 여부 검증
-     * @param orderId 주문 ID
-     * @param memberNumber 회원 번호
-     * @return 주문 요약 정보
+     * 注文の概要確認＋本人確認
+     * @param orderId 注文 ID
+     * @param memberNumber 会員番号
+     * @return 注文の概要情報
      */
     @Override
     @Transactional(readOnly = true)
@@ -212,7 +213,7 @@ public class CM061001ServiceImpl implements CM061001Service {
         final String owner = cm061001Mapper.findOrderOwner(orderId);
         if (owner == null || !owner.equals(memberNumber)) {
             log.warn(CM061001MessageConstant.LOG_ORDER_SUMMARY_ACCESS_DENIED, orderId, memberNumber);
-            throw new AccessDeniedException("해당 주문에 접근할 수 없습니다.");
+            throw new AccessDeniedException("該当の注文にアクセスできません。");
         }
 
         final OrderSummary summary = cm061001Mapper.findOrderSummary(orderId);
@@ -227,9 +228,9 @@ public class CM061001ServiceImpl implements CM061001Service {
     }
 
     /**
-     * 최신 결제 상태 조회
-     * @param orderNumber 주문 번호
-     * @return 최신 결제 정보 객체
+     * 最新決済情報の取得
+     * @param orderNumber 注文番号
+     * @return 最新の決済情報オブジェクト
      */
     @Override
     @Transactional(readOnly = true)
@@ -241,10 +242,96 @@ public class CM061001ServiceImpl implements CM061001Service {
         return cm061001Mapper.findLatestPayment(orderNumber);
     }
 
+    @Override
+    @Transactional
+    public OrderSummary completeLocalCardPayment(Long orderId, String memberNumber) {
+        validateOrderAccessInput(orderId, memberNumber);
+
+        final String owner = cm061001Mapper.findOrderOwner(orderId);
+        if (owner == null || !memberNumber.equals(owner)) {
+            log.warn(CM061001MessageConstant.LOG_ORDER_SUMMARY_ACCESS_DENIED, orderId, memberNumber);
+            throw new AccessDeniedException("해당 주문에 접근할 수 없습니다.");
+        }
+
+        final OrderSummary summary = cm061001Mapper.findOrderSummary(orderId);
+        if (summary == null) {
+            throw new IllegalStateException(CM061001MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        final String actor = resolveAuditUser(orderId, memberNumber);
+        final List<OrderItemInfo> orderItems = cm061001Mapper.findOrderItems(orderId);
+        if (orderItems == null || orderItems.isEmpty()) {
+            throw new IllegalStateException(CM061001MessageConstant.CART_ITEMS_NOT_FOUND);
+        }
+
+        PaymentInfo payment = cm061001Mapper.findLatestPaymentByOrderId(orderId);
+        boolean alreadyApproved = payment != null && "2".equals(String.valueOf(payment.getPaymentStatusCode()));
+
+        if (!alreadyApproved) {
+            if (payment == null) {
+                final String paymentOrderNumber = cm061001Mapper.selectNextOrderNumber();
+                final PaymentInfo localPayment = PaymentInfo.builder()
+                        .paymentId(UUID.randomUUID().toString())
+                        .orderId(orderId)
+                        .orderNumber(paymentOrderNumber)
+                        .paymentType("011")
+                        .paymentMethod("CARD")
+                        .paymentStatusType("013")
+                        .paymentStatusCode("2")
+                        .amount(summary.getTotalAmount() != null ? summary.getTotalAmount().intValue() : 0)
+                        .transactionId(generateMockTid())
+                        .approvedAt(dateCalculator.tokyoTime())
+                        .createdBy(actor)
+                        .updatedBy(actor)
+                        .build();
+                cm061001Mapper.insertPayment(localPayment);
+                payment = cm061001Mapper.findLatestPaymentByOrderId(orderId);
+            } else {
+                cm061001Mapper.updatePaymentStatusOnApprove(
+                        payment.getPaymentId(),
+                        orderId,
+                        payment.getTransactionId() != null ? payment.getTransactionId() : generateMockTid(),
+                        "LOCAL_OK",
+                        "Local card mock approved",
+                        "2",
+                        dateCalculator.tokyoTime().toString(),
+                        actor);
+            }
+
+            cm061001Mapper.deactivateCartItemsByOrderId(orderId, actor);
+
+            for (OrderItemInfo item : orderItems) {
+                final String productId = item.getProductId();
+                final int quantity = item.getQuantity() != null ? item.getQuantity() : 0;
+                if (productId == null || productId.isBlank() || quantity < 1) {
+                    throw new IllegalStateException(CM061001MessageConstant.ORDER_QUANTITY_INVALID);
+                }
+
+                final int affected = cm061001Mapper.decreaseStock(productId, quantity);
+                if (affected != 1) {
+                    throw new IllegalStateException(CM061001MessageConstant.STOCK_NOT_ENOUGH);
+                }
+
+                final Long stockId = cm061001Mapper.findStockIdByProductCode(productId);
+                if (stockId == null) {
+                    throw new IllegalStateException(CM061001MessageConstant.STOCK_NOT_FOUND);
+                }
+
+                cm061001Mapper.insertStockDetail(stockId, -1L * quantity, null, actor, actor);
+            }
+
+            cm061001Mapper.updateOrderStatusOnApprove(orderId, 2, "LOCAL_CARD_MOCK", actor);
+            cm061001Mapper.updateOrderNetProfit(orderId, actor);
+            sendOrderConfirmationEmail(summary, orderItems, "CARD");
+        }
+
+        return cm061001Mapper.findOrderSummary(orderId);
+    }
+
     /**
-     * 주문 완료(구매확정) + 본인 검증
-     * @param orderId 주문 ID
-     * @param memberNumber 회원 번호
+     * 注文完了（購入確定）＋本人確認
+     * @param orderId 注文ID
+     * @param memberNumber 会員番号
      */
     @Override
     @Transactional
@@ -254,7 +341,7 @@ public class CM061001ServiceImpl implements CM061001Service {
         final String owner = cm061001Mapper.findOrderOwner(orderId);
         if (owner == null || !memberNumber.equals(owner)) {
             log.warn(CM061001MessageConstant.LOG_ORDER_SUMMARY_ACCESS_DENIED, orderId, memberNumber);
-            throw new AccessDeniedException("해당 주문에 접근할 수 없습니다.");
+            throw new AccessDeniedException("該当の注文にアクセスできません。");
         }
         final String confirmDate = dateCalculator.DateString();
         final String refundDeadline =
@@ -262,8 +349,13 @@ public class CM061001ServiceImpl implements CM061001Service {
 
         cm061001Mapper.updateOrderStatusToCompleted(orderId, refundDeadline);
 
+        // 銀行振込の購入確定時にも注文確認メールを送信する
+        final OrderSummary summary = cm061001Mapper.findOrderSummary(orderId);
+        final List<OrderItemInfo> orderItems = cm061001Mapper.findOrderItems(orderId);
+        sendOrderConfirmationEmail(summary, orderItems, "BANK");
+
         log.info(
-                "[주문 완료] orderId={}, member={}, confirmDate={}, refundDeadline={}",
+                "[注文完了] orderId={}, member={}, confirmDate={}, refundDeadline={}",
                 orderId,
                 memberNumber,
                 confirmDate,
@@ -271,8 +363,8 @@ public class CM061001ServiceImpl implements CM061001Service {
     }
 
     /**
-     * 주문 생성 요청 검증
-     * @param request 주문 생성 요청 객체
+     * 注文作成リクエスト検証
+     * @param request 注文作成リクエストオブジェクト
      */
     private void validateCreateOrderRequest(OrderCreate request) {
         require(request, CM061001MessageConstant.ORDER_REQUEST_REQUIRED);
@@ -291,10 +383,10 @@ public class CM061001ServiceImpl implements CM061001Service {
     }
 
     /**
-     * 필수 값 검증
+     * 必須値の検証
      * 
-     * @param value
-     * @param message
+     * @param value 検証対象値
+     * @param message 例外メッセージ
      */
     private void require(Object value, String message) {
         if (value == null) {
@@ -303,10 +395,10 @@ public class CM061001ServiceImpl implements CM061001Service {
     }
     
     /**
-     * 필수 텍스트 값 검증
+     * 必須テキスト値の検証
      * 
-     * @param value
-     * @param message
+     * @param value 検証対象文字列
+     * @param message 例外メッセージ
      */
     private void requireText(String value, String message) {
         if (value == null || value.isBlank()) {
@@ -315,9 +407,9 @@ public class CM061001ServiceImpl implements CM061001Service {
     }
 
     /**
-     * 주문 접근시 공통 입력값 검증
-     * @param orderId 주문 ID
-     * @param memberNumber 회원 번호
+     * 注文アクセス時の共通入力値検証
+     * @param orderId 注文ID
+     * @param memberNumber 会員番号
      */
     private void validateOrderAccessInput(Long orderId, String memberNumber) {
         if (orderId == null) {
@@ -329,10 +421,10 @@ public class CM061001ServiceImpl implements CM061001Service {
     }
 
     /**
-     * 프론트에서 넘어온 결제방법 문자열
+     * フロントから渡される支払方法文字列
      * 
-     * @param rawPaymentMethod "1": 계좌이체, "2": 신용카드
-     * @return 코드값(1 또는 2)
+     * @param rawPaymentMethod "1": 銀行振込, "2": クレジットカード
+     * @return コード値（1 または 2）
      */
     private int resolvePaymentValue(String rawPaymentMethod) {
         final int method = parseIntSafe(rawPaymentMethod);
@@ -349,10 +441,10 @@ public class CM061001ServiceImpl implements CM061001Service {
     }
 
     /**
-     * 문자열을 int 로 안전하게 변환. 변환 실패 시 -1 반환
+     * 文字列を int に安全変換。変換失敗時は -1 を返却
      * 
-     * @param value 문자열 값
-     * @return 변환된 정수, 실패 시 -1
+     * @param value 文字列値
+     * @return 変換後の整数、失敗時は -1
      */
     private int parseIntSafe(String value) {
         if (value == null || value.isBlank()) {
@@ -367,15 +459,89 @@ public class CM061001ServiceImpl implements CM061001Service {
     }
 
     /**
-     * 계좌이체 안내 이메일 발송
+     * 銀行振込案内メール送信
      * 
-     * @param orderId 주문 ID
-     * @param orderNumber 주문 번호
-     * @param memberNumber 회원 번호
-     * @param recipientName 수령인 이름
+     * @param orderId 注文ID
+     * @param orderNumber 注文番号
+     * @param memberNumber 会員番号
+     * @param recipientName 受取人名
      */
     private void sendBankTransferGuideEmail(Long orderId, String orderNumber, String memberNumber, String recipientName) {
         sendBankTransferGuideEmailWithResponse(orderId, orderNumber, memberNumber, recipientName);
+    }
+
+    private void sendOrderConfirmationEmail(OrderSummary summary, List<OrderItemInfo> orderItems, String paymentMethod) {
+        try {
+            if (summary == null || summary.getBuyerEmail() == null || summary.getBuyerEmail().isBlank()) {
+                log.warn("注文確認メール送信スキップ: メールアドレスなし");
+                return;
+            }
+
+            final EmailDto emailInfo = new EmailDto();
+            emailInfo.setSendEmail(summary.getBuyerEmail());
+            emailInfo.setName(summary.getBuyerName());
+            emailInfo.setOrderDate(dateCalculator.convertToYYMMDD(dateCalculator.tokyoTime(), 0));
+            emailInfo.setOrderNumber(summary.getOrderNumber());
+            emailInfo.setPaymentMethod(resolvePaymentMethodLabel(paymentMethod));
+            emailInfo.setPaymentAmount(formatAmount(summary.getTotalAmount()));
+            emailInfo.setOrderItems(buildOrderItemsText(orderItems));
+
+            emailService.sendOrderConfirmation(emailInfo);
+        } catch (Exception ex) {
+            log.error("注文確認メール送信失敗: orderId={}", summary != null ? summary.getOrderId() : null, ex);
+        }
+    }
+
+    private String buildOrderItemsText(List<OrderItemInfo> orderItems) {
+        if (orderItems == null || orderItems.isEmpty()) {
+            return "";
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < orderItems.size(); i++) {
+            final OrderItemInfo item = orderItems.get(i);
+            final String productName = item.getProductName() != null ? item.getProductName() : item.getProductId();
+            sb.append("・").append(productName).append(" X ").append(item.getQuantity());
+            if (i < orderItems.size() - 1) {
+                sb.append("<br>\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    private String resolvePaymentMethodLabel(String paymentMethod) {
+        if ("BANK".equalsIgnoreCase(paymentMethod)) {
+            return "銀行振込";
+        }
+        if ("CARD".equalsIgnoreCase(paymentMethod)) {
+            return "クレジットカード";
+        }
+        return paymentMethod != null ? paymentMethod : "";
+    }
+
+    private String formatAmount(Number amount) {
+        if (amount == null) {
+            return "";
+        }
+        return new DecimalFormat("#,###").format(amount.longValue());
+    }
+
+    private String resolveAuditUser(Long orderId, String memberNumber) {
+        final String userId = cm061001Mapper.findOrderUserId(orderId);
+        if (userId != null && !userId.isBlank()) {
+            return userId;
+        }
+        return memberNumber;
+    }
+
+    private String generateMockTid() {
+        final String prefix = dateCalculator.tokyoTime().format(DateTimeFormatter.ofPattern("yyMMddHHmmss"));
+        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        final StringBuilder suffix = new StringBuilder(4);
+        for (int i = 0; i < 4; i++) {
+            int idx = (int) (Math.random() * chars.length());
+            suffix.append(chars.charAt(idx));
+        }
+        return prefix + "GU00" + suffix;
     }
 
     private ResponseEntity<ResponseModel<Integer>> sendBankTransferGuideEmailWithResponse(
@@ -419,12 +585,12 @@ public class CM061001ServiceImpl implements CM061001Service {
     }
 
     /**
-     * 공통 응답 모델 생성
+     * 共通レスポンスモデル生成
      * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    응답 메시지
-     * @return ResponseModel 객체
+     * @param resultList 結果データ
+     * @param result 処理結果
+     * @param message 応答メッセージ
+     * @return ResponseModel オブジェクト
      */
     private <T> ResponseModel<T> createResponseModel(T resultList, boolean result, String message) {
         return ResponseModel.<T>builder()

@@ -27,7 +27,7 @@ export default function CM_06_1000() {
         : null;
 
   // カート状態
-  const [items, setItems] = useState([]); // CartItemResponse[]
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [openCartModal, setOpenCartModal] = useState(false);
@@ -37,7 +37,7 @@ export default function CM_06_1000() {
   const [selectedCartItemIds, setSelectedCartItemIds] = useState([]);
   const [bulkDeleteMode, setBulkDeleteMode] = useState(false);
 
-  // 합계 계산
+  // 合計・採算
   const subtotal = useMemo(() => items.reduce((sum, it) => sum + (it.lineTotal || 0), 0), [items]);
   const shippingFee = useMemo(
     () => items.reduce((sum, it) => sum + (it.shippingFee || 0), 0),
@@ -52,7 +52,7 @@ export default function CM_06_1000() {
 
   const hasSelected = selectedCartItemIds.length > 0;
 
-  // 이미지 URL helper (리스트 페이지와 동일 스타일)
+  // 画像URLヘルパー（一覧ページと同一スタイル）
   const getImageUrl = (url) => {
     const PLACEHOLDER = 'https://placehold.jp/100x100.png';
     if (!url || typeof url !== 'string') return PLACEHOLDER;
@@ -101,7 +101,10 @@ export default function CM_06_1000() {
         );
       }
     } catch (err) {
-      console.error('ヘッダーのカート件数の同期に失敗しました:', err?.response?.data || err.message);
+      console.error(
+        'ヘッダーのカート件数の同期に失敗しました:',
+        err?.response?.data || err.message
+      );
     }
   }
 
@@ -200,14 +203,14 @@ export default function CM_06_1000() {
     if (!Number.isFinite(nextQuantity)) return;
     if (nextQuantity === target.quantity) return;
 
-    // 최대 수량 체크
+    // 最大数量チェック
     if (nextQuantity > purchaseLimit) {
       restoreQuantity(target);
       openInfoModal(CMMessage.MSG_LIMIT_001(purchaseLimit));
       return;
     }
 
-    // 재고 체크
+    // 在庫チェック
     const availableQty =
       typeof target.availableQty === 'number' && target.availableQty >= 0
         ? target.availableQty
@@ -216,9 +219,7 @@ export default function CM_06_1000() {
     if (availableQty !== null && nextQuantity > availableQty) {
       restoreQuantity(target);
       const insufficientMessage =
-        availableQty <= 0
-          ? CMMessage.MSG_ERR_032
-          : CMMessage.MSG_LIMIT_002(availableQty);
+        availableQty <= 0 ? CMMessage.MSG_ERR_032 : CMMessage.MSG_LIMIT_002(availableQty);
       openInfoModal(insufficientMessage);
       return;
     }
@@ -229,13 +230,13 @@ export default function CM_06_1000() {
       return;
     }
 
-    // 서버 PATCH 요청
+    // サーバーへPATCHリクエスト
     try {
       const { data } = await axiosInstance.patch(`/guest/cart/${cartItemId}`, {
         quantity: nextQuantity,
       });
 
-      // 백엔드 ResponseModel 형식: { result: boolean, message: string, ... } 가정
+      // バックエンドのResponseModel形式: { result: boolean, message: string, ... } を想定
       if (!data?.result) {
         throw new Error(data?.message || '数量の変更に失敗しました');
       }
@@ -259,7 +260,7 @@ export default function CM_06_1000() {
       const message = err?.response?.data?.message || err.message;
       openInfoModal(message || CMMessage.MSG_ERR_007('数量変更'));
 
-      // 서버 에러 시에도 원래 수량 복원
+      // フロントの状態へ反映
       restoreQuantity(target);
     }
 
@@ -311,13 +312,13 @@ export default function CM_06_1000() {
   }
 
   async function handleCheckout() {
-    // 장바구니 자체가 비어 있는 경우
+    // カート自体が空の場合
     if (items.length === 0) {
       openInfoModal(CMMessage.MSG_EMPTY_013);
       return;
     }
 
-    // 구매할 상품을 선택하지 않은 경우
+    // 選択された商品のみ対象
     if (!selectedCartItemIds || selectedCartItemIds.length === 0) {
       openInfoModal(CMMessage.MSG_VAL_011);
       return;
@@ -329,18 +330,17 @@ export default function CM_06_1000() {
       return;
     }
 
-    // 선택된 상품만 대상
     const selectedItems = items.filter((it) => selectedCartItemIds.includes(it.cartItemId));
     const cartItemIds = selectedItems.map((it) => it.cartItemId);
 
-    // 선택된 항목이 필터링 과정에서 0개가 되면 방어적으로 한 번 더 체크
+    // フィルタリングの結果、選択項目が0件になった場合は防御的に再チェック
     if (cartItemIds.length === 0) {
       openInfoModal(CMMessage.MSG_VAL_011);
       return;
     }
 
     try {
-      // 백엔드에서 주문 준비(금액/재고 등 최종 검증)를 수행
+      // バックエンドで注文準備（金額/在庫などの最終検証）を実行
       const { data } = await axiosInstance.post('/guest/cart/prepare-order', {
         cartItemIds,
       });
@@ -353,7 +353,7 @@ export default function CM_06_1000() {
       const preparedItems =
         Array.isArray(payload.items) && payload.items.length > 0 ? payload.items : selectedItems;
 
-      // 서버에서 내려준 합계를 우선 사용하고, 없으면 프론트에서 재계산
+      // サーバーから返却された合計を優先し、無ければフロントで再計算
       const preparedSubtotal =
         typeof payload.subtotal === 'number'
           ? payload.subtotal
@@ -367,7 +367,7 @@ export default function CM_06_1000() {
       const preparedTotal =
         typeof payload.total === 'number' ? payload.total : preparedSubtotal + preparedShipping;
 
-      // 주문 생성은 CM_06_1001 화면에서 배송정보/결제수단 선택 후 실행
+      // 注文作成はCM_06_1001画面で配送情報/決済手段を選択後に実行
       navigate('/order-payment', {
         state: {
           cartItemIds,
