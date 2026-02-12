@@ -32,7 +32,7 @@ public class OrderDetailResponse {
         private int paymentValue;
         private long shippingCost;
         private String productName;
-        private LocalDateTime paymentAt; // 72시간 계산의 기준이 될 시각
+        private LocalDateTime paymentAt;
         private UserRefundInfo userRefundInfo;
     }
 

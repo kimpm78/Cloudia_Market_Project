@@ -307,13 +307,13 @@ public class CM011015ServiceImpl implements CM011015Service {
 
         String rawContent = request.getContent();
         String cleanContent = rawContent;
-        if (rawContent != null && rawContent.contains("주문번호:")) {
-            cleanContent = rawContent.substring(rawContent.indexOf("주문번호:")).trim();
+        if (rawContent != null && rawContent.contains("注文番号")) {
+            cleanContent = rawContent.substring(rawContent.indexOf("注文番号：")).trim();
         }
 
         Map<String, String> templateData = new HashMap<>();
         templateData.put("title", request.getTitle());
-        templateData.put("type", request.getType() == 0 ? "反품" : "교환");
+        templateData.put("type", request.getType() == 0 ? "返品" : "交換");
         templateData.put("returnNumber", String.valueOf(returnNumber));
         templateData.put("orderNumber", request.getOrderNo());
         templateData.put("memberNumber", user.getMemberNumber());

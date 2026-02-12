@@ -11,14 +11,14 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class OrderListResponse {
-    private String orderNo; // 주문 번호
-    private String orderDate; // 주문 일자
-    private String productName; // 상품명
-    private String deliveryDate; // 발송 예정일
-    private Long totalPrice; // 가격/결제수단
+    private String orderNo;             // 注文番号
+    private String orderDate;           // 注文日
+    private String productName;         // 商品名
+    private String deliveryDate;        // 発送予定日
+    private Long totalPrice;            // 金額／決済方法
     private int paymentValue;
-    private String orderStatus; // 상태
-    private int orderStatusValue; // 상태 값
-    private LocalDateTime paymentAt; // 72시간 계산의 기준이 될 시각
+    private String orderStatus;         // 状態
+    private int orderStatusValue;       // 状態値
+    private LocalDateTime paymentAt;    // 72時間計算の基準となる時刻
     private String productImageUrl;
 }

@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * PG 결제 금액 검증 요청(PayCert)
- * - 결제 위/변조 방지를 위해 PG에서 제공하는 금액 검증 API용 DTO
+ * PG決済金額検証リクエスト（PayCert）
+ * - 決済の改ざん防止のため、PGが提供する金額検証API用のDTO
  */
 @Data
 @NoArgsConstructor
@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PGPayCertRequest {
 
-    /** PG 거래 번호 (TID) */
+    /** PG取引番号（TID） */
     private String tid;
 
-    /** 검증할 결제 금액 */
+    /** 検証対象の決済金額 */
     private Integer amount;
 
-    /** PG 종류 (쿠키페이 / 토스 / 이니시스 등) */
+    /** PG種別（CookiePay / TOSS / INICIS など） */
     private String pgType;
 }

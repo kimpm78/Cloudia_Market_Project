@@ -3,48 +3,45 @@ package com.cloudia.backend.common.model.pg;
 import lombok.Data;
 
 /**
- * PG 결제 요청(Ready) DTO
- * - 내부 주문 정보
- * - PG 전달 정보
- * - PG별 선택 옵션(다중 PG 대응)
+ * PG決済リクエスト（Ready）DTO
  */
 @Data
 public class PGReadyRequest {
 
     /**
-     *  내부 시스템(가맹점) 주문 정보
+     * 内部システム（加盟店）の注文情報
      */
-    private Long orderId;          // 내부 주문 PK
-    private String orderNumber;    // 내부 주문번호 (가맹점 주문번호)
-    private String orderNo;        // PG로 전달되는 주문번호 (보통 orderNumber 와 동일)
+    private Long orderId;             // 内部注文PK
+    private String orderNumber;       // 内部注文番号（加盟店注文番号）
+    private String orderNo;           // PGへ渡される注文番号（通常は orderNumber と同一）
 
     /**
-     *  PG 필수 요청 정보
+     * PG必須リクエスト情報
      */
-    private String productName;    // 상품명 (쿠키페이: 일부 특수문자 제한)
-    private Integer amount;        // 결제 금액
-    private String buyerName;      // 결제자 이름
-    private String buyerEmail;     // 결제자 이메일 (선택이지만 대부분 사용)
-    private String returnUrl;      // PG 결제 결과 callback 주소
-    private String homeUrl;        // 결제 완료 후 이동 주소
-    private String cancelUrl;      // 결제 중 취소 시 이동 주소
-    private String failUrl;        // PG 결제 실패 시 이동 주소
-    private String pgType;         // PG 종류 ("COOKIEPAY", "TOSS", "INICIS" 등)
+    private String productName;       // 商品名（CookiePay：一部特殊文字に制限あり）
+    private Integer amount;           // 決済金額
+    private String buyerName;         // 決済者名
+    private String buyerEmail;        // 決済者メール（任意だが通常使用）
+    private String returnUrl;         // PG決済結果のcallback URL
+    private String homeUrl;           // 決済完了後の遷移先URL
+    private String cancelUrl;         // 決済途中キャンセル時の遷移先URL
+    private String failUrl;           // PG決済失敗時の遷移先URL
+    private String pgType;            // PG種別（"COOKIEPAY", "TOSS", "INICIS" など）
 
     /**
-     *  PG 선택 요청 정보 (PG 정책에 따라 필요 시 사용)
+     * PG任意リクエスト情報（PGポリシーにより必要時に使用）
      */
-    private Integer taxFreeAmount;    // 비과세 금액 (복합과세 전용)
-    private String directResultFlag;  // Firefox cross-domain issue 대응 (키움페이)
-    private String mtype;             // WebView 결제 구분 (키움페이/원글로벌페이)
-    private String payMethod;         // 결제 수단 (CARD/BANK)
-    private String quota;             // 카드 할부기간 (00=일시불)
-    private String buyerId;           // 내부 고객 ID
-    private String taxYn;             // 과세/비과세 구분 (Y/N/M)
-    private String closeUrl;          // 취소 후 이동 URL (카카오페이)
-    private String escrow;            // 에스크로 결제 여부
-    private String engFlag;           // 해외 영문 결제창 출력 여부 (키움페이)
-    private String payType;           // 해외결제/특수카드 타입 (쿠키페이 PAY_TYPE)
-    private String cardList;          // 해외 카드 종류 선택
-    private String encYn;             // 암호화 리턴 여부 (Y=암호화 데이터 사용)
+    private Integer taxFreeAmount;    // 非課税金額（複合課税専用）
+    private String directResultFlag;  // Firefox のクロスドメイン問題対応（KiwoomPay）
+    private String mtype;             // WebView決済区分（KiwoomPay／OneGlobalPay）
+    private String payMethod;         // 決済手段（CARD/BANK）
+    private String quota;             // カード分割期間（00＝一括払い）
+    private String buyerId;           // 内部顧客ID
+    private String taxYn;             // 課税／非課税区分（Y/N/M）
+    private String closeUrl;          // キャンセル後の遷移URL（KakaoPay）
+    private String escrow;            // エスクロー決済可否
+    private String engFlag;           // 海外英語決済画面表示可否（KiwoomPay）
+    private String payType;           // 海外決済／特殊カードタイプ（CookiePay PAY_TYPE）
+    private String cardList;          // 海外カード種別選択
+    private String encYn;             // 暗号化リターン可否（Y＝暗号化データ使用）
 }

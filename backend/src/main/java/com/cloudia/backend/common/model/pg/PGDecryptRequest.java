@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * PG ENC_DATA 복호화 요청
- * - PG 결제 승인(return URL 등)에서 전달되는 암호화 데이터 복호화용
+ * PG ENC_DATA 復号リクエスト
  */
 @Data
 @NoArgsConstructor
@@ -15,9 +14,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PGDecryptRequest {
 
-    /** PG returnUrl 에서 넘어온 encData */
+    /** PG returnUrl から渡された encData */
     private String encData;
 
-    /** PG 종류 (쿠키페이 / 토스 / 이니시스 등 구분용) */
+    /** PG種別（CookiePay / TOSS / INICIS などの区分用） */
     private String pgType;
 }
