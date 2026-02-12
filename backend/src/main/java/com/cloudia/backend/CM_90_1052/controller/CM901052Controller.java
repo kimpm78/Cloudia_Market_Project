@@ -3,22 +3,16 @@ package com.cloudia.backend.CM_90_1052.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.ResponseEntity;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cloudia.backend.CM_90_1052.model.OrderDetailDto;
 import com.cloudia.backend.CM_90_1052.model.RefundRequestDto;
 import com.cloudia.backend.CM_90_1052.model.RefundSearchRequestDto;
@@ -30,116 +24,13 @@ import com.cloudia.backend.config.jwt.JwtTokenProvider;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.springframework.http.*;
-
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/admin/settlement/refund")
 public class CM901052Controller {
-
-    @Value("${cookiepay.store-id}")
-    private String API_ID;
-
-    @Value("${cookiepay.secret-key}")
-    private String API_KEY;
-
-    @Value("${cookiepay.api.domain:https://sandbox.cookiepayments.com}")
-    private String API_DOMAIN;
-
-    private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
     private final CM901052Service cm901052Service;
     private final JwtTokenProvider jwtTokenProvider;
-
-    @GetMapping("/test")
-    public String getMethodName() {
-        try {
-            // 1. トークン発行リクエスト
-            String token = getAuthToken();
-            if (token == null) {
-                return null;
-            }
-
-            // 2. 決済取消リクエスト
-            String cancelUrl = API_DOMAIN + "/api/cancel";
-
-            // リクエストヘッダー設定
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("ApiKey", API_KEY);
-            headers.set("TOKEN", token);
-
-            // リクエストボディ設定
-            Map<String, String> cancelData = new HashMap<>();
-            cancelData.put("tid", "260131144253GU00KCCV");
-            cancelData.put("reason", "お客様都合");
-            HttpEntity<Map<String, String>> cancelRequest = new HttpEntity<>(cancelData, headers);
-
-            // API呼び出し
-            ResponseEntity<String> cancelResponse = restTemplate.exchange(
-                    cancelUrl,
-                    HttpMethod.POST,
-                    cancelRequest,
-                    String.class);
-
-            // レスポンス解析
-            JsonNode cancelResult = objectMapper.readTree(cancelResponse.getBody());
-            log.info("決済取消レスポンス: {}", cancelResult);
-
-            Map<String, Object> result = new HashMap<>();
-            result.put("result", true);
-            result.put("data", cancelResult);
-
-            return new String();
-        } catch (Exception e) {
-            log.error("決済取消中にエラーが発生しました", e);
-            return null;
-        }
-    }
-
-    /**
-     * CookiePay 認証トークン発行
-     */
-    private String getAuthToken() {
-        try {
-            String tokenUrl = API_DOMAIN + "/payAuth/token";
-
-            // リクエストヘッダー設定
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            // リクエストボディ設定
-            Map<String, String> tokenData = new HashMap<>();
-            tokenData.put("pay2_id", API_ID);
-            tokenData.put("pay2_key", API_KEY);
-
-            HttpEntity<Map<String, String>> tokenRequest = new HttpEntity<>(tokenData, headers);
-
-            // API呼び出し
-            ResponseEntity<String> tokenResponse = restTemplate.exchange(
-                    tokenUrl,
-                    HttpMethod.POST,
-                    tokenRequest,
-                    String.class);
-
-            // レスポンス解析
-            JsonNode tokenResult = objectMapper.readTree(tokenResponse.getBody());
-            String rtnCd = tokenResult.get("RTN_CD").asText();
-
-            // 0000: 成功
-            if ("0000".equals(rtnCd)) {
-                return tokenResult.get("TOKEN").asText();
-            } else {
-                log.error("トークン発行失敗: RTN_CD={}", rtnCd);
-                return null;
-            }
-
-        } catch (Exception e) {
-            log.error("トークン発行中にエラーが発生しました", e);
-            return null;
-        }
-    }
 
     /**
      * 返金・交換一覧取得

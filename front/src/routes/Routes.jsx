@@ -36,7 +36,7 @@ import CM_05_1000 from '../pages/CM_05_1000';
 import CM_05_1001 from '../pages/CM_05_1001';
 import CM_06_1000 from '../pages/CM_06_1000';
 import CM_06_1001 from '../pages/CM_06_1001';
-import CM_06_1002_CardInput from '../pages/CM_06_1002_CardInput';
+import CM_06_1002 from '../pages/CM_06_1002';
 import CM_07_1000 from '../pages/CM_07_1000';
 import CM_company from '../pages/CM_Company';
 
@@ -186,7 +186,7 @@ const Routes = () => (
       path="/order-payment/card-input"
       element={
         <ProtectedRoute requiredRole={3}>
-          <CM_06_1002_CardInput />
+          <CM_06_1002 />
         </ProtectedRoute>
       }
     />

@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "ShippingPreparing_jp",
+    "SubjectPart": "【Cloudia】発送準備中のお知らせ（注文番号: {{orderNumber}}）",
+    "TextPart": "{{name}} 様\n\nご注文ありがとうございます。\n現在、ご注文商品の発送準備を進めております。\n\n注文番号: {{orderNumber}}\n発送予定日: {{shippingDate}}\n\nご注文商品\n{{orderItems}}\n\n※本メールは自動送信です。",
+    "HtmlPart": "<html><body style=\"font-family: Arial, sans-serif; color:#000; font-size:14px; line-height:1.7;\"><p>{{name}} 様</p><p>ご注文ありがとうございます。<br>現在、ご注文商品の発送準備を進めております。</p><p>注文番号: <strong>{{orderNumber}}</strong><br>発送予定日: <strong>{{shippingDate}}</strong></p><p>ご注文商品<br>{{orderItems}}</p><p style=\"color:#666; font-size:12px;\">※本メールは自動送信です。</p></body></html>"
+  }
+}

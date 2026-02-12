@@ -18,7 +18,7 @@ public class OrderSummary implements Serializable {
    private Integer shippingCost;       // 配送料（EMS計算結果）
    private Integer totalAmount;        // 最終決済金額
    private Integer orderStatusValue;   // ステータスコード値
-    private String orderStatusText;    // 画面表示用文字列（例：決済待ち／決済完了／配送準備中）
+    private String orderStatusText;    // 画面表示用文字列（例：決済待ち/決済完了/配送準備中）
    private String buyerName;
    private String buyerEmail;
    private String recipientName;

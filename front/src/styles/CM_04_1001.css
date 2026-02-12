@@ -3,6 +3,32 @@
   overflow-x: auto;
 }
 
+.review-content figure {
+  margin: 0 0 1rem;
+  max-width: 100%;
+}
+
+.review-content img {
+  display: block;
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.review-content figure[style*='text-align: center'] img {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.review-content figure[style*='text-align: right'] img {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.review-content figure[style*='text-align: left'] img {
+  margin-left: 0;
+  margin-right: auto;
+}
+
 .review-content table {
   width: 100%;
   border-collapse: collapse;
@@ -32,15 +58,15 @@
 }
 
 .reply-line {
-  border-left: 2px solid #ccc; /* 세로줄 */
-  border-bottom: 2px solid #ccc; /* 가로줄 */
-  width: 20px; /* ㄴ 가로 길이 */
-  height: 20px; /* ㄴ 세로 길이 */
-  margin-top: 10px; /* 댓글과의 높이 맞추기 */
+  border-left: 2px solid #ccc;
+  border-bottom: 2px solid #ccc;
+  width: 20px;
+  height: 20px; 
+  margin-top: 10px; 
 }
 
 .comment-box {
-  background-color: #eaf4f6; /* 댓글 배경 */
+  background-color: #eaf4f6;
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 4px;
@@ -51,9 +77,9 @@
 }
 
 .comment-reply {
-  background-color: #f8f9fa; /* 대댓글 배경 */
+  background-color: #f8f9fa;
   padding: 10px;
-  margin: 10px 0 10px 24px; /* 대댓글은 들여쓰기 */
+  margin: 10px 0 10px 24px;
   border-radius: 4px;
   position: relative;
   border: 1px solid #ccc;
@@ -73,11 +99,11 @@
   border-bottom: 2px solid #ccc;
 }
 
-/* 모바일 및 태블릿: 0 ~ 1023px */
+/* TB: 0 ~ 1023px */
 @media screen and (max-width: 1023px) {
 }
 
-/* 모바일: 0 ~ 767px */
+/* SP: 0 ~ 767px */
 @media screen and (max-width: 767px) {
   .comment-box {
     padding: 16px;

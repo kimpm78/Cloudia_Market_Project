@@ -9,42 +9,42 @@ import com.cloudia.backend.common.model.pg.PGReceiptRequest;
 import com.cloudia.backend.common.model.pg.PGResult;
 
 /**
- * PGProvider 인터페이스
+ * PGProviderインターフェース
  */
 public interface PGProvider {
 
     /**
-     * 결제 준비(READY)
+     * 決済準備（READY）
      */
     PGResult ready(PGReadyRequest request);
 
     /**
-     * 결제 승인(APPROVE)
+     * 決済承認（APPROVE）
      */
     PGResult approve(PGApproveRequest request);
 
     /**
-     * 결제 취소(CANCEL)
+     * 決済キャンセル（CANCEL）
      */
     PGResult cancel(PGCancelRequest request);
 
     /**
-     * ENC_DATA 복호화
+     * ENC_DATAの復号
      */
     PGResult decrypt(PGDecryptRequest request);
 
     /**
-     * 금액 검증 (PayCert)
+     * 金額検証（PayCert）
      */
     PGResult payCert(PGPayCertRequest request);
 
     /**
-     * 전표 출력/조회
+     * 伝票出力／照会
      */
     PGResult receipt(PGReceiptRequest request);
 
     /**
-     * Provider 타입 반환 (예: COOKIEPAY, TOSS)
+     * Providerタイプを返却（例: COOKIEPAY, TOSS）
      */
     String getProviderType();
 }

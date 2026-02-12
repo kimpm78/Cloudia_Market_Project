@@ -3,6 +3,7 @@ package com.cloudia.backend.CM_90_1051.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.cloudia.backend.CM_90_1051.model.AddressDto;
 import com.cloudia.backend.CM_90_1051.model.OrderDetailDto;
@@ -57,4 +58,38 @@ public interface CM901051Mapper {
      * @return 配送先情報
      */
     AddressDto getAddress(SearchRequestDto searchRequest);
+
+    /**
+     * 注文IDの最新決済TIDを取得
+     *
+     * @param orderId 注文ID
+     * @return 取引TID
+     */
+    String findLatestTransactionIdByOrderId(@Param("orderId") Integer orderId);
+
+    /**
+     * 注文IDの最新決済TIDを更新（未設定時のみ）
+     *
+     * @param orderId 注文ID
+     * @param transactionId 取引TID
+     * @param updatedBy 更新者
+     * @return 更新件数
+     */
+    int updateLatestPaymentTransactionIdByOrderId(
+            @Param("orderId") Integer orderId,
+            @Param("transactionId") String transactionId,
+            @Param("updatedBy") String updatedBy);
+
+    /**
+     * 決済レコードがない場合、ローカルカード決済モックを作成
+     *
+     * @param orderId 注文ID
+     * @param transactionId 取引TID
+     * @param updatedBy 更新者
+     * @return 追加件数
+     */
+    int insertLocalMockCardPaymentIfMissing(
+            @Param("orderId") Integer orderId,
+            @Param("transactionId") String transactionId,
+            @Param("updatedBy") String updatedBy);
 }

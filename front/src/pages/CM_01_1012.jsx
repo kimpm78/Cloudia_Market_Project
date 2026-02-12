@@ -408,9 +408,20 @@ export default function CM_01_1012() {
   };
 
   return (
-    <>
-      <h1>1:1 お問い合わせ（作成）</h1>
-      <div className="pt-0 px-5 pb-5">
+    <div className="container mt-2">
+      <div className="d-flex justify-content-between align-items-end pb-4 mb-4 border-bottom">
+        <h2 className="fw-bolder mt-3">1:1 お問い合わせ（作成）</h2>
+        <button
+          type="button"
+          className="btn btn-outline-secondary"
+          onClick={() => navigate('/mypage/inquiries')}
+          disabled={isLoading}
+        >
+          一覧へ
+        </button>
+      </div>
+      <div className="card shadow-sm border-0">
+        <div className="card-body p-4 p-md-5">
         <CM_99_1002
           isOpen={openLoadingPopup}
           onClose={() => setOpenLoadingPopup(false)}
@@ -429,7 +440,7 @@ export default function CM_01_1012() {
         />
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-3 w-50">
+          <div className="mb-3 w-100" style={{ maxWidth: '640px' }}>
             <label className="form-label">件名</label>
             <div className="input-group">
               {visibilityLabel && <span className="input-group-text">{visibilityLabel}</span>}
@@ -446,7 +457,7 @@ export default function CM_01_1012() {
             {errors.title && <div className="text-danger small mt-1">{errors.title}</div>}
           </div>
 
-          <div className="mb-3 w-50">
+          <div className="mb-3 w-100" style={{ maxWidth: '640px' }}>
             <label className="form-label">お問い合わせ種別</label>
             <select
               className="form-select"
@@ -495,7 +506,7 @@ export default function CM_01_1012() {
                     type="radio"
                     name="visibility"
                     id="qna-private"
-                    value="비공개"
+                    value="非公開"
                     checked={selectedTag === '非公開'}
                     onChange={(e) => {
                       setSelectedTag(e.target.value);
@@ -540,7 +551,8 @@ export default function CM_01_1012() {
             </button>
           </div>
         </form>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -324,7 +324,7 @@ export default function CM_01_1013() {
 
   return (
     <>
-      <h1>1:1お問い合わせ</h1>
+      <h2 className="fw-bolder mt-3">1:1お問い合わせ</h2>
       <div className="container-fluid px-3 px-md-5 py-4">
         <div className="border-top border-bottom py-3 px-2 d-flex justify-content-between fs-6 fs-sm-5">
           <div className="flex-grow-1">

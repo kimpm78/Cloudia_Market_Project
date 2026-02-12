@@ -12,19 +12,19 @@ import java.util.Map;
 public class PGProviderRegistry {
 
     /**
-     * PG 종류 > Provider 매핑
+     * PG種別 → Provider のマッピング
      */
     private final Map<String, PGProvider> providerMap = new HashMap<>();
 
     /**
-     * 구/신 PG 타입 명칭 차이, 프론트 상수 변경 등에 대비한 alias 맵핑
+     * 旧／新PGタイプ名の差異やフロント定数変更に備えたエイリアスのマッピング
      */
     private static final Map<String, String> TYPE_ALIASES = Map.of(
             "PAYVERSE", "COOKIEPAY"
     );
 
     /**
-     * 생성자에서 스프링이 PGProvider 구현체들을 자동 주입
+     * コンストラクタで Spring が PGProvider 実装を自動注入
      */
     public PGProviderRegistry(List<PGProvider> providers) {
         for (PGProvider provider : providers) {
@@ -35,12 +35,12 @@ public class PGProviderRegistry {
     }
 
     /**
-     * Provider 를 가져오기
+     * Provider を取得
      */
     public PGProvider getProvider(String pgType) {
 
         if (pgType == null) {
-            throw new IllegalArgumentException("PG 타입이 null 입니다.");
+            throw new IllegalArgumentException("PGタイプが null です。");
         }
 
         String normalized = pgType.toUpperCase();
@@ -49,7 +49,7 @@ public class PGProviderRegistry {
         PGProvider provider = providerMap.get(resolved);
 
         if (provider == null) {
-            throw new IllegalArgumentException("지원하지 않는 PG 타입입니다: " + pgType);
+            throw new IllegalArgumentException("未対応のPGタイプです: " + pgType);
         }
 
         return provider;

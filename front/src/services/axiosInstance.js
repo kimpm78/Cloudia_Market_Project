@@ -2,7 +2,7 @@ import axios from 'axios';
 
 let accessToken = null;
 
-// 토큰 갱신 함수 (로그인 성공 시, 혹은 리프레시 성공 시 호출)
+// トークン更新関数（ログイン成功時、またはリフレッシュ成功時に呼び出す）
 export const setAccessToken = (token) => {
   accessToken = token;
 };
@@ -11,7 +11,7 @@ export const getAccessToken = () => accessToken;
 
 export const authClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: true, // 쿠키(Refresh Token) 전송용
+  withCredentials: true, // Cookie（Refresh Token）送信用
 });
 
 export const axiosInstance = axios.create({
@@ -23,7 +23,7 @@ export const axiosPublic = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-// 요청 인터셉터
+// リクエストインターセプター
 axiosInstance.interceptors.request.use(
   (config) => {
     if (accessToken) {
@@ -34,11 +34,11 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 응답 인터셉터 (토큰 만료 시 쿠키로 재발급)
+// レスポンスインターセプター（トークン失効時にCookieで再発行）
 let isRefreshing = false;
 let failedQueue = [];
 
-// 대기 중인 요청 처리 함수
+// 待機中リクエストの処理関数
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
@@ -55,7 +55,7 @@ axiosInstance.interceptors.response.use(
 
     if (!response) return Promise.reject(error);
 
-    // 401(토큰 만료) 발생 && 아직 재시도 안 한 요청
+    // 401（トークン失効）/403 が発生 && まだ再試行していないリクエスト
     if ((response.status === 401 || response.status === 403) && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -72,26 +72,26 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // 리프레시 요청
+        // リフレッシュリクエスト
         const { data } = await authClient.post('/auth/refresh');
 
         const newToken = data.resultList?.accessToken;
 
-        if (!newToken) throw new Error('토큰 갱신 실패: 토큰이 없습니다.');
+        if (!newToken) throw new Error('トークン更新失敗: トークンがありません。');
 
-        // 메모리 변수에 저장
+        // メモリ変数に保存
         setAccessToken(newToken);
 
-        // 큐에 대기중인 요청 처리
+        // キューに待機中のリクエストを処理
         processQueue(null, newToken);
 
-        // 원래 요청 재시도
+        // 元のリクエストを再試行
         originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
         return axiosInstance(originalRequest);
       } catch (err) {
         processQueue(err, null);
         setAccessToken(null);
-        localStorage.removeItem('isConnected'); // 로그인 상태 정보 삭제
+        localStorage.removeItem('isConnected'); // ログイン状態情報を削除
         window.location.href = '/';
         return Promise.reject(err);
       } finally {
@@ -115,7 +115,7 @@ export const getRequest = async (url, params) => {
     const res = await axiosInstance.get(url, { params });
     return handleResponse(res);
   } catch (error) {
-    console.error(`GET 요청 실패:`, ('url', url), ('error', error));
+    console.error(`GET リクエスト失敗:`, ('url', url), ('error', error));
     throw error;
   }
 };
@@ -127,7 +127,7 @@ export const postRequest = async (url, data) => {
     const res = await axiosInstance.post(url, data, config);
     return handleResponse(res);
   } catch (error) {
-    console.error(`POST 요청 실패:`, ('url', url), ('error', error));
+    console.error(`POST リクエスト失敗:`, ('url', url), ('error', error));
     throw error;
   }
 };
@@ -137,7 +137,7 @@ export const putRequest = async (url, data) => {
     const res = await axiosInstance.put(url, data);
     return handleResponse(res);
   } catch (error) {
-    console.error(`PUT 요청 실패:`, ('url', url), ('error', error));
+    console.error(`PUT リクエスト失敗:`, ('url', url), ('error', error));
     throw error;
   }
 };
@@ -146,7 +146,7 @@ export const deleteRequest = async (url, data) => {
     const res = await axiosInstance.delete(url, { data });
     return handleResponse(res);
   } catch (error) {
-    console.error(`DELETE 요청 실패:`, ('url', url), ('error', error));
+    console.error(`DELETE リクエスト失敗:`, ('url', url), ('error', error));
     throw error;
   }
 };

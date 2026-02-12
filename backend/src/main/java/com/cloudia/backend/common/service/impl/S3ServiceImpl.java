@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- * S3 파일 업로드/삭제 서비스 구현체
+ * S3ファイルのアップロード／削除サービス実装
  */
 @Service
 @Profile({ "dev", "prod" })
@@ -34,93 +34,93 @@ public class S3ServiceImpl implements S3Service {
     private String baseUrl;
 
     /**
-     * S3에 파일 업로드
-     * 파일명 형식: folder/yyyy/MM/dd/UUID.확장자
-     * 
-     * @param file   업로드할 파일
-     * @param folder S3 내 폴더명
-     * @return 업로드된 파일의 전체 URL
-     * @throws IOException 파일 읽기 실패 시
+     * S3へファイルをアップロード
+     * ファイル名形式: folder/yyyy/MM/dd/UUID.拡張子
+     *
+     * @param file   アップロードするファイル
+     * @param folder S3上のフォルダ名
+     * @return アップロードしたファイルの完全URL
+     * @throws IOException ファイル読み取りに失敗した場合
      */
     @Override
     public String uploadFile(MultipartFile file, String folder) throws IOException {
-        // 원본 파일명에서 확장자 추출
+        // 元のファイル名から拡張子を抽出
         String originalFilename = file.getOriginalFilename();
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
 
-        // 날짜별 폴더 생성 (yyyy/MM/dd)
+        // 日付別フォルダ生成（yyyy/MM/dd）
         // String dateFolder =
         // LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
 
-        // UUID를 사용한 고유 파일명 생성
+        // UUIDを用いた一意なファイル名を生成
         String fileName = UUID.randomUUID().toString() + extension;
 
-        // S3 키 생성 (전체 경로)
+        // S3キーを生成（フルパス）
         String s3Key = folder + "/" + fileName;
 
-        // S3 업로드 요청 생성
+        // S3アップロードリクエストを作成
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(s3Key)
                 .contentType(file.getContentType())
                 .build();
 
-        // S3에 파일 업로드
+        // S3へファイルをアップロード
         s3Client.putObject(putObjectRequest,
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
-        log.info("S3 업로드 완료: {}", s3Key);
+        log.info("S3アップロード完了: {}", s3Key);
 
-        // 전체 URL 반환
+        // 完全URLを返却
         return baseUrl + "/" + s3Key;
     }
 
     /**
-     * S3에서 파일 삭제
-     * 
-     * @param fileUrl 삭제할 파일의 전체 URL
+     * S3からファイルを削除
+     *
+     * @param fileUrl 削除対象ファイルの完全URL
      */
     @Override
     public void deleteFile(String fileUrl) {
         try {
-            // URL에서 S3 키 추출
+            // URLからS3キーを抽出
             String s3Key = fileUrl.replace(baseUrl + "/", "");
 
-            // S3 삭제 요청 생성
+            // S3削除リクエストを作成
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                     .bucket(bucketName)
                     .key(s3Key)
                     .build();
 
-            // S3에서 파일 삭제
+            // S3からファイルを削除
             s3Client.deleteObject(deleteObjectRequest);
 
-            log.info("S3 파일 삭제 완료: {}", s3Key);
+            log.info("S3ファイル削除完了: {}", s3Key);
         } catch (Exception e) {
-            log.error("S3 파일 삭제 실패: {}", fileUrl, e);
+            log.error("S3ファイル削除失敗: {}", fileUrl, e);
         }
     }
 
     /**
-     * S3 내에서 파일 이동 (복사 후 원본 삭제)
-     * 
-     * @param sourceUrl    원본 파일 URL
-     * @param targetFolder 대상 폴더
-     * @return 이동된 파일의 전체 URL
+     * S3内でファイルを移動（コピー後に元ファイルを削除）
+     *
+     * @param sourceUrl    元ファイルURL
+     * @param targetFolder 移動先フォルダ
+     * @return 移動後ファイルの完全URL
      */
     @Override
     public String moveFile(String sourceUrl, String targetFolder) {
         try {
-            // URL에서 S3 키 추출
+            // URLからS3キーを抽出
             String sourceKey = sourceUrl.replace(baseUrl + "/", "");
 
-            // 파일명 추출
+            // ファイル名を抽出
             String fileName = sourceKey.substring(sourceKey.lastIndexOf("/") + 1);
 
-            // 새 경로 생성
+            // 新しいパスを作成
             String targetKey = targetFolder + "/" + fileName;
 
-            // S3 복사
+            // S3へコピー
             CopyObjectRequest copyRequest = CopyObjectRequest.builder()
                     .sourceBucket(bucketName)
                     .sourceKey(sourceKey)
@@ -130,16 +130,16 @@ public class S3ServiceImpl implements S3Service {
 
             s3Client.copyObject(copyRequest);
 
-            log.info("S3 파일 복사 완료: {} → {}", sourceKey, targetKey);
+            log.info("S3ファイルコピー完了: {} → {}", sourceKey, targetKey);
 
-            // 원본 삭제
+            // 元ファイルを削除
             deleteFile(sourceUrl);
 
-            // 새 URL 반환
+            // 新しいURLを返却
             return baseUrl + "/" + targetKey;
 
         } catch (Exception e) {
-            log.error("S3 파일 이동 실패: {}", sourceUrl, e);
+            log.error("S3ファイル移動失敗: {}", sourceUrl, e);
             return null;
         }
     }

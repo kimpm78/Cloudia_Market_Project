@@ -7,19 +7,19 @@ import com.cloudia.backend.common.model.CodeMaster;
 public interface CodeMasterService {
 
     /**
-     * 특정 코드 값을 가진 단일 코드를 조회
-     * 
-     * @param codeType  코드 타입
-     * @param codeValue 코드 값
-     * @return CodeMaster 객체
+     * 特定のコード値を持つ単一コードを取得
+     *
+     * @param codeType  コードタイプ
+     * @param codeValue コード値
+     * @return CodeMasterオブジェクト
      */
     CodeMaster getCodeByValue(String codeType, int codeValue);
 
     /**
-     * 특정 코드 타입을 가진 코드 목록 전체를 조회
+     * 特定のコードタイプを持つコード一覧を取得
      *
-     * @param codeType 코드 타입
-     * @return CodeMaster 객체 리스트
+     * @param codeType コードタイプ
+     * @return CodeMasterオブジェクトのリスト
      */
     List<CodeMaster> getCodesByType(String codeType);
 

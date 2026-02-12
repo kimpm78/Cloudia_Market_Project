@@ -10,6 +10,7 @@ import CM_90_1052_ReturnRequestModal from '../components/CM_90_1052_ReturnReques
 import CM_90_1052_DeliveryTrackingModal from '../components/CM_90_1052_DeliveryTrackingModal';
 
 const EXCHANGE_STATUS = [
+  { value: 1, label: '交換依頼' },
   { value: 2, label: '交換対応中' },
   { value: 3, label: '交換完了' },
 ];
@@ -83,16 +84,22 @@ export default function CM_90_1052() {
 
   const handleOrderClick = useCallback(
     async (orderData) => {
+      const refundNumber = orderData.memberNumber || orderData.customerId;
+      const orderNumber = orderData.orderNumber || orderData.orderNo;
+      const requestNo = orderData.orderNo;
       const searchRequestDto = {
-        memberNumber: orderData.memberNumber,
-        orderNumber: orderData.orderNumber,
+        requestNo,
+        refundNumber,
+        orderNumber,
       };
 
       const resultList = await apiHandler(() =>
-        axiosInstance.get('/admin/settlement/status/findDetails', searchRequestDto)
+        axiosInstance.get('/admin/settlement/refund/orderDetail', {
+          params: searchRequestDto,
+        })
       );
       if (resultList) {
-        setRowDetailData(resultList);
+        setRowDetailData(resultList.data?.resultList || []);
         setSelectedOrder(orderData);
         setShowOrderModal(true);
       }
@@ -194,7 +201,7 @@ export default function CM_90_1052() {
     // returnStatusValue に応じて表示するオプションを決定
     const getStatusOptions = (statusValue) => {
       // 交換ステータス
-      if ([2, 3].includes(statusValue)) {
+      if ([1, 2, 3].includes(statusValue)) {
         return EXCHANGE_STATUS;
       }
       // 返金ステータス

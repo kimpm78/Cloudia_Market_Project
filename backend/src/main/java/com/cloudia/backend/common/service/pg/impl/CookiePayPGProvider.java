@@ -26,8 +26,8 @@ public class CookiePayPGProvider implements PGProvider {
 
     /**
      * READY
-     * @param req
-     * @return
+     * @param req リクエスト
+     * @return 結果
      */
     @Override
     public PGResult ready(PGReadyRequest req) {
@@ -54,9 +54,9 @@ public class CookiePayPGProvider implements PGProvider {
     }
 
     /**
-     * 승인
-     * @param req
-     * @return
+     * 承認
+     * @param req リクエスト
+     * @return 結果
      */
     @Override
     public PGResult approve(PGApproveRequest req) {
@@ -71,16 +71,16 @@ public class CookiePayPGProvider implements PGProvider {
     }
 
     /**
-     * 취소
-     * @param req
-     * @return
+     * キャンセル
+     * @param req リクエスト
+     * @return 結果
      */
     @Override
     public PGResult cancel(PGCancelRequest req) {
 
         Map<String, Object> payload = new HashMap<>();
 
-        // 필수값
+        // 必須値
         if (req.getTid() != null && !req.getTid().isBlank()) {
             payload.put("tid", req.getTid());
         }
@@ -95,9 +95,9 @@ public class CookiePayPGProvider implements PGProvider {
     }
 
     /**
-     * 암호화 데이터 복호화
-     * @param req
-     * @return
+     * 暗号化データの復号
+     * @param req リクエスト
+     * @return 結果
      */
     @Override
     public PGResult decrypt(PGDecryptRequest req) {
@@ -109,10 +109,10 @@ public class CookiePayPGProvider implements PGProvider {
     }
 
     /**
-    * 금액 검증
-    * @param req
-    * @return
-    */
+     * 金額検証
+     * @param req リクエスト
+     * @return 結果
+     */
     @Override
     public PGResult payCert(PGPayCertRequest req) {
 
@@ -125,9 +125,9 @@ public class CookiePayPGProvider implements PGProvider {
     }
 
     /**
-     * 전표 조회
-     * @param req
-     * @return
+     * 伝票照会
+     * @param req リクエスト
+     * @return 結果
      */
     @Override
     public PGResult receipt(PGReceiptRequest req) {

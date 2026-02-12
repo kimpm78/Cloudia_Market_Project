@@ -31,7 +31,7 @@ export default function CM_01_1015_Table({ returns, loading }) {
       {
         headerName: '商品情報',
         flex: 2,
-        // products 배열의 첫 번째 요소에서 상품명 추출
+        // products配列の先頭要素から商品名を取得
         valueGetter: (params) => {
           const products = params.data.products;
           return products && products.length > 0 ? products[0].productName : '商品情報なし';
@@ -42,10 +42,10 @@ export default function CM_01_1015_Table({ returns, loading }) {
         headerName: '数量',
         width: 80,
         cellStyle: { textAlign: 'center' },
-        //products 배열의 첫 번째 요소에서 수량 추출
+        // products配列の先頭要素から数量を取得
         valueGetter: (params) => {
           const products = params.data.products;
-          return products && products.length > 0 ? `${products[0].quantity}개` : '-';
+          return products && products.length > 0 ? `${products[0].quantity}個` : '-';
         },
       },
       {

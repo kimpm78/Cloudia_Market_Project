@@ -15,8 +15,8 @@
                 interval '1 month'
             ) AS m(month)
         LEFT JOIN orders o
-            ON o.order_date >= m.month
-         AND o.order_date <  (m.month + interval '1 month')
+            ON COALESCE(o.order_date, o.created_at) >= m.month
+         AND COALESCE(o.order_date, o.created_at) <  (m.month + interval '1 month')
          AND o.order_status_value > 2
         GROUP BY m.month
         ORDER BY m.month
@@ -34,8 +34,8 @@
                 interval '1 month'
             ) AS m(month)
         LEFT JOIN orders o
-            ON o.order_date >= m.month
-         AND o.order_date <  (m.month + interval '1 month')
+            ON COALESCE(o.order_date, o.created_at) >= m.month
+         AND COALESCE(o.order_date, o.created_at) <  (m.month + interval '1 month')
          AND o.order_status_value > 2
         GROUP BY m.month
         ORDER BY m.month

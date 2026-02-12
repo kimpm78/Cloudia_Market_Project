@@ -109,6 +109,34 @@ public class CM061001Controller {
     }
 
     /**
+     * ローカルカード決済 完了処理（開発環境用）
+     */
+    @PostMapping("/order/local-card/complete")
+    public ResponseEntity<ResponseModel<OrderSummary>> completeLocalCardOrder(
+            @RequestParam Long orderId,
+            Authentication authentication) {
+
+        try {
+            User user = getLoginUser(authentication);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(buildResponse(null, false, CMMessageConstant.FAIL_UNAUTHORIZED));
+            }
+
+            OrderSummary summary = cm061001Service.completeLocalCardPayment(orderId, user.getMemberNumber());
+
+            return ResponseEntity.ok(
+                    buildResponse(summary, true, CM061001MessageConstant.ORDER_COMPLETE_SUCCESS)
+            );
+
+        } catch (Exception e) {
+            log.error("[ORDER][LOCAL CARD COMPLETE] ERROR", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(buildResponse(null, false, CMMessageConstant.ERROR_INTERNAL_SERVER));
+        }
+    }
+
+    /**
      * 注文取得（本人の注文のみ可）
      */
     @GetMapping("/orders/{orderId}")

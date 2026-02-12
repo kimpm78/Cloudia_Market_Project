@@ -16,19 +16,19 @@ public interface CM901010Mapper {
      * 
      * @return 現在のステータス一覧
      */
-    Status getStatus(@Param("startDate") String startDate, @Param("EndDate") String EndDate);
+    Status getStatus(@Param("startDate") String startDate, @Param("endDate") String endDate);
 
     /**
      * 前日情報を取得
      * 
      * @return 前日情報
      */
-    PreviousInfo getPreviousInfo(@Param("startDate") String startDate, @Param("EndDate") String EndDate);
+    PreviousInfo getPreviousInfo(@Param("startDate") String startDate, @Param("endDate") String endDate);
 
     /**
      * 週間売上を取得
      * 
      * @return 週間売上一覧
      */
-    List<WeeklySales> getWeeklySales(@Param("startDate") String startDate, @Param("EndDate") String EndDate);
+    List<WeeklySales> getWeeklySales(@Param("startDate") String startDate, @Param("endDate") String endDate);
 }

@@ -51,6 +51,24 @@ const isTrustedCookiepayHtml = (htmlText) => {
   );
 };
 
+const generateMockTid = () => {
+  const now = new Date();
+  const two = (n) => String(n).padStart(2, '0');
+  const prefix =
+    String(now.getFullYear()).slice(-2) +
+    two(now.getMonth() + 1) +
+    two(now.getDate()) +
+    two(now.getHours()) +
+    two(now.getMinutes()) +
+    two(now.getSeconds());
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let suffix = '';
+  for (let i = 0; i < 4; i += 1) {
+    suffix += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `${prefix}GU00${suffix}`;
+};
+
 export default function CM_06_1001() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -242,6 +260,11 @@ export default function CM_06_1001() {
   };
 
   const handlePayment = async (localCardInfo = null) => {
+    const normalizedCardInfo =
+      localCardInfo && typeof localCardInfo === 'object' && 'preventDefault' in localCardInfo
+        ? null
+        : localCardInfo;
+
     if (isPaymentDisabled) {
       return;
     }
@@ -269,9 +292,12 @@ export default function CM_06_1001() {
       return;
     }
 
-    if (isLocalCardMockEnabled && paymentMethod.code === 'CARD' && !localCardInfo) {
+    if (isLocalCardMockEnabled && paymentMethod.code === 'CARD' && !normalizedCardInfo) {
       navigate('/order-payment/card-input', {
-        state: locationState || {},
+        state: {
+          ...(locationState || {}),
+          total,
+        },
       });
       return;
     }
@@ -352,6 +378,9 @@ export default function CM_06_1001() {
 
       // ローカル開発環境：カード決済はモック完了として処理
       if (isLocalCardMockEnabled && paymentMethod.code === 'CARD') {
+        await axiosInstance.post('/guest/order/local-card/complete', null, {
+          params: { orderId: createdOrderId },
+        });
         navigate('/order-payment/result', {
           replace: true,
           state: {
@@ -360,8 +389,8 @@ export default function CM_06_1001() {
             pgType: 'LOCAL_MOCK',
             orderNumber: createdOrderNumber,
             orderId: createdOrderId,
-            tid: `LOCAL-${Date.now()}`,
-            cardLast4: localCardInfo?.cardNumber?.slice(-4) || '',
+            tid: generateMockTid(),
+            cardLast4: normalizedCardInfo?.cardNumber?.slice(-4) || '',
           },
         });
         return;
@@ -501,12 +530,28 @@ export default function CM_06_1001() {
     if (paymentMethod.code !== 'CARD') return;
     if (!locationState?.autoSubmitCard || !locationState?.localCardInfo) return;
     if (autoCardSubmitHandledRef.current) return;
+    if (isOrderLoading || isPaymentLoading) return;
+    if (!memberNumber) return;
+    if (!Array.isArray(items) || items.length === 0) return;
+    if (isAddressLoading) return;
+    if (addressError) return;
 
     autoCardSubmitHandledRef.current = true;
     const { autoSubmitCard, localCardInfo, ...cleanedState } = locationState;
     navigate('/order-payment', { replace: true, state: cleanedState });
     handlePayment(localCardInfo);
-  }, [isLocalCardMockEnabled, paymentMethod.code, locationState, navigate]);
+  }, [
+    isLocalCardMockEnabled,
+    paymentMethod.code,
+    locationState,
+    navigate,
+    isOrderLoading,
+    isPaymentLoading,
+    memberNumber,
+    items,
+    isAddressLoading,
+    addressError,
+  ]);
 
   return (
     <>
@@ -527,7 +572,7 @@ export default function CM_06_1001() {
               </div>
             )}
 
-            <h5 className="pb-2">商品情報</h5>
+            <h5 className="pb-2 fw-semibold">商品情報</h5>
             {!isOrderLoading && items.length === 0 ? (
               <div className="py-3 text-muted">{CMMessage.MSG_EMPTY_014}</div>
             ) : (
@@ -617,7 +662,7 @@ export default function CM_06_1001() {
               </div>
               <button
                 className="btn btn-primary w-100 mb-2 mt-3"
-                onClick={handlePayment}
+                onClick={() => handlePayment()}
                 disabled={isPaymentDisabled}
               >
                 {isPaymentLoading ? '決済準備中...' : '決済する'}

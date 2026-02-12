@@ -46,7 +46,11 @@ export default function CM_01_1011_RefundModal({ isOpen, onClose, order, onSucce
       onSuccess();
       onClose();
     } catch (error) {
-      alert('キャンセル処理中にエラーが発生しました。');
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        'キャンセル処理中にエラーが発生しました。';
+      alert(message);
     } finally {
       setLoading(false);
     }

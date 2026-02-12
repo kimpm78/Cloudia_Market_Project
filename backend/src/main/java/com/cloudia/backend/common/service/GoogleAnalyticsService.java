@@ -9,22 +9,22 @@ public interface GoogleAnalyticsService {
 
     Long getTotalSessions(LocalDate startDate, LocalDate endDate);
 
-    // 요일별 방문자 수 (PV, UV)
+    // 曜日別の訪問者数（PV, UV）
     Map<String, Object> getVisitorsByDayOfWeek(LocalDate startDate, LocalDate endDate);
 
-    // 월별 방문자 수 (PV, UV)
+    // 月別の訪問者数（PV, UV）
     Map<String, Object> getVisitorsByMonth(LocalDate startDate, LocalDate endDate);
 
-    // 신규 재방문자 수
+    // 新規／リピーター数
     Map<String, Long> getNewVsReturningUsers(LocalDate startDate, LocalDate endDate);
 
-    // 기기별 세션
+    // デバイス別セッション数
     Map<String, Long> getSessionsByDevice(LocalDate startDate, LocalDate endDate);
 
-    // 채널별 세션 (유입 경로)
+    // チャネル別セッション数（流入経路）
     List<Map<String, Object>> getSessionsByChannel(LocalDate startDate, LocalDate endDate);
 
-    // 페이지별 평균 머문 시간 (분 단위)
+    // ページ別の平均滞在時間（分単位）
     List<Map<String, Object>> getAverageEngagementTimeByPage(LocalDate startDate, LocalDate endDate);
 
 }

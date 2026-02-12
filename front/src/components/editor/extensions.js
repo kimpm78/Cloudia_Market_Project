@@ -72,7 +72,38 @@ export const getExtensions = (placeholderText = '内容を入力してくださ�
       const { dataSize, linkHref, linkTarget, linkRel } = node.attrs;
       const { style, ...imgAttrs } = HTMLAttributes;
       const figureAttrs = {};
-      if (style) figureAttrs.style = style;
+
+      if (style) {
+        const figureStyleParts = [];
+        const imageStyleParts = [];
+
+        style
+          .split(';')
+          .map((rule) => rule.trim())
+          .filter(Boolean)
+          .forEach((rule) => {
+            const [rawProp, ...rawValue] = rule.split(':');
+            if (!rawProp || rawValue.length === 0) return;
+
+            const prop = rawProp.trim().toLowerCase();
+            const value = rawValue.join(':').trim();
+            if (!value) return;
+
+            if (prop === 'text-align') {
+              figureStyleParts.push(`${prop}: ${value}`);
+            } else {
+              imageStyleParts.push(`${prop}: ${value}`);
+            }
+          });
+
+        if (figureStyleParts.length > 0) {
+          figureAttrs.style = figureStyleParts.join('; ');
+        }
+        if (imageStyleParts.length > 0) {
+          imgAttrs.style = imageStyleParts.join('; ');
+        }
+      }
+
       if (dataSize) figureAttrs['data-size'] = dataSize;
 
       const image = ['img', mergeAttributes(this.options.HTMLAttributes, imgAttrs)];

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-export default function CM_06_1002_CardInput() {
+export default function CM_06_1002() {
   const location = useLocation();
   const navigate = useNavigate();
   const sourceState =
@@ -14,6 +14,7 @@ export default function CM_06_1002_CardInput() {
     holderName: '',
   });
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const amountText = useMemo(() => {
     const total = Number(sourceState?.order?.total ?? sourceState?.total ?? 0);
@@ -56,11 +57,14 @@ export default function CM_06_1002_CardInput() {
   };
 
   const handleSubmit = () => {
+    if (isSubmitting) return;
     const message = validate();
     if (message) {
       setError(message);
       return;
     }
+    setError('');
+    setIsSubmitting(true);
 
     navigate('/order-payment', {
       replace: true,
@@ -139,12 +143,13 @@ export default function CM_06_1002_CardInput() {
       <div className="d-flex justify-content-end gap-2 mt-4">
         <button
           className="btn btn-outline-secondary"
+          disabled={isSubmitting}
           onClick={() => navigate('/order-payment', { replace: true, state: sourceState })}
         >
           戻る
         </button>
-        <button className="btn btn-primary" onClick={handleSubmit}>
-          入力内容で決済確定
+        <button className="btn btn-primary" disabled={isSubmitting} onClick={handleSubmit}>
+          {isSubmitting ? '確定中...' : '確定'}
         </button>
       </div>
     </div>

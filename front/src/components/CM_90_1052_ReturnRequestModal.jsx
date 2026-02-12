@@ -228,7 +228,7 @@ const CM_90_1052_ReturnRequestModal = ({ show, onHide, onConfirm }) => {
         <div className="modal-dialog modal-lg" role="document">
           <div className="modal-content border-0 shadow-lg">
             <div className="modal-header bg-primary text-white">
-              <h5 className="modal-title fw-bold">交換／返金依頼</h5>
+              <h5 className="modal-title fw-bold">交換 / 返金依頼</h5>
               <button
                 type="button"
                 className="btn-close btn-close-white"

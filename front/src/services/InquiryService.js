@@ -1,20 +1,20 @@
-import axiosInstance from './axiosInstance'; // axios 인스턴스 경로
+import axiosInstance from './axiosInstance'; // axiosインスタンスのパス
 
 /**
- * 1:1 문의 목록 조회
+ * 1:1問い合わせ一覧取得
  */
 export const fetchInquiryList = async () => {
   try {
     const { data } = await axiosInstance.get(`/user/mypage/inquiries`);
     return data;
   } catch (error) {
-    console.error(`[InquiryService] fetchInquiryList 실패:`, error);
+    console.error(`[InquiryService] fetchInquiryList 失敗:`, error);
     throw error;
   }
 };
 
 /**
- * 1:1 문의 상세 정보 조회
+ * 1:1問い合わせ詳細取得
  * @param {object} payload
  */
 export const fetchInquiryDetail = async (payload) => {
@@ -25,23 +25,23 @@ export const fetchInquiryDetail = async (payload) => {
     const { data } = await axiosInstance.get(`/user/mypage/inquiries/${inquiryId}`);
 
     if (!data) {
-      throw new Error('서버로부터 응답이 없습니다.');
+      throw new Error('サーバーからの応答がありません。');
     }
     return data;
   } catch (error) {
-    console.error(`[InquiryService] fetchInquiryDetail 실패:`, error);
+    console.error(`[InquiryService] fetchInquiryDetail 失敗:`, error);
     throw error;
   }
 };
 
 /**
- * 1:1 문의 답변 등록 (관리자)
+ * 1:1問い合わせ回答登録（管理者）
  * @param {object} payload
  */
 export const answerInquiry = async (payload) => {
   const { inquiryId, answerContent } = payload;
   if (!inquiryId || !answerContent) {
-    throw new Error('Inquiry ID와 답변 내용은 필수입니다.');
+    throw new Error('Inquiry ID と回答内容は必須です。');
   }
 
   try {
@@ -50,29 +50,29 @@ export const answerInquiry = async (payload) => {
     });
     return data ?? null;
   } catch (error) {
-    console.error(`[InquiryService] answerInquiry 실패:`, error);
+    console.error(`[InquiryService] answerInquiry 失敗:`, error);
     throw error;
   }
 };
 
 /**
- * 1:1 문의 생성
+ * 1:1問い合わせ作成
  * @param {object} payload
  */
 export const createInquiry = async (payload) => {
   if (!payload) throw new Error('Payload is required');
   try {
-    // payload를 요청 본문으로 그대로 사용
+    // payloadをリクエスト本文としてそのまま使用
     const { data } = await axiosInstance.post('/user/mypage/inquiries', payload);
     return data;
   } catch (error) {
-    console.error('[InquiryService] createInquiry 실패:', error);
+    console.error('[InquiryService] createInquiry 失敗:', error);
     throw error;
   }
 };
 
 /**
- * 문의 삭제 API 호출
+ * 問い合わせ削除API呼び出し
  * @param {object} payload
  */
 export const deleteInquiry = async (payload) => {
@@ -82,7 +82,7 @@ export const deleteInquiry = async (payload) => {
     const response = await axiosInstance.delete(`/user/mypage/inquiries/${inquiryId}`);
     return response.data;
   } catch (error) {
-    console.error(`[InquiryService] deleteInquiry 실패:`, error);
+    console.error(`[InquiryService] deleteInquiry 失敗:`, error);
     throw error;
   }
 };

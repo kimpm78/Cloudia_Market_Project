@@ -147,11 +147,11 @@ export default function CM_90_1050() {
 
   const fetchAllProducts = useCallback(async () => {
     setLoading(true);
-    const resultList = await apiHandler(() =>
+    const response = await apiHandler(() =>
       axiosInstance.get('/admin/settlement/sales/findAll', undefined)
     );
-    if (resultList) {
-      setRowData(resultList);
+    if (response?.data?.result) {
+      setRowData(response.data.resultList || []);
     }
     setLoading(false);
   }, [apiHandler, navigate]);
@@ -203,11 +203,13 @@ export default function CM_90_1050() {
     }
 
     try {
-      const resultList = await apiHandler(() =>
-        axiosInstance.get('/admin/settlement/sales/findSales', searchParams)
+      const response = await apiHandler(() =>
+        axiosInstance.get('/admin/settlement/sales/findSales', {
+          params: searchParams,
+        })
       );
-      if (resultList) {
-        setRowData(resultList);
+      if (response?.data?.result) {
+        setRowData(response.data.resultList || []);
       }
     } catch (error) {
       open('error', CMMessage.MSG_ERR_001);

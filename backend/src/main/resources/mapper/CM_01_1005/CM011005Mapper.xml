@@ -33,7 +33,7 @@
             o.order_id,
             o.order_number,
             o.member_number,
-            o.order_date,
+            COALESCE(o.order_date, o.created_at, o.updated_at) AS order_date,
             o.delivery_date,
             o.total_amount,
             o.shipping_cost,
@@ -99,16 +99,16 @@
             AND o.order_status_value = #{orderStatusValue} 
         </if>
         <if test="year != null and year != ''"> 
-            AND TO_CHAR(o.order_date, 'YYYY') = #{year} 
+            AND TO_CHAR(COALESCE(o.order_date, o.created_at, o.updated_at), 'YYYY') = #{year} 
         </if>
         <if test="month != null and month != ''"> 
-            AND TO_CHAR(o.order_date, 'MM') = LPAD(#{month}, 2, '0') 
+            AND TO_CHAR(COALESCE(o.order_date, o.created_at, o.updated_at), 'MM') = LPAD(#{month}, 2, '0') 
         </if>
         <if test="paymentMethod != null"> 
             AND o.payment_value = #{paymentMethod} 
         </if>
         ORDER BY 
-            o.order_date DESC
+            COALESCE(o.order_date, o.created_at, o.updated_at) DESC
     </select>
 
     <select id="findOrderByOrderNoAndMemberNumber" resultMap="OrderEntityMap">
@@ -116,7 +116,7 @@
             o.order_id,
             o.order_number,
             o.member_number,
-            o.order_date,
+            COALESCE(o.order_date, o.created_at, o.updated_at) AS order_date,
             o.delivery_date,
             o.total_amount,
             o.payment_type,

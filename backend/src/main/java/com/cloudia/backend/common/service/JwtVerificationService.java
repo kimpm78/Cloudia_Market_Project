@@ -1,24 +1,24 @@
 package com.cloudia.backend.common.service;
 
 /**
- * JWT 생성, 검증 및 Redis를 사용한 일회용 토큰 관리를 위한 공통 서비스
+ * JWTの生成・検証およびRedisを用いたワンタイムトークン管理の共通サービス
  */
 public interface JwtVerificationService {
 
     /**
-     * 특정 식별자에 대한 JWT와 Redis 키를 생성
-     * 
-     * @param identifier 사용자를 식별하는 고유 값
-     * @return 생성된 JWT
+     * 特定の識別子に対するJWTとRedisキーを生成
+     *
+     * @param identifier ユーザーを識別する一意の値
+     * @return 生成されたJWT
      */
     String generateTokenAndKey(String identifier);
 
     /**
-     * 전달된 JWT와 Redis 키의 유효성을 검증
-     * 
-     * @param token 프론트엔드에서 전달받은 JWT
-     * @param key   프론트엔드에서 전달받은 Redis 키
-     * @return 유효하면 식별자를 반환, 아니면 null 반환
+     * 渡されたJWTとRedisキーの有効性を検証
+     *
+     * @param token フロントエンドから受け取ったJWT
+     * @param key   フロントエンドから受け取ったRedisキー
+     * @return 有効な場合は識別子を返却、無効な場合はnullを返却
      */
     String verifyTokenAndKey(String token, String key);
 }

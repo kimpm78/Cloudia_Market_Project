@@ -36,4 +36,13 @@ public interface CM061001Service {
      * @return 최신 결제 정보
      */
     PaymentInfo findLatestPayment(String orderNumber);
+
+    /**
+     * ローカルカード決済の完了処理（開発用）
+     *
+     * @param orderId 注文ID
+     * @param memberNumber 会員番号
+     * @return 注文サマリー
+     */
+    OrderSummary completeLocalCardPayment(Long orderId, String memberNumber);
 }
