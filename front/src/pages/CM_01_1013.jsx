@@ -26,22 +26,22 @@ export default function CM_01_1013() {
   const navigate = useNavigate();
   const { isLoggedIn, user } = useAuth();
 
-  // --- 상태 관리 ---
+  // --- 状態管理 ---
   const [inquiry, setInquiry] = useState(null);
   const [prevNext, setPrevNext] = useState({ prev: null, next: null });
   const [loading, setLoading] = useState(true);
 
-  // 답변 관련
+  // 回答関連
   const [answerDraft, setAnswerDraft] = useState('');
   const [editingAnswer, setEditingAnswer] = useState(false);
   const [submittingAnswer, setSubmittingAnswer] = useState(false);
   const [answerError, setAnswerError] = useState('');
 
-  // 권한 및 삭제 상태
+  // 権限／削除状態
   const [isAuthor, setIsAuthor] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // --- 팝업 상태 ---
+  // ポップアップ状態
   const [errorPopup, setErrorPopup] = useState({ open: false, message: '' });
   const [confirmPopup, setConfirmPopup] = useState({ open: false, message: '' });
   const [successPopup, setSuccessPopup] = useState({ open: false, message: '' });
@@ -58,7 +58,7 @@ export default function CM_01_1013() {
     return false;
   }, [user]);
 
-  // 문의 상세 조회
+  // 問い合わせ詳細取得
   const loadInquiryDetail = useCallback(
     async (options = {}) => {
       if (!inquiryId) return false;
@@ -73,7 +73,7 @@ export default function CM_01_1013() {
           setEditingAnswer(false);
           setAnswerError('');
 
-          // 본인 확인
+          // 本人確認
           if (user) {
             const isLoginIdMatch =
               detail.current.loginId && user.loginId === detail.current.loginId;
@@ -163,7 +163,7 @@ export default function CM_01_1013() {
   const canManageAnswer = isLoggedIn && isAdmin && !isAuthor;
   const { prev, next } = prevNext;
 
-  // 날짜 포맷팅 적용
+  // 日付フォーマット適用
   const createdDate = formatDate(inquiry.createdAt);
   const answerDate = formatDate(inquiry.answerCreatedAt);
 
@@ -344,15 +344,15 @@ export default function CM_01_1013() {
           </div>
         </div>
 
-        {/* 본문 */}
+        {/* 本文 */}
         <div className="p-3" style={{ whiteSpace: 'pre-line', minHeight: '150px' }}>
           {inquiry.content}
         </div>
 
-        {/* 답변 */}
+        {/* 回答 */}
         {renderAnswerSection()}
 
-        {/* 이전/다음 글 */}
+        {/* 前／次の記事 */}
         <div className="border-top fs-5 mt-4">
           <div className="d-flex text-muted small border-bottom py-2">
             <span className="d-flex align-items-center gap-1">
@@ -388,7 +388,7 @@ export default function CM_01_1013() {
           </div>
         </div>
 
-        {/* 버튼 */}
+        {/* ボタン */}
         <div className="d-flex justify-content-center align-items-center mt-4 gap-2">
           <button className="btn btn-secondary px-5" onClick={() => navigate('/mypage/inquiries')}>
             一覧

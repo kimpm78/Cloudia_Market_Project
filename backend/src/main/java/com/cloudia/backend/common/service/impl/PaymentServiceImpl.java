@@ -50,10 +50,10 @@ public class PaymentServiceImpl implements PaymentService {
     private String apiBaseUrl;
     
     /**
-     * PG ready 호출
-     * 
-     * @param request PG 준비 요청 객체
-     * @return PG 준비 결과와 주문 정보
+     * PG ready 呼び出し
+     *
+     * @param request PG準備リクエストオブジェクト
+     * @return PG準備結果および注文情報
      */
     @Override
     public ResponseModel<Map<String, Object>> ready(PGReadyRequest request) {
@@ -63,7 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
             final Long orderId = request.getOrderId();
             final String pgType = request.getPgType();
 
-            // PG ORDERNO는 서버에서 전역 유니크로 생성
+            // PGのORDERNOはサーバー側でグローバルに一意生成
             final String pgOrderNo = mapper.selectNextOrderNumber();
             request.setOrderNo(pgOrderNo);
 
@@ -81,7 +81,7 @@ public class PaymentServiceImpl implements PaymentService {
             request.setCancelUrl(buildCallbackUrl(apiBase, "/pay/cancel-callback"));
             request.setFailUrl(buildCallbackUrl(apiBase, "/pay/fail-callback"));
 
-            log.info("[결제 준비 요청] {}", request);
+            log.info("[決済準備リクエスト] {}", request);
 
             String paymentId = UUID.randomUUID().toString();
             String paymentUserId = resolvePaymentUserId(orderId);
@@ -145,17 +145,17 @@ public class PaymentServiceImpl implements PaymentService {
             log.error("[PG READY] ERROR", e);
             return ResponseModel.<Map<String, Object>>builder()
                     .result(false)
-                    .message("PG 준비 에러: " + e.getMessage())
+                    .message("PG準備エラー: " + e.getMessage())
                     .resultList(null)
                     .build();
         }
     }
 
     /**
-     * 승인 요청 + DB 업데이트
-     * 
-     * @param request PG 승인 요청 객체
-     * @return PG 승인 결과와 관련 정보
+     * 承認リクエスト + DB更新
+     *
+     * @param request PG承認リクエストオブジェクト
+     * @return PG承認結果および関連情報
      */
     @Override
     @Transactional
@@ -166,7 +166,7 @@ public class PaymentServiceImpl implements PaymentService {
             String pgType = resolvePgType(request.getPgType());
             request.setPgType(pgType);
 
-            // tid로 결제 1건 확정 (없으면 orderId/orderNumber로 보완)
+            // tid で決済を1件特定（なければ orderId / orderNumber で補完）
             final String tid = request.getTid();
             PaymentInfo payment = resolvePayment(tid, request.getOrderId(), request.getOrderNumber(), true);
             if (payment == null) {
@@ -217,7 +217,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             if (success && expectedAmount != null) {
-                // PG 응답 amount가 문자열일 수 있으니 숫자만 비교
+            // PG応答の amount が文字列の場合があるため、数字のみで比較
                 String pgAmtRaw = result != null ? result.getAmount() : null;
                 if (pgAmtRaw != null && !pgAmtRaw.isBlank()) {
                     String digits = pgAmtRaw.replaceAll("[^0-9]", "");
@@ -233,7 +233,7 @@ public class PaymentServiceImpl implements PaymentService {
                 }
             }
 
-            // (성공 시) 재고 처리/카트 비활성화는 orderId로
+            // （成功時）在庫処理／カート無効化は orderId 基準
             String paymentUserId = resolvePaymentUserId(orderId);
 
             List<OrderItemInfo> orderItems = null;
@@ -242,31 +242,31 @@ public class PaymentServiceImpl implements PaymentService {
 
                 orderItems = mapper.findOrderItems(orderId);
                 if (orderItems == null || orderItems.isEmpty()) {
-                    throw new IllegalStateException("주문 상품 정보를 찾을 수 없습니다.");
+                    throw new IllegalStateException("注文商品の情報が見つかりません。");
                 }
 
                 for (OrderItemInfo item : orderItems) {
                     String productId = item.getProductId();
                     int quantity = item.getQuantity() != null ? item.getQuantity() : 0;
                     if (productId == null || productId.isBlank() || quantity < 1) {
-                        throw new IllegalStateException("재고 차감 대상 정보가 올바르지 않습니다.");
+                        throw new IllegalStateException("在庫差し引き対象情報が正しくありません。");
                     }
 
                     int affected = mapper.decreaseStock(productId, quantity);
                     if (affected != 1) {
-                        throw new IllegalStateException("재고가 부족하여 주문을 완료할 수 없습니다.");
+                        throw new IllegalStateException("在庫不足のため注文を完了できません。");
                     }
 
                     Long stockId = mapper.findStockIdByProductCode(productId);
                     if (stockId == null) {
-                        throw new IllegalStateException("재고 정보를 찾을 수 없습니다.");
+                        throw new IllegalStateException("在庫情報が見つかりません。");
                     }
 
                     mapper.insertStockDetail(stockId, -1L * quantity, null, paymentUserId, paymentUserId);
                 }
             }
 
-            // DB 업데이트는 tid 기준
+            // DB 更新は tid 基準で
             mapper.updatePaymentStatusOnApprove(
                     payment.getPaymentId(),
                     orderId,
@@ -301,7 +301,7 @@ public class PaymentServiceImpl implements PaymentService {
             log.error("[PG APPROVE ERROR]", e);
             return ResponseModel.<Map<String, Object>>builder()
                     .result(false)
-                    .message("PG 승인 중 오류 발생: " + e.getMessage())
+                    .message("PG承認中にエラーが発生しました: " + e.getMessage())
                     .resultList(null)
                     .build();
         }
@@ -451,7 +451,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             PaymentInfo payment = resolvePayment(tid, orderId, orderNumber, true);
             if (payment == null) {
-                throw new IllegalArgumentException("결제 정보를 찾을 수 없습니다.");
+                throw new IllegalArgumentException("決済情報が見つかりません。");
             }
 
             log.info(
@@ -463,27 +463,27 @@ public class PaymentServiceImpl implements PaymentService {
 
             String status = String.valueOf(payment.getPaymentStatusCode());
 
-            // 013: 2=승인, 3=실패 (코드일람 기준)
+            // 013: 2=承認, 3=失敗（コード一覧基準）
             if ("2".equals(status)) {
                 return ResponseModel.<Map<String, Object>>builder()
                         .result(true)
-                        .message("이미 승인 완료된 결제입니다.")
+                        .message("既に承認済みの決済です。")
                         .resultList(Map.of("success", true, "idempotent", true))
                         .build();
             }
             if ("3".equals(status)) {
                 return ResponseModel.<Map<String, Object>>builder()
                         .result(true)
-                        .message("이미 실패 처리된 결제입니다.")
+                        .message("既に失敗処理済みの決済です。")
                         .resultList(Map.of("success", true, "idempotent", true))
                         .build();
             }
 
             final String reason = (request.getReason() != null && !request.getReason().isBlank())
                     ? request.getReason()
-                    : "사용자 또는 PG 처리 실패";
+                    : "ユーザーまたはPG処理失敗";
 
-            // tid 기준 업데이트
+            // tid 基準で更新
             mapper.updatePaymentStatusToFailed(
                     payment.getPaymentId(),
                     tid,
@@ -492,7 +492,7 @@ public class PaymentServiceImpl implements PaymentService {
                     resolvePaymentUserId(payment.getOrderId()),
                     dateCalculator.tokyoTime());
 
-            // 주문 상태 업데이트는 payment.orderId 사용
+            // 注文ステータス更新は payment.orderId を使用
             mapper.updateOrderStatusOnApprove(
                     payment.getOrderId(),
                     8,
@@ -501,7 +501,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             return ResponseModel.<Map<String, Object>>builder()
                     .result(true)
-                    .message("결제를 실패 처리했습니다.")
+                    .message("決済を失敗として処理しました。")
                     .resultList(Map.of("success", true))
                     .build();
 
@@ -509,17 +509,17 @@ public class PaymentServiceImpl implements PaymentService {
             log.error("[PG FAIL ERROR]", e);
             return ResponseModel.<Map<String, Object>>builder()
                     .result(false)
-                    .message("PG 실패 처리 중 오류가 발생했습니다: " + e.getMessage())
+                    .message("PG失敗処理中にエラーが発生しました: " + e.getMessage())
                     .resultList(null)
                     .build();
         }
     }
 
     /**
-     * DECRYPT — PG encData 복호화
+     * DECRYPT — PG encData 復号
      *
-     * @param request 복호화 요청 객체
-     * @return 복호화 결과와 관련 정보
+     * @param request 復号リクエストオブジェクト
+     * @return 復号結果および関連情報
      */
     @Override
     public ResponseModel<Map<String, Object>> decrypt(PGDecryptRequest request) {
@@ -550,17 +550,17 @@ public class PaymentServiceImpl implements PaymentService {
             log.error("[PG DECRYPT ERROR]", e);
             return ResponseModel.<Map<String, Object>>builder()
                     .result(false)
-                    .message("PG decrypt 중 오류 발생: " + e.getMessage())
+                    .message("PG decrypt 中にエラーが発生しました: " + e.getMessage())
                     .resultList(null)
                     .build();
         }
     }
 
     /**
-     * CALLBACK — PG returnURL 복호화 처리
-     * 
-     * @param params PG 콜백 파라미터
-     * @return 복호화 결과와 관련 정보
+     * CALLBACK — PG returnURL 復号処理
+     *
+     * @param params PGコールバックパラメータ
+     * @return 復号結果および関連情報
      */
     @Override
     public ResponseModel<Map<String, Object>> callback(Map<String, String> params) {
@@ -662,7 +662,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             return ResponseModel.<Map<String, Object>>builder()
                     .result(false)
-                    .message("PG callback 중 오류 발생: " + e.getMessage())
+                    .message("PG callback 中にエラーが発生しました: " + e.getMessage())
                     .resultList(null)
                     .build();
         }
@@ -705,7 +705,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private void validateFailRequest(PGFailRequest request) {
         if (request == null) {
-            throw new IllegalArgumentException("요청 값이 비어 있습니다.");
+            throw new IllegalArgumentException("リクエスト値が空です。");
         }
     }
 
@@ -854,7 +854,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
             mapper.updatePaymentTransactionId(payment.getPaymentId(), tid);
         } catch (Exception e) {
-            log.warn("[PG 콜백] Failed to update transactionId for orderId={}", orderIdRaw, e);
+            log.warn("[PGコールバック] transactionId の更新に失敗しました。orderId={}", orderIdRaw, e);
         }
     }
 }

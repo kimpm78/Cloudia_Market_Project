@@ -8,25 +8,25 @@ import org.apache.ibatis.annotations.Mapper;
 public interface CM011007Mapper {
 
     /**
-     * 로그인 ID를 사용하여 users 테이블에서 프로필 정보를 조회
+     * ログインIDを使用して users テーブルからプロフィール情報を取得
      * 
-     * @param loginId 조회할 사용자의 로그인 ID
-     * @return 프로필 객체
+     * @param loginId 取得対象ユーザーのログインID
+     * @return プロフィールオブジェクト
      */
     UserProfile findProfileByLoginId(String loginId);
 
     /**
-     * 로그인 ID를 사용하여 users 테이블에서 전체 User 객체를 조회
+     * ログインIDを使用して users テーブルから User 全体オブジェクトを取得
      * 
-     * @param loginId 조회할 사용자의 로그인 ID
-     * @return User 객체
+     * @param loginId 取得対象ユーザーのログインID
+     * @return Userオブジェクト
      */
     User findUserByLoginId(String loginId);
 
     /**
-     * users 테이블의 프로필 관련 정보를 업데이트
+     * users テーブルのプロフィール関連情報を更新
      * 
-     * @param user User 객체
+     * @param user Userオブジェクト
      */
 
     void updateUserProfile(User user);

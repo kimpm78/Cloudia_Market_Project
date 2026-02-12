@@ -71,9 +71,9 @@ public class CM011009ServiceImpl implements CM011009Service {
                 emailDto.setSendEmail(user.getEmail());
                 emailDto.setName(user.getName());
                 emailService.sendPasswordChangedNotification(emailDto);
-                log.info("비밀번호 변경 알림 이메일 발송 완료: {}", user.getEmail());
+                log.info("パスワード変更通知メール送信完了: {}", user.getEmail());
             } catch (Exception e) {
-                log.warn("이메일 발송 실패 (비밀번호 변경은 완료됨): {}", e.getMessage());
+                log.warn("メール送信失敗（パスワード変更は完了）: {}", e.getMessage());
             }
 
             log.info(CM011009MessageConstant.SERVICE_END, loginId);
@@ -88,17 +88,17 @@ public class CM011009ServiceImpl implements CM011009Service {
     }
 
     /**
-     * 6개월 이내 비밀번호 사용 여부 확인
-     * 
-     * @param memberNumber 사원 번호 (DB의 password_history 테이블 키)
+     * 過去6か月以内のパスワード使用有無を確認
+     *
+     * @param memberNumber 会員番号（DBの password_history テーブルキー）
      */
     private boolean isPasswordUsedInLast6Months(String memberNumber, String plainPassword) {
         LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
 
-        // memberNumber와 날짜로 조회
+        // memberNumber と日付で取得
         List<String> recentPasswordHashes = CM011009Mapper.findRecentPasswords(memberNumber, sixMonthsAgo);
 
-        // 비교
+        // 比較
         return recentPasswordHashes.stream()
                 .anyMatch(historyHash -> passwordEncoder.matches(plainPassword, historyHash));
     }

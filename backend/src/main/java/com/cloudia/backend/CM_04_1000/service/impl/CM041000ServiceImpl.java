@@ -699,7 +699,7 @@ public class CM041000ServiceImpl implements CM041000Service {
             }
         } catch (Exception e) {
             if ("editor".equals(type)) {
-                log.error("리뷰 에디터 이미지 삭제 오류 reviewId={}, imageId={}", reviewId, imageId, e);
+                log.error("レビュー編集者の画像削除エラー reviewId={}, imageId={}", reviewId, imageId, e);
             } else if ("main".equals(type)) {
                 log.error("{} reviewId={}, imageId={}", CM041000MessageConstant.REVIEW_IMAGE_DELETE_FAIL, reviewId, imageId, e);
             } else {

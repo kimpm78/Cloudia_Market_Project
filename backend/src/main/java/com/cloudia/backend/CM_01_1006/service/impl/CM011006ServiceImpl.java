@@ -31,7 +31,7 @@ public class CM011006ServiceImpl implements CM011006Service {
     private String getMemberNumberByLoginId(String loginId) {
         User user = userMapper.findByLoginId(loginId);
         if (user == null) {
-            throw new RuntimeException("사용자 정보를 찾을 수 없습니다: " + loginId);
+            throw new RuntimeException("ユーザー情報が見つかりません: " + loginId);
         }
         return user.getMemberNumber();
     }
@@ -99,7 +99,7 @@ public class CM011006ServiceImpl implements CM011006Service {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
-            // 권한 체크를 위해 User 정보 조회
+            // 権限チェックのため User 情報を取得
             User user = userMapper.findByLoginId(loginId);
             if (user == null)
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -18,6 +18,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefundSearchRequestDto {
+    private String requestNo;               // 依頼番号
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateFrom;             // 返金日付（From）
     @DateTimeFormat(pattern = "yyyy-MM-dd")

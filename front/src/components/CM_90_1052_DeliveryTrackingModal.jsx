@@ -74,7 +74,7 @@ export default function CM_90_1052_DeliveryTrackingModal({ show, onHide, onConfi
 
   return (
     <>
-      {/* 백드롭 */}
+      {/* バックドロップ */}
       <div
         className="modal-backdrop fade show"
         onClick={handleCancel}

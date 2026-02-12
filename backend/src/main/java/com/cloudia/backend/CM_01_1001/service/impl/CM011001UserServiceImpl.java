@@ -61,7 +61,7 @@ public class CM011001UserServiceImpl implements CM011001UserService {
             User user = request.getUser();
             Address address = request.getAddress();
 
-            // 유효성 검사 (ID, 이메일 중복 등)
+            // 入力値検証（ID／メール重複など）
             if (userMapper.countByLoginId(user.getLoginId()) > 0) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(Map.of("message", CM011001MessageConstant.FAIL_ID_CONFLICT));

@@ -120,16 +120,16 @@ public class CM061000ServiceImpl implements CM061000Service {
     @Transactional
     public Long addToCart(Long userId, String productId, int quantity) {
         try {
-            // 입력값 검증 - fail fast
+            // 入力値検証（fail fast）
             if (quantity < 1) {
                 throw new IllegalArgumentException(CM061000MessageConstant.CART_INVALID_QUANTITY);
             }
             if (productId == null || productId.isBlank()) {
                 throw new IllegalArgumentException(CM061000MessageConstant.CART_ITEM_NOT_FOUND);
             }
-            // 장바구니 만료 처리
+            // カート期限切れ処理
             expireCartIfNecessary(userId);
-            // 상품코드 정규화
+            // 商品コード正規化
             String normalizedProductId = normalizeProductId(productId);
             if (normalizedProductId == null) {
                 throw new IllegalArgumentException(CM061000MessageConstant.CART_ITEM_NOT_FOUND);
@@ -137,16 +137,14 @@ public class CM061000ServiceImpl implements CM061000Service {
 
             ensureReleaseMonthCompatible(userId, normalizedProductId);
 
-            // 상품 단위 경쟁조건 방지: 재고 행 잠금 후 남은 수량 계산
             cm061000Mapper.lockLatestStockRow(normalizedProductId);
 
-            // 기존 장바구니 항목 조회
+            // 既存カートアイテム取得
             CartItem existingItem = cm061000Mapper.findActiveCartItem(userId, normalizedProductId);
             String updater = resolveUpdater();
 
             if (existingItem != null) {
                 int desiredQuantity = existingItem.getQuantity() + quantity;
-                // 재고 / 제한 검증
                 ensurePurchaseLimit(normalizedProductId, desiredQuantity);
                 ensureStockAvailable(userId, normalizedProductId, desiredQuantity);
                 ensureCartLimit(userId, existingItem.getQuantity(), desiredQuantity);
@@ -157,7 +155,7 @@ public class CM061000ServiceImpl implements CM061000Service {
                         userId, normalizedProductId, existingItem.getCartItemId(), quantity);
                 return existingItem.getCartItemId();
             }
-            // 새 항목 추가 처리
+            // 新規アイテム追加処理
             ensurePurchaseLimit(normalizedProductId, quantity);
             ensureStockAvailable(userId, normalizedProductId, quantity);
             ensureCartLimit(userId, 0, quantity);
@@ -176,12 +174,12 @@ public class CM061000ServiceImpl implements CM061000Service {
             return item.getCartItemId();
 
         } catch (IllegalStateException | IllegalArgumentException e) {
-            // 비즈니스/검증 오류는 WARN 레벨 + 메시지
+            // ビジネス／検証エラーは WARN レベル + メッセージ
             log.warn("カート追加失敗 - userId: {}, productId: {}, reason: {}",
                     userId, productId, e.getMessage());
             throw e;
         } catch (Exception e) {
-            // 시스템/DB 오류는 ERROR 레벨
+            // システム／DBエラーは ERROR レベル
             LogHelper.log(LogMessage.DB_ACCESS_ERROR, new String[] { "カート追加" }, e);
             throw e;
         }
@@ -197,23 +195,23 @@ public class CM061000ServiceImpl implements CM061000Service {
     @Transactional
     public void updateQuantity(Long userId, Long cartItemId, int quantity) {
         try {
-            // 입력값 검증 - fail fast
+            // 入力値検証（fail fast）
             if (quantity < 1) {
                 throw new IllegalArgumentException(CM061000MessageConstant.CART_INVALID_QUANTITY);
             }
 
-            // 장바구니 만료 처리 먼저
+            // 先にカート期限切れ処理
             expireCartIfNecessary(userId);
 
-            // 대상 장바구니 항목 조회
+            // 対象カートアイテム取得
             CartItem cartItem = cm061000Mapper.findCartItemById(cartItemId);
             if (cartItem == null || cartItem.getIsActive() == null || cartItem.getIsActive() == 0) {
                 throw new IllegalArgumentException(CM061000MessageConstant.CART_ITEM_NOT_FOUND);
             }
 
-            // 소유자 검증 (다른 사람 카트 차단)
+            // 所有者検証（他ユーザーのカートを遮断）
             if (!userId.equals(cartItem.getUserId())) {
-                // 보안상 "없다"로 응답 (존재 여부 노출 방지)
+                // セキュリティ上「存在しない」として応答（存在有無の露出防止）
                 throw new IllegalStateException(CM061000MessageConstant.CART_ITEM_NOT_FOUND);
             }
 
@@ -227,7 +225,7 @@ public class CM061000ServiceImpl implements CM061000Service {
             if (delta != 0) {
                 applyCartStockDelta(cartItem.getProductId(), delta);
             }
-            // 수량 업데이트
+            // 数量更新
             cm061000Mapper.updateQuantity(cartItemId, quantity, resolveUpdater());
 
             log.info(
@@ -235,13 +233,13 @@ public class CM061000ServiceImpl implements CM061000Service {
                     userId, cartItemId, cartItem.getProductId(), cartItem.getQuantity(), quantity);
 
         } catch (IllegalStateException | IllegalArgumentException e) {
-            // 비즈니스/검증 오류
+            // ビジネス／検証エラー
             log.warn(
                     "カート数量変更失敗 - userId: {}, cartItemId: {}, reason: {}",
                     userId, cartItemId, e.getMessage());
             throw e;
         } catch (Exception e) {
-            // 시스템/DB 오류
+            // システム／DBエラー
             log.error(CM061000MessageConstant.CART_DB_ERROR, e);
             throw e;
         }
@@ -257,32 +255,32 @@ public class CM061000ServiceImpl implements CM061000Service {
     @Transactional
     public void remove(Long userId, Long cartItemId) {
         try {
-            // 먼저 장바구니 만료 처리
+            // 先にカート期限切れ処理
             expireCartIfNecessary(userId);
-            // 대상 장바구니 항목 조회
+            // 対象カートアイテム取得
             CartItem cartItem = cm061000Mapper.findCartItemById(cartItemId);
             if (cartItem == null || cartItem.getIsActive() == null || cartItem.getIsActive() == 0) {
                 throw new IllegalArgumentException(CM061000MessageConstant.CART_ITEM_NOT_FOUND);
             }
-            // 소유자 검증 (다른 사람의 카트를 지우지 못하도록)
+            // 所有者検証（他ユーザーのカートを削除できないように）
             if (!userId.equals(cartItem.getUserId())) {
-                // 존재 여부를 숨기기 위해 NOT_FOUND 그대로 사용
+                // 存在有無を隠すため NOT_FOUND をそのまま使用
                 throw new IllegalStateException(CM061000MessageConstant.CART_ITEM_NOT_FOUND);
             }
             applyCartStockDelta(cartItem.getProductId(), -1 * cartItem.getQuantity());
-            // 소프트 삭제
+            // ソフトデリート
             cm061000Mapper.softDelete(cartItemId, resolveUpdater());
             log.info(
                     "カートアイテム削除成功 - userId: {}, cartItemId: {}, productId: {}",
                     userId, cartItemId, cartItem.getProductId());
         } catch (IllegalStateException | IllegalArgumentException e) {
-            // 비즈니스/검증 에러
+            // ビジネス／検証エラー
             log.warn(
                     "カートアイテム削除失敗 - userId: {}, cartItemId: {}, reason: {}",
                     userId, cartItemId, e.getMessage());
             throw e;
         } catch (Exception e) {
-            // 시스템/DB 에러
+            // システム／DBエラー
             log.error(CM061000MessageConstant.CART_DB_ERROR, e);
             throw e;
         }

@@ -15,48 +15,48 @@ import lombok.*;
 public class PGResult {
 
     /**
-    * PG 응답 공통값
-    */
+     * PG応答の共通項目
+     */
     @JsonProperty("RESULTCODE")
     @JsonAlias({"RTN_CD", "rtn_cd"})
-    private String resultCode;     // PG 결과 코드
+    private String resultCode;     // PG結果コード
 
     @JsonProperty("RESULTMSG")
     @JsonAlias({"RTN_MSG", "rtn_msg"})
-    private String resultMsg;      // PG 결과 메시지
+    private String resultMsg;      // PG結果メッセージ
 
     @JsonProperty("TID")
     @JsonAlias({"tid", "Tid", "transactionId", "transaction_id"})
-    private String tid;            // 거래 ID
+    private String tid;            // 取引ID
 
     @JsonProperty("ORDERNO")
-    private String orderNo;        // 주문번호
+    private String orderNo;        // 注文番号
 
     @JsonProperty("AMOUNT")
-    private String amount;         // 결제 금액
+    private String amount;         // 決済金額
 
     @JsonProperty("PAYMETHOD")
-    private String payMethod;      // 결제 수단
+    private String payMethod;      // 決済手段
 
     @JsonProperty("ACCEPTNO")
-    private String acceptNo;       // 승인번호
+    private String acceptNo;       // 承認番号
 
     @JsonProperty("ACCEPTDATE")
-    private String acceptDate;     // 승인일시(YYYYMMDDHHMMSS)
+    private String acceptDate;     // 承認日時（YYYYMMDDHHMMSS）
 
 
     /**
-    *  확장 옵션: 일부 PG에서 제공
-    */
+     * 拡張オプション（一部PGで提供）
+     */
     @JsonProperty("AUTHCODE")
-    private String authCode;       // 카드사 승인 코드
+    private String authCode;       // カード会社承認コード
 
     @JsonProperty("TRANSACTIONDATE")
-    private String transactionDate; // 거래 시간
+    private String transactionDate; // 取引時間
 
     /**
-    * READY 응답 확장 필드
-    */
+     * READY応答の拡張フィールド
+     */
     private String html;
 
     @JsonProperty("URL")
@@ -67,15 +67,15 @@ public class PGResult {
     @JsonAlias({"redirectUrl", "REDIRECT_URL", "redirect_url"})
     private String redirectUrl;
 
-    /** 
-    * 확장 필드: PG UI Script (jQuery + cookiepay + payverse)
-    */
+    /**
+     * 拡張フィールド：PG UI Script（jQuery + cookiepay + payverse）
+     */
     @JsonIgnore
     private String pgScripts;
     
     /**
-    *  유틸리티 메서드 (PG 성공 여부 체크)
-    */
+     * ユーティリティメソッド（PG成功可否の判定）
+     */
     public boolean isSuccess() {
         return "0000".equals(this.resultCode);
     }

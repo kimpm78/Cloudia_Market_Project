@@ -74,6 +74,7 @@ export default function CM_90_1052() {
   const [loading, setLoading] = useState(false);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [requestNo, setRequestNo] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -84,9 +85,15 @@ export default function CM_90_1052() {
 
   const handleOrderClick = useCallback(
     async (orderData) => {
-      const refundNumber = orderData.memberNumber || orderData.customerId;
-      const orderNumber = orderData.orderNumber || orderData.orderNo;
-      const requestNo = orderData.orderNo;
+      const refundNumber = orderData?.memberNumber || orderData?.customerId || '';
+      const orderNumber = orderData?.orderNumber || orderData?.orderNo || '';
+      const requestNo = orderData?.orderNo || orderData?.orderNumber || '';
+
+      if (!refundNumber || !orderNumber) {
+        open('error', '詳細照会に必要な注文情報が不足しています。');
+        return;
+      }
+
       const searchRequestDto = {
         requestNo,
         refundNumber,
@@ -98,13 +105,15 @@ export default function CM_90_1052() {
           params: searchRequestDto,
         })
       );
-      if (resultList) {
+      if (resultList?.data?.result) {
         setRowDetailData(resultList.data?.resultList || []);
         setSelectedOrder(orderData);
         setShowOrderModal(true);
+      } else {
+        open('error', resultList?.data?.message || CMMessage.MSG_ERR_001);
       }
     },
-    [apiHandler]
+    [apiHandler, open]
   );
 
   const handleCloseModal = useCallback(() => {
@@ -364,6 +373,7 @@ export default function CM_90_1052() {
     setLoading(true);
 
     const searchParams = {
+      requestNo,
       dateFrom,
       dateTo,
       orderStatusValue: selectedStatus,
@@ -383,21 +393,23 @@ export default function CM_90_1052() {
     const hasDateFrom = dateFrom && dateFrom.trim() !== '';
     const hasDateTo = dateTo && dateTo.trim() !== '';
 
-    if (!hasDateFrom && !hasDateTo) {
+    const hasRequestNo = requestNo && requestNo.trim() !== '';
+
+    if (!hasRequestNo && !hasDateFrom && !hasDateTo) {
       open('error', CMMessage.MSG_ERR_002('日付'));
       setLoading(false);
       return;
     }
 
-    if (hasDateFrom && !hasDateTo) {
+    if (!hasRequestNo && hasDateFrom && !hasDateTo) {
       open('error', CMMessage.MSG_ERR_002('開始日'));
       setLoading(false);
       return;
-    } else if (!hasDateFrom && hasDateTo) {
+    } else if (!hasRequestNo && !hasDateFrom && hasDateTo) {
       open('error', CMMessage.MSG_ERR_002('終了日'));
       setLoading(false);
       return;
-    } else if (hasDateFrom && hasDateTo) {
+    } else if (!hasRequestNo && hasDateFrom && hasDateTo) {
       const fromDate = new Date(dateFrom);
       const toDate = new Date(dateTo);
 
@@ -428,7 +440,7 @@ export default function CM_90_1052() {
     } finally {
       setLoading(false);
     }
-  }, [dateFrom, dateTo, selectedStatus, selectedPaymentMethod, apiHandler, fetchAllProducts, open]);
+  }, [requestNo, dateFrom, dateTo, selectedStatus, selectedPaymentMethod, apiHandler, fetchAllProducts, open]);
 
   const handleRefundClick = useCallback(() => {
     setShowRefundModal(true);
@@ -465,6 +477,7 @@ export default function CM_90_1052() {
   );
 
   const handleReset = useCallback(() => {
+    setRequestNo('');
     setDateFrom('');
     setDateTo('');
     setSelectedStatus('');
@@ -522,7 +535,19 @@ export default function CM_90_1052() {
             <div className="card shadow-sm">
               <div className="card-body">
                 <div className="row g-3 align-items-end">
-                  <div className="col-12 col-md-4">
+                  <div className="col-12 col-md-3">
+                    <label className="form-label fw-semibold">依頼番号</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={requestNo}
+                      onChange={(e) => setRequestNo(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="依頼番号で検索"
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-5">
                     <label className="form-label fw-semibold">対象期間</label>
                     <div className="d-flex flex-nowrap align-items-center gap-2">
                       <select

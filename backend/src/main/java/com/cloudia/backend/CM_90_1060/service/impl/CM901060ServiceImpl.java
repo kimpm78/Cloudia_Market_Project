@@ -693,7 +693,7 @@ public class CM901060ServiceImpl implements CM901060Service {
                 }
             } else {
                 if (fileName != null) {
-                    // tmp 파일을 product 폴더로 이동
+                    // tmpファイルをproductフォルダに移動します
                     String newImagePath = moveTmpImageToProduct("/tmp/" + fileName, productFolder);
 
                     if (newImagePath != null) {

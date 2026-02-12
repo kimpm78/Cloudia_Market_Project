@@ -141,7 +141,7 @@ export default WritePost;
 
 ポップアップは共通 `ModalBase` を基盤として実装され、以下の構成で利用します。
 
-## 폴더 구조
+## フォルダ構造
 
 ```
 - front/
@@ -156,9 +156,9 @@ export default WritePost;
               └── CM_99_popup.css    // ポップアップ共通スタイル
 ```
 
-## 1. 기본 구조
+## 1. 基本構造
 
-공통 팝업은 아래처럼 구성됩니다.
+共通ポップアップは以下のように構成されています。
 
 ```jsx
 import CM_99_1001 from '@/components/popup/CM_99_1001';
@@ -193,10 +193,7 @@ return (
 
 # テストアカウント
 
-### 一般
-
-ID:user1
-PW:test123123!
+### 一般 （新規登録してください。）
 
 ### 管理者
 

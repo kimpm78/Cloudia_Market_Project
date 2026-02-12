@@ -12,27 +12,27 @@ import java.util.List;
 public interface CM011006Service {
 
     /**
-     * 내 문의 내역 조회
+     * 自分の問い合わせ履歴を取得
      */
-    List<InquiryResponseDTO> getMyInquiries(String loginId); // [수정]
+    List<InquiryResponseDTO> getMyInquiries(String loginId);
 
     /**
-     * 문의 작성용 상품 목록 조회
+     * 問い合わせ作成用の商品一覧を取得
      */
     List<InquiryProductDTO> getProductList();
 
     /**
-     * 1:1 문의 등록
+     * 1:1問い合わせ登録
      */
-    InquiryResponseDTO createInquiry(String loginId, InquiryWriteDTO writeDTO); // [수정]
+    InquiryResponseDTO createInquiry(String loginId, InquiryWriteDTO writeDTO);
 
     /**
-     * 1:1 문의 상세 조회
+     * 1:1問い合わせ詳細取得
      */
-    ResponseEntity<InquiryDetailResponse> getInquiryDetail(Long inquiryId, String loginId); // [수정]
+    ResponseEntity<InquiryDetailResponse> getInquiryDetail(Long inquiryId, String loginId);
 
     /**
-     * 1:1 문의 삭제
+     * 1:1問い合わせ削除
      */
-    ResponseEntity<Void> deleteInquiry(Long inquiryId, String loginId); // [수정]
+    ResponseEntity<Void> deleteInquiry(Long inquiryId, String loginId);
 }

@@ -327,7 +327,7 @@ const DetailImageUpload = ({ images, onChange, error, onError, isEdit = false })
     onChange(images.filter((img) => img.id !== imageId));
   };
 
-  // 드래그 앤 드롭 이벤트 핸들러
+  // ドラッグ＆ドロップのイベントハンドラー
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();

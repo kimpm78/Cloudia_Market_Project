@@ -61,9 +61,12 @@
              , shipping_fee_customer_amount
              , shipping_fee_seller_amount
              , refund_amount
-          FROM returns
+         FROM returns
          WHERE return_status_value IN (1,2,3,4,5)
            AND COALESCE(CAST(is_display AS TEXT), '1') = '1'
+           <if test="requestNo != null and requestNo != ''">
+           AND CAST(order_number AS TEXT) LIKE CONCAT('%', #{requestNo}, '%')
+           </if>
            AND requested_at::date <![CDATA[>=]]> #{dateFrom}::date
            AND requested_at::date <![CDATA[<=]]> #{dateTo}::date
     </select>

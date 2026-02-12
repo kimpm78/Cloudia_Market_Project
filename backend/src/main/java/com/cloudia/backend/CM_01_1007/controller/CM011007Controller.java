@@ -22,7 +22,7 @@ public class CM011007Controller {
     private final CM011007Service CM011007Service;
 
     /**
-     * 현재 로그인된 사용자의 프로필 정보를 조회
+     * 現在ログイン中のユーザーのプロフィール情報を取得
      */
     @GetMapping("/profile")
     public ResponseEntity<UserProfile> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
@@ -34,7 +34,7 @@ public class CM011007Controller {
     }
 
     /**
-     * 현재 로그인된 사용자의 프로필 정보를 수정
+     * 現在ログイン中のユーザーのプロフィール情報を更新
      */
     @PutMapping("/profile")
     public ResponseEntity<Map<String, Object>> updateProfile(

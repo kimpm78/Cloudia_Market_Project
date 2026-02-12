@@ -8,12 +8,12 @@ export default function FindIdResult({ id }) {
 
   return (
     <>
-      <h4 className="fw-bold mb-3">아이디 찾기</h4>
-      <p className="text-muted mb-4">회원님의 아이디를 확인했습니다.</p>
+      <h4 className="fw-bold mb-3">ID検索</h4>
+      <p className="text-muted mb-4">お客様のIDを確認しました。</p>
       <div className="alert alert-light text-center fs-4 fw-bold">{maskedId}</div>
       <div className="d-grid mt-4">
         <button className="btn btn-primary" onClick={() => navigate('/login')}>
-          로그인 화면으로 이동
+          ログイン画面へ移動
         </button>
       </div>
     </>

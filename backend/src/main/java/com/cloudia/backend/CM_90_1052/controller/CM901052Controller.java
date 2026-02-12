@@ -64,7 +64,18 @@ public class CM901052Controller {
      * @return 返金商品一覧
      */
     @GetMapping("/orderDetail")
-    public ResponseEntity<ResponseModel<List<OrderDetailDto>>> getOrderDetail(@RequestParam String requestNo,
+    public ResponseEntity<ResponseModel<List<OrderDetailDto>>> getOrderDetail(@RequestParam(required = false) String requestNo,
+            @RequestParam String refundNumber,
+            @RequestParam String orderNumber) {
+        List<OrderDetailDto> result = cm901052Service.getOrderDetail(requestNo, refundNumber, orderNumber);
+        return ResponseEntity.ok(ResponseHelper.success(result, "取得成功"));
+    }
+
+    /**
+     * 旧フロント互換: 顧客情報/注文詳細取得
+     */
+    @GetMapping("/getCustomerInfo")
+    public ResponseEntity<ResponseModel<List<OrderDetailDto>>> getCustomerInfo(@RequestParam(required = false) String requestNo,
             @RequestParam String refundNumber,
             @RequestParam String orderNumber) {
         List<OrderDetailDto> result = cm901052Service.getOrderDetail(requestNo, refundNumber, orderNumber);

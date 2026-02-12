@@ -26,7 +26,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     /**
-     * PG 결제 준비 (Ready)
+     * PG決済準備（Ready）
      */
     @PostMapping("/ready")
     public ResponseModel<Map<String, Object>> ready(@RequestBody PGReadyRequest request) {
@@ -34,7 +34,7 @@ public class PaymentController {
     }
 
     /**
-     * PG 결제 승인 (Approve)
+     * PG決済承認（Approve）
      */
     @PostMapping("/approve")
     public ResponseModel<Map<String, Object>> approve(@RequestBody PGApproveRequest request) {
@@ -42,7 +42,7 @@ public class PaymentController {
     }
 
     /**
-     * PG 결제 취소 (Cancel - 사용자/관리자)
+     * PG決済キャンセル（Cancel - ユーザー／管理者）
      */
     @PostMapping("/cancel")
     public ResponseModel<Map<String, Object>> cancel(@RequestBody PGCancelRequest request) {
@@ -50,7 +50,7 @@ public class PaymentController {
     }
 
     /**
-     * PG 결제 실패/닫힘 처리 (내부 상태만 업데이트)
+     * PG決済失敗／クローズ処理（内部状態のみ更新）
      */
     @PostMapping("/fail")
     public ResponseModel<Map<String, Object>> fail(@RequestBody PGFailRequest request) {
@@ -58,11 +58,11 @@ public class PaymentController {
     }
 
     /**
-     * 통합 PG Callback 처리 (Success, Cancel, Fail 통합)
-     * 
-     * @param success, cancel, fail 중 하나
-     * @param allParams 모든 쿼리 파라미터
-     * @return 리다이렉트 응답
+     * 統合PG Callback処理（Success, Cancel, Fail を統合）
+     *
+     * @param type success / cancel / fail のいずれか
+     * @param allParams すべてのクエリパラメータ
+     * @return リダイレクトレスポンス
      */
     @GetMapping("/callback")
     @RequestMapping(value = {"/callback", "/callback/{type}"}, method = {RequestMethod.GET, RequestMethod.POST})
@@ -70,16 +70,16 @@ public class PaymentController {
             @PathVariable(required = false) String type,
             @RequestParam Map<String, String> allParams) {
 
-        // 쿠키페이는 성공/실패 여부를 'resultStatus' 파라미터로 보내줍니다.
+        // CookiePay は成功／失敗の判定を 'resultStatus' パラメータで返却します。
         String status = (type != null) ? type : allParams.get("resultStatus");
         
         log.info("[COOKIEPAY CALLBACK] Status: {}, OrderId: {}, Message: {}", 
                 status, allParams.get("orderId"), allParams.get("resultMessage"));
 
-        // 서비스 로직 수행
+        // サービスロジック実行
         ResponseModel<Map<String, Object>> rm = paymentService.callback(allParams);
 
-        // 쿠키페이는 결제 성공 시 결제 완료 페이지로, 실패 시(DECLINE) 에러 페이지나 메인으로 리다이렉트
+        // CookiePay は決済成功時は完了ページへ、失敗（DECLINE）時はエラーページまたはメインへリダイレクトします。
         String redirectUrl = extractRedirectUrl(rm, status);
 
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -92,15 +92,15 @@ public class PaymentController {
             return String.valueOf(rm.getResultList().get("redirectUrl"));
         }
         
-        // 로직 처리가 애매할 때 기본 리다이렉트 경로
+        // ロジック判定が曖昧な場合のデフォルトリダイレクト先
         if ("DECLINE".equals(status)) {
-            return "/payment/fail"; // 결제 실패 페이지
+            return "/payment/fail"; // 決済失敗ページ
         }
-        return "/payment/success"; // 결제 성공 페이지
+        return "/payment/success"; // 決済成功ページ
     }
 
     /**
-     * PG encData 복호화
+     * PG encData の復号
      */
     @GetMapping("/decrypt")
     public ResponseModel<Map<String, Object>> decrypt(@RequestParam Map<String, String> query) {

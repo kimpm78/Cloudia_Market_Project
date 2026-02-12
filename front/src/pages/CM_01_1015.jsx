@@ -69,7 +69,7 @@ export default function CM_01_1015() {
     fetchReturns();
   }, [fetchReturns]);
 
-  // --- [로직 유지] 검색 및 페이징 로직 ---
+  // 検索およびページングロジック ---
   const filteredReturns = returns.filter((item) => {
     if (!activeKeyword) return true;
     const keyword = activeKeyword.toLowerCase();
@@ -90,14 +90,13 @@ export default function CM_01_1015() {
     setGridApi(params.api);
   };
 
-  // --- [디자인] 1006 스타일의 컬럼 정의 ---
   const columnDefs = [
     {
       headerName: '処理状態',
       field: 'returnStatusName',
       width: 120,
       cellRenderer: (params) => {
-        const isComplete = params.value?.includes('완료');
+        const isComplete = params.value?.includes('完了') || params.value?.includes('완료');
         return (
           <span className={`fw-bold ${isComplete ? 'text-primary' : 'text-danger'}`}>
             {params.value || '処理中'}

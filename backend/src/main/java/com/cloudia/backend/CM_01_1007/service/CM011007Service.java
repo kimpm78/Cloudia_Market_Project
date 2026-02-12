@@ -6,18 +6,19 @@ import java.util.Map;
 
 public interface CM011007Service {
     /**
-     * 사용자의 프로필 정보를 조회
+     * ユーザーのプロフィール情報を取得
      * 
-     * @param loginId 조회할 사용자의 로그인 ID
-     * @return 프로필 정보를 담은 ResponseEntity 객체
+     * @param loginId 取得対象ユーザーのログインID
+     * @return プロフィール情報を含む ResponseEntity オブジェクト
      */
     ResponseEntity<UserProfile> getProfile(String loginId);
 
     /**
-     * 사용자의 프로필 정보를 조회
+     * ユーザーのプロフィール情報を更新
      * 
-     * @param loginId 조회할 사용자의 로그인 ID
-     * @return 프로필 정보를 담은 ResponseEntity 객체
+     * @param loginId 更新対象ユーザーのログインID
+     * @param profileDTO 更新するプロフィール情報
+     * @return 更新結果を含む ResponseEntity オブジェクト
      */
     ResponseEntity<Map<String, Object>> updateProfile(String loginId, UserProfile profileDTO);
 }

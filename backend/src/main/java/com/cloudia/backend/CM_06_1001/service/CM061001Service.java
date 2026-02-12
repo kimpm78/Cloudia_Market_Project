@@ -7,33 +7,34 @@ import com.cloudia.backend.CM_06_1001.model.PaymentInfo;
 public interface CM061001Service {
 
     /**
-     * 주문 생성
-     * @param request 주문 생성 요청 정보
-     * @return 생성된 주문 요약 정보
+     * 注文作成
+     *
+     * @param request 注文作成リクエスト情報
+     * @return 作成された注文サマリー情報
      */
     OrderSummary createOrder(OrderCreate request);
 
     /**
-     * 주문 완료 처리
+     * 注文完了処理
      *
-     * @param orderId 주문 ID
+     * @param orderId 注文ID
      */
     void completeOrder(Long orderId, String memberNumber);
 
     /**
-     * 주문 요약 정보 조회
+     * 注文サマリー情報を取得
      *
-     * @param orderId      주문 ID
-     * @param memberNumber 회원 번호 (권한 검증용)
-     * @return 주문 요약 정보
+     * @param orderId      注文ID
+     * @param memberNumber 会員番号（権限検証用）
+     * @return 注文サマリー情報
      */
     OrderSummary getOrderSummary(Long orderId, String memberNumber);
 
     /**
-     * 최신 결제 상태 조회 (orderNumber 기준)
+     * 最新の決済ステータスを取得（orderNumber基準）
      *
-     * @param orderNumber 주문번호
-     * @return 최신 결제 정보
+     * @param orderNumber 注文番号
+     * @return 最新の決済情報
      */
     PaymentInfo findLatestPayment(String orderNumber);
 

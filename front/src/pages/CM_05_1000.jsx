@@ -37,7 +37,6 @@ export default function CM_05_1000() {
     axiosInstance
       .get(`${import.meta.env.VITE_API_BASE_URL}/guest/notice`)
       .then((res) => {
-        // console.log('공지사항 응답 데이터:', res.data);
         const list = Array.isArray(res.data) ? res.data : res.data?.resultList || [];
         if (Array.isArray(list)) {
           setNotices(list.filter((notice) => notice.isDisplay === 1));
@@ -46,7 +45,7 @@ export default function CM_05_1000() {
         }
       })
       .catch((err) => {
-        console.error('공지사항 로드 실패:', err?.response?.data?.message || err.message);
+        console.error('お知らせ読み込み失敗:', err?.response?.data?.message || err.message);
       });
   }, []);
 

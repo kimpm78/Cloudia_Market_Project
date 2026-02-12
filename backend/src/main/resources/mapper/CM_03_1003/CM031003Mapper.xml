@@ -118,7 +118,7 @@
     ORDER BY p.created_at DESC
   </select>
 
-  <!-- 상품 상세 조회 -->
+  <!-- 商品詳細照会 -->
   <select id="selectProductDetail" parameterType="long" resultType="com.cloudia.backend.CM_03_1003.model.ProductInfo">
     SELECT 
       p.product_id,

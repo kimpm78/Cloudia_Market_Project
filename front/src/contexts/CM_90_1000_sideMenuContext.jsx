@@ -32,7 +32,7 @@ export const MenuProvider = ({ children }) => {
         setError(null);
       }
     } catch (err) {
-      console.error('메뉴 데이터 불러오기 실패:', err);
+      console.error('メニューデータの取得に失敗しました:', err);
       setError(err);
       setMenuData([]);
     } finally {

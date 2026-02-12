@@ -75,24 +75,23 @@ h3 {
   }
 }
 
-/* Tablet: 768 ~ 1023px */
+/* TB: 768 ~ 1023px */
 @media screen and (min-width: 768px) and (max-width: 1023px) {
   html {
     font-size: 15px;
   }
-
   .container {
     padding: 0 2rem;
   }
+  /* PC: 1024px 以上 */
+  @media screen and (min-width: 1024px) {
+    html {
+      font-size: 16px;
+    }
+  
+    .container {
+      padding: 0 3rem;
+    }
+  }
 }
 
-/* PC: 1024px 이상 */
-@media screen and (min-width: 1024px) {
-  html {
-    font-size: 16px;
-  }
-
-  .container {
-    padding: 0 3rem;
-  }
-}

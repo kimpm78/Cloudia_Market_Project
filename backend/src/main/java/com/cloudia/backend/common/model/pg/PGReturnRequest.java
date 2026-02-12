@@ -6,9 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * PG ReturnUrl 요청 DTO
- * PG 결제 완료 후 our-server로 전달되는 데이터를 담는 모델
- * encData 기반 decrypt → approve 로 이어지는 핵심 구조
+ * PG ReturnUrl リクエストDTO
+ * PG決済完了後に our-server へ渡されるデータを保持するモデル
+ * encData を基点に decrypt → approve へと続く中核構造
  */
 @Data
 @NoArgsConstructor
@@ -16,16 +16,16 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PGReturnRequest {
 
-    /** PG returnUrl 에서 넘어오는 암호화 데이터 */
+    /** PG returnUrl から渡される暗号化データ */
     private String encData;
 
-    /** PG returnUrl 에서 직접 넘어오는 주문번호 */
+    /** PG returnUrl から直接渡される注文番号 */
     private String orderNo;
 
-    /** PG 종류 (COOKIEPAY, TOSS, INICIS 등) */
+    /** PG種別（COOKIEPAY, TOSS, INICIS など） */
     private String pgType;
 
-    /** PG 가 return 시 함께 넘길 수 있는 코드/메시지 (옵션) */
-    private String resultCode;     // 직접 넘어올 수 있음
-    private String resultMessage;  // 직접 넘어올 수 있음
+    /** PGがreturn時に併せて渡す可能性のあるコード／メッセージ（任意） */
+    private String resultCode;     // 直接渡される場合あり
+    private String resultMessage;  // 直接渡される場合あり
 }

@@ -47,7 +47,7 @@ export default function ProductCardBasic({
               src={imageUrl}
               onError={(e) => (e.currentTarget.src = noImage)}
               className="card-img-top rounded"
-              alt="상품 이미지"
+              alt="商品画像"
               style={{ aspectRatio: '1/1', objectFit: 'cover' }}
             />
             {showOverlay && (

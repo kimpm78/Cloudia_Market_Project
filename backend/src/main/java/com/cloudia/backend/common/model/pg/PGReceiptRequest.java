@@ -6,17 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * PG 결제 영수증(전표) 조회 요청 DTO
+ * PG決済領収書（伝票）照会リクエストDTO
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class PGReceiptRequest {
-
-    /** PG 거래 번호 (TID) */
-    private String tid;
-
-    /** PG 종류 구분 (COOKIEPAY, TOSS, INICIS 등) */
-    private String pgType;
+    private String tid;         // 取引番号
+    private String pgType;      // 決済システム種別
 }

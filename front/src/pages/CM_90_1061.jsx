@@ -285,7 +285,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
 
     onError('');
 
-    // 모든 이미지를 한 번에 처리하기 위한 Promise 배열
+    // 全画像をまとめて処理するための Promise 配列
     const imagePromises = files.map((file, index) => {
       return new Promise((resolve, reject) => {
         if (!file.type.startsWith('image/')) {
@@ -325,7 +325,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
       });
     });
 
-    // 모든 이미지 처리 후 한 번에 상태 업데이트
+    // 全画像の処理後にまとめて状態更新
     Promise.all(imagePromises)
       .then((newImages) => {
         onChange([...images, ...newImages]);
@@ -357,7 +357,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
     onChange(images.filter((img) => img.id !== imageId));
   };
 
-  // 드래그 앤 드롭 이벤트 핸들러
+  // ドラッグ＆ドロップのイベントハンドラー
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -400,7 +400,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
 
   return (
     <div className="mb-3">
-      {/* 헤더 */}
+      {/* ヘッダー */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <label className="form-label mb-0">
           詳細画像 <span className="text-muted">({images.length}枚)</span>
@@ -416,7 +416,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
         </button>
       </div>
 
-      {/* 숨겨진 파일 입력 */}
+      {/* 非表示のファイル入力 */}
       <input
         ref={fileInputRef}
         type="file"
@@ -441,7 +441,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        {/* 드래그 오버레이 */}
+        {/* ドラッグオーバーレイ */}
         {isDragging && (
           <div
             style={{
@@ -478,7 +478,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
         ) : (
           images.map((image) => (
             <div key={image.id} className="d-flex align-items-center p-2 border-bottom">
-              {/* 이미지 썸네일 */}
+              {/* 画像サムネイル */}
               <div className="me-3" style={{ flexShrink: 0 }}>
                 <img
                   src={image.src}
@@ -493,13 +493,13 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
                 />
               </div>
 
-              {/* 파일명 */}
+              {/* ファイル名 */}
               <div className="flex-grow-1">
                 <span className="text-primary fw-medium d-block">{image.name}</span>
                 <small className="text-muted">{(image.file.size / 1024).toFixed(1)} KB</small>
               </div>
 
-              {/* 삭제 버튼 */}
+              {/* 削除ボタン */}
               <button
                 type="button"
                 className="btn btn-outline-danger btn-sm"
@@ -513,7 +513,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
         )}
       </div>
 
-      {/* 진행률 표시 */}
+      {/* 進捗表示 */}
       {images.length > 0 && (
         <div className="mt-2">
           <div className="d-flex justify-content-between align-items-center mb-1">
@@ -531,7 +531,7 @@ const DetailImageUpload = ({ images, onChange, error, onError }) => {
           </div>
         </div>
       )}
-      {/* 이미지 목록 */}
+      {/* 画像一覧 */}
       <div>
         ※最小サイズ <b>150 × 150 ピクセル</b>を推奨します。
       </div>
@@ -813,7 +813,7 @@ export default function CM_90_1061() {
         <h5 className="border-bottom pb-2 mb-3">商品登録</h5>
 
         <form onSubmit={handleRegister}>
-          {/* 카테고리 선택 */}
+          {/* カテゴリ選択 */}
           <CategorySelectGroup
             categoryGroup={form.categoryGroup}
             category={form.category}
@@ -823,7 +823,7 @@ export default function CM_90_1061() {
             onCategoryChange={handleCategoryChange}
             error={errors.categoryGroup || errors.category}
           />
-          {/* 상품명 */}
+          {/* 商品名 */}
           <div className="mb-3">
             <label htmlFor="productName" className="form-label">
               商品名
@@ -858,7 +858,7 @@ export default function CM_90_1061() {
             {errors.productName && <div className="text-danger">{errors.productName}</div>}
           </div>
           <InputGroup>
-            {/* 상품코드 (자동 입력)  */}
+            {/* 商品コード（自動入力） */}
             <InputGroupItem
               id="productCode"
               label="商品コード（自動入力）"
@@ -867,7 +867,7 @@ export default function CM_90_1061() {
               readOnly
               disabled
             />
-            {/* 상품분류 (자동 입력)  */}
+            {/* 商品区分（自動入力） */}
             <InputGroupItem
               id="productCategory"
               label="商品区分（自動入力）"
@@ -877,7 +877,7 @@ export default function CM_90_1061() {
               disabled
             />
           </InputGroup>
-          {/* 상품 정보 그룹 */}
+          {/* 商品情報グループ */}
           <InputGroup>
             <InputGroupItem
               id="availableQty"
@@ -899,7 +899,7 @@ export default function CM_90_1061() {
             />
           </InputGroup>
 
-          {/* 가격 정보 그룹 */}
+          {/* 価格情報グループ */}
           <InputGroup>
             <InputGroupItem
               id="productPrice"
@@ -910,7 +910,7 @@ export default function CM_90_1061() {
               error={errors.productPrice}
             />
 
-            {/* 중량 */}
+            {/* 重量 */}
             <InputGroupItem
               id="weight"
               label="重量（g）"
@@ -921,7 +921,7 @@ export default function CM_90_1061() {
             />
           </InputGroup>
 
-          {/* 구매 수량 */}
+          {/* 購入数量 */}
           <InputField
             id="purchaseLimit"
             label="最大購入数量"
@@ -931,7 +931,7 @@ export default function CM_90_1061() {
             error={errors.purchaseLimit}
           />
 
-          {/* 출고 예정일 */}
+          {/* 出荷予定月 */}
           <InputField
             id="expectedDeliveryDate"
             label="出荷予定月"
@@ -941,7 +941,7 @@ export default function CM_90_1061() {
             error={errors.expectedDeliveryDate}
           />
 
-          {/* 예약 마감일 */}
+          {/* 予約締切日 */}
           <InputField
             id="reservationDeadline"
             label="予約締切日"
@@ -951,7 +951,7 @@ export default function CM_90_1061() {
             error={errors.reservationDeadline}
           />
 
-          {/* 상품 이미지 */}
+          {/* 商品画像 */}
           <ImageUploadField
             id="productFile"
             label="商品画像"
@@ -961,7 +961,7 @@ export default function CM_90_1061() {
             error={errors.productFile}
           />
 
-          {/* 상세 이미지 업로드 */}
+          {/* 詳細画像アップロード */}
           <DetailImageUpload
             images={form.detailImages}
             onChange={handleDetailImagesChange}
@@ -969,7 +969,7 @@ export default function CM_90_1061() {
             onError={handleDetailImageError}
           />
 
-          {/* 상품 설명 */}
+          {/* 商品説明 */}
           <div className="mb-3">
             <label htmlFor="productnote" className="form-label">
               商品説明
@@ -981,7 +981,7 @@ export default function CM_90_1061() {
             />
           </div>
 
-          {/* 버튼 그룹 */}
+          {/* ボタングループ */}
           <div className="d-flex justify-content-center gap-2">
             <button type="submit" className="btn btn-primary btn-fixed-width">
               登録
@@ -992,7 +992,7 @@ export default function CM_90_1061() {
           </div>
         </form>
 
-        {/* 모달 컴포넌트들 */}
+        {/* モーダルコンポーネント */}
         <CM_99_1001
           isOpen={modals.confirm}
           onClose={() => close('confirm')}

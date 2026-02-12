@@ -12,49 +12,49 @@ import com.cloudia.backend.CM_03_1003.model.CategoryGroupForCheckbox;
 
 public interface CM031003Service {
     /**
-     * 카테고리 그룹 코드 전체 리스트 조회
-     * 
-     * @return 카테고리 그룹 코드 전체 리스트
+     * カテゴリグループコード一覧を取得
+     *
+     * @return カテゴリグループコード一覧
      */
     ResponseEntity<ResponseModel<List<Categories>>> findAllCategoryGroupCode();
 
     /**
-     * 선택 된 카테고리 그룹의 하위 카테고리 정보 조회
-     * 
-     * @param categoryGroupCode 카테고리 그룹 코드드
-     * @return 하위 카테고리 정보
+     * 選択したカテゴリグループの下位カテゴリ情報を取得
+     *
+     * @param categoryGroupCode カテゴリグループコード一覧
+     * @return 下位カテゴリ情報
      */
     ResponseEntity<ResponseModel<List<CategoryDetails>>> findCategory(List<String> categoryGroupCode);
 
     /**
-     * 체크박스용 카테고리 그룹 + 하위 카테고리 목록 조회
+     * チェックボックス用：カテゴリグループ＋下位カテゴリ一覧を取得
      *
-     * @return 그룹 + 카테고리 리스트
+     * @return グループ＋カテゴリ一覧
      */
     ResponseEntity<ResponseModel<List<CategoryGroupForCheckbox>>> findAllCategoryGroupForCheckbox();
 
 
     /**
-     * 전체 상품 전체 목록 조회
+     * 商品一覧を取得
      *
-     * @param categories 카테고리 리스트
-     * @return 상품 리스트
+     * @param categories カテゴリ一覧
+     * @return 商品一覧
      */
     ResponseEntity<ResponseModel<List<ProductInfo>>> getProductList(List<String> categories);
 
     /**
-     * 특정 상품 상세 조회
+     * 商品詳細を取得
      *
-     * @param productId 상품 ID
-     * @return 해당 상품 정보
+     * @param productId 商品ID
+     * @return 該当商品の情報
      */
     ResponseEntity<ResponseModel<List<ProductInfo>>> getProductDetail(Long productId);
 
     /**
-     * 장바구니에 상품 추가
+     * カートに商品を追加
      *
-     * @param cartRequest 사용자 ID, 상품 ID, 수량
-     * @return 처리 결과
+     * @param cartRequest ユーザーID、商品ID、数量
+     * @return 処理結果
      */
     ResponseEntity<ResponseModel<Void>> addToCart(CartRequest cartRequest);
 }

@@ -251,7 +251,7 @@ public class CM901040ServiceImpl implements CM901040Service {
             throw new AuthenticationException(ErrorCode.INVALID_TOKEN);
         }
         try {
-            // 활성 배너 수 확인
+            // 有効（表示中）バナー数を確認
             int activeBannerCount = findByUsedAllBanner();
             log.debug(CM901040MessageConstant.BANNER_UPLOAD_ACTIVE_COUNT_CHECK, activeBannerCount);
 
@@ -262,14 +262,14 @@ public class CM901040ServiceImpl implements CM901040Service {
                         .body(createResponseModel(0, false, CM901040MessageConstant.FAIL_MAX_ACTIVE_BANNERS));
             }
 
-            // 디스플레이 순서 중복 확인
+            // 表示順の重複チェック
             if (isDisplayOrderDuplicated(entity.getDisplayOrder())) {
                 log.warn(CM901040MessageConstant.BANNER_UPLOAD_FAILED_DUPLICATE_ORDER, entity.getDisplayOrder());
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(createResponseModel(0, false, CM901040MessageConstant.FAIL_DUPLICATE_DISPLAY_ORDER));
             }
 
-            // 파일 저장
+            // ファイル保存
             String savedFileName = null;
             if (entity.getImageFile() != null && !entity.getImageFile().isEmpty()) {
                 savedFileName = saveFile(entity.getImageFile());
@@ -319,7 +319,7 @@ public class CM901040ServiceImpl implements CM901040Service {
         }
 
         try {
-            // 기존 배너 정보 조회
+            // 既存バナー情報を取得
             BannerInfo existingBanner = cm901040Mapper.findByBannerById(entity.getBannerId());
             if (existingBanner == null) {
                 log.warn(CM901040MessageConstant.BANNER_UPDATE_FAILED_NOT_EXISTS, entity.getBannerId());
@@ -333,10 +333,10 @@ public class CM901040ServiceImpl implements CM901040Service {
                         .body(createResponseModel(0, false, CM901040MessageConstant.FAIL_BANNER_UPDATE));
             }
 
-            // 활성 배너 수 확인 (업데이트 시에는 현재 배너를 제외한 수를 확인)
+            // 有効（表示中）バナー数を確認（更新時は現バナーを除外して確認）
             int activeBannerCount = findByUsedAllBanner();
 
-            // 현재 비활성 배너를 활성으로 변경하는 경우만 체크
+            // 非表示バナーを表示に変更する場合のみチェック
             if (entity.getIsDisplay() == 1 && activeBannerCount >= CM901040Constant.MAX_ACTIVE_BANNERS) {
                 log.warn(CM901040MessageConstant.BANNER_UPDATE_FAILED_MAX_EXCEEDED,
                         CM901040Constant.MAX_ACTIVE_BANNERS, activeBannerCount);
@@ -344,7 +344,7 @@ public class CM901040ServiceImpl implements CM901040Service {
                         .body(createResponseModel(0, false, CM901040MessageConstant.FAIL_MAX_ACTIVE_BANNERS));
             }
 
-            // 디스플레이 순서 변경 시 중복 확인
+            // 表示順変更時の重複チェック
             if (existingBanner.getDisplayOrder() != entity.getDisplayOrder()) {
                 if (isDisplayOrderDuplicated(entity.getDisplayOrder())) {
                     log.warn(CM901040MessageConstant.BANNER_UPDATE_FAILED_DUPLICATE_ORDER, entity.getDisplayOrder());
@@ -354,7 +354,7 @@ public class CM901040ServiceImpl implements CM901040Service {
                 }
             }
 
-            // 파일 저장
+            // ファイル保存
             String savedFileName = null;
             if (entity.getImageFile() != null && !entity.getImageFile().isEmpty()) {
                 savedFileName = saveFile(entity.getImageFile());
@@ -364,7 +364,7 @@ public class CM901040ServiceImpl implements CM901040Service {
                 }
                 log.debug(CM901040MessageConstant.BANNER_FILE_SAVED, savedFileName);
 
-                // 기존 파일 삭제
+                // 既存ファイルを削除
                 try {
                     deleteImageFile(existingBanner.getImageLink());
                 } catch (Exception e) {
@@ -537,7 +537,6 @@ public class CM901040ServiceImpl implements CM901040Service {
      * @return 保存されたファイルURL（失敗時は null）
      */
     private String saveFile(MultipartFile file) throws IOException, SecurityException {
-
         // 追加のセキュリティ検証
         if (!isValidImageFile(file)) {
             log.error(CM901040MessageConstant.FAIL_INVALID_FILE_TYPE);
@@ -548,11 +547,11 @@ public class CM901040ServiceImpl implements CM901040Service {
         if ("s3".equals(uploadType) && s3Service != null) {
             try {
                 String fileUrl = s3Service.uploadFile(file, "images/banner");
-                log.debug("S3 업로드 완료: {}", fileUrl);
+                log.debug("S3アップロード完了: {}", fileUrl);
                 String fileName = Paths.get(fileUrl).getFileName().toString();
                 return fileName;
             } catch (IOException e) {
-                log.error("S3 업로드 실패", e);
+                log.error("S3アップロード失敗", e);
                 throw new IOException(CMMessageConstant.ERROR_FILE_SAVE_FAILED, e);
             }
         }

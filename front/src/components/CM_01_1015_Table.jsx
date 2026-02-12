@@ -63,7 +63,7 @@ export default function CM_01_1015_Table({ returns, loading }) {
     []
   );
 
-  //  행 클릭 시 상세 페이지 이동
+  // 行クリック時に詳細ページへ遷移
   const onRowClicked = (event) => {
     const returnId = event.data.returnId;
     if (returnId) {

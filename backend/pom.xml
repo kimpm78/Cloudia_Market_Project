@@ -100,14 +100,14 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 			<version>3.3.0</version>
 		</dependency>
-		<!-- 테스트용 security 의존성 -->
+		<!-- テスト用のSecurity依存関係 -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<version>6.3.0</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- JWT 라이브러리: jjwt (JSON Web Token) -->
+		<!-- JWTライブラリ: jjwt（JSON Web Token） -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>

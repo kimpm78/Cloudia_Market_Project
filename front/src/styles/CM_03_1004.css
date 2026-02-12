@@ -321,7 +321,7 @@
   }
 }
 
-/* 큰 표가 들어와도 레이아웃이 깨지지 않도록 처리 */
+./* 大きい表が入ってもレイアウトが崩れないように調整 */
 .product-description-content table {
   width: 100% !important;
   border-collapse: collapse;
@@ -339,7 +339,7 @@
   margin: 0 0 1rem 0;
 }
 
-/* 상세보기 이미지 오른쪽 클릭 방지 */
+./* 詳細画像の右クリック防止 */
 .product-description-content img {
   pointer-events: auto;
   -webkit-user-drag: none;
@@ -356,7 +356,7 @@
 }
 
 .tab-switch .btn:hover {
-  color: #0d6efd !important; /* Bootstrap primary 색상 */
+  color: #0d6efd !important; /* Bootstrap primaryカラー */
 }
 
 .image-zoom-overlay {

@@ -95,7 +95,7 @@ export default function CM_90_1045() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (form.title.trim().length === 0) newErrors.title = CMMessage.MSG_ERR_002('타이틀 명');
+    if (form.title.trim().length === 0) newErrors.title = CMMessage.MSG_ERR_002('タイトル名');
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

@@ -35,7 +35,7 @@ public class CM901052ServiceImpl implements CM901052Service {
      * @return 返金/交換リスト取得
      */
     public List<ReturnsDto> getRefund() {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "交換/返金 조회" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "交換/返金 照会" });
         List<ReturnsDto> result = cm901052Mapper.getRefunds();
 
         if (result == null) {
@@ -43,7 +43,7 @@ public class CM901052ServiceImpl implements CM901052Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "交換/返金 조회", String.valueOf(result.size()) });
+                new String[] { "交換/返金 照会", String.valueOf(result.size()) });
 
         return result;
     }
@@ -56,7 +56,7 @@ public class CM901052ServiceImpl implements CM901052Service {
     @Override
     @Transactional(readOnly = true)
     public List<ReturnsDto> getPeriod(RefundSearchRequestDto searchDto) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "交換/返金 조회" });
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "交換/返金 照会" });
         List<ReturnsDto> result = cm901052Mapper.getPeriod(searchDto);
 
         if (result == null) {
@@ -64,7 +64,7 @@ public class CM901052ServiceImpl implements CM901052Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "交換/返金 조회", String.valueOf(result.size()) });
+                new String[] { "交換/返金 照会", String.valueOf(result.size()) });
 
         return result;
     }
@@ -82,12 +82,13 @@ public class CM901052ServiceImpl implements CM901052Service {
     public List<OrderDetailDto> getOrderDetail(String requestNo,
             String refundNumber,
             String orderNumber) {
-        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "交換/返金 조회" });
-        int refundCount = cm901052Mapper.getRefundCount(requestNo, refundNumber);
+        LogHelper.log(LogMessage.COMMON_SELECT_START, new String[] { "交換/返金 照会" });
+        String lookupRequestNo = (requestNo == null || requestNo.isBlank()) ? orderNumber : requestNo;
+        int refundCount = cm901052Mapper.getRefundCount(lookupRequestNo, refundNumber);
 
         if (refundCount == 0) {
-            LogHelper.log(LogMessage.COMMON_SELECT_EMPTY, new String[] { "交換/返金 조회" });
-            throw new InvalidRequestException(ErrorCode.VALIDATION_SEARCH_TERM_EMPTY);
+            log.warn("返金申請一致データなし。requestNo={}, refundNumber={}, orderNumber={}",
+                    lookupRequestNo, refundNumber, orderNumber);
         }
 
         List<OrderDetailDto> result = cm901052Mapper.getOrderDetail(refundNumber, orderNumber);
@@ -97,7 +98,7 @@ public class CM901052ServiceImpl implements CM901052Service {
         }
 
         LogHelper.log(LogMessage.COMMON_SELECT_SUCCESS,
-                new String[] { "交換/返金 조회", String.valueOf(result.size()) });
+                new String[] { "交換/返金 照会", String.valueOf(result.size()) });
 
         return result;
     }

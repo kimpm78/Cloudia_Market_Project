@@ -118,10 +118,10 @@ public class CM051000ServiceImpl implements CM051000Service {
     }
 
     /**
-     * 특정 공지사항 및 이전/다음 공지사항 조회
+     * 特定のお知らせおよび前／次のお知らせを取得
      *
-     * @param noticeId 공지사항 아이디
-     * @return Map(current, prev, next) 공지사항 정보
+     * @param noticeId お知らせID
+     * @return Map(current, prev, next) お知らせ情報
      */
     @Override
     @Transactional(readOnly = true)
@@ -162,17 +162,17 @@ public class CM051000ServiceImpl implements CM051000Service {
     }
 
     /**
-     * 공지사항 조회수 증가 (하루 1회 제한)
+     * お知らせの閲覧数を増加（1日1回制限）
      *
-     * @param noticeId 공지사항 ID
-     * @param viewerKey 뷰어 키
-     * @return 증가 여부
+     * @param noticeId お知らせID
+     * @param viewerKey ビューアーキー
+     * @return 増加可否
      */
     @Override
     @Transactional
     public boolean increaseViewOncePerDay(int noticeId, String viewerKey) {
         if (viewerKey == null || viewerKey.isBlank()) {
-            log.warn("Viewer key is missing. noticeId={}", noticeId);
+            log.warn("ビューアーキーがありません。noticeId={}", noticeId);
             return false;
         }
 
@@ -201,10 +201,10 @@ public class CM051000ServiceImpl implements CM051000Service {
     }
 
     /**
-     * 공지사항 등록
-     * 
-     * @param entity 등록 할 공지사항 정보
-     * @return 등록 여부
+     * お知らせ登録
+     *
+     * @param entity 登録するお知らせ情報
+     * @return 登録結果
      */
     @Override
     @Transactional
@@ -245,10 +245,10 @@ public class CM051000ServiceImpl implements CM051000Service {
     }
 
     /**
-     * 공지사항 업데이트
-     * 
-     * @param entity 업데이트 할 공지사항 정보
-     * @return 업데이트 여부
+     * お知らせ更新
+     *
+     * @param entity 更新するお知らせ情報
+     * @return 更新結果
      */
     @Override
     @Transactional
@@ -311,10 +311,10 @@ public class CM051000ServiceImpl implements CM051000Service {
     }
 
     /**
-     * 공지사항 업데이트 실행
-     * 
-     * @param entity 공지사항 정보
-     * @return 업데이트 결과
+     * お知らせ更新の実行
+     *
+     * @param entity お知らせ情報
+     * @return 更新結果
      */
     private int updateNotice(NoticeInfo entity) {
         NoticeInfo noticeModel = createNoticeModel(entity);
@@ -324,10 +324,10 @@ public class CM051000ServiceImpl implements CM051000Service {
     }
 
     /**
-     * 공지사항 모델 생성 (공통 로직)
-     * 
-     * @param entity 원본 엔티티
-     * @return NoticeInfo 모델
+     * お知らせモデル生成（共通ロジック）
+     *
+     * @param entity 元エンティティ
+     * @return NoticeInfoモデル
      */
     private NoticeInfo createNoticeModel(NoticeInfo entity) {
         NoticeInfo noticeModel = new NoticeInfo();
@@ -346,11 +346,11 @@ public class CM051000ServiceImpl implements CM051000Service {
     }
 
     /**
-     * ResponseModel 생성
-     * 
-     * @param resultList 결과 데이터
-     * @param result     처리 결과
-     * @param message    메시지
+     * ResponseModel生成
+     *
+     * @param resultList 結果データ
+     * @param result     処理結果
+     * @param message    メッセージ
      * @return ResponseModel
      */
     private <T> ResponseModel<T> createResponseModel(T resultList, boolean result, String message) {
@@ -362,10 +362,10 @@ public class CM051000ServiceImpl implements CM051000Service {
     }
 
     /**
-     * 공지사항 삭제
+     * お知らせ削除
      *
-     * @param noticeId 삭제할 공지사항 ID
-     * @return 삭제 결과
+     * @param noticeId 削除するお知らせID
+     * @return 削除結果
      */
     @Override
     @Transactional
