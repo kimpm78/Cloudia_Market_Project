@@ -58,7 +58,27 @@ const isCategoryMatch = (filters, categories) => {
 // 選択されたフィルターでアイテムを絞り込む
 export const filterItemBySelectedFilters = (item, selectedFilters) => {
   const filtersArray = Array.isArray(selectedFilters) ? selectedFilters : [];
-  const normalized = filtersArray.map((f) => String(f ?? '').trim());
+  const normalizeFilterLabel = (label) => {
+    const value = String(label ?? '').trim();
+
+    const aliasMap = {
+      // 商品情報
+      売り切れ商品を表示: '品切れ商品表示',
+      売り切れ商品を除外: '品切れ商品除外',
+      受付終了商品を表示: '終了商品表示',
+      予約終了商品を除外: '予約終了商品除外',
+      予約終了商品を除く: '予約終了商品除外',
+      締切済み商品を表示: '終了商品表示',
+      // 価格帯
+      '10,000円以上': '1万円以上',
+      '50,000円以上': '5万円以上',
+      '100,000円以上': '10万円以上',
+    };
+
+    return aliasMap[value] ?? value;
+  };
+
+  const normalized = filtersArray.map((f) => normalizeFilterLabel(f));
 
   const statusFilters = ['品切れ商品除外', '品切れ商品表示', '終了商品表示', '予約終了商品除外'];
   const priceFilters = ['1万円以上', '5万円以上', '10万円以上'];

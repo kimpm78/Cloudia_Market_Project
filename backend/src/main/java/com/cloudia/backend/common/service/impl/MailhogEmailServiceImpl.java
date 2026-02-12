@@ -281,7 +281,7 @@ public class MailhogEmailServiceImpl implements EmailService {
             try (InputStream is = resource.getInputStream()) {
                 return parseTemplateNode(is, "classpath:" + candidate);
             } catch (IOException ignored) {
-                // 다음 candidate 경로를 시도
+                // 次の候補者のパスを試み
             }
 
             try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(candidate)) {
@@ -289,7 +289,7 @@ public class MailhogEmailServiceImpl implements EmailService {
                     return parseTemplateNode(is, "contextClassLoader:" + candidate);
                 }
             } catch (IOException ignored) {
-                // 다음 candidate 경로를 시도
+                // 次の候補者のパスを試み
             }
 
             try (InputStream is = MailhogEmailServiceImpl.class.getClassLoader().getResourceAsStream(candidate)) {
@@ -297,7 +297,7 @@ public class MailhogEmailServiceImpl implements EmailService {
                     return parseTemplateNode(is, "classLoader:" + candidate);
                 }
             } catch (IOException ignored) {
-                // 다음 candidate 경로를 시도
+                // 次の候補者のパスを試み
             }
         }
 

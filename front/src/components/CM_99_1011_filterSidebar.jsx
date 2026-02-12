@@ -18,6 +18,27 @@ export default function CM_99_1011_filterSideBar({
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState({});
 
+  const normalizeFilterLabel = (label) => {
+    const value = String(label ?? '').trim();
+    const aliasMap = {
+      売り切れ商品を表示: '品切れ商品表示',
+      売り切れ商品を除外: '品切れ商品除外',
+      受付終了商品を表示: '終了商品表示',
+      締切済み商品を表示: '終了商品表示',
+      予約終了商品を除外: '予約終了商品除外',
+      予約終了商品を除く: '予約終了商品除外',
+      '10,000円以上': '1万円以上',
+      '50,000円以上': '5万円以上',
+      '100,000円以上': '10万円以上',
+    };
+    return aliasMap[value] ?? value;
+  };
+
+  const isSelectedFilter = (label) => {
+    const target = normalizeFilterLabel(label);
+    return (selectedFilters || []).some((f) => normalizeFilterLabel(f) === target);
+  };
+
   useEffect(() => {
     setCategoryOptions(localCategoryGroups.map((g) => g.label));
     setExpandedGroups((prev) => {
@@ -124,7 +145,7 @@ export default function CM_99_1011_filterSideBar({
                 className="form-check-input"
                 type="checkbox"
                 id="outOfStock"
-                checked={selectedFilters.includes('売り切れ商品を表示')}
+                checked={isSelectedFilter('売り切れ商品を表示')}
                 onChange={() => onFilterChange('売り切れ商品を表示')}
               />
               <label className="form-check-label" htmlFor="outOfStock">
@@ -136,7 +157,7 @@ export default function CM_99_1011_filterSideBar({
                 className="form-check-input"
                 type="checkbox"
                 id="closedReservation"
-                checked={selectedFilters.includes('受付終了商品を表示')}
+                checked={isSelectedFilter('受付終了商品を表示')}
                 onChange={() => onFilterChange('受付終了商品を表示')}
               />
               <label className="form-check-label" htmlFor="closedReservation">
@@ -148,7 +169,7 @@ export default function CM_99_1011_filterSideBar({
                 className="form-check-input"
                 type="checkbox"
                 id="endOfReservation"
-                checked={selectedFilters.includes('予約終了商品を除外')}
+                checked={isSelectedFilter('予約終了商品を除外')}
                 onChange={() => onFilterChange('予約終了商品を除外')}
               />
               <label className="form-check-label" htmlFor="endOfReservation">
@@ -163,7 +184,7 @@ export default function CM_99_1011_filterSideBar({
                 className="form-check-input"
                 type="checkbox"
                 id="priceOver10000"
-                checked={selectedFilters.includes('10,000円以上')}
+                checked={isSelectedFilter('10,000円以上')}
                 onChange={() => onFilterChange('10,000円以上')}
               />
               <label className="form-check-label" htmlFor="priceOver10000">
@@ -175,7 +196,7 @@ export default function CM_99_1011_filterSideBar({
                 className="form-check-input"
                 type="checkbox"
                 id="priceOver50000"
-                checked={selectedFilters.includes('50,000円以上')}
+                checked={isSelectedFilter('50,000円以上')}
                 onChange={() => onFilterChange('50,000円以上')}
               />
               <label className="form-check-label" htmlFor="priceOver50000">
@@ -187,7 +208,7 @@ export default function CM_99_1011_filterSideBar({
                 className="form-check-input"
                 type="checkbox"
                 id="priceOver100000"
-                checked={selectedFilters.includes('100,000円以上')}
+                checked={isSelectedFilter('100,000円以上')}
                 onChange={() => onFilterChange('100,000円以上')}
               />
               <label className="form-check-label" htmlFor="priceOver100000">

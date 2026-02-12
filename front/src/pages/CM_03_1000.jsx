@@ -511,7 +511,7 @@ export default function CM_03_1000({
                       </div>
                     </div>
                   );
-                  // 상세 진입은 상태와 무관하게 허용(품절/예약마감도 상세는 확인 가능)
+                  // 詳細なエントリーは状態に関係なく許可される
                   const disableLink =
                     itemId === undefined || itemId === null || `${itemId}`.trim() === '';
                   return (

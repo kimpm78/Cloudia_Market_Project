@@ -24,7 +24,7 @@ public class LogMessageLoader {
             InputStream input = getClass().getClassLoader().getResourceAsStream(LOG_MESSAGE_FILE);
 
             if (input == null) {
-                log.error("로그 메시지 파일을 찾을 수 없습니다: {}", LOG_MESSAGE_FILE);
+                log.error("ログメッセージファイルが見つかりません: {}", LOG_MESSAGE_FILE);
                 return;
             }
 
@@ -34,43 +34,43 @@ public class LogMessageLoader {
 
             initialized = true;
 
-            log.info("로그 메시지 파일 로드 완료: {} 개", LOG_MESSAGES.size() / 2);
+            log.info("ログメッセージファイルの読み込み完了: {} 件", LOG_MESSAGES.size() / 2);
 
         } catch (IOException e) {
-            log.error("로그 메시지 파일 로드 실패", e);
+            log.error("ログメッセージファイルの読み込み失敗", e);
             initialized = false;
         }
     }
 
     /**
-     * 메시지 템플릿 가져오기
+     * メッセージテンプレートを取得
      */
     public static String getTemplate(String code) {
         if (!initialized) {
-            return String.format("[미초기화] 코드: %s", code);
+            return String.format("[未初期化] コード: %s", code);
         }
 
         String template = LOG_MESSAGES.getProperty(code + ".message");
         if (template == null) {
-            log.warn("메시지를 찾을 수 없습니다 [코드: {}]", code);
-            return String.format("메시지를 찾을 수 없습니다 [코드: %s]", code);
+            log.warn("メッセージが見つかりません [コード: {}]", code);
+            return String.format("メッセージが見つかりません [コード: %s]", code);
         }
 
         return template;
     }
 
     /**
-     * 메시지 가져오기
+     * メッセージを取得
      */
     public static String getMessage(String code, Object... args) {
         try {
             if (!initialized) {
-                return String.format("[미초기화] 코드: %s", code);
+                return String.format("[未初期化] コード: %s", code);
             }
 
             String messageTemplate = LOG_MESSAGES.getProperty(code + ".message");
             if (messageTemplate == null) {
-                return String.format("메시지를 찾을 수 없습니다 [코드: %s]", code);
+                return String.format("メッセージが見つかりません [コード: %s]", code);
             }
 
             if (args == null || args.length == 0) {
@@ -80,12 +80,12 @@ public class LogMessageLoader {
             return MessageFormat.format(messageTemplate, args);
 
         } catch (IllegalArgumentException e) {
-            log.error("메시지 포맷 오류 - 코드: {}, 인자 개수: {}", code, args.length, e);
+            log.error("メッセージフォーマットエラー - コード: {}, 引数数: {}", code, args.length, e);
             String template = LOG_MESSAGES.getProperty(code + ".message");
-            return String.format("포맷 오류 [코드: %s, 템플릿: %s]", code, template);
+            return String.format("フォーマットエラー [コード: %s, テンプレート: %s]", code, template);
         } catch (Exception e) {
-            log.error("getMessage 오류 - 코드: {}", code, e);
-            return String.format("메시지 로드 오류 [코드: %s]", code);
+            log.error("getMessage エラー - コード: {}", code, e);
+            return String.format("メッセージ読み込みエラー [コード: %s]", code);
         }
     }
 
@@ -99,7 +99,7 @@ public class LogMessageLoader {
             return LogCategory.valueOf(category.toUpperCase());
 
         } catch (IllegalArgumentException e) {
-            log.warn("잘못된 로그 카테고리 (코드: {}), INFO로 대체", code);
+            log.warn("不正なログカテゴリ（コード: {}）のため、INFO に置き換えます", code);
             return LogCategory.INFO;
         }
     }

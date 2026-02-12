@@ -250,7 +250,7 @@ public class CM061001ServiceImpl implements CM061001Service {
         final String owner = cm061001Mapper.findOrderOwner(orderId);
         if (owner == null || !memberNumber.equals(owner)) {
             log.warn(CM061001MessageConstant.LOG_ORDER_SUMMARY_ACCESS_DENIED, orderId, memberNumber);
-            throw new AccessDeniedException("해당 주문에 접근할 수 없습니다.");
+            throw new AccessDeniedException("該当の注文にアクセスできません。");
         }
 
         final OrderSummary summary = cm061001Mapper.findOrderSummary(orderId);

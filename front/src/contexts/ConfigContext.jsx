@@ -43,7 +43,6 @@ export const ConfigProvider = ({ children }) => {
         dispatch({ type: 'SET_ERROR', payload: 'Invalid data' });
       }
     } catch (error) {
-      // 401 에러가 나면 axiosInstance가 알아서 리프레시 시도함
       console.error('Role Fetch Error:', error);
       dispatch({ type: 'SET_ERROR', payload: error.message });
     }

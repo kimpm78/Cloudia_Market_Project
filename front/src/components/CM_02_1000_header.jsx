@@ -258,7 +258,7 @@ const CM_02_1000_Header = () => {
     try {
       await axiosInstance.delete('/guest/cart');
     } catch (err) {
-      console.error('로그아웃 시 장바구니 정리 실패:', err?.response?.data || err.message);
+      console.error('ログアウト時のカート整理失敗：', err?.response?.data || err.message);
     }
 
     setCartNotice('');

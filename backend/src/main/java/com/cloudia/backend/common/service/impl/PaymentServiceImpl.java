@@ -201,7 +201,7 @@ public class PaymentServiceImpl implements PaymentService {
                         .build();
             }
 
-            // PG 승인 호출 (tid/amount만 사용)
+            // PG承認呼び出し（tid/amount のみ使用）
             PGProvider provider = providerRegistry.getProvider(pgType);
             PGResult result = provider.approve(request);
 
@@ -272,7 +272,7 @@ public class PaymentServiceImpl implements PaymentService {
                     orderId,
                     request.getTid(),
                     result != null ? result.getResultCode() : "NULL_RESULT",
-                    result != null ? result.getResultMsg() : "PG 승인 결과가 없습니다.",
+                    result != null ? result.getResultMsg() : "PG承認結果がありません。",
                     success ? "2" : "3",
                     success ? dateCalculator.tokyoTime().toString() : null,
                     paymentUserId);

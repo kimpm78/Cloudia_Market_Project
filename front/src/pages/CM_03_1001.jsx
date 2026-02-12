@@ -146,117 +146,129 @@ export default function CM_03_1001({
     return false;
   };
 
-  const getProductStatus = (item) => {
-    const explicitCode = normalizeStatusCode(item?.codeValue ?? item?.code_value);
-    const reservationClosed = hasReservationClosed(item);
-    const soldOutByStock = detectSoldOut(item);
-    const reservationFlag = isReservationProduct(item);
+    const getProductStatus = (item) => {
+      const explicitCode = normalizeStatusCode(item?.codeValue ?? item?.code_value);
+      const reservationClosed = hasReservationClosed(item);
+      const soldOutByStock = detectSoldOut(item);
+      const reservationFlag = isReservationProduct(item);
 
-    if (explicitCode) {
-      return {
-        code: explicitCode,
-        label: PRODUCT_STATUS_MAP[explicitCode],
-        isReservation: isReservationStatus(explicitCode),
-        reservationClosed: explicitCode === '4',
-        // 코드일람(003) 기준으로만 품절/마감 처리 (2=품절, 4=예약 마감)
-        soldOut: isSoldOutStatus(explicitCode) || soldOutByStock,
-      };
-    }
+      if (explicitCode) {
+        return {
+          code: explicitCode,
+          label: PRODUCT_STATUS_MAP[explicitCode],
+          isReservation: isReservationStatus(explicitCode),
+          reservationClosed: explicitCode === '4',
+          // コード一覧（003）基準でのみ売り切れ / 締切判定（2=売り切れ、4=予約締切）
+          soldOut: isSoldOutStatus(explicitCode) || soldOutByStock,
+        };
+      }
 
-    if (reservationClosed) {
-      return {
-        code: '4',
-        label: PRODUCT_STATUS_MAP['4'],
-        isReservation: true,
-        reservationClosed: true,
-        soldOut: true,
-      };
-    }
+      if (reservationClosed) {
+        return {
+          code: '4',
+          label: PRODUCT_STATUS_MAP['4'],
+          isReservation: true,
+          reservationClosed: true,
+          soldOut: true,
+        };
+      }
 
-    if (soldOutByStock) {
-      return {
-        code: '2',
-        label: PRODUCT_STATUS_MAP['2'],
-        isReservation: reservationFlag,
-        reservationClosed: false,
-        soldOut: true,
-      };
-    }
+      if (soldOutByStock) {
+        return {
+          code: '2',
+          label: PRODUCT_STATUS_MAP['2'],
+          isReservation: reservationFlag,
+          reservationClosed: false,
+          soldOut: true,
+        };
+      }
 
-    if (reservationFlag) {
+      if (reservationFlag) {
+        return {
+          code: '3',
+          label: PRODUCT_STATUS_MAP['3'],
+          isReservation: true,
+          reservationClosed: false,
+          soldOut: false,
+        };
+      }
+
       return {
-        code: '3',
-        label: PRODUCT_STATUS_MAP['3'],
-        isReservation: true,
+        code: '1',
+        label: PRODUCT_STATUS_MAP['1'],
+        isReservation: false,
         reservationClosed: false,
         soldOut: false,
       };
-    }
-
-    return {
-      code: '1',
-      label: PRODUCT_STATUS_MAP['1'],
-      isReservation: false,
-      reservationClosed: false,
-      soldOut: false,
-    };
-  };
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const [preOrderRes, newProductRes] = await Promise.all([
-          axiosInstance.get(`${import.meta.env.VITE_API_BASE_URL}/guest/pre-order`),
-          axiosInstance.get(`${import.meta.env.VITE_API_BASE_URL}/guest/new-product`),
-        ]);
-
-        const preOrderList = Array.isArray(preOrderRes.data?.resultList)
-          ? preOrderRes.data.resultList
-          : [];
-        const filteredPreOrderList = preOrderList.filter(isReservationProduct);
-        const newProductList = Array.isArray(newProductRes.data?.resultList)
-          ? newProductRes.data.resultList
-          : [];
-
-        const existingKeys = new Set(
-          filteredPreOrderList.map((item) => getItemPrimaryKey(item)).filter((v) => v !== null)
-        );
-
-        const supplement = newProductList.filter(
-          (item) => isReservationProduct(item) && !existingKeys.has(getItemPrimaryKey(item))
-        );
-
-        setAllItems([...filteredPreOrderList, ...supplement]);
-        setLoading(false);
-      } catch (err) {
-        console.error('예약상품 불러오기 실패:', err?.response?.data?.message || err.message);
-        setError(err);
-        setLoading(false);
-      }
     };
 
-    fetchProducts();
-  }, []);
+    useEffect(() => {
+      const fetchProducts = async () => {
+        try {
+          const [preOrderRes, newProductRes] = await Promise.all([
+            axiosInstance.get(`${import.meta.env.VITE_API_BASE_URL}/guest/pre-order`),
+            axiosInstance.get(`${import.meta.env.VITE_API_BASE_URL}/guest/new-product`),
+          ]);
+
+          const preOrderList = Array.isArray(preOrderRes.data?.resultList)
+            ? preOrderRes.data.resultList
+            : [];
+          const filteredPreOrderList = preOrderList.filter(isReservationProduct);
+          const newProductList = Array.isArray(newProductRes.data?.resultList)
+            ? newProductRes.data.resultList
+            : [];
+
+          const existingKeys = new Set(
+            filteredPreOrderList.map((item) => getItemPrimaryKey(item)).filter((v) => v !== null)
+          );
+
+          const supplement = newProductList.filter(
+            (item) => isReservationProduct(item) && !existingKeys.has(getItemPrimaryKey(item))
+          );
+
+          setAllItems([...filteredPreOrderList, ...supplement]);
+          setLoading(false);
+        } catch (err) {
+          console.error('予約商品の取得に失敗しました:', err?.response?.data?.message || err.message);
+          setError(err);
+          setLoading(false);
+        }
+      };
+
+      fetchProducts();
+    }, []);
 
   const handleReset = () => {
     resetFilters();
   };
 
-  const handleFilterChange = (filter) => {
-    setSelectedFilters((prev) => {
-      const isActive = prev.includes(filter);
-      if (isActive) {
-        return prev.filter((f) => f !== filter);
-      }
-      if (filter === '마감된 상품 보기') {
-        return [...prev.filter((f) => f !== '예약종료상품 제외'), filter];
-      }
-      if (filter === '예약종료상품 제외') {
-        return [...prev.filter((f) => f !== '마감된 상품 보기'), filter];
-      }
-      return [...prev, filter];
-    });
-  };
+    const handleFilterChange = (filter) => {
+      setSelectedFilters((prev) => {
+        const showClosedLabelJa = '締切済み商品を表示';
+        const showClosedLabelKo = '受付終了商品を表示';
+        const excludeClosedLabelJa = '予約締切商品を除外';
+        const excludeClosedLabelKo = '予約終了商品を除く';
+
+        const normalizeFilterLabel = (label) => {
+          if (label === showClosedLabelKo) return showClosedLabelJa;
+          if (label === excludeClosedLabelKo) return excludeClosedLabelJa;
+          return label;
+        };
+
+        const normalized = normalizeFilterLabel(filter);
+        const isActive = prev.map(normalizeFilterLabel).includes(normalized);
+        if (isActive) {
+          return prev.filter((f) => normalizeFilterLabel(f) !== normalized);
+        }
+        if (filter === showClosedLabelJa || filter === showClosedLabelKo) {
+          return [...prev.filter((f) => f !== excludeClosedLabelJa && f !== excludeClosedLabelKo), showClosedLabelJa];
+        }
+        if (filter === excludeClosedLabelJa || filter === excludeClosedLabelKo) {
+          return [...prev.filter((f) => f !== showClosedLabelJa && f !== showClosedLabelKo), excludeClosedLabelJa];
+        }
+        return [...prev, normalized];
+      });
+    };
 
   const categoryGroupLabels = ['予約商品'];
   const {

@@ -1100,7 +1100,7 @@
       "uxjr2F0bjCjFQ4lXtmtqt": {
         "id": "uxjr2F0bjCjFQ4lXtmtqt",
         "name": "product_code",
-        "comment": "상품 코드 정보",
+        "comment": "商品コード情報",
         "columnIds": [
           "dhu56mNF2ZdQOhZqjRa24",
           "nBVnS_1Cc259V2bVOsTRr",
@@ -1135,7 +1135,7 @@
       "MmhWwvUBtPrFm5jtHnDWB": {
         "id": "MmhWwvUBtPrFm5jtHnDWB",
         "name": "attachments",
-        "comment": "첨부 파일 정보",
+        "comment": "添付ファイル情報",
         "columnIds": [
           "jI-q2TCYwGqo_TcSNktht",
           "5NW_blaYvWxHIHewIHyKm",
@@ -1225,7 +1225,7 @@
         "id": "djStjJOmmUiDcRQQUs9G9",
         "tableId": "QBdLQ_CP6ymUvftAjIrq5",
         "name": "url",
-        "comment": "주소",
+        "comment": "住所",
         "dataType": "VARCHAR(100)",
         "default": "",
         "options": 8,
@@ -1325,7 +1325,7 @@
         "id": "dY5zHVbb4d7ySVt8c_KKb",
         "tableId": "QBdLQ_CP6ymUvftAjIrq5",
         "name": "is_active",
-        "comment": "삭제 여부",
+        "comment": "削除有無",
         "dataType": "INTEGER",
         "default": "",
         "options": 0,
@@ -2485,7 +2485,7 @@
         "id": "OMkpmnv6KG6zDOdlsHheP",
         "tableId": "ShYhq8x9J___g02vZnuhX",
         "name": "reservation_deadline",
-        "comment": "예약 마감일",
+        "comment": "予約締切日",
         "dataType": "DATE",
         "default": "",
         "options": 0,

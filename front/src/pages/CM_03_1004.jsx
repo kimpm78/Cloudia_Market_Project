@@ -90,7 +90,7 @@ export default function CM_03_1004() {
     const codeValue = product?.codeValue ?? product?.code_value;
     const code = codeValue !== undefined && codeValue !== null ? String(codeValue).trim() : '';
 
-    // 코드일람(003) 기준: 2(품절), 4(예약 마감)만 SOLD OUT 처리
+    // コード一覧（003）基準：2（売り切れ）、4（予約締切）のみ SOLD OUT として処理
     if (code === '2') {
       return { remainingQty: 0, soldOut: true, soldOutReason: CMMessage.MSG_ERR_032 };
     }

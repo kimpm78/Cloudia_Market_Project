@@ -34,6 +34,7 @@
       SELECT s.available_qty
       FROM stocks s
       WHERE s.product_code = p.product_code
+         OR s.product_code = CAST(p.product_id AS VARCHAR)
       ORDER BY s.updated_at DESC NULLS LAST
       LIMIT 1
     ) stock ON true
@@ -94,6 +95,7 @@
       SELECT s.available_qty
       FROM stocks s
       WHERE s.product_code = p.product_code
+         OR s.product_code = CAST(p.product_id AS VARCHAR)
       ORDER BY s.updated_at DESC NULLS LAST
       LIMIT 1
     ) stock ON true
